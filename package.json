@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "lint:security": "python3 scripts/security_lint.py",
     "astro": "astro"
   },
   "dependencies": {
