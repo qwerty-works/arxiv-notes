@@ -90,7 +90,10 @@ a:hover{text-decoration:underline}
 .copyBtn{appearance:none; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:999px; padding:6px 10px; font-size:12px; cursor:pointer}
 .copyBtn:hover{color:var(--fg); border-color:var(--border)}
 .promptPre{margin:10px 0 0; padding:10px 10px; overflow:auto; border-radius:12px; border:1px dashed var(--border); background: rgba(127,127,127,.06)}
-.promptPre code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; white-space:pre;}
+/* Mobile-friendly prompt blocks: wrap long lines instead of forcing horizontal scroll.
+   Keep overflow:auto as a fallback for extremely long unbreakable tokens. */
+.promptPre{white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word}
+.promptPre code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word;}
 
 .related{margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px}
 .related h3{margin:0; font-size: 14px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
