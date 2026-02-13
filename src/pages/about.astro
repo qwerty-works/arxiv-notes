@@ -5,22 +5,28 @@ const title = 'About — arxiv-notes';
 const description = '5-minute arXiv briefs that teach humans how to use AI better.';
 ---
 
-<BaseLayout title={title} description={description} canonical={'/about/'}>
+<BaseLayout title={title} description={description} canonical={'about/'}>
   <section class="paper article">
     <h1>About</h1>
-    <p class="subhead">A tiny newspaper for arXiv papers, written for general curious humans.</p>
+    <p class="subhead">A tiny newspaper for arXiv papers, written for builders who want the useful parts.</p>
 
     <h2>What you’ll get</h2>
     <p>
-      Each post distills one paper in ~5 minutes and extracts the practical takeaways:
-      how you should structure prompts, workflows, context, interaction loops, and tool boundaries
-      to get better outcomes with AI.
+      Each post is a ~5-minute brief plus a “structure lens”: how this paper should change the way you
+      design prompts, workflows, evals, and human-in-the-loop checks.
     </p>
+
+    <h2>How posts are made (so we don’t hallucinate)</h2>
+    <ul>
+      <li>Read the arXiv <strong>HTML</strong> version end-to-end (for structure/sections).</li>
+      <li>Also read the <strong>PDF</strong> (and pull figure captions/tables where relevant).</li>
+      <li>If figures matter, we render/inspect them instead of guessing.</li>
+    </ul>
 
     <h2>What we don’t do</h2>
     <p>
-      No hype. No "this changes everything". No 3,000-word throat clearing.
-      Just structure, takeaways, and what to try next.
+      No hype. No “this changes everything.” No 3,000-word throat clearing.
+      Just claims, evidence, failure modes, and what to try next.
     </p>
   </section>
 </BaseLayout>

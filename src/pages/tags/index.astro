@@ -12,7 +12,9 @@ const tags = Array.from(tagCounts.entries()).sort((a,b) => b[1] - a[1]);
 const title = 'Tags — arxiv-notes';
 const description = 'Browse papers by tag.';
 
-const BASE = import.meta.env.BASE_URL;
+const BASE = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 function href(path: string) {
   return `${BASE}${path.replace(/^\/+/, '')}`;
 }
