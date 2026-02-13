@@ -1,43 +1,82 @@
-# Astro Starter Kit: Minimal
+# arxiv-notes
 
-```sh
-npm create astro@latest -- --template minimal
+A tiny newspaper for arXiv papers: **5-minute briefs** that teach humans how to use AI better.
+
+Live:
+- https://qwerty-works.github.io/arxiv-notes/
+
+## What this repo is
+
+- **Astro** static site
+- Content lives in **Astro Content Collections** (`src/content/papers/**`)
+- Deployed to **GitHub Pages** via GitHub Actions
+
+Design goals:
+- Mobile-first
+- System light/dark
+- Punchy + imaginative writing (help readers visualize concepts)
+- Posts are **tip-heavy**: aim for **≥75% actionable takeaways**
+
+## Writing / publishing workflow (required)
+
+Before publishing a post:
+1) Read the arXiv **HTML** version end-to-end (structure + sections)
+2) Also read the **PDF** and extract key text + **figure captions/tables**
+3) If figures matter: render/inspect them visually (don’t guess)
+
+## Post template requirements (enforced)
+
+Every paper entry must include:
+- **TL;DR** (frontmatter `tldr`)
+- **Copy/paste prompts** (frontmatter `prompts`, 1+), rendered with JS **copy-to-clipboard** buttons
+- Tags (1–6)
+
+### Frontmatter schema
+
+See `src/content/config.ts`.
+
+Example:
+
+```yaml
+---
+arxivId: "2602.12345"
+catchyTitle: "Your punchy title"
+funnySubtitle: "Short, memorable, slightly unhinged"
+blurb: "Homepage blurb (1–2 sentences)."
+tldr: "TL;DR shown before the body. Keep it tight."
+prompts:
+  - title: "Prompt title"
+    prompt: |-
+      <copy/paste prompt text>
+
+tags: ["tag-one", "tag-two"]
+sourceUrl: "https://arxiv.org/abs/2602.12345"
+publishedAt: "2026-02-12"
+---
+
+## Body
+Write the post here.
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Development
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+npm install
+npm run dev
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Build:
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+npm run build
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Deployment
 
-## 🧞 Commands
+- Pushing to `main` triggers the **Deploy to GitHub Pages** workflow.
+- The site is published at: https://qwerty-works.github.io/arxiv-notes/
 
-All commands are run from the root of the project, from a terminal:
+## Notes
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Copy buttons are implemented with a tiny vanilla JS handler in `src/layouts/BaseLayout.astro`.
+- Prompt blocks are styled to be **mobile-friendly** (wrap long lines; scroll only as a fallback).
