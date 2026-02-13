@@ -71,7 +71,7 @@ This paper’s punchline:
 ### Tip 1 — Enforce a reasoning budget
 Long chain-of-thought can become self-generated noise.
 
-**Reader move:** cap output aggressively.
+**Your move:** cap output aggressively.
 - character limit
 - bullet limit
 - “final answer in one sentence”
@@ -81,7 +81,7 @@ If it can’t answer concisely, it probably doesn’t actually understand.
 ### Tip 2 — Track belief state explicitly
 ToM failures often come from losing track of who believes what.
 
-**Reader move:** require a belief table.
+**Your move:** require a belief table.
 - Alice believes:
 - Bob believes:
 - Reality:
@@ -91,20 +91,20 @@ Make it impossible to “hand-wave.”
 ### Tip 3 — Ask 1–2 clarifying questions before answering
 ToM scenarios are under-specified by default.
 
-**Reader move:** allow the model to ask questions *before* it commits.
+**Your move:** allow the model to ask questions *before* it commits.
 This beats “think harder” 10 times out of 10.
 
 ### Tip 4 — For multiple choice, hide the options until the end
 Options can trigger lazy matching.
 
-**Reader move:**
+**Your move:**
 1) free-form answer
 2) then map to A/B/C/D
 
 ### Tip 5 — Use counterexamples as a lie detector
 If the model can’t name what would change its mind, it’s guessing.
 
-**Reader move:** require one counterexample that flips the answer.
+**Your move:** require one counterexample that flips the answer.
 
 ## What’s actually new (quickly)
 

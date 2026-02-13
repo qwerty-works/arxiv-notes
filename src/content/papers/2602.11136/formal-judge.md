@@ -92,12 +92,12 @@ The paper’s toy example is painfully real:
 - “Budget $800” is easy.
 - “IF flying THEN hotel must start on arrival day” is what breaks “judge vibes.”
 
-**Reader move:** write requirements as conditionals whenever possible.
+**Your move:** write requirements as conditionals whenever possible.
 
 ### Tip 4 — Put strict tools in charge of the verdict
 LLMs are creative; solvers/checkers are strict.
 
-**Reader move:**
+**Your move:**
 - LLM proposes what to check
 - deterministic checker decides pass/fail
 
