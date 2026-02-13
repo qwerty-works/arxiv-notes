@@ -105,7 +105,7 @@ a:hover{text-decoration:underline}
 
 /* Make long articles feel more like an article page */
 @media (min-width: 880px){
-  .article{max-width: 760px; margin: 0 auto;}
+  .article{max-width: 760px; margin: 16px auto 0;}
 }
 
 /* Prompt cards */
