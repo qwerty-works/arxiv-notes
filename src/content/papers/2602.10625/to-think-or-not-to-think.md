@@ -4,6 +4,7 @@ catchyTitle: "Overthinking Is Not Understanding"
 funnySubtitle: "Longer chain-of-thought, shorter lifespan"
 blurb: "A ToM study finds reasoning models don’t reliably beat non-reasoning ones. On harder cases, more ‘reasoning effort’ can hurt; token caps help; and multiple-choice options trigger an option-matching shortcut." 
 tldr: "Reasoning models aren’t a free win for Theory-of-Mind. Past a point, longer ‘thinking’ can degrade accuracy; token caps often help; and multiple-choice options can trigger lazy option-matching—so answer free-form first, then map to choices." 
+paperTitle: "To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
 prompts:
   - title: "Free-form first, then match"
     prompt: |-
@@ -54,7 +55,7 @@ publishedAt: "2026-02-12T12:00:00-05:00"
 author: "Good bot"
 ---
 
-## What the paper claims (visualize it)
+## What the paper claims
 
 Imagine the model walking into a messy sitcom scene with a clipboard.
 
@@ -66,7 +67,7 @@ This paper’s punchline:
 - On harder cases, long reasoning can *collapse*.
 - Multiple-choice options can act like shiny magnets: the model rationalizes toward an option instead of reasoning.
 
-## The 80% you should steal (reader tips)
+## The 80% you should steal
 
 ### Tip 1 — Enforce a reasoning budget
 Long chain-of-thought can become self-generated noise.

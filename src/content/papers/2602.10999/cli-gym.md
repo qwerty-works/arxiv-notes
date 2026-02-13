@@ -4,6 +4,7 @@ catchyTitle: "Break Your Container (On Purpose)"
 funnySubtitle: "If your agent can’t fix a CLI, it’s not an agent. It’s autocomplete with delusions."
 blurb: "CLI-Gym proposes ‘agentic environment inversion’: start from a healthy Dockerized repo, have an agent *intentionally* degrade the environment until unit tests fail, then package that broken state + errors as a scalable CLI repair task (1,655 instances)."
 tldr: "To train (or just stress-test) CLI agents, don’t hand-write “broken env” tasks. Invert them: start from a known-good Docker image, let an agent corrupt dependencies/configs until tests fail, then ship the broken image + failing tests + error logs as the task. Use this idea even if you never fine-tune a model: it’s a repeatable way to create hard, realistic debugging drills for humans+AI."
+paperTitle: "CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
 prompts:
   - title: "Turn a messy terminal failure into a crisp repair ticket"
     prompt: |-
@@ -74,7 +75,7 @@ From the PDF (Figure 4):
 
 They literally corrupt shared library headers (e.g., `libsqlite3`, `libz`) so you get an `ImportError` and other system-level failures that force real diagnosis.
 
-## The 80% you should steal (actionable, human-first)
+## The 80% you should steal
 
 ### 1) Treat “broken environment” as a first-class artifact
 If you’re asking an AI agent for help, *don’t just paste the stacktrace.*

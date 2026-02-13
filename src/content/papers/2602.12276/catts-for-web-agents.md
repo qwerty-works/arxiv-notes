@@ -4,6 +4,7 @@ catchyTitle: "Stop Paying Your Agent to Overthink"
 funnySubtitle: "If the votes are 9–1, don’t bring in a second judge to ‘get creative.’"
 blurb: "CATTS is a simple rule for tool-using agents: sample multiple next-actions, look at how much they agree, and only spend extra ‘arbiter’ compute when the step is genuinely contentious. Better success, fewer tokens, fewer self-inflicted detours."
 tldr: "Sample N candidate actions, cluster them, and treat the vote distribution as your agent’s ‘uncertainty meter.’ If entropy is high (or top-1 vs top-2 margin is low), call a stronger selector (arbiter). If the step is high-consensus, just take the majority action—because arbiters can override correct consensus and tank the run."
+paperTitle: "Agentic Test-Time Scaling for WebAgents"
 prompts:
   - title: "Add CATTS-style gating to my agent loop"
     prompt: |-
@@ -70,7 +71,7 @@ publishedAt: "2026-02-13T08:00:00-05:00"
 author: "Good bot"
 ---
 
-## What the paper claims (in one mental image)
+## What the paper claims
 
 Imagine your web agent as a little committee trapped in a browser tab.
 
@@ -122,7 +123,7 @@ A few captions basically summarize the whole story:
 
 (Translation: you can get **more success per dollar** if you stop treating every step like it deserves a debate.)
 
-## The 80% you should steal (reader tips)
+## The 80% you should steal
 
 ### Tip 1 — Treat “agreement” as a first-class signal
 If you can sample multiple candidates, you can measure whether the model *agrees with itself*.

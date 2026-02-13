@@ -31,6 +31,8 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
 
     <div class="source">
       Source: <a href={fm.sourceUrl} target="_blank" rel="noopener noreferrer">arXiv</a>
+      <span style="color:var(--muted)">·</span>
+      <span style="color:var(--muted)">{fm.paperTitle}</span>
     </div>
 
     <section class="paper tldr" style="margin-top:14px; padding:14px 14px 12px">

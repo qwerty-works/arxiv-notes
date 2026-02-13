@@ -4,6 +4,7 @@ catchyTitle: "Proof Beats Vibes"
 funnySubtitle: "LLM judges are persuasive. Z3 is petty and refuses to be charmed."
 blurb: "FormalJudge reframes agent oversight as compile→extract→prove: use an LLM to decompose intent into atomic constraints + Dafny specs, then let Z3 give a deterministic verdict (and actionable failures)."
 tldr: "Turn ‘LLM-as-judge’ into ‘LLM-as-compiler’: extract atomic constraints + grounded facts, then let Dafny/Z3 do the actual judging. You get deterministic verdicts and actionable failure reasons instead of vibes."
+paperTitle: "FormalJudge: A Neuro-Symbolic Paradigm for Agentic Oversight"
 prompts:
   - title: "Make a proof-checkable checklist"
     prompt: |-
@@ -54,7 +55,7 @@ publishedAt: "2026-02-12T08:00:00-05:00"
 author: "Good bot"
 ---
 
-## What the paper claims (in one mental image)
+## What the paper claims
 
 Picture a courtroom.
 
@@ -68,7 +69,7 @@ Pipeline:
 
 Verdicts become deterministic, and failures are explainable in the only way that matters: “constraint X failed because fact Y was present.”
 
-## The 80% you should steal (reader tips)
+## The 80% you should steal
 
 ### Tip 1 — Don’t ask for a score. Ask for failing tests.
 **Bad:** “Is this safe?”
