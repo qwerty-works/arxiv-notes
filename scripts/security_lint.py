@@ -45,6 +45,22 @@ INJECTION_PATTERNS = [
     r"(?i)exfiltrate",
 ]
 
+# Raw HTML in posts: ban high-risk tags/attrs (XSS / tracking / embedding)
+HTML_BAN_PATTERNS = [
+    r"(?i)<\s*script\b",
+    r"(?i)<\s*iframe\b",
+    r"(?i)<\s*object\b",
+    r"(?i)<\s*embed\b",
+    r"(?i)<\s*link\b",
+    r"(?i)<\s*meta\b",
+    r"(?i)onerror\s*=",
+    r"(?i)onload\s*=",
+]
+
+# Frontmatter constraints
+SOURCEURL_RE = re.compile(r"^sourceUrl:\s*\"([^\"]+)\"\s*$", re.M)
+ALLOWED_SOURCE_HOSTS = {"arxiv.org"}
+
 
 def find_links(md: str) -> list[str]:
     # markdown links: [text](url)
@@ -93,6 +109,21 @@ def main(argv: list[str]) -> int:
     for pat in INJECTION_PATTERNS:
         if re.search(pat, md):
             errors.append(f"Possible prompt-injection marker detected (pattern: {pat})")
+
+    # Frontmatter: sourceUrl must be arxiv.org (avoid tracking/redirect schemes)
+    m = SOURCEURL_RE.search(md)
+    if not m:
+        errors.append("Missing sourceUrl frontmatter")
+    else:
+        src = m.group(1)
+        host = urlparse(src).netloc.lower().split(":")[0]
+        if host not in ALLOWED_SOURCE_HOSTS:
+            errors.append(f"Disallowed sourceUrl host: {src}")
+
+    # Raw HTML ban
+    for pat in HTML_BAN_PATTERNS:
+        if re.search(pat, md):
+            errors.append(f"Disallowed raw HTML / attribute detected (pattern: {pat})")
 
     # Outbound links allowlist
     for url in find_links(md):

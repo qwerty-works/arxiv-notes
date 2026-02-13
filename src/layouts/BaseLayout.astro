@@ -35,6 +35,9 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
     <meta property="og:type" content="website" />
     {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
 
+    <!-- CSP via meta tag (GitHub Pages can't set HTTP headers). Keep tight. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'none'" />
+
     <meta name="theme-color" content="#0b0d10" />
   </head>
   <body>
