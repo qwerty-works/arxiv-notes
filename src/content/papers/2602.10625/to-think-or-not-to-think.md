@@ -13,33 +13,39 @@ author: "Good bot"
 
 This paper tests whether the gains from Large Reasoning Models (LRMs)—the “step-by-step” style that helps in math/code—transfer to **Theory of Mind (ToM)** tasks (inferring beliefs/intentions).
 
-They run a systematic comparison across **nine** advanced models on **three** ToM benchmarks.
+They run a systematic comparison across **nine** advanced models on **three** ToM benchmarks:
+- **HiToM** (0th–4th order recursive belief; includes deceptive agents)
+- **ToMATO** (interactive conversation scenarios; up to 2nd-order)
+- **ToMBench** (broad mental-state taxonomy: belief/desire/emotion/intention/knowledge, etc.)
 
 Main result:
 - Reasoning models **do not consistently outperform** non-reasoning models.
-- Sometimes they perform **worse**.
+- They can be **worse**, especially on the harder/high-order settings.
 
-And they dig into why.
+They then diagnose failure modes and test two interventions (S2F, T2M).
 
 ## What’s actually new
 
 Not the headline “social reasoning is hard.” The useful contribution is the diagnosis:
 
 ### 1) Slow thinking collapses
-Accuracy drops as responses get longer.
-Bigger reasoning budgets can **hurt** performance.
+They find a strong correlation between **long responses** and **wrong answers** (especially on HiToM). 
+On proprietary reasoning models, increasing "reasoning effort" can *reduce* accuracy on the hardest benchmark.
 
 ### 2) Moderate + adaptive reasoning helps
-Constrain reasoning length.
-Adapt reasoning depth to the instance.
+Two concrete knobs they test:
+- Add **CoT prompting** to non-reasoning models → helps (moderate thinking)
+- Impose **token limits** on reasoning models → often helps, but the optimal limit varies by model + benchmark
+
+Their point: there isn’t a single “best” reasoning budget. It should be instance-adaptive.
 
 ### 3) Option-matching shortcut
-When multiple-choice options are removed, reasoning models improve.
-That implies they were leaning on pattern matching against options instead of doing the underlying inference.
+On HiToM, when they remove multiple-choice options (making it extractive/open), reasoning models improve a lot.
+Interpretation: the model is doing a chaotic "justify a choice" search rather than first-principles deduction.
 
-They also test interventions:
-- **Slow-to-Fast (S2F)** adaptive reasoning
-- **Think-to-Match (T2M)** shortcut prevention
+They test two interventions:
+- **Slow-to-Fast (S2F)**: terminate slow thinking when the reasoning trace hits unproductive patterns (they use “wait” frequency as a trigger)
+- **Think-to-Match (T2M)**: think *without* options, then re-introduce options only at the final matching step
 
 ## Structure takeaways (how humans should use AI better)
 
