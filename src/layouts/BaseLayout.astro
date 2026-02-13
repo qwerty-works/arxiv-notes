@@ -10,6 +10,8 @@ const {
 const canonicalUrl = canonical
   ? new URL(canonical, Astro.site ?? 'https://example.com').toString()
   : undefined;
+
+const BASE = import.meta.env.BASE_URL;
 ---
 
 <!doctype html>
@@ -33,15 +35,15 @@ const canonicalUrl = canonical
     <div class="container">
       <header class="masthead">
         <div class="brand">
-          <a href="/" style="text-decoration:none">
+          <a href={BASE} style="text-decoration:none">
             <div class="brand__name">arxiv-notes</div>
           </a>
           <div class="brand__tag">5-minute paper briefs for humans using AI better</div>
         </div>
         <nav class="nav" aria-label="Site">
-          <a href="/">Front page</a>
-          <a href="/tags/">Tags</a>
-          <a href="/about/">About</a>
+          <a href={BASE}>Front page</a>
+          <a href={`${BASE}tags/`}>Tags</a>
+          <a href={`${BASE}about/`}>About</a>
         </nav>
       </header>
 
