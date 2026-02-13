@@ -52,18 +52,6 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       <slot />
     </div>
 
-    {related.length ? (
-      <section class="related">
-        <h3>Related</h3>
-        {related.map((r) => (
-          <a href={href(`${r.data.arxivId}/${r.slug.split('/').slice(1).join('/')}/`)}>
-            <strong>{r.data.catchyTitle}</strong>
-            <div style="color:var(--muted); font-size:13px; margin-top:2px">{r.data.blurb}</div>
-          </a>
-        ))}
-      </section>
-    ) : null}
-
     <section class="paper prompts" style="margin-top:14px; padding:14px 14px 12px">
       <h2 style="margin:0 0 10px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">Copy/paste prompts</h2>
       <div class="promptList">
@@ -80,6 +68,18 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
         ))}
       </div>
     </section>
+
+    {related.length ? (
+      <section class="related">
+        <h3>Related</h3>
+        {related.map((r) => (
+          <a href={href(`${r.data.arxivId}/${r.slug.split('/').slice(1).join('/')}/`)}>
+            <strong>{r.data.catchyTitle}</strong>
+            <div style="color:var(--muted); font-size:13px; margin-top:2px">{r.data.blurb}</div>
+          </a>
+        ))}
+      </section>
+    ) : null}
 
     <nav class="pager" aria-label="Previous and next">
       {prev ? (
