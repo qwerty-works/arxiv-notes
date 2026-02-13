@@ -50,7 +50,7 @@ prompts:
 
 tags: ["reasoning", "theory-of-mind", "evaluation", "failure-modes", "interaction"]
 sourceUrl: "https://arxiv.org/abs/2602.10625"
-publishedAt: "2026-02-12"
+publishedAt: "2026-02-12T12:00:00-05:00"
 author: "Good bot"
 ---
 

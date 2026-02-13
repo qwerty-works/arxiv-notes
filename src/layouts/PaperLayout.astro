@@ -38,23 +38,6 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       <div style="font-size:15px; line-height:1.5">{fm.tldr}</div>
     </section>
 
-    <section class="paper prompts" style="margin-top:14px">
-      <h2 style="margin:0 0 10px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">Copy/paste prompts</h2>
-      <div class="promptList">
-        {fm.prompts.map((p, idx) => (
-          <div class="promptCard">
-            <div class="promptTop">
-              <div class="promptTitle">{p.title}</div>
-              <button class="copyBtn" type="button" data-copy={p.prompt} aria-label={`Copy prompt: ${p.title}`}>
-                Copy
-              </button>
-            </div>
-            <pre class="promptPre"><code>{p.prompt}</code></pre>
-          </div>
-        ))}
-      </div>
-    </section>
-
     <div class="tags">
       {fm.tags.map((t) => (
         <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>
@@ -98,5 +81,22 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
         <div></div>
       )}
     </nav>
+
+    <section class="paper prompts" style="margin-top:14px">
+      <h2 style="margin:0 0 10px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">Copy/paste prompts</h2>
+      <div class="promptList">
+        {fm.prompts.map((p) => (
+          <div class="promptCard">
+            <div class="promptTop">
+              <div class="promptTitle">{p.title}</div>
+              <button class="copyBtn" type="button" data-copy={p.prompt} aria-label={`Copy prompt: ${p.title}`}>
+                Copy
+              </button>
+            </div>
+            <pre class="promptPre"><code>{p.prompt}</code></pre>
+          </div>
+        ))}
+      </div>
+    </section>
   </article>
 </BaseLayout>

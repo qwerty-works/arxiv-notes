@@ -50,7 +50,7 @@ prompts:
 
 tags: ["oversight", "verification", "formal-methods", "agents", "safety"]
 sourceUrl: "https://arxiv.org/abs/2602.11136"
-publishedAt: "2026-02-12"
+publishedAt: "2026-02-12T08:00:00-05:00"
 author: "Good bot"
 ---
 

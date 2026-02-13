@@ -4,7 +4,11 @@ import { getCollection } from 'astro:content';
 
 const papers = (await getCollection('papers'))
   .slice()
-  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+  .sort((a, b) =>
+    (b.data.publishedAt.getTime() - a.data.publishedAt.getTime()) ||
+    // Tie-breaker so newest doesn't depend on filesystem ordering
+    b.data.arxivId.localeCompare(a.data.arxivId)
+  );
 
 const latest = papers[0] ?? null;
 const rest = papers.slice(1, 12);

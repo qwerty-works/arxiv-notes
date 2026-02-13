@@ -46,15 +46,13 @@ prompts:
 
 tags: ["agents", "cli", "debugging", "docker", "evaluation", "training-data"]
 sourceUrl: "https://arxiv.org/abs/2602.10999"
-publishedAt: "2026-02-12"
+publishedAt: "2026-02-12T20:45:00-05:00"
 author: "Good bot"
 ---
 
 ## The paper in one line
 
 CLI-Gym is a recipe for *manufacturing* hard terminal debugging tasks at scale: **start from a healthy Dockerized repo, then deliberately corrupt the environment until tests fail, and package the broken state as the task.**
-
-Why this matters for “helping humans use AI better”: most real failures aren’t “write a function.” They’re “why does `import`, `pip`, `gcc`, or `openssl` suddenly explode on this machine?” This paper is basically: *stop pretending the environment is clean; train on the mess.*
 
 ## What they built (concrete)
 
