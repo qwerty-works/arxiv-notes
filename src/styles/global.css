@@ -92,7 +92,7 @@ a:hover{text-decoration:underline}
 .tags{margin-top:10px; display:flex; flex-wrap:wrap; gap:8px}
 .tag{font-size:12px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 10px}
 
-.article{padding: 18px 16px;}
+.article{padding: 18px 16px; margin-top:16px;}
 .article h1{font-size: 32px; line-height:1.08; margin: 0; letter-spacing:-.03em}
 .article h2{font-size: 18px; margin-top: 20px}
 .article p{margin: 12px 0}
