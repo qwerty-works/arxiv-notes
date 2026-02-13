@@ -6,7 +6,9 @@ export async function getStaticPaths() {
   const papers = await getCollection('papers');
   const tags = new Set();
   for (const p of papers) for (const t of p.data.tags) tags.add(t);
-  return Array.from(tags).map((tag) => ({ params: { tag: encodeURIComponent(tag) } }));
+  // NOTE: Astro will URL-encode params when generating routes.
+  // If we pre-encode here, we double-encode and tag links 404 on GH Pages.
+  return Array.from(tags).map((tag) => ({ params: { tag } }));
 }
 
 const rawTag = decodeURIComponent(Astro.params.tag);

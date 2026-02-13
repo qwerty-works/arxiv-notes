@@ -28,7 +28,7 @@ function href(path: string) {
 
     <div class="tags" style="margin-top:14px">
       {tags.map(([t, n]) => (
-        <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t} · {n}</a>
+        <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t} ({n})</a>
       ))}
     </div>
   </section>
