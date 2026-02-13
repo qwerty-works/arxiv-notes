@@ -1,9 +1,9 @@
 ---
 arxivId: "2602.11136"
-catchyTitle: "Oversight Without Vibes"
-funnySubtitle: "When your judge stops being a probabilistic HR department"
-blurb: "FormalJudge replaces ‘LLM-as-a-judge’ scoring with a compile→verify loop: translate intent into atomic constraints, then prove compliance with Dafny + Z3."
-tags: ["safety", "oversight", "verification", "agents", "specs"]
+catchyTitle: "Proof Beats Vibes"
+funnySubtitle: "LLM judges are persuasive. Z3 is petty and refuses to be charmed."
+blurb: "FormalJudge reframes agent oversight as compile→extract→prove: use an LLM to decompose intent into atomic constraints + Dafny specs, then let Z3 give a deterministic verdict (and actionable failures)."
+tags: ["oversight", "verification", "formal-methods", "agents", "safety"]
 sourceUrl: "https://arxiv.org/abs/2602.11136"
 publishedAt: "2026-02-12"
 author: "Good bot"
@@ -11,96 +11,104 @@ author: "Good bot"
 
 ## What the paper claims
 
-As agents get deployed in high-stakes settings, “LLM-as-a-Judge” oversight runs into a nasty problem:
-**a probabilistic system supervising another probabilistic system tends to inherit the same failure modes.**
+The dominant oversight pattern—**LLM-as-a-Judge**—has a fundamental problem: if your judge is probabilistic, it inherits the same failure modes as the thing it’s judging (biases, hallucination, persuasion).
 
-FormalJudge’s pitch is: stop asking for a *score*, start asking for a *proof*.
+FormalJudge proposes a neuro-symbolic alternative:
 
-Concretely, they propose a neuro-symbolic oversight loop:
-- Take a natural-language requirement (human intent)
-- Decompose it into **atomic, checkable constraints**
-- Translate those into formal specs
-- Use formal verification (Dafny specs + Z3 SMT solving) to prove whether the agent behavior complies
+1) **Compile intent into constraints**
+- An LLM takes natural-language intent and decomposes it into **atomic, verifiable constraints**.
 
-They report improvements over LLM-as-a-judge baselines across behavioral safety / constraint adherence / deception detection.
+2) **Extract grounded facts from the agent trace**
+- Extractor LLM answers only small, binary/atomic questions.
 
-## What’s actually new
+3) **Generate a formal spec (Dafny) and prove it (Z3)**
+- Dafny encodes how atomic facts compose.
+- Z3 proves whether the composed constraints hold.
 
-Not “formal methods are good” — we already knew that.
+They argue this breaks the “probabilistic echo chamber” because the final verdict is **deterministic**.
 
-The new-ish move is treating the LLM as a **spec compiler** rather than a judge:
-- Top-down: intent → smaller constraints
-- Bottom-up: constraints → formal proof (or a precise failure)
+## What’s actually new (the non-hand-wavy part)
 
-The key bottleneck they target is the part everyone hand-waves:
-> translating natural language requirements into formal specifications.
+### 1) LLM as a *spec compiler*, not a judge
+The LLM isn’t asked “is it safe?”
+It’s asked to translate intent into:
+- a taxonomy of atomic facts
+- predicates that combine them
+- a formal program that can be proven (or failed)
+
+### 2) A concrete pipeline + baselines across oversight benchmarks
+They evaluate on three oversight problems:
+- **Agent-SafetyBench** (behavioral safety in tool-use scenarios)
+- **VitaBench** (multi-domain constraint adherence in real-world-ish tasks)
+- **Deceivers** (agentic upward deception detection)
+
+And they compare against multiple judge baselines (vanilla LLM, CoT, few-shot, structured input, python checkers).
+
+### 3) Iterative refinement that actually improves
+They report that Dafny-based feedback enables strong improvement across rounds (the headline number they emphasize is near-linear improvement, e.g. a trajectory improving up to ~99.8% after several refinement rounds in one setup).
 
 ## Structure takeaways (how humans should use AI better)
 
-### 1) Don’t ask a model to be a judge. Ask it to be a compiler.
-If you prompt an LLM: “Is this safe?” you’ll get a vibes-based essay.
+### 1) Replace “judge” with “checklist → proof”
+If you want safety/reliability, do not ask for a holistic score.
 
-If you prompt it: “Compile this policy into atomic constraints with explicit inputs/outputs,” you can **verify** the result.
+Ask for:
+- atomic constraints
+- explicit evidence
+- deterministic checks
 
-### 2) Add a bidirectional loop: decompose → verify → refine
-Good oversight isn’t one shot.
+Even if you never touch Dafny, the structure transfers.
 
-It’s an iteration loop:
-1) write requirements
-2) decompose into constraints
-3) run verification
-4) refine requirements when the verifier finds a hole
+### 2) Make conditional requirements explicit
+Their toy example is perfect:
+- “Budget $800” is easy.
+- “If flying, hotel must start on arrival day” is the one that breaks vibes-based judges.
 
-That loop is the difference between “it sounded safe” and “it passed the checklist.”
+Humans should write specs like:
+- IF condition → THEN constraint
 
-### 3) Make deception / policy violations an *interface* problem
-If an agent can “deceive” a judge, your oversight interface is too fuzzy.
+### 3) Constrain the model to facts it can be right about
+The pipeline assumes:
+- LLMs can be flaky at global reasoning
+- but decent at local extraction (“did the agent call X?”, “what was the total cost?”)
 
-Fix by:
-- forcing explicit claims
-- forcing explicit evidence
-- forcing explicit constraint checks
+That is a sane division of labor.
 
-### 4) Near-linear safety improvements are usually “process improvements”
-If iterating on constraints improves safety, that’s basically saying:
-**your requirements were underspecified**.
-
-The real human move is to stop pretending your first spec is good.
+### 4) Use formal feedback to tighten your own specs
+When the verifier fails, it produces a *specific* failure.
+That’s a gift:
+- it tells you where your requirements were underspecified
 
 ## Try this (copy/paste)
 
-Use this when you want oversight that doesn’t collapse into vibes:
+Use this when you’re overseeing an agent / tool-using workflow:
 
 ```text
-You are a SPEC COMPILER, not a judge.
+You are a SPEC COMPILER.
 
 Input:
-- A natural-language policy
-- A description of the agent behavior / trace / output
+- Natural-language requirement
+- The agent trace (actions + observations)
 
 Output:
-1) A list of atomic constraints (each must be objectively checkable)
-   - Constraint ID
-   - Preconditions
-   - What evidence would satisfy it
-   - Failure message template
-2) A minimal test/verification plan:
-   - checks to run
-   - what data is required
-3) Questions you must ask if requirements are ambiguous
+1) Atomic constraints (objectively checkable)
+   - ID
+   - Condition / predicate
+   - Evidence required
+   - Failure message
+2) A deterministic check plan (no vibes)
+3) If any constraint cannot be checked, ask a question.
 
-Do NOT:
-- give a single holistic safety score
-- hide uncertainty
+Do not provide a single holistic score.
 ```
 
 ## Skeptic check
 
-Formal methods don’t magically solve oversight — they move the pain.
+Formal methods don’t remove ambiguity — they expose it.
 
-You still have to answer:
-- Are the constraints *the right ones*?
-- Are you verifying the right thing (behavior vs proxy signals)?
-- What happens when you can’t formalize a requirement?
+FormalJudge still relies on an LLM in two places:
+- decomposing intent
+- extracting semantics
 
-But that’s the point: you surface ambiguity early, instead of shipping it.
+So the real lesson is structural:
+**move as much as possible from “interpretation” to “verification.”**
