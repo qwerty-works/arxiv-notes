@@ -113,6 +113,12 @@ Every failure should come with:
 - A concrete end-to-end pipeline evaluated against judge baselines.
 - Iterative refinement with solver feedback that improves outcomes.
 
+## Do this now
+
+- Take the last thing you asked an LLM to “judge.” Rewrite it as **10 boolean constraints**.
+- Run the “Extract grounded facts” prompt on a real trace/log and force **true/false/unknown + quotes**.
+- Replace your one big “score” with **one failing test** the agent must make pass.
+
 ## Skeptic check
 
 Formal methods don’t remove ambiguity—they expose it.

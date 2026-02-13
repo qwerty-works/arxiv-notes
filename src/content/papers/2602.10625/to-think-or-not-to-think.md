@@ -112,6 +112,12 @@ If the model can’t name what would change its mind, it’s guessing.
 - A consistent pattern: LRMs don’t always win; sometimes they lose—especially when “reasoning effort” is high.
 - Simple interventions: token caps and “think first, match later.”
 
+## Do this now
+
+- Add a hard cap: “answer in **6 sentences max**.” Watch accuracy *and* confidence.
+- Force a belief table (Alice/Bob/Reality) on your next ToM-ish prompt.
+- For multiple choice: answer free-form first, then match. Don’t give the options up front.
+
 ## Skeptic check
 
 This isn’t “never reason.”

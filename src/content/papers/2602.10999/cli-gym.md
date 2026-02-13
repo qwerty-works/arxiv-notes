@@ -125,6 +125,12 @@ They lean on an analogy:
 Your move:
 - if you can’t explain the fix as a few Dockerfile lines (or shell commands), it’s probably not reproducible.
 
+## Do this now
+
+- The next time a CLI task fails, stop pasting vibes. Paste **command + full output + env** (Dockerfile / `pip freeze` / OS).
+- Make your agent prove the fix: “run `pytest ...` until it passes.” No green check, no victory.
+- Create one intentional breakage in a Dockerfile (PATH/deps/permissions) and make the agent undo it.
+
 ## What to believe vs not believe
 
 ### Believe
