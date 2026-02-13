@@ -82,6 +82,16 @@ a:hover{text-decoration:underline}
 .article .source{margin-top: 16px; font-size: 13px}
 .article .source a{color: var(--accent)}
 
+/* Prompt cards */
+.promptList{display:grid; gap:10px}
+.promptCard{border:1px solid var(--border); border-radius:14px; padding:12px 12px 10px; background: rgba(255,255,255,.02)}
+.promptTop{display:flex; justify-content:space-between; gap:12px; align-items:center}
+.promptTitle{font-weight:800; font-size:13px; color:var(--fg); letter-spacing:-.01em}
+.copyBtn{appearance:none; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:999px; padding:6px 10px; font-size:12px; cursor:pointer}
+.copyBtn:hover{color:var(--fg); border-color:var(--border)}
+.promptPre{margin:10px 0 0; padding:10px 10px; overflow:auto; border-radius:12px; border:1px dashed var(--border); background: rgba(127,127,127,.06)}
+.promptPre code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; white-space:pre;}
+
 .related{margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px}
 .related h3{margin:0; font-size: 14px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
 .related a{display:block; padding:10px 0; text-decoration:none; border-bottom:1px dashed var(--border)}

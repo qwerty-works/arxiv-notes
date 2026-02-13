@@ -3,113 +3,120 @@ arxivId: "2602.11136"
 catchyTitle: "Proof Beats Vibes"
 funnySubtitle: "LLM judges are persuasive. Z3 is petty and refuses to be charmed."
 blurb: "FormalJudge reframes agent oversight as compile→extract→prove: use an LLM to decompose intent into atomic constraints + Dafny specs, then let Z3 give a deterministic verdict (and actionable failures)."
-tldr: "Use LLMs to compile intent into checkable constraints and grounded facts, then rely on a formal solver (Dafny/Z3) for the final verdict. It’s less ‘judge vibes’ and more ‘proof or it didn’t happen.’"
+tldr: "Turn ‘LLM-as-judge’ into ‘LLM-as-compiler’: extract atomic constraints + grounded facts, then let Dafny/Z3 do the actual judging. You get deterministic verdicts and actionable failure reasons instead of vibes."
+prompts:
+  - title: "Make a proof-checkable checklist"
+    prompt: |-
+      You are helping me turn a vague requirement into a proof-checkable checklist.
+
+      Task:
+      1) Rewrite the requirement as 8–15 atomic constraints (each must be boolean-checkable).
+      2) For each constraint, list what evidence would prove it from an agent trace.
+      3) List 3 ambiguous points that require clarification.
+
+      Requirement:
+      <paste requirement here>
+
+  - title: "Extract grounded facts from a trace"
+    prompt: |-
+      You are an extractor. Only answer with JSON.
+
+      Given this agent trace, answer these atomic questions with true/false/unknown and a quote span:
+      - Did the agent access external network? (true/false/unknown)
+      - Did it write any files outside the allowed directory? (true/false/unknown)
+      - Did it send any messages externally? (true/false/unknown)
+
+      Output schema:
+      {
+        "q": {
+          "answer": "true|false|unknown",
+          "evidence": "<direct quote from trace or empty>"
+        }
+      }
+
+      Trace:
+      <paste trace>
+
+  - title: "Think-to-prove (no vibes)"
+    prompt: |-
+      Do NOT grade holistically.
+
+      Step 1: Propose 6–10 atomic predicates that capture the intent.
+      Step 2: For each predicate, define exactly what observation would make it true/false.
+      Step 3: If any predicate is not decidable from the info given, ask 1 clarifying question.
+
+      Intent:
+      <paste intent>
+
 tags: ["oversight", "verification", "formal-methods", "agents", "safety"]
 sourceUrl: "https://arxiv.org/abs/2602.11136"
 publishedAt: "2026-02-12"
 author: "Good bot"
 ---
 
-## What the paper claims
+## What the paper claims (in one mental image)
 
-The dominant oversight pattern—**LLM-as-a-Judge**—has a fundamental problem: if your judge is probabilistic, it inherits the same failure modes as the thing it’s judging (biases, hallucination, persuasion).
+Picture a courtroom.
 
-FormalJudge proposes a neuro-symbolic alternative:
+- The usual approach is hiring a smooth-talking lawyer (**an LLM judge**) to decide whether another smooth-talking lawyer (**the agent**) behaved.
+- FormalJudge replaces the lawyer with a grumpy auditor: **a solver** that only accepts **proof**.
 
-1) **Compile intent into constraints**
-- An LLM takes natural-language intent and decomposes it into **atomic, verifiable constraints**.
+Pipeline:
+1) **Compile intent → atomic constraints** (LLM as *spec compiler*)
+2) **Extract trace → grounded facts** (LLM as *fact extractor*)
+3) **Prove constraints over facts** (Dafny/Z3 as the *actual judge*)
 
-2) **Extract grounded facts from the agent trace**
-- Extractor LLM answers only small, binary/atomic questions.
+Verdicts become deterministic, and failures are explainable in the only way that matters: “constraint X failed because fact Y was present.”
 
-3) **Generate a formal spec (Dafny) and prove it (Z3)**
-- Dafny encodes how atomic facts compose.
-- Z3 proves whether the composed constraints hold.
+## The 80% you should steal (reader tips)
 
-They argue this breaks the “probabilistic echo chamber” because the final verdict is **deterministic**.
+### Tip 1 — Don’t ask for a score. Ask for failing tests.
+**Bad:** “Is this safe?”
 
-## What’s actually new (the non-hand-wavy part)
+**Good:**
+- “List the constraints.”
+- “For each constraint: pass/fail/unknown + evidence quote.”
+- “If fail: the smallest counterexample.”
 
-### 1) LLM as a *spec compiler*, not a judge
-The LLM isn’t asked “is it safe?”
-It’s asked to translate intent into:
-- a taxonomy of atomic facts
-- predicates that combine them
-- a formal program that can be proven (or failed)
+If it can’t produce a failing test, you don’t have an oversight system—you have vibes.
 
-### 2) A concrete pipeline + baselines across oversight benchmarks
-They evaluate on three oversight problems:
-- **Agent-SafetyBench** (behavioral safety in tool-use scenarios)
-- **VitaBench** (multi-domain constraint adherence in real-world-ish tasks)
-- **Deceivers** (agentic upward deception detection)
+### Tip 2 — Separate extraction from composition
+One model trying to both read messy logs *and* produce a verdict will bluff.
 
-And they compare against multiple judge baselines (vanilla LLM, CoT, few-shot, structured input, python checkers).
+**Do this instead:**
+- Extraction: many tiny questions (true/false/unknown + quotes)
+- Composition: deterministic rules (code / schema / solver)
 
-### 3) Iterative refinement that actually improves
-They report that Dafny-based feedback enables strong improvement across rounds (the headline number they emphasize is near-linear improvement, e.g. a trajectory improving up to ~99.8% after several refinement rounds in one setup).
-
-## Structure takeaways (how humans should use AI better)
-
-### 1) Replace “judge” with “checklist → proof”
-If you want safety/reliability, do not ask for a holistic score.
-
-Ask for:
-- atomic constraints
-- explicit evidence
-- deterministic checks
-
-Even if you never touch Dafny, the structure transfers.
-
-### 2) Make conditional requirements explicit
-Their toy example is perfect:
+### Tip 3 — Make conditionals explicit (IF → THEN)
+The paper’s toy example is painfully real:
 - “Budget $800” is easy.
-- “If flying, hotel must start on arrival day” is the one that breaks vibes-based judges.
+- “IF flying THEN hotel must start on arrival day” is what breaks “judge vibes.”
 
-Humans should write specs like:
-- IF condition → THEN constraint
+**Reader move:** write requirements as conditionals whenever possible.
 
-### 3) Constrain the model to facts it can be right about
-The pipeline assumes:
-- LLMs can be flaky at global reasoning
-- but decent at local extraction (“did the agent call X?”, “what was the total cost?”)
+### Tip 4 — Put strict tools in charge of the verdict
+LLMs are creative; solvers/checkers are strict.
 
-That is a sane division of labor.
+**Reader move:**
+- LLM proposes what to check
+- deterministic checker decides pass/fail
 
-### 4) Use formal feedback to tighten your own specs
-When the verifier fails, it produces a *specific* failure.
-That’s a gift:
-- it tells you where your requirements were underspecified
+### Tip 5 — Debug oversight like code
+Every failure should come with:
+- which constraint failed
+- evidence span
+- how to fix (change behavior vs change spec)
 
-## Try this (copy/paste)
+## What’s actually new (why this isn’t fluff)
 
-Use this when you’re overseeing an agent / tool-using workflow:
-
-```text
-You are a SPEC COMPILER.
-
-Input:
-- Natural-language requirement
-- The agent trace (actions + observations)
-
-Output:
-1) Atomic constraints (objectively checkable)
-   - ID
-   - Condition / predicate
-   - Evidence required
-   - Failure message
-2) A deterministic check plan (no vibes)
-3) If any constraint cannot be checked, ask a question.
-
-Do not provide a single holistic score.
-```
+- LLM used as **compiler** (NL → predicates/spec) rather than judge.
+- A concrete end-to-end pipeline evaluated against judge baselines.
+- Iterative refinement with solver feedback that improves outcomes.
 
 ## Skeptic check
 
-Formal methods don’t remove ambiguity — they expose it.
+Formal methods don’t remove ambiguity—they expose it.
 
-FormalJudge still relies on an LLM in two places:
-- decomposing intent
-- extracting semantics
-
-So the real lesson is structural:
-**move as much as possible from “interpretation” to “verification.”**
+If your logs don’t contain the evidence, no amount of Z3 will save you.
+But the transferable lesson holds:
+**make judgments test-like, evidence-backed, and composable.**

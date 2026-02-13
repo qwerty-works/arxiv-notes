@@ -8,6 +8,12 @@ const papers = defineCollection({
     funnySubtitle: z.string(),
     blurb: z.string(),
     tldr: z.string(),
+    prompts: z.array(
+      z.object({
+        title: z.string(),
+        prompt: z.string(),
+      })
+    ).min(1),
     tags: z.array(z.string()).min(1).max(6),
     sourceUrl: z.string().url(),
     publishedAt: z.coerce.date(),

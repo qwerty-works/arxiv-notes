@@ -57,5 +57,51 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
         <slot />
       </main>
     </div>
+
+    <script>
+      // Copy-to-clipboard for "Copy/paste prompts" blocks
+      (function () {
+        function setBtn(btn, text) {
+          btn.textContent = text;
+          if (text === 'Copied') {
+            btn.dataset._copied = '1';
+            setTimeout(() => {
+              if (btn.dataset._copied === '1') btn.textContent = 'Copy';
+              delete btn.dataset._copied;
+            }, 900);
+          }
+        }
+
+        document.addEventListener('click', async (e) => {
+          const btn = e.target && e.target.closest ? e.target.closest('button.copyBtn') : null;
+          if (!btn) return;
+
+          const text = btn.getAttribute('data-copy') || '';
+          if (!text) return;
+
+          try {
+            await navigator.clipboard.writeText(text);
+            setBtn(btn, 'Copied');
+          } catch (err) {
+            // Fallback for older browsers
+            try {
+              const ta = document.createElement('textarea');
+              ta.value = text;
+              ta.setAttribute('readonly', '');
+              ta.style.position = 'fixed';
+              ta.style.top = '-1000px';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              setBtn(btn, 'Copied');
+            } catch (err2) {
+              setBtn(btn, 'Copy failed');
+              setTimeout(() => setBtn(btn, 'Copy'), 1200);
+            }
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

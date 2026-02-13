@@ -3,109 +3,121 @@ arxivId: "2602.10625"
 catchyTitle: "Overthinking Is Not Understanding"
 funnySubtitle: "Longer chain-of-thought, shorter lifespan"
 blurb: "A ToM study finds reasoning models don’t reliably beat non-reasoning ones. On harder cases, more ‘reasoning effort’ can hurt; token caps help; and multiple-choice options trigger an option-matching shortcut." 
-tldr: "Reasoning models aren’t a free win for social reasoning (ToM). When tasks get hard, longer ‘thinking’ can collapse; token caps help; and multiple-choice options can cause lazy option-matching—so think free-form first, then match." 
+tldr: "Reasoning models aren’t a free win for Theory-of-Mind. Past a point, longer ‘thinking’ can degrade accuracy; token caps often help; and multiple-choice options can trigger lazy option-matching—so answer free-form first, then map to choices." 
+prompts:
+  - title: "Free-form first, then match"
+    prompt: |-
+      Answer in free-form first.
+      Rules:
+      - Keep it under 6 sentences.
+      - Track the beliefs of each character explicitly (bullet list).
+      - If required info is missing, ask up to 2 clarifying questions.
+
+      Only after the free-form answer, map it to one option:
+      A) ...
+      B) ...
+      C) ...
+      D) ...
+
+      Do not reference the options until after the free-form answer.
+
+      Question:
+      <paste question>
+
+  - title: "Reasoning budget cap"
+    prompt: |-
+      You may think, but you must be brief.
+
+      Output:
+      1) Belief state (bullets)
+      2) One counterexample that would flip the answer
+      3) Final answer (one sentence)
+
+      Keep the entire output under 1200 characters.
+
+      Prompt:
+      <paste scenario>
+
+  - title: "Ask clarifying questions (ToM)"
+    prompt: |-
+      Before answering, ask up to 2 clarifying questions that would most reduce uncertainty.
+      Then answer with:
+      - 3 bullets of reasoning (max)
+      - final answer
+
+      Scenario:
+      <paste scenario>
+
 tags: ["reasoning", "theory-of-mind", "evaluation", "failure-modes", "interaction"]
 sourceUrl: "https://arxiv.org/abs/2602.10625"
 publishedAt: "2026-02-12"
 author: "Good bot"
 ---
 
-## What the paper claims
+## What the paper claims (visualize it)
 
-Theory of Mind (ToM) is about inferring hidden mental states (beliefs, desires, intentions). The paper asks a very direct question:
+Imagine the model walking into a messy sitcom scene with a clipboard.
 
-> Do “reasoning models” (LRMs) that help in math/code also help in social reasoning?
+A normal model makes a quick guess (“Alice thinks X”).
+A reasoning model… starts narrating a 500-line detective novel.
 
-They evaluate **9 models** across **3 ToM benchmarks**:
-- **HiToM**: higher-order belief depth (0th–4th order; includes deceptive agents)
-- **ToMATO**: interactive, dialogue-based scenarios (up to ~2nd order)
-- **ToMBench**: broad mental-state taxonomy (belief/desire/emotion/intention/knowledge)
+This paper’s punchline:
+- For Theory of Mind tasks, **more thinking isn’t reliably more correct**.
+- On harder cases, long reasoning can *collapse*.
+- Multiple-choice options can act like shiny magnets: the model rationalizes toward an option instead of reasoning.
 
-Result: reasoning models do **not** consistently outperform non-reasoning ones; on some benchmarks (notably ToMATO) they can be worse.
+## The 80% you should steal (reader tips)
 
-## What’s actually new
+### Tip 1 — Enforce a reasoning budget
+Long chain-of-thought can become self-generated noise.
 
-The paper doesn’t just dunk on LRMs—it diagnoses where the “think longer” strategy breaks.
+**Reader move:** cap output aggressively.
+- character limit
+- bullet limit
+- “final answer in one sentence”
 
-### 1) Slow thinking collapse
-On harder tasks, errors concentrate in *very long* responses.
-They explicitly test “reasoning effort” on GPT reasoning models and find an inverse relationship on the hard benchmark (e.g., GPT‑o3 dropping from ~0.838 at low effort to ~0.693 at high effort on HiToM).
+If it can’t answer concisely, it probably doesn’t actually understand.
 
-### 2) Token caps can improve reasoning models
-For open-source reasoning models, they force a max thinking length and find performance often improves, but:
-- the best cap varies by model size and benchmark
-- there’s no universal magic number
+### Tip 2 — Track belief state explicitly
+ToM failures often come from losing track of who believes what.
 
-### 3) Moderate reasoning helps non-reasoning models
-They prompt non-reasoning models with CoT and see gains on the hard benchmark (moderate “structured thinking” without runaway collapse).
+**Reader move:** require a belief table.
+- Alice believes:
+- Bob believes:
+- Reality:
 
-### 4) Option matching shortcut (multiple choice is a trap)
-On HiToM, removing the multiple-choice options (making answers extractive/open-ended) *improves* reasoning models a lot.
-Interpretation: with options present, the model often does “reverse lookup” justification instead of deduction.
+Make it impossible to “hand-wave.”
 
-### Interventions
-They propose two practical interventions to verify/mitigate the above:
-- **S2F (Slow-to-Fast)**: stop unproductive slow thinking when it hits a pattern; they use “wait” frequency as a trigger.
-- **T2M (Think-to-Match)**: think without options, then match to options at the end.
+### Tip 3 — Ask 1–2 clarifying questions before answering
+ToM scenarios are under-specified by default.
 
-## Structure takeaways (how humans should use AI better)
+**Reader move:** allow the model to ask questions *before* it commits.
+This beats “think harder” 10 times out of 10.
 
-### 1) Cap the ramble
-If you let the model monologue, you’re not buying truth—you’re buying a bigger blast radius.
+### Tip 4 — For multiple choice, hide the options until the end
+Options can trigger lazy matching.
 
-**Structure:** short reasoning budgets + explicit uncertainty.
+**Reader move:**
+1) free-form answer
+2) then map to A/B/C/D
 
-### 2) Force clarifying questions on ToM tasks
-Social contexts are under-specified by default.
-“Think harder” won’t fix missing information.
+### Tip 5 — Use counterexamples as a lie detector
+If the model can’t name what would change its mind, it’s guessing.
 
-**Structure:** allow 1–2 clarifying questions before answering.
+**Reader move:** require one counterexample that flips the answer.
 
-### 3) For multiple choice: think first, match later
-If you want understanding, don’t hand the model the answer-shaped hooks up front.
+## What’s actually new (quickly)
 
-**Structure:** free-form answer → then map to choices.
-
-### 4) Treat ToM as an interface problem
-Many ToM failures are:
-- evidence grounding errors
-- state tracking errors
-- perspective attribution errors
-- discourse misinterpretation
-
-These are *prompt/interface* failures as much as model failures.
-
-## Try this (copy/paste)
-
-### Pattern: free-form → then match
-```text
-Answer in free-form first.
-Rules:
-- Keep it under 6 sentences.
-- If required info is missing, ask up to 2 clarifying questions.
-
-Only after the free-form answer, map it to one of these options:
-A) ...
-B) ...
-C) ...
-D) ...
-
-Do not reference the options until after the free-form answer.
-```
-
-### Pattern: cap reasoning budget
-```text
-You may think, but you must be brief.
-
-Output:
-- Max 6 bullets.
-- Then: final answer in 1 sentence.
-- If uncertain: state what evidence would change your mind.
-```
+- Benchmarks across multiple ToM settings (belief depth, interactive dialogue, broad taxonomy).
+- A consistent pattern: LRMs don’t always win; sometimes they lose—especially when “reasoning effort” is high.
+- Simple interventions: token caps and “think first, match later.”
 
 ## Skeptic check
 
-This paper is basically yelling: “Stop treating long chain-of-thought as a universal solvent.”
+This isn’t “never reason.”
+It’s: **don’t let the model narrate itself into a ditch**.
 
-If the task is ambiguous, long reasoning can become self-generated noise.
-So tighten the interface: ask questions, cap verbosity, and verify with counterexamples.
+If the task is ambiguous, fix the interface:
+- ask questions
+- cap verbosity
+- force explicit state tracking
