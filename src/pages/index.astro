@@ -9,16 +9,22 @@ const papers = (await getCollection('papers'))
 const latest = papers[0] ?? null;
 const rest = papers.slice(1, 12);
 
+const BASE = import.meta.env.BASE_URL;
+
+function href(path) {
+  return `${BASE}${path.replace(/^\/+/, '')}`;
+}
+
 function paperUrl(p) {
   const slug = p.slug.split('/').slice(1).join('/');
-  return `/${p.data.arxivId}/${slug}/`;
+  return href(`${p.data.arxivId}/${slug}/`);
 }
 
 const title = 'arxiv-notes — front page';
 const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach humans how to use AI better.';
 ---
 
-<BaseLayout title={title} description={description} canonical={'/'}>
+<BaseLayout title={title} description={description} canonical={''}>
   <div class="grid">
     <section class="paper hero">
       <div class="hero__kicker">Latest paper</div>
@@ -30,11 +36,10 @@ const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach huma
             <div class="hero__meta">
               <span class="pill">{latest.data.publishedAt.toLocaleDateString()}</span>
               <span class="pill">arXiv: {latest.data.arxivId}</span>
-              <span class="pill">By {latest.data.author}</span>
             </div>
             <div class="tags">
               {latest.data.tags.map((t) => (
-                <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>#{t}</a>
+                <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t}</a>
               ))}
             </div>
             <p style="margin-top:12px; color:var(--muted)">{latest.data.blurb}</p>
@@ -57,21 +62,21 @@ const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach huma
               <div class="cardSub">{p.data.blurb}</div>
             </a>
 
-            {/* Footer: date + tags (tags should not be part of the paper link) */}
+            {/* Footer: date (separate) + tags (not part of the paper link) */}
             <div style="padding:0 16px 14px">
-              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:var(--muted); font-size:12px">
-                <span class="pill">{p.data.publishedAt.toLocaleDateString()}</span>
-                <div class="tags" style="margin-top:0">
-                  {p.data.tags.slice(0, 4).map((t) => (
-                    <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a>
-                  ))}
-                </div>
+              <div style="color:var(--muted); font-size:12px; margin-top:2px">
+                {p.data.publishedAt.toLocaleDateString()}
+              </div>
+              <div class="tags" style="margin-top:10px">
+                {p.data.tags.slice(0, 4).map((t) => (
+                  <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>{t}</a>
+                ))}
               </div>
             </div>
           </div>
         ))
       ) : (
-        <a class="cardLink" href="/about/">
+        <a class="cardLink" href={href('about/')}>
           <div class="cardTitle">What is this?</div>
           <div class="cardSub">A 5-minute paper brief, but optimized for humans who use AI.</div>
         </a>

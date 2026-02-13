@@ -7,8 +7,12 @@ const {
   canonical,
 } = Astro.props;
 
+// NOTE: Astro.site is configured as the full GH Pages base URL
+// (e.g. https://qwerty-works.github.io/arxiv-notes). If we pass a canonical
+// starting with "/", new URL(...) will drop the /arxiv-notes base path.
+// So we normalize by stripping leading slashes.
 const canonicalUrl = canonical
-  ? new URL(canonical, Astro.site ?? 'https://example.com').toString()
+  ? new URL(canonical.replace(/^\/+/, ''), Astro.site ?? 'https://example.com').toString()
   : undefined;
 
 const BASE = import.meta.env.BASE_URL;

@@ -11,16 +11,22 @@ const tags = Array.from(tagCounts.entries()).sort((a,b) => b[1] - a[1]);
 
 const title = 'Tags — arxiv-notes';
 const description = 'Browse papers by tag.';
+
+const BASE = import.meta.env.BASE_URL;
+function href(path: string) {
+  return `${BASE}${path.replace(/^\/+/, '')}`;
+}
 ---
 
-<BaseLayout title={title} description={description} canonical={'/tags/'}>
+<BaseLayout title={title} description={description} canonical={'tags/'}>
   <section class="paper article">
     <h1>Tags</h1>
     <p class="subhead">Loose tags. Useful clustering. Minimal ceremony.</p>
 
+
     <div class="tags" style="margin-top:14px">
       {tags.map(([t, n]) => (
-        <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>#{t} · {n}</a>
+        <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t} · {n}</a>
       ))}
     </div>
   </section>
