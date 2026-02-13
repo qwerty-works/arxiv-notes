@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const papers = await getCollection('papers');
+  const tags = new Set();
+  for (const p of papers) for (const t of p.data.tags) tags.add(t);
+  return Array.from(tags).map((tag) => ({ params: { tag: encodeURIComponent(tag) } }));
+}
+
+const rawTag = decodeURIComponent(Astro.params.tag);
+const papers = (await getCollection('papers'))
+  .filter((p) => p.data.tags.includes(rawTag))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+function paperUrl(p) {
+  const slug = p.slug.split('/').slice(1).join('/');
+  return `/${p.data.arxivId}/${slug}/`;
+}
+
+const title = `#${rawTag} — arxiv-notes`;
+const description = `Papers tagged with ${rawTag}.`;
+---
+
+<BaseLayout title={title} description={description} canonical={`/tags/${encodeURIComponent(rawTag)}/`}>
+  <section class="paper article">
+    <h1>#{rawTag}</h1>
+    <p class="subhead">{papers.length} post(s).</p>
+
+    <div class="list" style="margin-top:12px">
+      {papers.map((p) => (
+        <a class="cardLink" href={paperUrl(p)}>
+          <div class="cardTitle">{p.data.catchyTitle}</div>
+          <div class="cardSub">{p.data.blurb}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

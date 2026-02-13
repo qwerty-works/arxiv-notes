@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+
+const {
+  title = 'arxiv-notes',
+  description = '5-minute paper briefs for humans using AI better',
+  canonical,
+} = Astro.props;
+
+const canonicalUrl = canonical
+  ? new URL(canonical, Astro.site ?? 'https://example.com').toString()
+  : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonicalUrl ? <link rel="canonical" href={canonicalUrl} /> : null}
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
+
+    <meta name="theme-color" content="#0b0d10" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="masthead">
+        <div class="brand">
+          <a href="/" style="text-decoration:none">
+            <div class="brand__name">arxiv-notes</div>
+          </a>
+          <div class="brand__tag">5-minute paper briefs for humans using AI better</div>
+        </div>
+        <nav class="nav" aria-label="Site">
+          <a href="/">Front page</a>
+          <a href="/tags/">Tags</a>
+          <a href="/about/">About</a>
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

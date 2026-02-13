@@ -1,0 +1,73 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+const { entry, prev, next, related } = Astro.props as {
+  entry: CollectionEntry<'papers'>;
+  prev: CollectionEntry<'papers'> | null;
+  next: CollectionEntry<'papers'> | null;
+  related: CollectionEntry<'papers'>[];
+};
+
+const fm = entry.data;
+const title = `${fm.catchyTitle} — arxiv-notes`;
+const description = fm.blurb;
+
+const canonical = `/${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <article class="paper article">
+    <h1>{fm.catchyTitle}</h1>
+    <div class="subhead">{fm.funnySubtitle}</div>
+    <div class="byline">By {fm.author} · {fm.publishedAt.toLocaleDateString()}</div>
+
+    <div class="source">
+      Source: <a href={fm.sourceUrl} target="_blank" rel="noopener noreferrer">arXiv</a>
+    </div>
+
+    <div class="tags">
+      {fm.tags.map((t) => (
+        <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>
+          #{t}
+        </a>
+      ))}
+    </div>
+
+    <div style="margin-top:14px">
+      <slot />
+    </div>
+
+    {related.length ? (
+      <section class="related">
+        <h3>Related</h3>
+        {related.map((r) => (
+          <a href={`/${r.data.arxivId}/${r.slug.split('/').slice(1).join('/')}/`}>
+            <strong>{r.data.catchyTitle}</strong>
+            <div style="color:var(--muted); font-size:13px; margin-top:2px">{r.data.blurb}</div>
+          </a>
+        ))}
+      </section>
+    ) : null}
+
+    <nav class="pager" aria-label="Previous and next">
+      {prev ? (
+        <a href={`/${prev.data.arxivId}/${prev.slug.split('/').slice(1).join('/')}/`}>
+          <div class="label">Previous</div>
+          <div class="name">{prev.data.catchyTitle}</div>
+        </a>
+      ) : (
+        <div></div>
+      )}
+
+      {next ? (
+        <a href={`/${next.data.arxivId}/${next.slug.split('/').slice(1).join('/')}/`}>
+          <div class="label">Next</div>
+          <div class="name">{next.data.catchyTitle}</div>
+        </a>
+      ) : (
+        <div></div>
+      )}
+    </nav>
+  </article>
+</BaseLayout>

@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const papers = (await getCollection('papers'))
+  .slice()
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+const latest = papers[0] ?? null;
+const rest = papers.slice(1, 12);
+
+function paperUrl(p) {
+  const slug = p.slug.split('/').slice(1).join('/');
+  return `/${p.data.arxivId}/${slug}/`;
+}
+
+const title = 'arxiv-notes — front page';
+const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach humans how to use AI better.';
+---
+
+<BaseLayout title={title} description={description} canonical={'/'}>
+  <div class="grid">
+    <section class="paper hero">
+      <div class="hero__kicker">Latest paper</div>
+      {
+        latest ? (
+          <>
+            <h1 class="hero__title"><a href={paperUrl(latest)} style="text-decoration:none">{latest.data.catchyTitle}</a></h1>
+            <div class="hero__sub">{latest.data.funnySubtitle}</div>
+            <div class="hero__meta">
+              <span class="pill">{latest.data.publishedAt.toLocaleDateString()}</span>
+              <span class="pill">arXiv: {latest.data.arxivId}</span>
+              <span class="pill">By {latest.data.author}</span>
+            </div>
+            <div class="tags">
+              {latest.data.tags.map((t) => (
+                <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>#{t}</a>
+              ))}
+            </div>
+            <p style="margin-top:12px; color:var(--muted)">{latest.data.blurb}</p>
+          </>
+        ) : (
+          <>
+            <h1 class="hero__title">No papers yet</h1>
+            <div class="hero__sub">Send an arXiv link and I’ll start filing the front page.</div>
+          </>
+        )
+      }
+    </section>
+
+    <aside class="paper list" aria-label="Other papers">
+      {rest.length ? (
+        rest.map((p) => (
+          <a class="cardLink" href={paperUrl(p)}>
+            <div class="cardTitle">{p.data.catchyTitle}</div>
+            <div class="cardSub">{p.data.blurb}</div>
+            <div class="tags">
+              {p.data.tags.slice(0, 4).map((t) => (
+                <span class="tag">#{t}</span>
+              ))}
+            </div>
+          </a>
+        ))
+      ) : (
+        <a class="cardLink" href="/about/">
+          <div class="cardTitle">What is this?</div>
+          <div class="cardSub">A 5-minute paper brief, but optimized for humans who use AI.</div>
+        </a>
+      )}
+    </aside>
+  </div>
+</BaseLayout>

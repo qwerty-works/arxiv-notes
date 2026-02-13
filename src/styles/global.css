@@ -1,0 +1,108 @@
+:root{
+  --bg:#fbfbf8;
+  --fg:#111827;
+  --muted:#4b5563;
+  --border:rgba(17,24,39,.12);
+  --paper:#ffffff;
+  --accent:#0f766e;
+  --shadow: 0 12px 40px rgba(0,0,0,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b0d10;
+    --fg:#f3f4f6;
+    --muted:#a1a1aa;
+    --border:rgba(255,255,255,.12);
+    --paper:rgba(255,255,255,.04);
+    --accent:#34d399;
+    --shadow: 0 18px 60px rgba(0,0,0,.55);
+  }
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  line-height:1.55;
+}
+
+a{color:inherit}
+a:hover{text-decoration:underline}
+
+.container{max-width: 980px; margin: 0 auto; padding: 18px 14px 60px;}
+
+.masthead{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:16px; padding: 8px 0 14px; border-bottom: 1px solid var(--border);
+}
+.brand{display:grid; gap:4px}
+.brand__name{font-size: 22px; font-weight: 800; letter-spacing:-.02em}
+.brand__tag{font-size: 13px; color:var(--muted)}
+
+.nav{display:flex; gap:12px; flex-wrap:wrap; font-size: 13px; color:var(--muted)}
+.nav a{padding:6px 10px; border:1px solid transparent; border-radius: 999px}
+.nav a:hover{border-color:var(--border); text-decoration:none; color:var(--fg)}
+
+.paper{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.grid{display:grid; gap:14px; margin-top:16px;}
+
+/* Mobile-first: single column */
+.hero{padding:16px;}
+.hero__kicker{font-size: 12px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+.hero__title{font-size: 28px; font-weight: 900; line-height: 1.08; margin: 8px 0 0; letter-spacing:-.02em}
+.hero__sub{margin-top: 10px; color:var(--muted); font-size: 14px}
+.hero__meta{margin-top: 12px; display:flex; flex-wrap:wrap; gap:8px; font-size:12px; color:var(--muted)}
+.pill{border:1px solid var(--border); border-radius:999px; padding:4px 10px; background: rgba(255,255,255,.02)}
+
+.list{padding: 10px 0;}
+.cardLink{display:block; padding:14px 16px; border-top:1px solid var(--border); text-decoration:none}
+.cardLink:first-child{border-top:none}
+.cardLink:hover{background: rgba(127,127,127,.06); text-decoration:none}
+.cardTitle{font-weight: 800; letter-spacing:-.01em}
+.cardSub{margin-top:6px; color:var(--muted); font-size: 13px}
+
+.tags{margin-top:10px; display:flex; flex-wrap:wrap; gap:8px}
+.tag{font-size:12px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 10px}
+
+.article{padding: 18px 16px;}
+.article h1{font-size: 28px; line-height:1.1; margin: 0}
+.article h2{font-size: 18px; margin-top: 18px}
+.article p{margin: 10px 0}
+.article .byline{margin-top: 8px; color: var(--muted); font-size: 13px}
+.article .subhead{margin-top: 10px; font-size: 15px; color: var(--muted)}
+.article .source{margin-top: 16px; font-size: 13px}
+.article .source a{color: var(--accent)}
+
+.related{margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px}
+.related h3{margin:0; font-size: 14px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+.related a{display:block; padding:10px 0; text-decoration:none; border-bottom:1px dashed var(--border)}
+.related a:last-child{border-bottom:none}
+.related a:hover{text-decoration:underline}
+
+.pager{margin-top: 18px; display:grid; gap:10px; border-top: 1px solid var(--border); padding-top: 14px}
+.pager a{display:block; text-decoration:none; border:1px solid var(--border); border-radius: 14px; padding: 12px 14px; background: rgba(255,255,255,.02)}
+.pager a:hover{background: rgba(127,127,127,.06)}
+.pager .label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
+.pager .name{margin-top:6px; font-weight:800}
+
+@media (min-width: 880px){
+  .grid{grid-template-columns: 1.2fr .8fr; align-items:start;}
+  .hero{padding:22px 22px 20px;}
+  .hero__title{font-size: 40px}
+  .article{padding: 22px 22px 20px;}
+  .pager{grid-template-columns: 1fr 1fr}
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *{scroll-behavior:auto !important; transition:none !important; animation:none !important}
+}

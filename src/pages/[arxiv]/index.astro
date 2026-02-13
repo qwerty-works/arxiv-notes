@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const papers = await getCollection('papers');
+  const ids = new Set(papers.map((p) => p.data.arxivId));
+  return Array.from(ids).map((arxiv) => ({ params: { arxiv } }));
+}
+
+const arxiv = Astro.params.arxiv;
+const papers = await getCollection('papers');
+const match = papers.find((p) => p.data.arxivId === arxiv) ?? null;
+
+if (!match) {
+  // Let the 404 handle it.
+  throw new Error(`Unknown arXiv id: ${arxiv}`);
+}
+
+const slug = match.slug.split('/').slice(1).join('/');
+const target = `/${match.data.arxivId}/${slug}/`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>Redirecting…</title>
+  </head>
+  <body>
+    <a href={target}>Go to paper</a>
+  </body>
+</html>

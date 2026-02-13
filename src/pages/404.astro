@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Not found — arxiv-notes';
+const description = 'That page does not exist.';
+---
+
+<BaseLayout title={title} description={description}>
+  <section class="paper article">
+    <h1>404</h1>
+    <p class="subhead">That page doesn’t exist. Which is, honestly, very on-brand for research.</p>
+    <p><a href="/">Go back to the front page</a></p>
+  </section>
+</BaseLayout>
