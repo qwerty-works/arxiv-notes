@@ -51,15 +51,24 @@ const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach huma
     <aside class="paper list" aria-label="Other papers">
       {rest.length ? (
         rest.map((p) => (
-          <a class="cardLink" href={paperUrl(p)}>
-            <div class="cardTitle">{p.data.catchyTitle}</div>
-            <div class="cardSub">{p.data.blurb}</div>
-            <div class="tags">
-              {p.data.tags.slice(0, 4).map((t) => (
-                <span class="tag">#{t}</span>
-              ))}
+          <div class="cardLink" style="padding:0">
+            <a href={paperUrl(p)} style="display:block; padding:14px 16px; text-decoration:none">
+              <div class="cardTitle">{p.data.catchyTitle}</div>
+              <div class="cardSub">{p.data.blurb}</div>
+            </a>
+
+            {/* Footer: date + tags (tags should not be part of the paper link) */}
+            <div style="padding:0 16px 14px">
+              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; color:var(--muted); font-size:12px">
+                <span class="pill">{p.data.publishedAt.toLocaleDateString()}</span>
+                <div class="tags" style="margin-top:0">
+                  {p.data.tags.slice(0, 4).map((t) => (
+                    <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>{t}</a>
+                  ))}
+                </div>
+              </div>
             </div>
-          </a>
+          </div>
         ))
       ) : (
         <a class="cardLink" href="/about/">
