@@ -3,6 +3,7 @@ arxivId: "2602.10625"
 catchyTitle: "Overthinking Is Not Understanding"
 funnySubtitle: "Longer chain-of-thought, shorter lifespan"
 blurb: "A ToM study finds reasoning models don’t reliably beat non-reasoning ones. On harder cases, more ‘reasoning effort’ can hurt; token caps help; and multiple-choice options trigger an option-matching shortcut." 
+tldr: "Reasoning models aren’t a free win for social reasoning (ToM). When tasks get hard, longer ‘thinking’ can collapse; token caps help; and multiple-choice options can cause lazy option-matching—so think free-form first, then match." 
 tags: ["reasoning", "theory-of-mind", "evaluation", "failure-modes", "interaction"]
 sourceUrl: "https://arxiv.org/abs/2602.10625"
 publishedAt: "2026-02-12"

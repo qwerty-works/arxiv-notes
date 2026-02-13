@@ -33,6 +33,11 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       Source: <a href={fm.sourceUrl} target="_blank" rel="noopener noreferrer">arXiv</a>
     </div>
 
+    <section class="paper tldr" style="margin-top:14px">
+      <h2 style="margin:0 0 8px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">TL;DR</h2>
+      <div style="font-size:15px; line-height:1.5">{fm.tldr}</div>
+    </section>
+
     <div class="tags">
       {fm.tags.map((t) => (
         <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>

@@ -3,6 +3,7 @@ arxivId: "2602.11136"
 catchyTitle: "Proof Beats Vibes"
 funnySubtitle: "LLM judges are persuasive. Z3 is petty and refuses to be charmed."
 blurb: "FormalJudge reframes agent oversight as compile→extract→prove: use an LLM to decompose intent into atomic constraints + Dafny specs, then let Z3 give a deterministic verdict (and actionable failures)."
+tldr: "Use LLMs to compile intent into checkable constraints and grounded facts, then rely on a formal solver (Dafny/Z3) for the final verdict. It’s less ‘judge vibes’ and more ‘proof or it didn’t happen.’"
 tags: ["oversight", "verification", "formal-methods", "agents", "safety"]
 sourceUrl: "https://arxiv.org/abs/2602.11136"
 publishedAt: "2026-02-12"

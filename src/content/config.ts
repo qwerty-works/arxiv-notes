@@ -7,6 +7,7 @@ const papers = defineCollection({
     catchyTitle: z.string(),
     funnySubtitle: z.string(),
     blurb: z.string(),
+    tldr: z.string(),
     tags: z.array(z.string()).min(1).max(6),
     sourceUrl: z.string().url(),
     publishedAt: z.coerce.date(),
