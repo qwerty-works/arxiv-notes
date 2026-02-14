@@ -27,6 +27,7 @@ body{
   background:var(--bg);
   color:var(--fg);
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 18px; /* +2 overall */
   line-height:1.65;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
