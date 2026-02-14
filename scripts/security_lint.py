@@ -130,6 +130,11 @@ def main(argv: list[str]) -> int:
     if re.search(r"(?m)^##\s+TL;DR\b", md):
         errors.append("Duplicate TL;DR heading found in body (remove the '## TL;DR' section; frontmatter tldr is rendered by the template)")
 
+    # Copy/paste prompts are rendered from frontmatter by the template.
+    # Do not duplicate them inside the markdown body.
+    if re.search(r"(?m)^##\s+Copy/paste prompts\b", md):
+        errors.append("Duplicate Copy/paste prompts section found in body (remove the '## Copy/paste prompts' section; prompts render from frontmatter)")
+
     # Outbound links allowlist
     for url in find_links(md):
         if not host_ok(url):

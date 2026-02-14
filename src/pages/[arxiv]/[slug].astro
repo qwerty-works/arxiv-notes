@@ -16,6 +16,10 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 
+// Template already renders prompts from frontmatter; if a post body accidentally
+// includes a prompts section, suppress the template prompts block to avoid doubles.
+const bodyHasPromptsSection = entry.body?.includes('## Copy/paste prompts') ?? false;
+
 const papers = (await getCollection('papers'))
   .slice()
   .sort((a, b) => a.data.publishedAt.getTime() - b.data.publishedAt.getTime());
@@ -38,7 +42,7 @@ const related = papers
   .map((x) => x.p);
 ---
 
-<PaperLayout entry={entry} prev={prev} next={next} related={related}>
+<PaperLayout entry={entry} prev={prev} next={next} related={related} bodyHasPromptsSection={bodyHasPromptsSection}>
   <div class="prose prose-slate dark:prose-invert max-w-none">
     <Content />
   </div>

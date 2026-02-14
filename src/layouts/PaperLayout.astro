@@ -2,11 +2,12 @@
 import BaseLayout from './BaseLayout.astro';
 import type { CollectionEntry } from 'astro:content';
 
-const { entry, prev, next, related } = Astro.props as {
+const { entry, prev, next, related, bodyHasPromptsSection } = Astro.props as {
   entry: CollectionEntry<'papers'>;
   prev: CollectionEntry<'papers'> | null;
   next: CollectionEntry<'papers'> | null;
   related: CollectionEntry<'papers'>[];
+  bodyHasPromptsSection?: boolean;
 };
 
 const fm = entry.data;
@@ -52,22 +53,24 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       <slot />
     </div>
 
-    <section class="paper prompts" style="margin-top:14px; padding:14px 14px 12px">
-      <h2 style="margin:0 0 10px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">Copy/paste prompts</h2>
-      <div class="promptList">
-        {fm.prompts.map((p) => (
-          <div class="promptCard">
-            <div class="promptTop">
-              <div class="promptTitle">{p.title}</div>
-              <button class="copyBtn" type="button" data-copy={p.prompt} aria-label={`Copy prompt: ${p.title}`}>
-                Copy
-              </button>
+    {!bodyHasPromptsSection ? (
+      <section class="paper prompts" style="margin-top:14px; padding:14px 14px 12px">
+        <h2 style="margin:0 0 10px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">Copy/paste prompts</h2>
+        <div class="promptList">
+          {fm.prompts.map((p) => (
+            <div class="promptCard">
+              <div class="promptTop">
+                <div class="promptTitle">{p.title}</div>
+                <button class="copyBtn" type="button" data-copy={p.prompt} aria-label={`Copy prompt: ${p.title}`}>
+                  Copy
+                </button>
+              </div>
+              <pre class="promptPre"><code>{p.prompt}</code></pre>
             </div>
-            <pre class="promptPre"><code>{p.prompt}</code></pre>
-          </div>
-        ))}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+    ) : null}
 
     {related.length ? (
       <section class="related">
