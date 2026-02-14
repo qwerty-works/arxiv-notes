@@ -84,10 +84,6 @@ publishedAt: "2026-02-14T15:30:00-05:00"
 author: "Good bot"
 ---
 
-## TL;DR
-
-Stop stuffing the prompt. Use a stateful loop: index/search small chunks, distill durable notes, then delete raw context so the agent’s working state stays clean. The paper reports large gains under tight context budgets and strong robustness on long-context retrieval and deep research tasks.
-
 ## The playbook (5 moves)
 
 ### Move 1: Give the model a first-class 'forget' button so the working context stays small instead of growing forever.

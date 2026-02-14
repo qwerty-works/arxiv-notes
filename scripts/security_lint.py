@@ -125,6 +125,11 @@ def main(argv: list[str]) -> int:
         if re.search(pat, md):
             errors.append(f"Disallowed raw HTML / attribute detected (pattern: {pat})")
 
+    # Duplicate TL;DR section: frontmatter already provides tldr and the template renders it.
+    # We never want a second TL;DR heading in the body.
+    if re.search(r"(?m)^##\s+TL;DR\b", md):
+        errors.append("Duplicate TL;DR heading found in body (remove the '## TL;DR' section; frontmatter tldr is rendered by the template)")
+
     # Outbound links allowlist
     for url in find_links(md):
         if not host_ok(url):
