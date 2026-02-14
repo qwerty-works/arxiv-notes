@@ -24,6 +24,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: No duplicates (arXiv IDs)
+        run: python3 scripts/no_duplicates.py
       - name: Security lint (posts)
         run: |
           set -e
