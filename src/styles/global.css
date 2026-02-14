@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root{
   /* NYT-ish: quiet paper, strong type, subtle rules */
   --bg:#f7f7f3;

@@ -38,6 +38,9 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
     <section class="paper tldr" style="margin-top:14px; padding:14px 14px 12px">
       <h2 style="margin:0 0 8px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">TL;DR</h2>
       <div style="font-size:15px; line-height:1.5">{fm.tldr}</div>
+      <div style="margin-top:10px; color:var(--muted); font-size:13px; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, \"Apple Color Emoji\", \"Segoe UI Emoji\";">
+        Do this now: copy prompt #1 and run it on a real example.
+      </div>
     </section>
 
     <div class="tags">
@@ -72,12 +75,19 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
     {related.length ? (
       <section class="related">
         <h3>Related</h3>
-        {related.map((r) => (
-          <a href={href(`${r.data.arxivId}/${r.slug.split('/').slice(1).join('/')}/`)}>
-            <strong>{r.data.catchyTitle}</strong>
-            <div style="color:var(--muted); font-size:13px; margin-top:2px">{r.data.blurb}</div>
-          </a>
-        ))}
+        {related.map((r) => {
+          const shared = (r.data.tags || []).filter((t) => (fm.tags || []).includes(t));
+          const why = shared.length ? `Also about: ${shared.slice(0, 2).join(', ')}` : '';
+          return (
+            <a href={href(`${r.data.arxivId}/${r.slug.split('/').slice(1).join('/')}/`)}>
+              <strong>{r.data.catchyTitle}</strong>
+              <div style="color:var(--muted); font-size:13px; margin-top:2px">{r.data.blurb}</div>
+              {why ? (
+                <div style="color:var(--muted); font-size:12px; margin-top:6px">{why}</div>
+              ) : null}
+            </a>
+          );
+        })}
       </section>
     ) : null}
 
