@@ -60,6 +60,17 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
       <main>
         <slot />
       </main>
+
+      <footer class="siteFooter" role="contentinfo">
+        <div class="siteFooter__inner">
+          <div class="siteFooter__brand">arxiv-notes</div>
+          <div class="siteFooter__meta">
+            Briefs twice a twice a day every day.
+            <span aria-hidden="true"> · </span>
+            <a href={`${BASE}rss.xml`} style="text-decoration:none">RSS</a>
+          </div>
+        </div>
+      </footer>
     </div>
 
     <script>
