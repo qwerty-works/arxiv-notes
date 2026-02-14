@@ -34,7 +34,7 @@ const related = papers
   })
   .filter((x) => x.score > 0)
   .sort((a, b) => b.score - a.score || b.p.data.publishedAt.getTime() - a.p.data.publishedAt.getTime())
-  .slice(0, 4)
+  .slice(0, 3)
   .map((x) => x.p);
 ---
 
