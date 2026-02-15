@@ -167,7 +167,3 @@ This approach breaks down when the ‘right’ behavior can’t be captured as o
 - Benchmark mismatch can dominate; they note training context/turn limits vs τ²-Bench requiring much longer contexts and up to 200 turns.
 - Labeling + training has real cost (they report about $0.1 per trajectory for checklist labeling, and RL training on 64 GPUs for 680 hours): validate signal on a small slice first.
 
-## Related
-
-- If your problem is **spending tokens in the wrong places at test time**, see CATTS for confidence-gated test-time scaling: `/papers/2602.12276/`.
-- If you’re more interested in **stopping over-long reflections in reasoning models**, see ARLCP: `/papers/2602.12113/`.
