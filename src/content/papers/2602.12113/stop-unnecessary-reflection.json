@@ -1,0 +1,80 @@
+{
+  "paperTitle": "Stop Unnecessary Reflection: Training LRMs for Efficient Reasoning with Adaptive Reflection and Length Coordinated Penalty",
+  "arxivId": "2602.12113",
+  "moves": [
+    {
+      "claim": "Over-reflection is a measurable failure mode: more ‘reflection-y’ tokens correlate with harder problems, but *also* with lower accuracy once models spiral.",
+      "yourMove": [
+        "Instrument your reasoning traces with a cheap ‘reflection-trigger counter’ (e.g., occurrences of tokens like ‘wait’, ‘hmm’, ‘double-check’, ‘alternatively’).",
+        "Plot accuracy (or pass@k) vs reflection-trigger count bins. If accuracy drops as reflection triggers rise, treat that as a ‘spiral’ signal you can act on (stop, branch, or resample).",
+        "Use that signal in evaluation dashboards the same way you’d use latency/token counts: as an early warning indicator, not just a curiosity metric."
+      ],
+      "receipt": "Figure 2 reports that accuracy declines as reflection token count increases, and incorrect responses have longer outputs and more reflection tokens than correct ones."
+    },
+    {
+      "claim": "Don’t use one blunt ‘shorter is better’ penalty; separate *reflection* penalties from overall *length* penalties so you can target the waste without crushing necessary reasoning.",
+      "yourMove": [
+        "If you’re training (or re-ranking) for efficiency, score outputs with two terms: (a) reflection-trigger penalty and (b) total-length penalty.",
+        "Keep them explicitly separate so you can diagnose which knob is doing the work (and avoid accidentally rewarding ‘short but wrong’ answers).",
+        "When you can’t train: use the same decomposition in a selection policy (sample N, prefer candidates that are correct/consistent *and* low-reflection / moderate-length)."
+      ],
+      "receipt": "ARLCP’s reward uses separate penalties for reflection-token count and total length (Methodology, Eq. 5 / Algorithm 1)."
+    },
+    {
+      "claim": "Make the penalty *adaptive* to problem difficulty: punish reflection much harder on ‘easy’ cases, but allow more headroom on hard cases—while still discouraging runaway loops.",
+      "yourMove": [
+        "Bucket prompts into easy/moderate/hard using an online complexity proxy you can compute cheaply (ARLCP uses reflection token counts from sampled rollouts with thresholds n1/n2).",
+        "Allocate a bigger fraction of your ‘penalty budget’ to reflection on hard cases, and shift it toward length on low-reflection cases.",
+        "If you’re doing inference-time policies (no training), mimic this: set a per-task reflection budget that is larger for hard tasks (detected via early uncertainty/hesitation signals), smaller for easy tasks."
+      ],
+      "receipt": "ARLCP sets reflection-penalty weight α1 by thresholding reflection token count (n1=40, n2=80) into three levels, and allocates the remaining penalty α2 to length (Methodology, Eq. 2 + α2=α−α1)."
+    },
+    {
+      "claim": "You can get ‘cheaper *and* better’ reasoning by explicitly training away spiral behavior: ARLCP reports large length reductions with accuracy gains on multiple benchmarks.",
+      "yourMove": [
+        "When you’re comparing ‘efficient reasoning’ approaches, report *both* accuracy and response length, plus deltas vs vanilla, across a ladder of difficulties (easy → olympiad-level).",
+        "Prioritize methods that improve the Pareto frontier (shorter while not losing accuracy).",
+        "Use ablations to prove you didn’t just learn ‘be brief’: remove reflection penalty vs length penalty and check which failure mode returns."
+      ],
+      "receipt": "Table 1 shows ARLCP vs baselines; for DeepSeek-R1-Distill-Qwen-1.5B it reports −53.05% length with +5.81 ΔAcc, and for 7B −34.96% length with +2.69 ΔAcc. Table 2 ablates the two penalties."
+    },
+    {
+      "claim": "Check domain transfer: an efficiency trick that only works on math is a toy. ARLCP reports length reduction with a small accuracy gain on MMLU.",
+      "yourMove": [
+        "After any ‘make it shorter’ intervention, run at least one out-of-domain eval where verbosity is common (e.g., multiple-choice knowledge like MMLU) to catch regressions.",
+        "Track whether you’re shortening *thinking* without shortening *answers* (e.g., keep final responses concise but not cryptic)."
+      ],
+      "receipt": "Table 4 reports on MMLU: ARLCP on the 7B model reduces length by ~41% with a +0.7 accuracy improvement over vanilla."
+    }
+  ],
+  "skeptic_check": [
+    "Reflection-trigger words can be style artifacts (a model might ‘think silently’ or use different phrasing), so validate that reflection count actually predicts errors in *your* model/domain.",
+    "Penalizing reflection can induce reward-hacking: models may avoid trigger words while still doing circular reasoning, or may prematurely stop and guess.",
+    "The paper’s strongest numbers are on math benchmarks with ground-truth answers; if your task has subjective or long-form quality criteria, you need a different correctness signal.",
+    "Thresholds (n1/n2) and weights (λ1/λ2/λ3/α) are sensitive knobs; copy them blindly only after a quick pilot distribution check.",
+    "If you use sampling+selection instead of training, be careful not to ‘select for shortness’ and silently lower reliability—measure consistency and error rates explicitly."
+  ],
+  "receipts": [
+    "Figure 2: accuracy trends vs reflection token count; correct vs incorrect outputs differ in length and reflection tokens.",
+    "Table 1: main benchmark results showing length reductions with accuracy gains across 1.5B and 7B models.",
+    "Table 2: ablation of length vs reflection penalties (removing either degrades the trade-off).",
+    "Table 4: out-of-domain MMLU results (length reduction with small accuracy gain)."
+  ],
+  "where_this_breaks": "If your model’s ‘hesitation language’ doesn’t correlate with errors (or your domain demands deliberate, verbose reasoning), a reflection-penalty policy can just train the model to stop early and guess."
+,
+  "prompt_recipes": [
+    {
+      "title": "Prompt #1 — Reflection spiral detector + stop rule (for inference policies)",
+      "prompt": "You are monitoring a model’s reasoning trace for over-reflection.\n\nInput:\n- problem: <text>\n- reasoning_trace: <text>\n\nTask:\n1) Count occurrences of these reflection triggers (case-insensitive): wait, hmm, hold on, alternatively, another thought, verify, double-check, think again, however, but, check, alternative, oh.\n2) Identify whether the trace is *making progress* (new equations, new constraints, new subgoals) or looping (repeating doubts without new information).\n3) Output a decision:\n   - CONTINUE if progress is clear,\n   - STOP_AND_SUMMARIZE if triggers are high and progress is low,\n   - RESAMPLE if it looks stuck and uncertainty is rising.\n4) If STOP_AND_SUMMARIZE: produce a 5-bullet ‘compressed reasoning’ summary and then a final answer.\n\nOutput JSON with fields: triggerCount, loopingSignals[], progressSignals[], decision, compressedSummary[], finalAnswer." 
+    },
+    {
+      "title": "Prompt #2 — Two-term efficiency score (reflection vs length)",
+      "prompt": "We are comparing candidate answers for the same problem.\n\nInput:\n- problem\n- candidates: [{id, answer_text}]\n\nFor each candidate:\n1) Estimate a reflection-trigger count using the same trigger list as Prompt #1.\n2) Estimate total length (approximate token count using word count if needed).\n3) Give a brief correctness check using only the problem statement (no external tools).\n\nThen rank candidates by: (a) correctness first, then (b) lower reflection-trigger count, then (c) shorter length.\n\nOutput JSON: {ranking:[...], perCandidate:{id:{correctnessConfidence, reflectionCount, lengthEstimate, notes}}}." 
+    },
+    {
+      "title": "Prompt #3 — Threshold/weight pilot for adaptive penalties",
+      "prompt": "You are designing an adaptive penalty scheme inspired by ARLCP.\n\nInput:\n- sample_outputs: a set of {problem_id, correct:boolean, reflection_trigger_count:int, length:int}\n\nTask:\n1) Compute the reflection-trigger count distribution (min/median/p90/max).\n2) Propose two threshold pairs (n1, n2) that split the distribution into easy/moderate/hard buckets.\n3) Propose a starting set of penalty weights (λ1, λ2, λ3, α) and explain what each controls.\n4) List 3 sanity checks to detect collapse or reward-hacking early.\n\nOutput: bullets only." 
+    }
+  ],
+  "tags": ["reasoning", "efficiency", "reinforcement-learning", "test-time-scaling", "evaluation"]
+}
