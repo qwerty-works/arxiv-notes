@@ -1,0 +1,80 @@
+{
+  "paperTitle": "CM2: Reinforcement Learning with Checklist Rewards for Multi-Turn and Multi-Step Agentic Tool Use",
+  "arxivId": "2602.12268",
+  "moves": [
+    {
+      "claim": "If your agent objective isn’t ‘verifiable’, you can still do RL by turning ‘good behavior’ into evidence-grounded pass/fail items.",
+      "yourMove": [
+        "For each user turn, write a short checklist of binary questions (pass/fail), each anchored to specific evidence in the trajectory (tool calls, tool responses, reasoning, final reply).",
+        "Include explicit pass conditions + 2–3 failure examples so a judge model is classifying, not vibes-scoring.",
+        "Add lightweight metadata: what step-type to focus on, dependencies between items, and per-item weights that sum to 1 within a turn."
+      ],
+      "receipt": "Table 1 (checklist item fields) + Figure 2 (worked example checklist item with evidence, pass_condition, failure_examples, strictness, dependency, weight)."
+    },
+    {
+      "claim": "Don’t confuse ‘more detailed evaluation’ with ‘more frequent reward’. In noisy agentic RL, dense assignment can collapse training.",
+      "yourMove": [
+        "Keep criteria dense (many checklist items), but assign/normalize reward at a coarser granularity (trajectory-level or turn-level) to average out simulation/judge noise.",
+        "Treat dense step-level credit assignment as an ablation you earn, not a default. If you see early gains then collapse, back off to coarser assignment.",
+        "When you change reward granularity, change only one knob at a time (assignment granularity vs criteria granularity)."
+      ],
+      "receipt": "Figure 3a: finer-grained assignment improves faster early, but collapses earlier/more severely; trajectory-level stays stable. Paper principle: ‘Sparse in assignment; Dense in criteria’."
+    },
+    {
+      "claim": "You can scale tool-use RL without engineering 5,000 real APIs by simulating tool I/O—and still keep some grounding.",
+      "yourMove": [
+        "Build a hybrid tool simulator: exact-match tool name+args to replay known tool responses when available; otherwise fall back to LLM simulation conditioned on tool schema and in-dialog I/O exemplars.",
+        "Log when you’re in replay vs simulation mode; treat simulation-heavy domains as higher-risk for reward noise.",
+        "Use the same ‘evidence grounding’ idea in your judge: make each checklist question point to concrete snippets/steps."
+      ],
+      "receipt": "Section 4.3: hybrid tool simulator (exact-match replay else LLM simulation); simulated environment covers 5,000+ tools; LLM-as-a-judge answers each checklist question at each step."
+    },
+    {
+      "claim": "Use strictness gates to prevent ‘bad early decisions’ from polluting later turns—and to make rollouts comparable.",
+      "yourMove": [
+        "Mark a small subset of checklist items as strict (must-pass) for the turn; if any strict item fails at end-of-turn, terminate the rollout early.",
+        "Only advance to the next user turn if strictness items pass; otherwise stop, so your RL signal isn’t dominated by nonsense continuations.",
+        "Keep strictness items about ‘procedural correctness’ (e.g., don’t proceed when user constraint is violated), not style."
+      ],
+      "receipt": "Section 3.3 (Rollout and Reward Computation): judge returns Boolean per item; after final reply, enforce strictness—if strictness items satisfied, issue next user query; else terminate early."
+    },
+    {
+      "claim": "Before RL, shrink the context you’re forcing the agent to drag around: compress long chains-of-thought into shorter planning traces.",
+      "yourMove": [
+        "If your training data includes verbose internal reasoning, run a ‘CoT compression’ pass that preserves decisions/plans but cuts length.",
+        "Re-run your checklist/judging on the compressed traces to make sure the evidence you rely on still exists.",
+        "Use this as a latency lever: smaller contexts let you push longer-horizon rollouts before you hit context limits."
+      ],
+      "receipt": "Section 4.2: they use GPT-5 to rewrite thinking content into shorter form while preserving key planning/decisions (CoT compression)."
+    }
+  ],
+  "skeptic_check": [
+    "Checklist rewards are still judged by an LLM; binarizing reduces randomness, but doesn’t remove it—watch for reward noise amplified by group-relative normalization.",
+    "LLM-simulated tools can drift from real tool behavior; improvements may partially reflect ‘simulator skill’ rather than real execution robustness.",
+    "If your checklist items are derived post-hoc from existing trajectories, you can accidentally bake in dataset-specific quirks (and miss truly novel failure modes).",
+    "Benchmark mismatch can dominate: they note context-length/turn limits during training vs τ²-Bench requiring much longer contexts and up to 200 turns; you may need in-domain RL data to close the gap.",
+    "Cost isn’t free: they report checklist labeling at about $0.1 per trajectory and RL training on 64 GPUs for 680 hours—your version should start smaller and validate the signal first."
+  ],
+  "receipts": [
+    "Figure 1: end-to-end CM2 pipeline (filtering + CoT compression + cold-start SFT + checklist annotation + LLM-sim tool env + LLM judge).",
+    "Table 1 + Figure 2: checklist item structure + example with evidence, pass/fail criteria, strictness, dependencies, weight.",
+    "Figure 3a: step/turn/trajectory assignment granularity tradeoff (early speed vs collapse; trajectory-level stable).",
+    "Tables 2–4: reported gains vs SFT: +8 points on τ²-Bench, +10 on BFCL-V4, +12 on ToolSandbox (from an 8B base model trained on an 8k-example RL dataset)."
+  ],
+  "where_this_breaks": "This approach breaks down when the ‘right’ behavior can’t be captured as observable binary checks (or when your simulator/judge is too noisy to make stable pass/fail calls).",
+  "prompt_recipes": [
+    {
+      "title": "Prompt #1 — Turn checklist generator (binary, evidence-grounded)",
+      "prompt": "You are annotating a multi-turn, multi-step tool-using agent trajectory.\n\nGiven: (1) the user query for this turn, (2) the assistant reasoning/actions, (3) tool calls + tool responses, and (4) the assistant final reply.\n\nTask: infer the turn intent and produce a CHECKLIST for this turn.\n\nRules:\n- Output 4–8 checklist items.\n- Each item must be a YES/NO question.\n- Each item MUST include: evidence pointers (turn/step + snippet), focus_on (tool_calls|tool_responses|assistant_reasoning|assistant_final_reply), pass_condition, 2–3 failure_examples, strictness (true/false), dependency list (ids), and weight (weights sum to 1 for this turn).\n- Make strictness items about ‘must not proceed if violated’ constraints from the user query.\n\nOutput JSON array of items with fields: id, evidence[], focus_on, question, pass_condition, failure_examples[], strictness, dependency[], weight."
+    },
+    {
+      "title": "Prompt #2 — Checklist judge (classification, not scoring)",
+      "prompt": "You are an LLM judge. Your job is to answer checklist items as strictly YES/NO.\n\nInput:\n- dialogue_prefix: the conversation history up to the current step\n- checklist_items: a list of checklist items with evidence pointers and pass/fail criteria\n\nFor EACH item:\n1) Read the provided evidence pointers/snippets.\n2) Decide YES if the pass_condition is satisfied by the dialogue_prefix; otherwise NO.\n3) If NO, briefly cite the missing requirement using only the dialogue text.\n\nOutput JSON:\n[{\"id\":..., \"pass\": true|false, \"rationale\": \"...\"}, ...]\n\nDo not score on a 1–10 scale. Do not invent evidence."
+    },
+    {
+      "title": "Prompt #3 — Reward granularity smoke test (avoid collapse)",
+      "prompt": "We are training a tool-using agent with checklist rewards.\n\nGiven:\n- observed training curves (reward vs steps) under step-level, turn-level, and trajectory-level advantage assignment\n- notes about simulator/judge stability\n\nTask:\n1) Identify which granularity is most likely to be stable long-run.\n2) Propose a 3-run ablation plan that changes only one knob at a time.\n3) List 5 indicators of ‘noise amplification’ that should trigger backing off from dense assignment.\n\nOutput: bullets only."
+    }
+  ],
+  "tags": ["agents", "tool-use", "reinforcement-learning", "reward-shaping", "evaluation", "reliability"]
+}
