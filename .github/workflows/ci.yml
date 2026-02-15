@@ -31,5 +31,9 @@ jobs:
           set -e
           shopt -s globstar
           for f in src/content/papers/**/*.md; do
+            # Skip meta docs
+            if [[ "$f" == src/content/papers/_meta/* ]]; then
+              continue
+            fi
             python3 scripts/security_lint.py "$f"
           done
