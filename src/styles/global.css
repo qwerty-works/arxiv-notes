@@ -31,10 +31,15 @@ body{
   background:var(--bg);
   color:var(--fg);
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  font-size: 18px; /* +2 overall */
+  font-size: 18px; /* base */
   line-height:1.65;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Smaller screens: bump body copy +2 */
+@media (max-width: 420px){
+  body{font-size: 20px;}
 }
 
 a{color:inherit}
