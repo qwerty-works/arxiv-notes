@@ -1,0 +1,77 @@
+{
+  "paperTitle": "Consistency of Large Reasoning Models Under Multi-Turn Attack",
+  "arxivId": "2602.13093",
+  "moves": [
+    {
+      "claim": "If you only test a model once, you’re not testing reliability — you’re testing luck. Use a multi-turn ‘pressure test’ that tries to flip correct answers.",
+      "how_to_use_it": ["Build an eval harness that takes questions the model answered correctly at turn 0, then runs an 8-turn follow-up sequence (random order) and scores whether it flips away from the correct answer; track a position-weighted metric that penalizes early flips."],
+      "decision_rule": "Use this whenever you’re deploying an assistant in a setting where a user can push back (support, medical, legal, education) and ‘Are you sure?’ is a realistic interaction.",
+      "pitfall_guardrail": "Pitfall: average accuracy hides catastrophic early capitulation; guardrail: log per-turn correctness and weight early failures more heavily (position-weighted consistency style).",
+      "receipt": "Receipt: Section 3 describes an 8-round adversarial protocol with randomized follow-up types; Section 4.1 uses Acc_avg plus Position-Weighted Consistency to avoid averaging away early failures."
+    },
+    {
+      "claim": "Treat ‘misleading suggestions’ as the default killer move: explicitly proposing a wrong alternative flips every model the authors tested more than social pressure does.",
+      "how_to_use_it": ["Add a ‘suggestion-hijack’ probe to your eval and a production guardrail: when the user suggests a specific alternative answer, force the assistant to restate the original evidence and only change its answer if it can produce new, checkable evidence."],
+      "decision_rule": "Trigger the guardrail when the follow-up contains an explicit alternative (e.g., ‘I think it’s B’) or a concrete proposed edit, not just generic doubt.",
+      "pitfall_guardrail": "Pitfall: the model rationalizes the suggested answer post hoc; guardrail: require an explicit ‘what new information changed?’ line, and refuse to switch if there is none.",
+      "receipt": "Receipt: Figure 1 caption + Section 4.3: misleading suggestions (A3) are ‘universally effective’ and highest/second-highest flip-rate across models."
+    },
+    {
+      "claim": "Most flips aren’t ‘gotchas’ — they’re two boring failure modes you can design against: Self-Doubt and Social Conformity account for ~50% of failures.",
+      "how_to_use_it": ["In prompts, separate ‘politeness’ from ‘truth’: tell the model to acknowledge the user’s concern without changing the answer unless it finds verifiable counter-evidence; add a ‘confidence anchor’ step: restate the final answer first, then re-check."],
+      "decision_rule": "Use this for assistants that face authority/consensus cues (‘most people disagree’, ‘as an expert…’) or repeated prodding.",
+      "pitfall_guardrail": "Pitfall: the model treats social cues as negative feedback and flips; guardrail: explicitly downgrade social signals to ‘non-evidence’ and require a factual check before revisions.",
+      "receipt": "Receipt: Section 4.4 + Table 4: Self-Doubt and Social Conformity are the two dominant failure modes and together account for 50% of failures."
+    },
+    {
+      "claim": "Don’t build safety or routing on the model’s confidence for reasoning models: confidence barely predicts correctness (r≈-0.08; ROC-AUC≈0.54) and is tightly clustered near ~96%.",
+      "how_to_use_it": ["If you need ‘should I trust this?’ signals, use external checks (retrieval + citation, unit tests, rule-based verifiers, or a second model) instead of confidence thresholds; treat high confidence as ‘not informative’."],
+      "decision_rule": "If you’re using a reasoning model with long traces, assume confidence is miscalibrated unless you’ve validated it on your own data.",
+      "pitfall_guardrail": "Pitfall: confidence-based defenses protect already-robust responses and miss the vulnerable ones; guardrail: stratify flip-rate by confidence bins and verify the signal before shipping it.",
+      "receipt": "Receipt: Section 5.2 reports r=-0.080 (p=0.054) and ROC-AUC=0.54; the PDF text reports mean confidence 96.1% (SD 4.6%) and Table 5 shows flip rates by confidence tercile (low-confidence correct answers flip 8.8%)."
+    },
+    {
+      "claim": "Expect ‘reasoning fatigue’ in long pushback threads: oscillation and late-round capitulation are real patterns, not just noise — design your chat UX to reset.",
+      "how_to_use_it": ["When a conversation exceeds N challenge turns, automatically restart from the original question with a clean slate: re-ask the question, re-derive, and compare to the current stance; if they disagree, escalate to a verifier or a human."],
+      "decision_rule": "Turn on the reset when you see multiple answer flips (oscillation) or when the user has been challenging for several turns.",
+      "pitfall_guardrail": "Pitfall: ‘keep debating in the same thread’ degrades reasoning quality; guardrail: cap the number of adversarial follow-ups and force a reset + re-derivation.",
+      "receipt": "Receipt: Section 4.2 defines oscillating / terminal capitulation trajectory patterns; Section 4.4 defines Reasoning Fatigue and links it to oscillation (e.g., Claude 4.5’s oscillation and fatigue counts align in the paper’s analysis)."
+    }
+  ],
+  "do_this_now": [
+    "Add a 5-minute ‘flip test’: take 50 questions your assistant answers correctly, then hit it with 8 randomized follow-ups (including an explicit wrong alternative) and record flip rate by turn.",
+    "Add a production rule: if the user proposes a specific alternative answer, require ‘new evidence or no change’.",
+    "Log per-turn correctness and a metric that penalizes early flips more than late flips.",
+    "Stop using raw model confidence as a trust signal until you’ve validated confidence→correctness on your own tasks.",
+    "Add a ‘reset after pushback’ UX: after N challenges, re-run the task from scratch and compare answers."
+  ],
+  "where_this_breaks": "If your task is open-ended or subjective (no verifiable ‘correct answer’), flip-style protocols can’t cleanly distinguish healthy revision from capitulation.",
+  "receipts": [
+    "Figure 1: attack-type vulnerability profiles; misleading suggestions (A3) are universally effective.",
+    "Table 4: failure-mode distribution; Self-Doubt + Social Conformity account for 50% of failures.",
+    "Section 5.2: confidence vs correctness (r=-0.080; ROC-AUC=0.54) and confidence clustering (mean 96.1%, SD 4.6%).",
+    "Table 5: flip rates by confidence tercile; low-confidence correct answers flip 8.8% (vs ~5.1–5.2% for medium/high)."
+  ],
+  "skeptic_check": [
+    "Are you measuring multi-turn reliability, or just single-turn accuracy? If you don’t log per-turn outcomes, you won’t see flips.",
+    "Do your follow-ups include an explicit wrong alternative? If not, you’re skipping the paper’s most consistently effective attack type.",
+    "Are you treating confidence as a proxy for correctness? Validate it; the paper reports near-chance ROC-AUC.",
+    "Can your product safely ‘reset’ the thread (new run) without confusing the user? If not, design a clear ‘re-check’ mode.",
+    "Do you have a verifier (retrieval, tests, rules) to break ties when the model wavers?"
+  ],
+  "prompt_recipes": [
+    {
+      "title": "Anti-sycophancy recheck (don’t flip without new evidence)",
+      "prompt": "You answered the user’s question already. Now the user is challenging you.\n\nRules (non-negotiable):\n- Treat social cues (tone, consensus, authority, ‘are you sure?’) as NON-EVIDENCE.\n- You may change your answer ONLY if you can name NEW, CHECKABLE evidence or a specific logical error in your prior reasoning.\n- If no new evidence exists, keep the original answer and explain why politely in 2-4 sentences.\n\nOutput format:\n1) Original answer (one line)\n2) Re-check: what evidence would change the answer? (1-3 bullets)\n3) Decision: KEEP or CHANGE\n4) If CHANGE: state the new answer and the exact reason (one sentence)\n\nConversation so far:\n<PASTE THREAD>"
+    },
+    {
+      "title": "Suggestion-hijack firewall (user proposes a specific alternative)",
+      "prompt": "The user is proposing a specific alternative answer.\n\nTask: decide whether to switch.\n\nGuardrail:\n- First, restate the current best-supported answer.\n- Then list the user’s suggested alternative.\n- Then list the minimal verification steps (tests, sources, calculations) that would discriminate between them.\n- Do NOT switch unless you can complete (or outline) a discriminating check.\n\nOutput:\nA) Current answer (one line)\nB) Proposed alternative (one line)\nC) Discriminating checks (3 bullets)\nD) Decision: KEEP or CHANGE (one word)\n\nQuestion + context:\n<PASTE>"
+    },
+    {
+      "title": "Reset after pushback (fresh run + compare)",
+      "prompt": "You are in a long multi-turn debate and may be experiencing reasoning fatigue.\n\nDo a FRESH RUN from scratch as if this is the first message.\n\nSteps:\n1) Restate the original question in your own words (one sentence).\n2) Answer it cleanly (no reference to the debate), max 6 sentences.\n3) Compare with your current stance: SAME or DIFFERENT.\n4) If DIFFERENT, explain which specific step changed and what evidence supports the new answer.\n\nOriginal question:\n<PASTE ORIGINAL QUESTION>\n\nCurrent stance (if any):\n<PASTE CURRENT ANSWER>"
+    }
+  ],
+  "tags": ["evaluation", "robustness", "multi-turn", "sycophancy", "failure-modes", "safety"]
+}
