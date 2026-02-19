@@ -36,9 +36,10 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
     {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
 
     <!-- CSP via meta tag (GitHub Pages can't set HTTP headers). Keep tight. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.openai.com" />
 
     <meta name="theme-color" content="#0b0d10" />
+    <link rel="stylesheet" href={`${BASE}chat/paper-chat.css`} />
   </head>
   <body>
     <div class="container">
@@ -60,6 +61,79 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
       <main>
         <slot />
       </main>
+
+      <!-- Chat with the paper (BYO key) -->
+      <div id="paperChat" class="paperChat" data-state="closed">
+        <section id="paperChatDrawer" class="paperChat__drawer" aria-label="Paper chat" role="dialog" aria-modal="false">
+          <header class="paperChat__header">
+            <div class="paperChat__title">Chat with this paper</div>
+            <button id="paperChatClose" class="paperChat__close" type="button" aria-label="Close">✕</button>
+          </header>
+
+          <div id="paperChatGate" class="paperChat__gate" hidden>
+            <div class="paperChat__gateTitle">Enable chat</div>
+            <div class="paperChat__gateBody">
+              <p>Bring your own OpenAI API key. It stays in your browser.</p>
+              <label class="paperChat__label">API key</label>
+              <input id="paperChatApiKey" class="paperChat__input" type="password" inputmode="text" autocomplete="off" placeholder="sk-..." />
+
+              <label class="paperChat__label" style="margin-top:10px">Passphrase (encrypts key locally)</label>
+              <input id="paperChatPass" class="paperChat__input" type="password" autocomplete="off" placeholder="Choose a passphrase" />
+
+              <div class="paperChat__row" style="margin-top:10px">
+                <button id="paperChatSaveKey" class="paperChat__btn paperChat__btnPrimary" type="button">Save & enable</button>
+                <button id="paperChatUseOnce" class="paperChat__btn" type="button">Use once</button>
+              </div>
+              <div class="paperChat__muted" style="margin-top:10px">
+                Note: if your device/browser is compromised, stored keys can be extracted.
+              </div>
+            </div>
+          </div>
+
+          <div id="paperChatUnlock" class="paperChat__gate" hidden>
+            <div class="paperChat__gateTitle">Unlock chat</div>
+            <div class="paperChat__gateBody">
+              <p>Enter your passphrase to decrypt your saved API key.</p>
+              <label class="paperChat__label">Passphrase</label>
+              <input id="paperChatPassUnlock" class="paperChat__input" type="password" autocomplete="off" placeholder="Passphrase" />
+              <div class="paperChat__row" style="margin-top:10px">
+                <button id="paperChatUnlockBtn" class="paperChat__btn paperChat__btnPrimary" type="button">Unlock</button>
+                <button id="paperChatForget" class="paperChat__btn" type="button">Forget key</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="paperChatMain" class="paperChat__main" hidden>
+            <div id="paperChatMsgs" class="paperChat__msgs" aria-label="Messages"></div>
+            <div class="paperChat__composer">
+              <textarea id="paperChatQ" class="paperChat__textarea" rows="2" placeholder="Ask a question…"></textarea>
+              <button id="paperChatSend" class="paperChat__send" type="button">Send</button>
+            </div>
+            <details class="paperChat__receipts" id="paperChatReceipts" hidden>
+              <summary>Receipts</summary>
+              <div id="paperChatReceiptsBody" class="paperChat__receiptsBody"></div>
+            </details>
+
+            <div id="paperChatModal" class="paperChat__modal" hidden>
+              <div class="paperChat__modalBackdrop" data-close="1"></div>
+              <div class="paperChat__modalPanel" role="dialog" aria-modal="true" aria-label="Receipt context">
+                <div class="paperChat__modalHeader">
+                  <div id="paperChatModalTitle" class="paperChat__modalTitle">Receipt</div>
+                  <button id="paperChatModalClose" class="paperChat__modalClose" type="button" aria-label="Close">✕</button>
+                </div>
+                <pre id="paperChatModalBody" class="paperChat__modalBody"></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <button id="paperChatFab" class="paperChat__fab" type="button" aria-label="Chat with this paper">
+          <span class="paperChat__fabDot" aria-hidden="true"></span>
+          <span class="paperChat__fabIcon" aria-hidden="true">💬</span>
+        </button>
+      </div>
+
+      <script type="module" src={`${BASE}chat/paper-chat.js`}></script>
 
       <footer class="siteFooter" role="contentinfo">
         <div class="siteFooter__inner">
