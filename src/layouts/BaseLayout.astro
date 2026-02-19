@@ -113,6 +113,17 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
               <summary>Receipts</summary>
               <div id="paperChatReceiptsBody" class="paperChat__receiptsBody"></div>
             </details>
+
+            <div id="paperChatModal" class="paperChat__modal" hidden>
+              <div class="paperChat__modalBackdrop" data-close="1"></div>
+              <div class="paperChat__modalPanel" role="dialog" aria-modal="true" aria-label="Receipt context">
+                <div class="paperChat__modalHeader">
+                  <div id="paperChatModalTitle" class="paperChat__modalTitle">Receipt</div>
+                  <button id="paperChatModalClose" class="paperChat__modalClose" type="button" aria-label="Close">✕</button>
+                </div>
+                <pre id="paperChatModalBody" class="paperChat__modalBody"></pre>
+              </div>
+            </div>
           </div>
         </section>
 

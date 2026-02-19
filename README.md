@@ -92,6 +92,26 @@ Pushing to `main` triggers the **Deploy to GitHub Pages** workflow.
 Published at:
 - https://qwerty-works.github.io/arxiv-notes/
 
+## Chat with the paper (experimental)
+
+This repo includes an **experimental** “Chat with this paper” drawer.
+
+Key properties:
+- **BYO API key**: users provide their own OpenAI key.
+- Key can be stored **encrypted in localStorage** using a passphrase (PBKDF2 → AES‑GCM).
+- Chat uses **retrieval** over a per-paper `context.json` to keep token usage efficient.
+
+### Paper context files
+
+Chat reads:
+- `public/paper-context/<arxivId>/context.json`
+
+You can (re)generate one context file with:
+
+```bash
+python3 scripts/build_paper_context.py <arxivId>
+```
+
 ## Implementation notes
 
 - Copy-to-clipboard buttons are implemented in `src/layouts/BaseLayout.astro` (vanilla JS).

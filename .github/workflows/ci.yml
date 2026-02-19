@@ -37,3 +37,14 @@ jobs:
             fi
             python3 scripts/security_lint.py "$f"
           done
+
+      - name: Context lint (public paper-context)
+        run: |
+          set -e
+          shopt -s globstar
+          files=(public/paper-context/**/context.json)
+          if (( ${#files[@]} )); then
+            python3 scripts/context_lint.py ${files[@]}
+          else
+            echo "No context.json files found; skipping"
+          fi

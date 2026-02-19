@@ -43,6 +43,21 @@
 
 .paperChat__receipts{padding:8px 12px 12px}
 .paperChat__receipts summary{cursor:pointer; font-size:12px; opacity:.85}
-.paperChat__receipt{margin-top:8px; border:1px dashed rgba(127,127,127,.25); border-radius:12px; padding:10px}
+.paperChat__receipt{margin-top:8px; border:1px dashed rgba(127,127,127,.25); border-radius:12px; padding:10px; cursor:pointer}
+.paperChat__receipt:hover{background: rgba(127,127,127,.06)}
 .paperChat__receiptId{font-weight:900; font-size:12px; margin-bottom:6px}
 .paperChat__receiptText{font-size:12px; opacity:.9; white-space:pre-wrap}
+
+.paperChat__modal{position:fixed; inset:0; z-index:10000}
+.paperChat__modalBackdrop{position:absolute; inset:0; background: rgba(0,0,0,.45)}
+.paperChat__modalPanel{position:absolute; right:16px; bottom:86px; width:min(560px, calc(100vw - 32px)); max-height: min(70vh, 520px);
+  border-radius:16px; overflow:hidden; border:1px solid rgba(127,127,127,.22);
+  background: rgba(255,255,255,.96); color:#0f172a; box-shadow: 0 20px 70px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: dark){
+  .paperChat__modalPanel{background: rgba(15,23,42,.96); color:#f8fafc; border-color: rgba(255,255,255,.14)}
+}
+.paperChat__modalHeader{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(127,127,127,.18)}
+.paperChat__modalTitle{font-weight:900; font-size:13px}
+.paperChat__modalClose{border:none; background:transparent; color:inherit; font-size:16px; cursor:pointer; padding:6px 8px}
+.paperChat__modalBody{margin:0; padding:12px; white-space:pre-wrap; overflow:auto; font-size:12px; line-height:1.35; max-height: calc(min(70vh, 520px) - 44px)}

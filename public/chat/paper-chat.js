@@ -26,6 +26,13 @@ const sendBtn = $('paperChatSend');
 const receiptsWrap = $('paperChatReceipts');
 const receiptsBody = $('paperChatReceiptsBody');
 
+const modal = $('paperChatModal');
+const modalTitle = $('paperChatModalTitle');
+const modalBody = $('paperChatModalBody');
+const modalClose = $('paperChatModalClose');
+
+let lastChunksSent = [];
+
 const LS_KEY = 'paperChat.encKey.v1';
 
 let sessionKey = null; // decrypted API key for this tab
@@ -190,11 +197,16 @@ function currentArxivId(){
   return parts[idx+1] || null;
 }
 
+const _ctxCache = new Map();
+
 async function loadContext(arxivId){
+  if (_ctxCache.has(arxivId)) return _ctxCache.get(arxivId);
   const url = `/arxiv-notes/paper-context/${arxivId}/context.json`;
-  const r = await fetch(url);
+  const r = await fetch(url, { cache: 'force-cache' });
   if (!r.ok) throw new Error('context_missing');
-  return r.json();
+  const j = await r.json();
+  _ctxCache.set(arxivId, j);
+  return j;
 }
 
 function tokenize(s){
@@ -287,6 +299,32 @@ function extractReceipts(answer){
   return null;
 }
 
+function openModal(chunkId){
+  const c = (lastChunksSent || []).find((x)=>x.id===chunkId);
+  if (!c) return;
+  if (!modal || !modalTitle || !modalBody) return;
+  modalTitle.textContent = `${c.id} (${c.type})`;
+  modalBody.textContent = c.text;
+  modal.hidden = false;
+}
+function closeModal(){
+  if (!modal) return;
+  modal.hidden = true;
+}
+modalClose?.addEventListener('click', closeModal);
+modal?.addEventListener('click', (e)=>{
+  const t = e.target;
+  if (t && t.dataset && t.dataset.close === '1') closeModal();
+});
+
+receiptsBody?.addEventListener('click', (e)=>{
+  const el = e.target && e.target.closest ? e.target.closest('.paperChat__receipt') : null;
+  if (!el) return;
+  const id = el.getAttribute('data-id');
+  if (!id) return;
+  openModal(id);
+});
+
 sendBtn?.addEventListener('click', async () => {
   const question = q.value.trim();
   if (!question) return;
@@ -315,11 +353,13 @@ sendBtn?.addEventListener('click', async () => {
     addMsg('assistant', answer);
 
     // receipts UI: show the chunks we sent
+    lastChunksSent = chunks.slice(0,4);
     receiptsWrap.hidden = false;
     receiptsBody.innerHTML = '';
-    for (const c of chunks.slice(0,4)){
+    for (const c of lastChunksSent){
       const div = document.createElement('div');
       div.className = 'paperChat__receipt';
+      div.setAttribute('data-id', c.id);
       div.innerHTML = `<div class="paperChat__receiptId">${c.id}</div><div class="paperChat__receiptText"></div>`;
       div.querySelector('.paperChat__receiptText').textContent = c.text.slice(0, 220) + (c.text.length>220?'…':'');
       receiptsBody.appendChild(div);
