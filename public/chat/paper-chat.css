@@ -1,0 +1,48 @@
+.paperChat{position:fixed; right:16px; bottom:16px; z-index:9999;}
+.paperChat__fab{width:54px; height:54px; border-radius:999px; border:1px solid rgba(255,255,255,.18); background: rgba(15,23,42,.65); backdrop-filter: blur(10px); color:#fff; cursor:pointer; box-shadow: 0 14px 40px rgba(0,0,0,.35); position:relative;}
+.paperChat__fabIcon{font-size:22px}
+.paperChat__fabDot{position:absolute; inset:-14px; border-radius:999px; background: radial-gradient(circle at 30% 20%, rgba(52,211,153,.24), transparent 55%); filter: blur(0px); animation: pc-pulse 2.4s ease-in-out infinite; pointer-events:none;}
+@keyframes pc-pulse{0%,100%{transform:scale(1); opacity:.55}50%{transform:scale(1.14); opacity:.95}}
+
+.paperChat__drawer{display:none; width:min(420px, calc(100vw - 24px)); height:min(60vh, 520px); margin-bottom:12px; border-radius:16px; border:1px solid rgba(15,23,42,.14); background: rgba(255,255,255,.92); color:#0f172a; box-shadow: 0 18px 60px rgba(0,0,0,.25); overflow:hidden;}
+@media (prefers-color-scheme: dark){
+  .paperChat__drawer{background: rgba(15,23,42,.92); color:#f8fafc; border-color: rgba(255,255,255,.12)}
+}
+
+.paperChat__header{display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(127,127,127,.18)}
+.paperChat__title{font-weight:900; font-size:13px; letter-spacing:-.01em}
+.paperChat__close{border:none; background:transparent; color:inherit; font-size:16px; cursor:pointer; padding:6px 8px}
+
+.paperChat__gate{padding:12px}
+.paperChat__gateTitle{font-weight:900; font-size:13px; margin-bottom:6px}
+.paperChat__gateBody p{margin:6px 0 10px; font-size:13px; opacity:.9}
+.paperChat__label{display:block; font-size:12px; opacity:.85; margin:8px 0 6px}
+.paperChat__input{width:100%; padding:10px 10px; border-radius:12px; border:1px solid rgba(127,127,127,.22); background: rgba(255,255,255,.8); color:inherit; font-size:16px}
+@media (prefers-color-scheme: dark){
+  .paperChat__input{background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14)}
+}
+
+.paperChat__row{display:flex; gap:10px; align-items:center}
+.paperChat__btn{border:1px solid rgba(127,127,127,.25); background:transparent; color:inherit; padding:10px 12px; border-radius:999px; cursor:pointer; font-size:13px}
+.paperChat__btnPrimary{border-color: rgba(52,211,153,.55); background: rgba(52,211,153,.10)}
+.paperChat__muted{font-size:12px; opacity:.75}
+
+.paperChat__main{display:flex; flex-direction:column; height: calc(100% - 44px)}
+.paperChat__msgs{flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px}
+.paperChat__msg{padding:10px 12px; border-radius:14px; font-size:13px; line-height:1.35; white-space:pre-wrap}
+.paperChat__msg--user{align-self:flex-end; background: rgba(52,211,153,.16); border:1px solid rgba(52,211,153,.22)}
+.paperChat__msg--assistant{align-self:flex-start; background: rgba(127,127,127,.10); border:1px solid rgba(127,127,127,.16)}
+
+.paperChat__composer{display:flex; gap:10px; padding:10px 10px; border-top:1px solid rgba(127,127,127,.18)}
+.paperChat__textarea{flex:1; resize:none; border-radius:12px; border:1px solid rgba(127,127,127,.22); padding:10px; font-size:16px; background: rgba(255,255,255,.8); color:inherit}
+.paperChat__send{border:none; border-radius:12px; padding:10px 12px; background: rgba(15,23,42,.85); color:#fff; cursor:pointer}
+@media (prefers-color-scheme: dark){
+  .paperChat__send{background: rgba(255,255,255,.16); color:#fff}
+  .paperChat__textarea{background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14)}
+}
+
+.paperChat__receipts{padding:8px 12px 12px}
+.paperChat__receipts summary{cursor:pointer; font-size:12px; opacity:.85}
+.paperChat__receipt{margin-top:8px; border:1px dashed rgba(127,127,127,.25); border-radius:12px; padding:10px}
+.paperChat__receiptId{font-weight:900; font-size:12px; margin-bottom:6px}
+.paperChat__receiptText{font-size:12px; opacity:.9; white-space:pre-wrap}

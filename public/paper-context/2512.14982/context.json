@@ -1,0 +1,72 @@
+{
+  "arxivId": "2512.14982",
+  "paperTitle": "Prompt Repetition Improves Non-Reasoning LLMs",
+  "generatedAt": "2026-02-18",
+  "chunks": [
+    {
+      "id": "abs-1",
+      "type": "abstract",
+      "text": "When not using reasoning, repeating the input prompt improves performance for popular models (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency."
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 1: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 2: Comparison of accuracy, average, and median response length, as well as average latency,"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: Comparison of accuracy, average, and median response length, as well as average latency,"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 4: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when"
+    },
+    {
+      "id": "c-1",
+      "type": "body",
+      "text": "Prompt Repetition Improves Non-Reasoning LLMs\n\nYaniv Leviathan∗               Matan Kalman∗                    Yossi Matias\n                                                      Google Research                 Google Research                Google Research\n                                                   leviathan@google.com             matank@google.com               yossi@google.com\narXiv:2512.14982v1 [cs.LG] 17 Dec 2025\n\nWhen not using reasoning, repeating the input prompt improves performance for popular models\n                                         (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency.\n\n1       Prompt Repetition\n                                         LLMs are often trained as causal language models, i.e. past tokens cannot attend to future tokens.\n                                         Therefore, the order of the to"
+    },
+    {
+      "id": "c-2",
+      "type": "body",
+      "text": "Figure 1: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when\n                                         asking the models not to reason. A star indicates a statistically significant win (pvalue < 0.1 according\n                                         to the McNemar test McNemar [1947]). Prompt repetition wins 47 out of 70 tests, with 0 losses.\n                                             ∗\n                                                 Equal contribution.\n\nPreprint.\n\fAs further motivation, we observe that reasoning models trained with RL often learn to repeat (parts\nof) the user’s request. Prompt repetition is efficient, moving the repetition to the parallelizable prefill\nstage. The number of generated tokens does not increase 1 . Moreover, prompt repetition does not\nchange the format of the generated outputs, keeping them interchangeable with those of t"
+    },
+    {
+      "id": "c-3",
+      "type": "body",
+      "text": "We test prompt repetition on a range of 7 popular models from leading LLM providers of varying\nsizes: Gemini 2.0 Flash and Gemini 2.0 Flash Lite [Gemini Team Google, 2023], GPT-4o-mini and\nGPT-4o [OpenAI, 2024], Claude 3 Haiku and Claude 3.7 Sonnet [Anthropic, 2024], and Deepseek\nV3 [DeepSeek-AI, 2025]. We ran all tests using each provider’s official API in Feb and Mar 2025.\nWe test each of the models on a set of 7 benchmarks in several configurations: ARC (Challenge)\n[Clark et al., 2018], OpenBookQA [Mihaylov et al., 2018], GSM8K [Cobbe et al., 2021], MMLU-Pro\n[Wang et al., 2024], MATH [Hendrycks et al., 2021], and 2 custom benchmarks: NameIndex and\nMiddleMatch (Appendix A.3). For the multiple choice benchmarks (ARC, OpenBookQA, and\nMMLU-Pro) we report results both when placing the question first and the answer options later, as\nwell as the other way around, the latter making the model "
+    },
+    {
+      "id": "c-4",
+      "type": "body",
+      "text": "Accuracy. Without reasoning, prompt repetition improves the accuracy of all tested LLMs and\nbenchmarks (Figure 1). We consider cases where one method is significantly better than the other\naccording to the McNemar test [McNemar, 1947] with pvalue < 0.1 as wins. With this criteria,\nprompt repetition wins 47 out of 70 benchmark-model combinations, with 0 losses. Notably,\nperformance is improved for all tested models. As expected, we observe smaller improvements for\nthe multiple-choice benchmarks with question-first, and larger improvements with options-first. On\nthe custom tasks of NameIndex and MiddleMatch we observe strong gains with prompt repetition\nfor all models (for example, prompt repetition improves the accuracy of Gemini 2.0 Flash-Lite on\nNameIndex from 21.33% to 97.33%). We also test a smaller set of benchmarks when encouraging\nthinking step-by-step (Figure 4), where the results"
+    },
+    {
+      "id": "c-5",
+      "type": "body",
+      "text": "Ablations and variations. We compare prompt repetition to 2 additional variants: Prompt Repeti-\ntion (Verbose) and Prompt Repetition ×3 (Appendix A.4). We observe that they perform similarly\nfor most tasks and models (Figures 2 and 3), and sometimes outperform vanilla prompt repetition.\nNotably, Prompt Repetition ×3 often substantially outperforms vanilla prompt repetition (which\nitself substantially outperforms the baseline) on NameIndex and MiddleMatch. It therefore seems\nworthwhile to further research variants. To demonstrate that the gains are indeed due to repeating the\nprompt and not to simply increasing the length of the input, we also evaluate the Padding method\n(Appendix A.4), which pads the inputs with periods (“.”) to the same length as prompt repetition,\nand, as expected, does not improve performance.\n\nEfficiency. For each model, prompting method, and dataset, we measure the "
+    },
+    {
+      "id": "c-6",
+      "type": "body",
+      "text": "Many prompting techniques for LLMs have been suggested, notably Chain of Thought (CoT)\nprompting [Wei et al., 2023] (which requires specific examples per task) and “Think step by step”\n[Kojima et al., 2023], which achieves substantial improvements, but increases the lengths of the\ngenerated outputs and thus the latency and compute requirements (we show that it can be used in\ntandem with prompt repetition, yielding mostly neutral results). More recently and independently,\nShaier [2024] experimented with repeating just the question part of the prompt and found that it yields\nno gains, Springer et al. [2024] showed that repeating the input twice yields better text embeddings,\nand Xu et al. [2024] showed that asking the model to re-read the question improves reasoning.\n\nWe show that repeating the prompts consistently improves model performance for a range of models\nand benchmarks, when not u"
+    },
+    {
+      "id": "c-7",
+      "type": "body",
+      "text": "Future directions. (1) Fine tune the model with repeated prompts; (2) Train a reasoning model\nwith prompt repetition to increase efficiency (the model might learn to avoid repeating the prompt);\n(3) Periodically repeat the last generated tokens during generation, as well as explore applicability to\nmulti-turn scenarios; (4) Only keep the second repetition in the KV-cache (thus being completely\nperformance neutral for the generation stage); (5) Repeat only parts of the prompt (especially for\nlonger prompts); (6) Reorder the prompt, e.g. with a smaller model, instead of repeating everything;\n(7) Applicability to non-text modalities (e.g. images); (8) Further analyze different variants, e.g.\nwhen more than 2 repetitions might be advantageous; (9) Further analyze the attention patterns due\nto repetition (in the same vein as done in Xu et al. [2024]); (10) Use repetitions in tandem with\ntechn"
+    },
+    {
+      "id": "c-8",
+      "type": "body",
+      "text": "We’d like to extend a huge thank you to Raya Leviathan, Danny Lumen, Dani Valevski, Sergey\nLevi, the Theta Labs and Google Research teams, and our families for insightful feedback, ideas,\nsuggestions, and support."
+    }
+  ]
+}
