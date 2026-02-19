@@ -151,8 +151,22 @@ a:hover{text-decoration:underline}
 .pager .label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
 .pager .name{margin-top:6px; font-weight:800}
 
+/* Home: main column + side column */
+.homeMain{display:grid; gap:14px;}
+.homeMore{padding: 14px 0;}
+.homeMore__kicker{padding: 0 16px 10px; font-size: 12px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";}
+.homeMore__list{display:grid;}
+.homeRow{display:block; padding:14px 16px; border-top:1px solid var(--border); text-decoration:none}
+.homeRow:first-child{border-top:none}
+.homeRow:hover{background: rgba(127,127,127,.06)}
+.homeRow__title{font-weight:900; letter-spacing:-.02em; line-height:1.15}
+.homeRow__sub{margin-top:6px; color:var(--muted); font-size: 13px}
+.homeRow__meta{margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-size:12px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";}
+
 @media (min-width: 880px){
-  .grid{grid-template-columns: 1.2fr .8fr; align-items:start;}
+  .grid{grid-template-columns: 1.35fr .65fr; align-items:start;}
   .hero{padding:22px 22px 20px;}
   .hero__title{font-size: 40px}
   .article{padding: 22px 22px 20px;}

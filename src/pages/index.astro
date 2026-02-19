@@ -10,8 +10,14 @@ const papers = (await getCollection('papers'))
     b.data.arxivId.localeCompare(a.data.arxivId)
   );
 
-const latest = papers[0] ?? null;
-const rest = papers.slice(1, 12);
+// Home page cap
+const home = papers.slice(0, 15);
+
+const latest = home[0] ?? null;
+// "More" stories shown under the hero in the main column
+const mainMore = home.slice(1, 5);
+// Sidebar stories
+const side = home.slice(5);
 
 const BASE = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -31,44 +37,64 @@ const description = 'A tiny newspaper for arXiv: 5-minute briefs that teach huma
 ---
 
 <BaseLayout title={title} description={description} canonical={''}>
-  <div class="grid">
-    <section class="paper hero">
-      <div class="hero__kicker">Latest paper</div>
-      {
-        latest ? (
-          <>
-            <h1 class="hero__title"><a href={paperUrl(latest)} style="text-decoration:none">{latest.data.catchyTitle}</a></h1>
-            <div class="hero__sub">{latest.data.funnySubtitle}</div>
-            <div class="hero__meta">
-              <span class="pill">{latest.data.publishedAt.toLocaleDateString()}</span>
-              <span class="pill">arXiv: {latest.data.arxivId}</span>
-            </div>
-            <div class="tags">
-              {latest.data.tags.map((t) => (
-                <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t}</a>
-              ))}
-            </div>
-            <p style="margin-top:12px; color:var(--muted)">{latest.data.blurb}</p>
-          </>
-        ) : (
-          <>
-            <h1 class="hero__title">No papers yet</h1>
-            <div class="hero__sub">Send an arXiv link and I’ll start filing the front page.</div>
-          </>
-        )
-      }
+  <div class="grid grid--home">
+    <section class="homeMain">
+      <section class="paper hero">
+        <div class="hero__kicker">Latest paper</div>
+        {
+          latest ? (
+            <>
+              <h1 class="hero__title"><a href={paperUrl(latest)} style="text-decoration:none">{latest.data.catchyTitle}</a></h1>
+              <div class="hero__sub">{latest.data.funnySubtitle}</div>
+              <div class="hero__meta">
+                <span class="pill">{latest.data.publishedAt.toLocaleDateString()}</span>
+                <span class="pill">arXiv: {latest.data.arxivId}</span>
+              </div>
+              <div class="tags">
+                {latest.data.tags.map((t) => (
+                  <a class="tag" href={href(`tags/${encodeURIComponent(t)}/`)}>#{t}</a>
+                ))}
+              </div>
+              <p style="margin-top:12px; color:var(--muted)">{latest.data.blurb}</p>
+            </>
+          ) : (
+            <>
+              <h1 class="hero__title">No papers yet</h1>
+              <div class="hero__sub">Send an arXiv link and I’ll start filing the front page.</div>
+            </>
+          )
+        }
+      </section>
+
+      {mainMore.length ? (
+        <section class="paper homeMore" aria-label="More stories">
+          <div class="homeMore__kicker">More stories</div>
+          <div class="homeMore__list">
+            {mainMore.map((p) => (
+              <a class="homeRow" href={paperUrl(p)}>
+                <div class="homeRow__title">{p.data.catchyTitle}</div>
+                <div class="homeRow__sub">{p.data.blurb}</div>
+                <div class="homeRow__meta">
+                  <span>{p.data.publishedAt.toLocaleDateString()}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>arXiv: {p.data.arxivId}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </section>
 
-    <aside class="paper list" aria-label="Other papers">
-      {rest.length ? (
-        rest.map((p) => (
+    <aside class="paper list" aria-label="More papers">
+      {side.length ? (
+        side.map((p) => (
           <div class="cardLink" style="padding:0">
             <a href={paperUrl(p)} style="display:block; padding:14px 16px; text-decoration:none">
               <div class="cardTitle">{p.data.catchyTitle}</div>
               <div class="cardSub">{p.data.blurb}</div>
             </a>
 
-            {/* Footer: date (separate) + tags (not part of the paper link) */}
             <div style="padding:0 16px 14px">
               <div style="color:var(--muted); font-size:12px; margin-top:2px">
                 {p.data.publishedAt.toLocaleDateString()}
