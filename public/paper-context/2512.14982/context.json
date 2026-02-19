@@ -1,72 +1,163 @@
 {
   "arxivId": "2512.14982",
   "paperTitle": "Prompt Repetition Improves Non-Reasoning LLMs",
-  "generatedAt": "2026-02-18",
+  "abstract": "When not using reasoning, repeating the input prompt improves performance for popular models (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency.",
   "chunks": [
     {
-      "id": "abs-1",
+      "id": "abs-0",
       "type": "abstract",
       "text": "When not using reasoning, repeating the input prompt improves performance for popular models (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency."
     },
     {
-      "id": "cap-1",
+      "id": "cap-0",
       "type": "caption",
       "text": "Figure 1: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when"
     },
     {
-      "id": "cap-2",
+      "id": "cap-1",
       "type": "caption",
       "text": "Figure 2: Comparison of accuracy, average, and median response length, as well as average latency,"
     },
     {
-      "id": "cap-3",
+      "id": "cap-2",
       "type": "caption",
       "text": "Figure 3: Comparison of accuracy, average, and median response length, as well as average latency,"
     },
     {
-      "id": "cap-4",
+      "id": "cap-3",
       "type": "caption",
       "text": "Figure 4: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when"
     },
     {
-      "id": "c-1",
+      "id": "b-0",
       "type": "body",
-      "text": "Prompt Repetition Improves Non-Reasoning LLMs\n\nYaniv Leviathan∗               Matan Kalman∗                    Yossi Matias\n                                                      Google Research                 Google Research                Google Research\n                                                   leviathan@google.com             matank@google.com               yossi@google.com\narXiv:2512.14982v1 [cs.LG] 17 Dec 2025\n\nWhen not using reasoning, repeating the input prompt improves performance for popular models\n                                         (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency.\n\n1       Prompt Repetition\n                                         LLMs are often trained as causal language models, i.e. past tokens cannot attend to future tokens.\n                                         Therefore, the order of the to"
+      "text": "Prompt Repetition Improves Non-Reasoning LLMs\n\nYaniv Leviathan∗               Matan Kalman∗                    Yossi Matias\n                                                      Google Research                 Google Research                Google Research\n                                                   leviathan@google.com             matank@google.com               yossi@google.com\narXiv:2512.14982v1 [cs.LG] 17 Dec 2025\n\nAbstract\n\nWhen not using reasoning, repeating the input prompt improves performance for popular models\n                                         (Gemini, GPT, Claude, and Deepseek) without increasing the number of generated tokens or latency."
     },
     {
-      "id": "c-2",
+      "id": "b-1",
       "type": "body",
-      "text": "Figure 1: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when\n                                         asking the models not to reason. A star indicates a statistically significant win (pvalue < 0.1 according\n                                         to the McNemar test McNemar [1947]). Prompt repetition wins 47 out of 70 tests, with 0 losses.\n                                             ∗\n                                                 Equal contribution.\n\nPreprint.\n\fAs further motivation, we observe that reasoning models trained with RL often learn to repeat (parts\nof) the user’s request. Prompt repetition is efficient, moving the repetition to the parallelizable prefill\nstage. The number of generated tokens does not increase 1 . Moreover, prompt repetition does not\nchange the format of the generated outputs, keeping them interchangeable with those of t"
+      "text": "1       Prompt Repetition\n                                         LLMs are often trained as causal language models, i.e. past tokens cannot attend to future tokens.\n                                         Therefore, the order of the tokens in a user’s query can affect prediction performance. For example, a\n                                         query of the form “<CONTEXT> <QUESTION>” often performs differently from a query of the form\n                                         “<QUESTION> <CONTEXT>” (see options-first vs. question-first in Figure 1). We propose to repeat\n                                         the prompt, i.e. transform the input from “ <QUERY> ” to “ <QUERY><QUERY> ”. This enables each\n                                         prompt token to attend to every other prompt token, addressing the above. When not using reasoning,\n                                         p"
     },
     {
-      "id": "c-3",
+      "id": "b-2",
+      "type": "body",
+      "text": "Figure 1: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when\n                                         asking the models not to reason. A star indicates a statistically significant win (pvalue < 0.1 according\n                                         to the McNemar test McNemar [1947]). Prompt repetition wins 47 out of 70 tests, with 0 losses.\n                                             ∗\n                                                 Equal contribution."
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Preprint.\n\fAs further motivation, we observe that reasoning models trained with RL often learn to repeat (parts\nof) the user’s request. Prompt repetition is efficient, moving the repetition to the parallelizable prefill\nstage. The number of generated tokens does not increase 1 . Moreover, prompt repetition does not\nchange the format of the generated outputs, keeping them interchangeable with those of the original\nprompts, enabling simple drop-in deployment in existing systems, and direct use by end-users. When\nreasoning is enabled, prompt repetition is neutral to slightly positive (Figure 4).\n\n2       Experiments"
+    },
+    {
+      "id": "b-4",
       "type": "body",
       "text": "We test prompt repetition on a range of 7 popular models from leading LLM providers of varying\nsizes: Gemini 2.0 Flash and Gemini 2.0 Flash Lite [Gemini Team Google, 2023], GPT-4o-mini and\nGPT-4o [OpenAI, 2024], Claude 3 Haiku and Claude 3.7 Sonnet [Anthropic, 2024], and Deepseek\nV3 [DeepSeek-AI, 2025]. We ran all tests using each provider’s official API in Feb and Mar 2025.\nWe test each of the models on a set of 7 benchmarks in several configurations: ARC (Challenge)\n[Clark et al., 2018], OpenBookQA [Mihaylov et al., 2018], GSM8K [Cobbe et al., 2021], MMLU-Pro\n[Wang et al., 2024], MATH [Hendrycks et al., 2021], and 2 custom benchmarks: NameIndex and\nMiddleMatch (Appendix A.3). For the multiple choice benchmarks (ARC, OpenBookQA, and\nMMLU-Pro) we report results both when placing the question first and the answer options later, as\nwell as the other way around, the latter making the model "
     },
     {
-      "id": "c-4",
+      "id": "b-5",
       "type": "body",
       "text": "Accuracy. Without reasoning, prompt repetition improves the accuracy of all tested LLMs and\nbenchmarks (Figure 1). We consider cases where one method is significantly better than the other\naccording to the McNemar test [McNemar, 1947] with pvalue < 0.1 as wins. With this criteria,\nprompt repetition wins 47 out of 70 benchmark-model combinations, with 0 losses. Notably,\nperformance is improved for all tested models. As expected, we observe smaller improvements for\nthe multiple-choice benchmarks with question-first, and larger improvements with options-first. On\nthe custom tasks of NameIndex and MiddleMatch we observe strong gains with prompt repetition\nfor all models (for example, prompt repetition improves the accuracy of Gemini 2.0 Flash-Lite on\nNameIndex from 21.33% to 97.33%). We also test a smaller set of benchmarks when encouraging\nthinking step-by-step (Figure 4), where the results"
     },
     {
-      "id": "c-5",
+      "id": "b-6",
       "type": "body",
-      "text": "Ablations and variations. We compare prompt repetition to 2 additional variants: Prompt Repeti-\ntion (Verbose) and Prompt Repetition ×3 (Appendix A.4). We observe that they perform similarly\nfor most tasks and models (Figures 2 and 3), and sometimes outperform vanilla prompt repetition.\nNotably, Prompt Repetition ×3 often substantially outperforms vanilla prompt repetition (which\nitself substantially outperforms the baseline) on NameIndex and MiddleMatch. It therefore seems\nworthwhile to further research variants. To demonstrate that the gains are indeed due to repeating the\nprompt and not to simply increasing the length of the input, we also evaluate the Padding method\n(Appendix A.4), which pads the inputs with periods (“.”) to the same length as prompt repetition,\nand, as expected, does not improve performance.\n\nEfficiency. For each model, prompting method, and dataset, we measure the "
+      "text": "Ablations and variations. We compare prompt repetition to 2 additional variants: Prompt Repeti-\ntion (Verbose) and Prompt Repetition ×3 (Appendix A.4). We observe that they perform similarly\nfor most tasks and models (Figures 2 and 3), and sometimes outperform vanilla prompt repetition.\nNotably, Prompt Repetition ×3 often substantially outperforms vanilla prompt repetition (which\nitself substantially outperforms the baseline) on NameIndex and MiddleMatch. It therefore seems\nworthwhile to further research variants. To demonstrate that the gains are indeed due to repeating the\nprompt and not to simply increasing the length of the input, we also evaluate the Padding method\n(Appendix A.4), which pads the inputs with periods (“.”) to the same length as prompt repetition,\nand, as expected, does not improve performance."
     },
     {
-      "id": "c-6",
+      "id": "b-7",
       "type": "body",
-      "text": "Many prompting techniques for LLMs have been suggested, notably Chain of Thought (CoT)\nprompting [Wei et al., 2023] (which requires specific examples per task) and “Think step by step”\n[Kojima et al., 2023], which achieves substantial improvements, but increases the lengths of the\ngenerated outputs and thus the latency and compute requirements (we show that it can be used in\ntandem with prompt repetition, yielding mostly neutral results). More recently and independently,\nShaier [2024] experimented with repeating just the question part of the prompt and found that it yields\nno gains, Springer et al. [2024] showed that repeating the input twice yields better text embeddings,\nand Xu et al. [2024] showed that asking the model to re-read the question improves reasoning.\n\nWe show that repeating the prompts consistently improves model performance for a range of models\nand benchmarks, when not u"
+      "text": "Efficiency. For each model, prompting method, and dataset, we measure the average and median\nof the lengths of the generated outputs, as well as the empirical latency2 . As expected, we observe\nsimilar latencies for all datasets and all tested models when reasoning is disabled. With reasoning\nenabled, all latencies (and the lengths of the generated outputs) are dramatically higher. Either way, in\nall cases prompt repetition and its variants do not increase the lengths of the generated outputs\nor the measured latencies (Figures 2 and 3), the only exception being the Anthropic models (Claude\nHaiku and Sonnet) for very long requests (from the NameIndex or MiddleMatch datasets or from the\nrepeat ×3 variant) where the latencies increase (likely due to the prefill stage taking longer).\n    1\n     Unlike other prompting techniques, such as “Think step by step” [Kojima et al., 2023], see Figures"
     },
     {
-      "id": "c-7",
+      "id": "b-8",
+      "type": "body",
+      "text": "2\n\f3       Related Work\n\nMany prompting techniques for LLMs have been suggested, notably Chain of Thought (CoT)\nprompting [Wei et al., 2023] (which requires specific examples per task) and “Think step by step”\n[Kojima et al., 2023], which achieves substantial improvements, but increases the lengths of the\ngenerated outputs and thus the latency and compute requirements (we show that it can be used in\ntandem with prompt repetition, yielding mostly neutral results). More recently and independently,\nShaier [2024] experimented with repeating just the question part of the prompt and found that it yields\nno gains, Springer et al. [2024] showed that repeating the input twice yields better text embeddings,\nand Xu et al. [2024] showed that asking the model to re-read the question improves reasoning.\n\n4       Conclusion"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "We show that repeating the prompts consistently improves model performance for a range of models\nand benchmarks, when not using reasoning. In addition, latency is not impacted3 , as only the\nparallelizable pre-fill stage is affected4 . Prompt repetition does not change the lengths or formats of\nthe generated outputs, and it might be a good default for many models and tasks, when reasoning is\nnot used."
+    },
+    {
+      "id": "b-10",
       "type": "body",
       "text": "Future directions. (1) Fine tune the model with repeated prompts; (2) Train a reasoning model\nwith prompt repetition to increase efficiency (the model might learn to avoid repeating the prompt);\n(3) Periodically repeat the last generated tokens during generation, as well as explore applicability to\nmulti-turn scenarios; (4) Only keep the second repetition in the KV-cache (thus being completely\nperformance neutral for the generation stage); (5) Repeat only parts of the prompt (especially for\nlonger prompts); (6) Reorder the prompt, e.g. with a smaller model, instead of repeating everything;\n(7) Applicability to non-text modalities (e.g. images); (8) Further analyze different variants, e.g.\nwhen more than 2 repetitions might be advantageous; (9) Further analyze the attention patterns due\nto repetition (in the same vein as done in Xu et al. [2024]); (10) Use repetitions in tandem with\ntechn"
     },
     {
-      "id": "c-8",
+      "id": "b-11",
       "type": "body",
-      "text": "We’d like to extend a huge thank you to Raya Leviathan, Danny Lumen, Dani Valevski, Sergey\nLevi, the Theta Labs and Google Research teams, and our families for insightful feedback, ideas,\nsuggestions, and support."
+      "text": "Acknowledgements\n\nWe’d like to extend a huge thank you to Raya Leviathan, Danny Lumen, Dani Valevski, Sergey\nLevi, the Theta Labs and Google Research teams, and our families for insightful feedback, ideas,\nsuggestions, and support.\n\nReferences\nAnthropic. The claude 3 model family: Opus, sonnet, haiku. 2024. URL https:\n //www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_\n  Card_Claude_3.pdf.\n\nPeter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and\n  Oyvind Tafjord. Think you have solved question answering? try arc, the ai2 reasoning challenge,\n  2018. URL https://arxiv.org/abs/1803.05457."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser,\n  Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John\n  Schulman. Training verifiers to solve math word problems, 2021. URL https://arxiv.org/\n  abs/2110.14168.\n\nDeepSeek-AI. Deepseek-v3 technical report, 2025. URL https://arxiv.org/abs/2412.19437.\n    3\n        Prompt repetition can affect latency for long prompts, and might be impossible for very long ones.\n    4\n        This parallelization has a similar motivation to e.g., speculative decoding [Leviathan et al., 2022]."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "3\n\fGemini Team Google. Gemini: A family of highly capable multimodal models. arXiv preprint\n  arXiv:2312.11805, 2023.\nDan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song,\n  and Jacob Steinhardt. Measuring mathematical problem solving with the math dataset. NeurIPS,\n  2021.\nTakeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. Large\n  language models are zero-shot reasoners, 2023. URL https://arxiv.org/abs/2205.11916.\nYaniv Leviathan, Matan Kalman, and Yossi Matias. Fast inference from transformers via speculative\n  decoding, 2022. URL https://arxiv.org/abs/2211.17192.\nYaniv Leviathan, Matan Kalman, and Yossi Matias. Selective attention improves transformer, 2024.\n  URL https://arxiv.org/abs/2410.02703.\nQuinn McNemar. Note on the sampling error of the difference between correlated proportions or\n  percentages. Psychome"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "4\n\fA     Appendix\nA.1   Ablations and Variations\n\nFigure 2: Comparison of accuracy, average, and median response length, as well as average latency,\nacross methods and benchmarks (1).\n\n5\n\fFigure 3: Comparison of accuracy, average, and median response length, as well as average latency,\nacross methods and benchmarks (2).\n\n6\n\fA.2   Prompt Repetition with Reasoning\n\nWhen asking the models to think step by step, we observe that prompt repetition is neutral to slightly\npositive (5 wins, 1 loss, 22 ties), which is expected given that the reasoning often starts with repeating\n(parts-of) the prompt anyway."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Figure 4: Prompt repetition vs. baseline accuracy for popular LLMs and various benchmarks when\nasking the model to think step by step. A star indicates a statistically significant win (pvalue < 0.1\naccording to the McNemar test McNemar [1947]). Prompt repetition wins 5 out of 28 tests, with 1\nloss.\n\n7\n\fA.3   Custom Tasks\n\nIn addition to the standard benchmarks, we also evaluate prompt repetition on two custom tasks\nspecifically designed to demonstrate its usefulness.\n\nNameIndex Here the model gets a list of N names and is asked to output the ith name on the list.\nWe use N = 50, i = 25. Example:\nHere’s a list of names:"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Dale Lopez, Peter Sanchez, Allen Harris, Scott Davis, Hudson Leviathan,\nDaphne Kalman, Dennis Davis, Henry King, Alfred Cooper, Bruce Usher, Travis\nRamirez, Rafael Jennings, Richard Rogers, Walter Young, Caleb Harris, Ben\nKalman, Donald Carter, Richard Sterling, Mark Nightingale, Steven Carter,\nTalia Kalman, Dennis Hanson, James Harris, Craig Chavez, Paul Sanchez,\nSamuel Curtis, Jacob James, Allen Thomas, Dale Evans, James Fox, Douglas\nAllen, Orion Johnson, Alexander Wright, Eugene Morrison, Nelson Lee, Alan\nYoung, Caleb Ward, Alberto Robinson, Robert McCarthy, Mark Price, Kenneth\nRamirez, Jeffrey White, Chad Cooper, Arthur Waters, Bruce Callahan, Liam\nLeviathan, Steven Robinson, Alberto Murphy, Leonard Johnson, Robert Murphy\n\nWhat’s the 25th name?"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "MiddleMatch Here the model gets a list of N names or numbers (out of a total possible set of K,\ni.e., K < N means there will be repeating elements), and is asked to output the name/number located\ndirectly between two given ones. We use N = 40, K = 10. Example:\nHere’s a list (potentially with repetitions) of names:\n\nCarlos Davis, Dale Sims, Carlos Davis, Dale Sims, Stephen Cruz, Dale Sims,\nFinnian Ross, Stephen Cruz, Stephen Cruz, Gregory Collins, Dale Sims,\nStephen Cruz, Carlos Davis, Stephen Cruz, Dale Sims, Dale Sims, Stephen\nCruz, Stephen Cruz, Leonard Kalman, Bruce Phillips, Raymond Roberts, Dale\nWhite, Leonard Kalman, Finnian Ross, James Wright, Finnian Ross, Raymond\nRoberts, Dale Sims, Dale Sims, Leonard Kalman, Dale Sims, Carlos Davis,\nLeonard Kalman, Bruce Phillips, Dale Sims, Raymond Roberts, Gregory Collins,\nGregory Collins, Dale Sims, Finnian Ross"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "What is the single name that appears right between Carlos Davis and Bruce\nPhillips?\n\n8\n\fA.4   Query Examples\n\nMethod       Template          Example Query\n\nWhich of the following combinations is a mixture rather\n                                than a compound?\n\nA. oxygen and nitrogen in air\n                                B. sodium and chlorine in salt\n Baseline     <QUERY>\n                                C. hydrogen and oxygen in water\n                                D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n                                The answer is <ANSWER>.\n\nWhich of the following combinations is a mixture rather\n                                than a compound?"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "A. oxygen and nitrogen in air\n                                B. sodium and chlorine in salt\n                                C. hydrogen and oxygen in water\n                                D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n              <QUERY>           The answer is <ANSWER>.\n Prompt\n Repetition\n              <QUERY>           Which of the following combinations is a mixture rather\n                                than a compound?\n\nA. oxygen and nitrogen in air\n                                B. sodium and chlorine in salt\n                                C. hydrogen and oxygen in water\n                                D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n                                The answer is <ANSWER>.\n\n(Continued on next page)"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "9\n\f                             (Continued from previous page)\nMethod       Template                  Example Query\n\nWhich of the following combinations is a mixture rather\n                                       than a compound?\n\nA. oxygen and nitrogen in air\n                                       B. sodium and chlorine in salt\n                                       C. hydrogen and oxygen in water\n                                       D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n             <QUERY>                   The answer is <ANSWER>.\nPrompt\nRepetition   Let me repeat that:       Let me repeat that:\n(Verbose)\n             <QUERY>                   Which of the following combinations is a mixture rather\n                                       than a compound?"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "A. oxygen and nitrogen in air\n                                       B. sodium and chlorine in salt\n                                       C. hydrogen and oxygen in water\n                                       D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n                                       The answer is <ANSWER>.\n\n(Continued on next page)\n\n10\n\f                             (Continued from previous page)\nMethod       Template                  Example Query\n\nWhich of the following combinations is a mixture rather\n                                       than a compound?\n\nA. oxygen and nitrogen in air\n                                       B. sodium and chlorine in salt\n                                       C. hydrogen and oxygen in water\n                                       D. nitrogen and hydrogen in ammonia"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Reply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n                                       The answer is <ANSWER>.\n\nLet me repeat that:\n\n<QUERY>                   Which of the following combinations is a mixture rather\n                                       than a compound?\n             Let me repeat that:\n                                       A. oxygen and nitrogen in air\nPrompt\n             <QUERY>                   B. sodium and chlorine in salt\nRepetition\n                                       C. hydrogen and oxygen in water\n×3\n             Let me repeat that one    D. nitrogen and hydrogen in ammonia\n             more time:\n                                       Reply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n             <QUERY>                   The answer is <ANSWER>.\n\nLet me repeat that one more time:"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Which of the following combinations is a mixture rather\n                                       than a compound?\n\nA. oxygen and nitrogen in air\n                                       B. sodium and chlorine in salt\n                                       C. hydrogen and oxygen in water\n                                       D. nitrogen and hydrogen in ammonia\n\nReply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n                                       The answer is <ANSWER>.\n\n(Continued on next page)\n\n11\n\f                          (Continued from previous page)\nMethod    Template                  Example Query\n\nWhich of the following combinations is a mixture rather\n                                    than a compound?"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "A. oxygen and nitrogen in air\n                                    B. sodium and chlorine in salt\n          <QUERY>\n                                    C. hydrogen and oxygen in water\n                                    D. nitrogen and hydrogen in ammonia\n          Ignore these periods\nPadding   (they are irrelevant)\n                                    Reply with one letter (’A’, ’B’, ’C’, ’D’) in the format:\n          and answer the above\n                                    The answer is <ANSWER>..\n          question: .......\n          ...<LEN(QUERY)>...\n                                    Ignore these periods (they are irrelevant) and answer the\n                                    above question: ......................................................................\n                                    ......................................................................................"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "12"
     }
-  ]
+  ],
+  "extractedAt": "2026-02-18T23:40:00Z"
 }
