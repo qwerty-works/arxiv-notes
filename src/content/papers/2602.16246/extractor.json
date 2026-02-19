@@ -1,0 +1,95 @@
+{
+  "paperTitle": "Toward Scalable Verifiable Reward: Proxy State-Based Evaluation for Multi-turn Tool-Calling LLM Agents",
+  "arxivId": "2602.16246",
+  "moves": [
+    {
+      "claim": "You can get state-based evaluation for tool-calling agents without building a deterministic backend by judging an LLM-inferred *proxy final state*.",
+      "how_to_use_it": [
+        "Define success as a check on the final proxy state + final user message (not the exact tool-call trajectory)."
+      ],
+      "decision_rule": "If your benchmark/dev loop is blocked on “we don’t have a real DB / deterministic tools yet”, use proxy state-based evaluation as the stopgap that still ranks models.",
+      "pitfall_guardrail": "Pitfall: you accidentally start grading *style* or *trajectory*; Guardrail: only compare against expected final state + expected behavior in the scenario spec.",
+      "receipt": "Receipt: the paper’s core setup replaces deterministic backends with an LLM proxy state tracker + judge while keeping final state-based evaluation (Sec. 1/3/4; Fig. 1)."
+    },
+    {
+      "claim": "A tight scenario schema is your anti-hallucination “contract”: missing facts predictably raise simulator hallucinations.",
+      "how_to_use_it": [
+        "Write each task as a scenario object: user goal + user facts + system facts (initial state) + expected final state + expected agent behavior."
+      ],
+      "decision_rule": "If tool/user hallucination rate is non-trivial, treat it as “scenario is under-specified” before blaming the agent model.",
+      "pitfall_guardrail": "Pitfall: “implicit” facts living in your head; Guardrail: add a scenario-completeness checklist and don’t ship scenarios that fail it.",
+      "receipt": "Receipt: removing system/user facts monotonically increases tool/user hallucination rates (Fig. 4)."
+    },
+    {
+      "claim": "Track proxy state from the *full trace prefix* to reduce drift: make the state tracker re-derive state from history instead of only applying incremental deltas.",
+      "how_to_use_it": [
+        "Have a state tracker infer the current structured proxy state from the interaction prefix (conversation + tool calls/returns), and classify tool calls as read vs write."
+      ],
+      "decision_rule": "If your tasks are long-horizon (many turns/steps), prefer “recompute from prefix” over purely stepwise updates to limit error accumulation.",
+      "pitfall_guardrail": "Pitfall: weak state tracking poisons downstream tools because tools “read from” the proxy state; Guardrail: upgrade the tracker model before tuning the agent.",
+      "receipt": "Receipt: weakening the state tracker (GPT-5o→GPT-4o) raises tool hallucination from 1.33%±0.53 to 3.61%±0.88 (Sec. 6.2)."
+    },
+    {
+      "claim": "Split grading into (1) goal completion and (2) hallucination detection, then measure *who* caused failure (agent vs user) so your iteration targets the right thing.",
+      "how_to_use_it": [
+        "Run a goal-completion judge that labels: completed vs not completed due to user error vs agent error; separately run a hallucination judge for tool/user hallucinations."
+      ],
+      "decision_rule": "If you can’t say whether failures are agent-side or user-side, you don’t yet have an eval you can optimize against.",
+      "pitfall_guardrail": "Pitfall: “overall success rate” hides error sources; Guardrail: always report GC, ER_user, ER_agent, HR_tool, HR_user.",
+      "receipt": "Receipt: the benchmark reports GC, user/agent error rates, and tool/user hallucination rates; human–LLM judge agreement is high (Table 1; Sec. 4/5)."
+    },
+    {
+      "claim": "Use personas as a stress test, but default to a “power user” persona when ranking models so user noise doesn’t swamp agent differences.",
+      "how_to_use_it": [
+        "Evaluate with a “power user” persona for leaderboard-style comparisons, then re-run with “ambiguous/confused” personas to locate robustness gaps."
+      ],
+      "decision_rule": "If you’re comparing models, keep user-induced errors low (power persona); if you’re hardening a product, include harder personas.",
+      "pitfall_guardrail": "Pitfall: you optimize to the benchmark’s easiest persona and call it “done”; Guardrail: require a persona-sweep report before shipping.",
+      "receipt": "Receipt: power-user ER_user=3.55% and HR_user=0.67%; confused/ambiguous increase both (Sec. 6.3; Fig. 5)."
+    },
+    {
+      "claim": "Treat the environment as a data factory: filter successful trajectories and fine-tune the agent—teacher SFT can produce big jumps.",
+      "how_to_use_it": [
+        "Generate rollouts, keep only judge-approved successes (c=1), then do SFT (off-policy teacher) or RFT (on-policy rejection sampling) for the reasoning agent."
+      ],
+      "decision_rule": "If you need a large capability jump fast, start with SFT on filtered successful trajectories; use on-policy RFT for smaller, incremental gains.",
+      "pitfall_guardrail": "Pitfall: training on unfiltered rollouts bakes in junk; Guardrail: success-filter using your goal-completion judge before fine-tuning.",
+      "receipt": "Receipt: base GC 65.64%; RFT 67.11%; SFT 77.34% (Sec. 6.1)."
+    }
+  ],
+  "do_this_now": [
+    "Pick 10–20 real workflows and rewrite them as scenarios (goal, user facts, system facts, expected final state, expected behavior).",
+    "Implement proxy state tracking that derives state from the full trace prefix; mark each tool as read-only or write.",
+    "Add two judges: goal completion (with agent-vs-user error labels) and hallucination detection (tool vs user).",
+    "Add reliability reporting to every run: GC, ER_agent, ER_user, HR_tool, HR_user + bootstrap standard error.",
+    "Run a scenario-completeness ablation (remove facts) on a sample set; if hallucinations jump, your scenario spec is too thin.",
+    "Generate rollouts and run success-filtered SFT as the first training baseline; compare against on-policy RFT." 
+  ],
+  "where_this_breaks": "If your scenario schema is incomplete or your proxy state tracker is weak, the simulation can fabricate state and your scores stop being trustworthy.",
+  "receipts": [
+    "Tool hallucination and user hallucination are near-zero under default simulator/judge setup: HR_tool=1.33%, HR_user=0.67% (Sec. 5 / Fig. 3 caption block).",
+    "Proxy state tracker ablation: HR_tool 1.33%±0.53 → 3.61%±0.88 when tracker is weakened (Sec. 6.2).",
+    "Human/LLM judge three-way agreement (n=50): goal completion 82.7%, tool hallucination 94.7%, user hallucination 94.7% (Table 1).",
+    "Training result: GC 65.64% (base) → 67.11% (RFT) → 77.34% (SFT) (Sec. 6.1).",
+    "Persona sensitivity: power ER_user=3.55% and HR_user=0.67%; confused/ambiguous raise both (Sec. 6.3; Fig. 5)."
+  ],
+  "skeptic_check": [
+    "Are you grading the *outcome state* (what changed) or accidentally grading the *path* (which tools were called)?",
+    "Can a human read the scenario and independently predict the expected final state? If not, the scenario is underspecified.",
+    "Do you have separate metrics for tool hallucinations vs agent errors vs user errors, or are they blended into “fail”?",
+    "Does your judge agree with humans on a small audited set (spot-check 20–50 trajectories)?",
+    "If you swap the state tracker for a weaker model, do your hallucination rates spike (a sign your proxy state is doing real work)?"
+  ],
+  "prompt_recipes": [
+    {
+      "title": "Prompt #1 — Scenario spec writer (turn a workflow into a graded scenario)",
+      "prompt": "You are writing a *scenario* for proxy state-based evaluation of a tool-calling agent.\n\nInput workflow description:\n{{WORKFLOW}}\n\nProduce a JSON object with these keys:\n- user_goal: one sentence\n- user_facts: bullet list of facts the user knows/says\n- system_facts: bullet list of initial backend facts (accounts, balances, carts, etc.)\n- expected_final_state: a structured description of what must be true at the end\n- expected_agent_behavior: bullet list of behaviors the agent must demonstrate (e.g., ask for missing info, confirm irreversible actions)\n\nRules:\n- Only include facts needed for simulation + grading.\n- Make every expected_final_state item verifiable from tool outputs.\n- Do not specify the exact tool-call trajectory."
+    },
+    {
+      "title": "Prompt #2 — Proxy-state rubric (what to track; what counts as read/write)",
+      "prompt": "You are designing a proxy state tracker for a multi-turn tool-calling task.\n\nGiven these tools and their JSON outputs:\n{{TOOLS_AND_OUTPUTS}}\n\nDefine:\n1) A minimal proxy state schema (fields + types)\n2) Which tools are read-only vs write\n3) For each write tool: which state fields change on success, and which must NOT change on failure\n4) Two invariants to detect drift (e.g., balances don’t change unless a write tool succeeded)\n\nOutput as a compact checklist the engineer can implement." 
+    }
+  ],
+  "tags": ["agents", "evaluation", "tool-calling", "benchmarks", "simulation", "hallucinations"],
+  "tldr": "Stop waiting on a perfect deterministic backend: define scenarios with explicit facts + expected final state, infer a structured proxy state from the full trace, and grade outcomes (plus hallucinations) so you can rank, debug, and fine-tune tool-calling agents fast."
+}

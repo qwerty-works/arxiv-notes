@@ -1,0 +1,232 @@
+{
+  "arxivId": "2602.16246",
+  "paperTitle": "Toward Scalable Verifiable Reward: Proxy State-Based Evaluation for Multi-turn Tool-Calling LLM Agents",
+  "abstract": "Interactive large language model (LLM) agents operating via multi-turn dialogue and multi-step tool calling are increasingly used in production. Benchmarks for these agents must both reliably compare models and yield on-policy training data. Prior agentic benchmarks (e.g., tau-bench, tau2-bench, AppWorld) rely on fully deterministic backends, which are costly to build and iterate. We propose Proxy State-Based Evaluation, an LLM-driven simulation framework that preserves final state-based evaluation without a deterministic database. Specifically, a scenario specifies the user goal, user/system facts, expected final state, and expected agent behavior, and an LLM state tracker infers a structured proxy state from the full interaction trace. LLM judges then verify goal completion and detect tool/user hallucinations against scenario constraints. Empirically, our benchmark produces stable, model-differentiating rankings across families and inference-time reasoning efforts, and its on-/off-policy rollouts provide supervision that transfers to unseen scenarios. Careful scenario specification yields near-zero simulator hallucination rates as supported by ablation studies. The framework also supports sensitivity analyses over user personas. Human-LLM judge agreement exceeds 90%, indicating reliable automated evaluation. Overall, proxy state-based evaluation offers a practical, scalable alternative to deterministic agentic benchmarks for industrial LLM agents.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Interactive large language model (LLM) agents operating via multi-turn dialogue and multi-step tool calling are increasingly used in production. Benchmarks for these agents must both reliably compare models and yield on-policy training data. Prior agentic benchmarks (e.g., tau-bench, tau2-bench, AppWorld) rely on fully deterministic backends, which are costly to build and iterate. We propose Proxy State-Based Evaluation, an LLM-driven simulation framework that preserves final state-based evaluation without a deterministic database. Specifically, a scenario specifies the user goal, user/system facts, expected final state, and expected agent behavior, and an LLM state tracker infers a structured proxy state from the full interaction trace. LLM judges then verify goal completion and detect tool/user hallucinations against scenario constraints. Empirically, our benchmark produces stable, model-differentiating rankings across families and inference-time reasoning efforts, and its on-/off-policy rollouts provide supervision that transfers to unseen scenarios. Careful scenario specification yields near-zero simulator hallucination rates as supported by ablation studies. The framework also supports sensitivity analyses over user personas. Human-LLM judge agreement exceeds 90%, indicating reliable automated evaluation. Overall, proxy state-based evaluation offers a practical, scalable alternative to deterministic agentic benchmarks for industrial LLM agents."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Overview of the proxy state-based evaluation benchmark. In a multi-turn interaction, an LLM-based"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: A scenario z specifies user goal g(z) and"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 4: Ablations on scenario facts increase hallu-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: Goal completion rate (GC) on testing scenar-                                                                                                              error."
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: User persona sensitivity analysis. Error due to                    6.3    User Persona Sensitivity"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 1: Three-way agreement among two human experts and the LLM judge on n=50 conversations."
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Toward Scalable Verifiable Reward: Proxy State-Based Evaluation for\n                                                            Multi-turn Tool-Calling LLM Agents\n\nYun-Shiuan Chuang, Chaitanya Kulkarni, Alec Chiu,\n                                                        Avinash Thangali, Zijie Pan, Shivani Shekhar, Yirou Ge, Yixi Li,\n                                                                 Uma Kona, Linsey Pang, Prakhar Mehrotra,\n                                                                                   PayPal AI"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract                              ration, and environment feedback. Recent agentic\n                                                                                                     benchmarks embrace a benchmark-as-environment\n                                             Interactive large language model (LLM) agents\n                                                                                                     paradigm (e.g., τ -bench, τ 2 bench, and AppWorld)\narXiv:2602.16246v1 [cs.AI] 18 Feb 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "operating via multi-turn dialogue and multi-\n                                             step tool calling are increasingly used in pro-         (Yao et al., 2025; Barres et al., 2025; Trivedi\n                                             duction. Benchmarks for these agents must               et al., 2024) with multi-turn user↔agent dialogue,\n                                             both reliably compare models and yield on-              multi-step agent↔tool interaction over determinis-\n                                             policy training data. Prior agentic benchmarks          tic backends, and final state-based evaluation that\n                                             (e.g., τ -bench, τ 2 bench, AppWorld) rely on           scores terminal database state and user-facing re-\n                                             fully deterministic backends, which are costly      "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\f   Our benchmark yields consistent capability or-            this idea to state-based evaluation by: (1) extract-\ndering across model families: goal completion                ing a structured proxy state from the full trace and\n(GC) scales with model strength and with inference-          (2) checking outcome conditions against a scenario\ntime reasoning effort. Training the RA (SFT, RFT)            specification.\nwithin the environment improves open-weight RAs\nusing both on-policy and off-policy data. Abla-              On-policy data generation from simulation. In-\ntion studies confirm the robustness of the proxy             teractive environments support both on-policy and\nstate tracker and to scenario completeness, and user         off-policy data generation for model training (e.g.,\npersona variability is captured while keeping user-          RFT, DPO, GRPO, expert iteration) (Triv"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\f    Proxy State-base Evaluation Benchmark                                                                        LLM-based Tool Simulator\n                                             Multi-Turn             Multi-Step\n                                            Conversation Reasoning Tool Calling                        Commerce Agent                          Account Agent\n                                             User Query       Agent        Tool Call                • Product Discovery • Account\n         LLM-based User Simulator User                                                  Tools\n                                                                                                    • Product Q&A         Management\n                                                                                                    • Offer & Promotion • Payment Methods\n    User Goal               "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Figure 1: Overview of the proxy state-based evaluation benchmark. In a multi-turn interaction, an LLM-based\nuser simulator converses with a reasoning agent that plans and executes multi-step tool calls to LLM-based tool\nsimulators. An LLM judge, calibrated with human experts, determines goal completion by checking the final\nproxy state. The benchmark 1) evaluates the reasoning agent’s ability to achieve goals via multi-turn dialogue\nand tool-calling, and also 2) yields conversation data with rewards and supporting a leaderboard for comparing\nreasoning agents."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "state is initialized by the scenario (s̃1,0 = s0 (z)).                    Scenario                              System Facts\n                                                                                                                - user_balance: $100\nAfter each tool step, the state tracker computes                          User Goal\n                                                                                                                - user_purchase_history: []\ns̃t,k = fstate (τ≤(t,k) ), where τ≤(t,k) denotes the in-                  - Find white running shoes in size    - catalog: [Running Shoes Brand A ($139; size: [6-\n                                                                                                                  14]; color: [grey, black, white]), Training Shoes Brand B\n                                                                            10 I ca"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "J to check whether the final state (s̃T , yT ) satis-                     - Email: sarah.cook@gmail.com         Expected Agent Behaviors\n                                                                          - Preference for shoes: white, size   - RA shouldn’t show any shoes to the\nfies the scenario’s expected final state s∗ (z) and                         10                                    user because all running shoes in the\n                                                                          - Always add $200 at a time when        catalog are beyond their $100\nexpected agent behavior b∗ (z) to determine if the                          the balance is insufficient           balance.\ngoal is successfully completed (details in Sec. 4).\n                                                                        Figure 2: A scenario z specifies user goal g(z) and\n4       Methods    "
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3\n\fproxy final state and user-facing message satisfy                 query content q.\n(s∗ (z), b∗ (z)), treating all correct paths equally.\n                                                                  Proxy State Tracker The state tracker fstate im-\n   We ensure internal consistency within each sce-\n                                                                  plements the proxy state mechanism defined in\nnario. The expected final state s∗ (z) must logically\n                                                                  Sec. 3. At each step (t, k), it infers the current\nfollow from the user goal g(z) and system facts\n                                                                  proxy state s̃t,k = fstate (τ≤(t,k) ). Tool calls are\ns0 (z). For example, if the goal is to add $100\n                                                                  categorized as read or write "
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "4\n\f                                                                 GPT-5                      GPT-4o           Gemini-2.5                                                                                    Tool Hallucination (Remove System Facts)\n\n25 30\n                                                                                                                                                                    Tool/User Hallucination Rate (%)\n                                                                                                                                                                                                           User Hallucination (Remove User Facts)\n       100                           Qwen 3                            Trained Models (Base: Qwen3-30B-A3B)\n\n85.76 84.47\n                                           83.21"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "20\n                                                      80.53                                                                                      77.34\n       80\n\n76.08 74.59\n                                                                                                             71.74\n                                                                     66.04                                               65.64 67.11\n\n15\nPercentage (%)\n\n59.83\n          60\n\n10\n    40\n\n5              0\n                                                                                                                                                                                                        0% (original)      25%             50%        75%      100%\n       20\n\nSystem/User Facts Removal Percentage (%)\n\nFigure 4: Ablations on scenario facts increase hallu-\n       0"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "pro\n                                                                                                     flash\n\n30B-A3B-SFT\n                                           RE = Low\n\nGPT-4o-mini\n\n235B-A22B\n                 RE = High\n\nRE = Minimal\n\n30B-A3B\n\n30B-A3B-RFT\n                                                                     GPT-4o\n                             RE = Medium"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "cinations. We randomly remove a fraction of system\n                                                                                                                                                                    facts s0 (z) or user facts u(z). Tool hallucination rate\n                                                                                                                                                                    and user hallucination rate rise steadily with more facts\n                                                                                                                                                                    being removed. Error bars show the bootstrap standard\nFigure 3: Goal completion rate (GC) on testing scenar-                                                                                                              error.\nios Ztest across "
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Training We investigate two training paradigms                                                                                                                      Simulators and Judge Models. Unless other-\nfor the LLM underlying the reasoning agent (RA),                                                                                                                    wise specified, the user simulator fuser , tool simu-\nusing trajectories from Ztrain . Only the RA’s LLM                                                                                                                  lator ftool , state tracker fstate , and LLM judges J\nparameters are updated; other LLMs (fuser ,ftool ,                                                                                                                  are instantiated using GPT-5o with medium reason-\nfstate , J) remain fixed. Training with On-"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "5\n\f       6\n                   Error Due to User                                         induces user-side fabrication. Overall, these results\n                   User Hallucination\n                                                                             highlight that the meticulous effort we invest in\n  2 3 4 5\nPercentage (%)\n\ncurating scenario files is essential. It specifies the\n                                                                             complete information required by each scenario\n                                                                             keeps simulation grounded and minimized both\n       1\n\ntool- and user-side hallucinations.\n       0\n\nPower User           Confused User   Ambiguous User"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Figure 5: User persona sensitivity analysis. Error due to                    6.3    User Persona Sensitivity\nuser (ERuser ) and user hallucination rate (HRuser ) across\nthree personas p. More challenging personas increase                         We evaluate the impact of user personas p ∈\nuser-induced errors and user hallucination rates. Error                      {power, confused, ambiguous} on error patterns.\nbars denote bootstrap standard error.                                        Fig. 5) reports error due to user (ERuser ) and user\n                                                                             hallucination rate (HRuser ) across personas. When\nGC gain (high > medium > low > minimal; e.g.,                                evaluated with the default power user, the user-\n85.76 > 80.53%). The alignment of these trends                               error rate is 3.55% and "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "6.2              Ablations                                                   7     Conclusion\nProxy State Tracker Model. To assess the im-\npact of the state tracker fstate , we replace the default                    We introduced Proxy State-Based Evaluation, a\nconfiguration (GPT-5o, medium reasoning effort)                              benchmark-as-environment that preserves the bene-\nwith the weaker model GPT-4o while keeping all                               fits of final state evaluation without the engineering\nother components fixed. The tool hallucination                               burden of a fully deterministic backend. Our sce-\nrate increases from 1.33% ± 0.53 to 3.61% ± 0.88.                            nario schema and cooperating LLM components\nThis suggests that weaker state inference degrades                           (RA, fuser , ftool , fstate , J) yield stable, interpr"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "6\n\fReferences                                                         2024. AppWorld: A controllable world of apps and\n                                                                   people for benchmarking interactive coding agents.\nGautham Govind Anil, Dheeraj Mysore Nagaraj,                       In Proceedings of the 62nd Annual Meeting of the\n  Karthikeyan Shanmugam, and Sanjay Shakkottai.                    Association for Computational Linguistics (Volume 1:\n  2025. Rejection sampling based fine tuning secretly              Long Papers), pages 16022–16076, Bangkok, Thai-\n  performs ppo. In Second Workshop on Test-Time                    land. Association for Computational Linguistics.\n  Adaptation: Putting Updates to the Test! at ICML\n  2025.                                                          Ruoyao Wang, Graham Todd, Ziang Xiao, Xingdi Yuan,\n                             "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan\n  Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea\n  Madotto, and Pascale Fung. 2023. Survey of hal-\n  lucination in natural language generation. ACM com-\n  puting surveys, 55(12):1–38.\n\nLong Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida,\n  Carroll Wainwright, Pamela Mishkin, Chong Zhang,\n  Sandhini Agarwal, Katarina Slama, Alex Ray, and 1\n  others. 2022. Training language models to follow in-\n  structions with human feedback. Advances in neural\n  information processing systems, 35:27730–27744.\n\nAaditya Singh, Adam Fry, Adam Perelman, Adam Tart,\n  Adi Ganesh, Ahmed El-Kishky, Aidan McLaughlin,\n  Aiden Low, AJ Ostrow, Akhila Ananthram, and 1 oth-\n  ers. 2025. Openai gpt-5 system card. arXiv preprint\n  arXiv:2601.03267."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Harsh Trivedi, Tushar Khot, Mareike Hartmann, Ruskin\n  Manku, Vinty Dong, Edward Li, Shashank Gupta,\n  Ashish Sabharwal, and Niranjan Balasubramanian.\n\n7\n\fA    Human Evaluation and Inter-Rater Agreement\nProtocol. Two domain experts independently annotated n=50 randomly sampled conversations from\nZtest across three dimensions: goal completion c, tool hallucination htool , and user hallucination huser . We\ncompare their labels to the outputs of the LLM judges Jgoal and Jhall defined in the main paper.\n\nResults\nTable 1 reports the three-way agreement rate, i.e., the percentage of examples where both human annotators\nand the LLM judge fully agree on the label for a given dimension."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Dimension                     Three-way Agreement (%)\n                         Goal completion (c)                       82.7\n                         Tool hallucination (htool )               94.7\n                         User hallucination (huser )               94.7\n\nTable 1: Three-way agreement among two human experts and the LLM judge on n=50 conversations.\n\nTakeaways\nThe LLM judges align closely with human experts, supporting the reliability of our evaluation setup."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "B    Training Data and Hyperparameters\nTraining data. We roll out each training scenario z ∈ Ztrain (|Ztrain |=157) for 10 trajectories, yielding\nDraw = {τi }1570\n             i=1 . Each trajectory τ is scored by the goal-completion judge Jgoal with indicator c(τ ) ∈\n{0, 1}. For rejection-sampling fine-tuning (RFT) and supervised fine-tuning (SFT), we success-filter as\n succ                                succ                   succ                                succ\nDrft  = {τ ∈ Draw : c(τ )=1},      |Drft  | = 1078;        Dsft  = {τ ∈ Draw : c(τ )=1},      |Dsft  | = 1209."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Each successful trajectory is decomposed into stepwise supervision pairs at RA emission points (tool calls\nor user-facing messages): Srft = {(xs , ys )} with |Srft | = 5017, and Ssft = {(xs , ys )} with |Ssft | = 8057,\nwhere xs is the trajectory prefix immediately before emission (the history τ<s ) and ys ∈ {at,k , Yt } is the\nRA’s next response.\nHyperparameters. We fine-tune the base RA model (Qwen3-30B-A3B-Thinking-2507) with LoRA (Hu\net al., 2022a):\n    • LoRA rank/alpha: 32 / 32\n\n• LoRA targets: all linear projections in self-attention (Q, K, V, O)\n\n• MoE router auxiliary loss coefficient: 1×10−3\n\n• Learning rate: 1×10−5 (constant; no scheduler)\n\n• Training epochs: 2\n\nC    User Persona Definitions\nThe user simulator fuser supports three persona p configurations:\n    • Power user: Provides complete constraints upfront and interacts efficiently."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "• Ambiguous user: Initially omits key information and requires clarification.\n\n• Confused user: Seeks guidance about the process and may misunderstand system responses.\n\nD    Example Trajectory\n\n8\n\f          Conversation Step 1                                                                     User"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Hi, this is James Wilson. Can you confirm my current [payment_provider] balance for the\n          account at james.wilson@email.com? I’m seeing $450 on my end. If that’s correct, I’d like\n          help browsing available options for men’s white [brand] running shoes under $150,\n          [product], from merchants that accept [payment_provider]. I’m just researching—no purchase\n          yet—so please share options with [product] in white is available. Also, based on that\n          price range, please confirm my balance would be sufficient for a potential purchase\n          (understanding taxes/shipping may apply).\n\nConversation Step 2                                                     Reasoning Agent"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Tool call(s):\n          call_account({\"subquery\": \"Confirm current [payment_provider] balance for the account\n          associated with james.wilson@email.com. Provide exact amount and currency.\"})\n\nConversation Step 3                                                       Tool Response\n\n{\n              \"success\": true,\n              \"message\": \"Your current [payment_provider] balance is $450.00\",\n              \"data\": {\n                \"current_balance\": 450.0,\n                \"currency\": \"USD\"\n              }\n          }\n\nConversation Step 4                                                     Reasoning Agent"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Tool call(s):\n          call_commerce({\"subquery\": \"Search for men's white [brand] running shoes priced under $150\n          from merchants that accept [payment_provider]. Provide current pricing, merchant name,\n          [product] in the white colorway is in stock for each option. Include links if available\n          and note any active promotions applicable to these items.\"})\n\nConversation Step 5                                                       Tool Response"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "{\n            \"success\": true,\n            \"message\": \"[product] men's white [brand] running shoes under $150 that accept\n            [payment_provider]. Included current pricing, merchant info (not available), size 10\n            stock status, links (n/a), and applicable promotions.\",\n            \"data\": {\n              \"products\": [\n                {\n                  \"title\": \"[product]\",\n                  \"description\": \"[product_description]\",\n                  \"price\": 139.99,\n          ...\n\nFigure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool\nresponses. Brand names and trademarks have been redacted.\n\n9\n\f          Conversation Step 5 (cont.)                                                Tool Response"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "\"brand\": \"[brand]\",\n                  \"category\": \"Men's Running\",\n                  \"colorway\": \"White/Black\",\n                  \"rating\": 4.6,\n                  \"availability\": \"In Stock\",\n                  \"size_10_in_stock\": true,\n                  \"size_10_stock_count\": 5,\n                  \"merchant\": {\n                     \"name\": \"n/a\",\n                     \"payment_provider_accepted\": true\n                  },\n                  \"product_url\": \"n/a\",\n                  \"shipping\": {\n                     \"standard\": \"Free (3-5 business days) on orders over $50\",\n                     \"express\": \"$15.99 (1-2 business days)\",\n                     \"next_day\": \"$25.99 (order by 2 PM PT)\"\n                  },\n                  \"promotions\": [\n                     \"Free standard shipping on orders over $50\",\n                     \"[product] interest-free payments available for purchases $3"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool\nresponses. Brand names and trademarks have been redacted.\n\n10\n\f          Conversation Step 5 (cont.)                                                    Tool Response"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "\"brand\": \"[brand]\",\n                      \"category\": \"Men's Lifestyle/Running\",\n                      \"colorway\": \"White\",\n                      \"rating\": 4.7,\n                      \"availability\": \"In Stock\",\n                      \"size_10_in_stock\": true,\n                      \"size_10_stock_count\": 4,\n                      \"merchant\": {\n                         \"name\": \"n/a\",\n                         \"payment_provider_accepted\": true\n                      },\n                      \"product_url\": \"n/a\",\n                      \"shipping\": {\n                         \"standard\": \"Free (3-5 business days) on orders over $50\",\n                         \"express\": \"$15.99 (1-2 business days)\",\n                         \"next_day\": \"$25.99 (order by 2 PM PT)\"\n                      },\n                      \"promotions\": [\n                         \"Free standard shipping on orders over $50\",\n     "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Conversation Step 6                                                          Reasoning Agent"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Tool call(s):\n          show_to_user({\"subquery\": \"Hi James \\u2014 here\\u2019s what I found:\\n\\n1) Balance\n          confirmation\\n\\u2022 Your current [payment_provider] balance is $450.00 USD.\\n\\n2)\n          Men\\u2019s white [brand] running shoes under $150 ([payment_provider] accepted; size 10 in\n          white available)\\n\\u2022 [product] (White/Black) \\u2014 $139.99\\n - Size 10: In stock (5\n          left)\\n - Shipping (from listing): Free standard over $50; Express $15.99; Next-day\n          $25.99\\n - Promo noted: [product] available (for eligible purchases)\\n\\n\\u2022 [product]\n          (White/Grey) \\u2014 $69.99\\n - Size 10: In stock (7 left)\\n - Shipping (from listing):\n          Free standard over $50; Express $15.99; Next-day $25.99\\n - Promo noted: [product]\n          available (for eligible purchases)\\n\\n\\u2022 [product] (White) \\u2014 $129.99\n          (Lifestyle/Running)"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Figure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool\nresponses. Brand names and trademarks have been redacted.\n\n11\n\f          Conversation Step 6 (cont.)                                             Reasoning Agent\n\nmodel/cushioning like [product] vs. [product], road vs. trail), check additional\n          retailers, or set up an [product] in white under $150?\"})\n\nConversation Step 7                                                                 User\n\n<done>\n\nFigure 6: Conversation flow across sequential steps, showing user turns, reasoning-agent tool calls, and tool\nresponses. Brand names and trademarks have been redacted.\n\n12"
+    }
+  ]
+}
