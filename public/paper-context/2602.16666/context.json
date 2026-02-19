@@ -1,0 +1,312 @@
+{
+  "arxivId": "2602.16666",
+  "paperTitle": "Towards a Science of AI Agent Reliability",
+  "abstract": "AI agents are increasingly deployed to execute important tasks. While rising accuracy scores on standard benchmarks suggest rapid progress, many agents still continue to fail in practice. This discrepancy highlights a fundamental limitation of current evaluations: compressing agent behavior into a single success metric obscures critical operational flaws. Notably, it ignores whether agents behave consistently across runs, withstand perturbations, fail predictably, or have bounded error severity. Grounded in safety-critical engineering, we provide a holistic performance profile by proposing twelve concrete metrics that decompose agent reliability along four key dimensions: consistency, robustness, predictability, and safety. Evaluating 14 agentic models across two complementary benchmarks, we find that recent capability gains have only yielded small improvements in reliability. By exposing these persistent limitations, our metrics complement traditional evaluations while offering tools for reasoning about how agents perform, degrade, and fail.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "AI agents are increasingly deployed to execute important tasks. While rising accuracy scores on standard benchmarks suggest rapid progress, many agents still continue to fail in practice. This discrepancy highlights a fundamental limitation of current evaluations: compressing agent behavior into a single success metric obscures critical operational flaws. Notably, it ignores whether agents behave consistently across runs, withstand perturbations, fail predictably, or have bounded error severity. Grounded in safety-critical engineering, we provide a holistic performance profile by proposing twelve concrete metrics that decompose agent reliability along four key dimensions: consistency, robustness, predictability, and safety. Evaluating 14 agentic models across two complementary benchmarks, we find that recent capability gains have only yielded small improvements in reliability. By exposing these persistent limitations, our metrics complement traditional evaluations while offering tools for reasoning about how agents perform, degrade, and fail."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Reliability gains lag behind capability progress. Overall reliability shows slow improvement over"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Table 1: Reliability dimensions derived from cross-domain safety-critical engineering practices."
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 2: Reliability metrics overview. All scores ∈ [0, 1] with higher values indicating better reliability."
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: Prompt robustness across models."
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Table 3: Mapping real-world agent failures to"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 6: Comparison of τ -bench vs. τ -bench"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 4: Models evaluated in our reliability study, organized by provider and release date."
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 5: Prompt perturbation strength levels. Higher temperatures encourage greater diversity in variations."
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 6: Fault type distribution. Probabilities reflect relative frequency when a fault is triggered."
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 7: Environment perturbation categories by benchmark."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 7: Trends across agents and benchmarks. Many of our reliability metrics show only marginal"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Figure 8: Reliability by model type (top: GAIA, bottom: τ -bench). Larger and reasoning models"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Figure 9: Reliability by provider (top: GAIA, bottom: τ -bench)."
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Figure 10: Consistency results across agents and benchmarks. Consistency metrics reveal agents"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Figure 11: Predictability results across agents and benchmarks. Claude models show superior"
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Figure 12: Reliability plots of different agent models on GAIA. Calibration plots show confidence"
+    },
+    {
+      "id": "cap-16",
+      "type": "caption",
+      "text": "Figure 13: Calibration plots of different agent models on τ -bench. All agents suffer from severe"
+    },
+    {
+      "id": "cap-17",
+      "type": "caption",
+      "text": "Figure 14: Selective prediction curves of different agent models on GAIA. Accuracy-coverage curves"
+    },
+    {
+      "id": "cap-18",
+      "type": "caption",
+      "text": "Figure 15: Selective prediction curves of different agent models on τ -bench. Selective prediction"
+    },
+    {
+      "id": "cap-19",
+      "type": "caption",
+      "text": "Figure 16: Detailed abstention results (top: GAIA, bottom: τ -bench). Top row shows three"
+    },
+    {
+      "id": "cap-20",
+      "type": "caption",
+      "text": "Figure 17: Robustness results across agents and benchmarks. Prompt robustness shows the largest"
+    },
+    {
+      "id": "cap-21",
+      "type": "caption",
+      "text": "Figure 18: Safety results across agents on τ -bench. Extension of Figure 5."
+    },
+    {
+      "id": "cap-22",
+      "type": "caption",
+      "text": "Figure 19: Comparison of reasoning vs non-reasoning models. We observe that reasoning models are"
+    },
+    {
+      "id": "cap-23",
+      "type": "caption",
+      "text": "Figure 20: Reliability metrics stratified by task difficulty on GAIA. Accuracy degrades as expected"
+    },
+    {
+      "id": "cap-24",
+      "type": "caption",
+      "text": "Figure 21: Consistency results across agents on τ -bench (original). We observe a noticeable"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Towards a Science of AI Agent Reliability\n\nStephan Rabanser Sayash Kapoor Peter Kirgis Kangheng Liu Saiteja Utpala\n                                                                                               Arvind Narayanan\n                                                                                                                            Princeton University\n\nCorrespondence to {rabanser, sayashk, arvindn}@princeton.edu\n                                                                                                                     Preprint as of February 19, 2026\n                                                                          A Interactive dashboard available at https://hal.cs.princeton.edu/reliability\narXiv:2602.16666v1 [cs.AI] 18 Feb 2026\n\nAbstract"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "AI agents are increasingly deployed to execute important tasks. While rising accuracy scores on standard\n                                                      benchmarks suggest rapid progress, many agents still continue to fail in practice. This discrepancy\n                                                      highlights a fundamental limitation of current evaluations: compressing agent behavior into a single success\n                                                      metric obscures critical operational flaws. Notably, it ignores whether agents behave consistently across\n                                                      runs, withstand perturbations, fail predictably, or have bounded error severity. Grounded in safety-critical\n                                                      engineering, we provide a holistic performance profile by proposing twelve concrete metrics that deco"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "OpenAI                                                            Google                                                 Anthropic\n                                                              Trend            GPT-4 Turbo        o1             GPT 5.2 (medium)                    Gemini 2.0 Flash    Gemini 2.5 Pro          Claude 3.5 Haiku                 Claude 4.5 Sonnet\n                                                                               GPT-4o mini        GPT 5.2        GPT 5.2 (xhigh)                     Gemini 2.5 Flash    Gemini 3.0 Pro          Claude 3.7 Sonnet                Claude 4.5 Opus\n                                                              1.0                                                                        1.0                                                                   1.0\n                                                              0.8       "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Reliability (R)\n                                                   Accuracy\n                                         GAIA\n\n0.6                                                                        0.6                                                                   0.6\n                                                              0.4                                                                        0.4                                                                   0.4"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "0.2                                                 r=0.63                 0.2                                           r=0.46                  0.2                               r=0.82\n                                                                                                            slope=0.21/yr                                                        slope=0.03/yr                                               slope=0.15\n                                                              0.0                                                                        0.0                                                                   0.0\n                                                              1.0                                                                        1.0                                                                   1.0\n                                            "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Reliability (R)\n                                         τ-bench\n                                                   Accuracy\n\n0.6                                                                        0.6                                                                   0.6\n                                                              0.4                                                                        0.4                                                                   0.4"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "0.2                                                 r=0.73                 0.2                                           r=0.82                  0.2                               r=0.92\n                                                                                                            slope=0.21/yr                                                        slope=0.10/yr                                               slope=0.38\n                                                              0.0                                                                        0.0                                                                   0.0\n                                                                                                                                                                                                                     0.0   0.2   0.4   0.6     0.8    1.0\n     "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "-09\n\n-01\n\n-05\n\n-09\n\n-01\n\n-05\n\n-09\n\n-01\n\n-05\n\n-09\n\n-01\n\nAccuracy\n                                                               24\n\n24\n\n25\n\n25\n\n25\n\n26\n\n24\n\n24\n\n25\n\n25\n\n25\n\n26\n                                                              20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\n20\n\nRelease Date                                                               Release Date\n                                          Figure 1: Reliability gains lag behind capability progress. Overall reliability shows slow improvement over\n                                          time. While accuracy rises steadily across both benchmarks (left), reliability trails behind (center), and the relationship\n                                          between the two varies across benchmarks (right), indicating that accuracy gains do not automatically yield reliability."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "1\n\f                               Towards a Science of AI Agent Reliability"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "1    Introduction                               that matter most for deployment. Accuracy cannot\n                                                               distinguish an agent that fails on a fixed, identifi-\n                                                               able subset of tasks from one that fails unpredictably\nAI agents are rapidly transitioning from research\n                                                               with the same rate. Yet the former permits system-\nprototypes to deployed systems that perform increas-\n                                                               atic debugging while the latter does not. Accuracy\ningly consequential tasks autonomously: modifying\n                                                               also cannot distinguish benign failures (incomplete\ncode [64], managing databases [59], browsing the\n                       "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "2\n\f                               Towards a Science of AI Agent Reliability"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "confidence and discrimination of correct/incorrect             2     A Cross-Domain Perspective of\npredictions), and safety (bounded severity when fail-\n                                                                              Reliability\nures occur). Each dimension captures a property\nthat matters for deployment but cannot be mea-\nsured by accuracy alone. Across these dimensions,              Before defining reliability metrics for AI agents, we\nwe propose a total of twelve concrete metrics that             take a step back to ask the foundational question:\nare independent of raw accuracy (see Section 3), en-           what is reliability, and how have engineering disci-\nabling comparison of reliability across agents with            plines with long traditions of building dependable\ndifferent capability levels.                                   systems approached it? This section sy"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "3\n\f                               Towards a Science of AI Agent Reliability\n\nTable 1: Reliability dimensions derived from cross-domain safety-critical engineering practices.\n\nDimension          Cross-Domain Notion                       Domain-Specific Exemplars\n\nConsistency        Repeatable outcomes under nominal         FAA requires deterministic execution of flight-critical\n                    conditions; low variance across           software [52]; NRC sets mandatory response times for\n                    repeated trials                           digital computers in nuclear reactors [58]."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Robustness         Graceful degradation under input,         NASA investigation of software-related unintended\n                    environment, tool perturbations;          acceleration in Toyota cars leads to recall [40]; FAA\n                    stable performance across the full        mandates aviation sensor testing at extreme\n                    operational envelope                      temperatures, turbulence, and vibration [16].\n\nPredictability     Prediction confidence aligned with        NRC models thousands of potential failure modes in\n                    accuracy; detect limits and               nuclear reactors [57]; Aviation uses tiered risk\n                    defer/escalate under uncertainty          classification with explicit probabilities [17]."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Safety             Bounded harm even when failures           SIL 4 standard requires dangerous failure probability\n                    occur; worst-case severity remains        less than 10−5 [22]; FAA uses a one catastrophic error\n                    acceptable                                per billion flight hours target [17]."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "these ad-hoc observations to safety-critical engineer-         ploy “safe modes” with reduced functionality but\ning practice remains largely absent.                           guaranteed safety when uncertainty exceeds thresh-\n                                                               olds. The key insight: systems should know what they\n  Dimension 2 (Robustness): When conditions                    do not know. ML research on calibration [20, 36, 34]\n  deviate from nominal, does the system degrade                and selective prediction [13, 27, 3, 46] addresses re-\n  gracefully or fail abruptly?                                 lated concerns, though often without connecting to\n                                                               the broader notion of predictable failure behavior\nReal-world systems rarely operate under ideal condi-\n                                           "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "4\n\f                               Towards a Science of AI Agent Reliability"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "unified account of reliability. Our contribution is            it successfully completes two identical orders, follow-\nto synthesize this connection: by grounding agent              ing different action sequences (e.g., sometimes charg-\nevaluation in cross-domain reliability practice, we            ing the credit card before checking inventory, other\nprovide a principled decomposition that organizes              times checking inventory first) creates different fail-\nscattered ML efforts and identifies gaps. Crucially,           ure modes if the agent is interrupted mid-execution\nall four dimensions are independent of raw capability.         and complicates auditing for compliance. Finally, re-\nA highly capable system can be unreliable [70], and            source consistency (Cres ) quantifies variability in\na less capable system can be highly reliable within            computational and"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "3.2   Robustness (RRob )\n3     Operationalizing Reliability for\n                                                               Real-world deployments expose agents to conditions\n               AI Agents                                       that deviate from their training and evaluation envi-\n                                                               ronments/distributions. Robust agents should main-\nBuilding on the reliability dimensions identified across       tain comparable performance despite such perturba-\ndisciplines from Section 2, we now operationalize              tions. We identify the following three categories of\nthese concepts for AI agents. Table 2 provides for-            perturbations that agents commonly encounter.\nmal definitions of our full metric suite. Here, we offer\nintuition for why each dimension and its constituent           Fault robustness (Rfault ) measu"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "5\n\f                                                                        Towards a Science of AI Agent Reliability\n\nTable 2: Reliability metrics overview. All scores ∈ [0, 1] with higher values indicating better reliability.\nNotation: T = number of tasks; K = runs per task; ϵ = small constant (10−8 ); 1[·] = indicator function.\n\nMetric                                                  Measurement Protocol"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Outcome                                                 Run each task t a total\n                                                                                                       P of K times, yielding outcomes     yt,k ∈P\n                                                                                                                                                 {0, 1}. Compute per-task\n                                    PT \u0010           σ̂ 2\n                                                             \u0011\n                                                                                                                                       2\n                          Cout = T1  t=1\n                                         1 − p̂t (1−tp̂t )+ϵ\n                                                                                                     1\n                                          "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Trajectory (Distributional)                             For task t, collect action sequences from K runs. Convert each sequence to distribution\n                                       P P                      (i,j)              (k)                                   (i,j)        (i)   (j)\n                           d\n                                       2\n                                             t       i<j\n                                                           JSDt                   pt over action types. Compute JSDt           = JSD(pt , p\u0001t ) as pairwise Jensen-Shannon\n                          Ctraj =1−              T K(K−1)                                                           2                     K\n                                                                                  divergence. The coefficient T K(K−1) averages over 2 pairs per task and T tasks.\n           "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "i i\n                                           Accfault\n                                                           \u0001\n                          Rfault = min      Acc0\n                                                    ,1                            injection (e.g., tool timeouts, error responses) to get Accfault . Compute clamped ratio.\n                          Environment\u0010           \u0011                                Run all tasks under baseline conditions to obtain Acc0 . Re-run with environment\n                                       Acc\n                          Renv = min Accpert , 1                                  perturbations (e.g., reordered fields, altered tool interfaces) to obtain Accpert .\n                                           0"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Prompt            \u0010                  \u0011                  Run all tasks under baseline conditions to obtain Acc0 . Re-run with semantically\n                          Rprompt = min\n                                                 Accpara\n                                                         ,1                       equivalent prompt paraphrases to obtain Accpara .\n                                                  Acc0\n\nCalibrationP                                            Collect confidence ci ∈ [0, 1] and outcome yi ∈ {0, 1} per task; partition into B bins by\nPredictability (RPred )"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "B\n                          Pcal = 1 − b=1 nNb |ȳb − c̄b |                                   P For bin b with nb samples,\n                                                                                  confidence.                                compute difference between mean confidence\n                                                                                  c̄b = n1b                                1\n                                                                                                                             P\n                                                                                             i∈b\n                                                                                                 ci and accuracy   ȳ b = nb\n                                                                                                                                 y (i.e"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "ComplianceP                                             Define constraint set C (e.g., no PII exposure, no destructive ops). An LLM judge\n                                      N\n                          Scomp = N1  i=1\n                                          1[vi = ∅]                               evaluates each task for violations vi ⊆ C. Compute fraction of tasks without violations.\n                          Harm                                                    For each violating task, compute wi = maxv∈vi w(v) with w(low) = 0.25, w(med) = 0.5,\n                          Sharm = 1 − E[wi | vi ̸= ∅]                             w(high) = 1.0. Average over violating tasks and subtract from 1."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "3.3                          Predictability (RPred )                                                         of the time. Poor calibration, such as consistent over-\n                                                                                                             confidence, leads users to trust outputs they should\nEven agents that perform well on average provide                                                             instead verify, while under-confidence can result in\nlimited value if users cannot anticipate when they                                                           unnecessary deferral. Discrimination (PAUROC ) as-\nwill succeed or fail. In many deployment settings,                                                           sesses whether confidence scores successfully separate\nusers must decide whether to act on an output, seek                                    "
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "6\n\f                                Towards a Science of AI Agent Reliability"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "3.4     Safety (RSaf )                                       sub-metrics. We note that trajectory consistency\n                                                             matters more in domains that demand auditability\nAgents that take actions in the world can cause harm         or process reproducibility, where stakeholders must\nbeyond simply failing at their assigned tasks. Unlike        verify not just what the agent concluded but how it\npure prediction systems, action-taking agents may            got there. It matters less in open-ended or creative\ninteract with external tools, modify data, or trigger        tasks where diverse solution paths are desirable.\nirreversible side effects. Safety quantifies both the\nseverity and the frequency of such harmful behaviors.        Safety. The safety score follows the classical risk\n                                                             f"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "3.5     Aggregation                                          Overall reliability. The overall reliability score R\n                                                             uses a uniform average across pillars. We note that\nTo enable upstream comparisons across agents, we             different deployment contexts may warrant alterna-\naggregate reliability metrics within each dimension          tive weightings and that practitioners should examine\nand compute an overall reliability score as follows:         individual metrics most relevant to their application\n                                                             rather than relying on the aggregate alone.\n   RCon = 13 Cout + Ctraj + Cres                   (1)\n                                   \u0001"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "RPred = Pbrier                                   (2)\n                                                             3.5.1    Disentangling Reliability & Capability\n   RRob = 31   Rfault + Rstruct + Rprompt          (3)\n                                            \u0001\n\nRSaf = 1 − P(violation)E[severity|violation] (4)\n                                                             A fundamental principle guides all of our metric\n           = 1 − (1 − Scomp )(1 − Sharm )          (5)       definitions: reliability should be disentangled from\n        R = 31 RCon + RPred + RRob                 (6)       capability. Raw task accuracy measures whether an\n                                       \u0001"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "agent succeeds; reliability measures how it succeeds\nThe following aggregation choices merit explanation:         and fails, i.e., the stability, predictability, robustness,\n                                                             and safety of its behavior.\nConsistency. We weight the three conceptual sub-\n                                                             Our metrics captures these distinctions through:\ncategories (outcome, trajectory, and resource) equally\nby default. We define aggregate trajectory consis-           • Normalization: For example, outcome consis-\ntency Ctraj = 12 (Ctraj\n                   d + C s ) as the mean of distri-\n                          traj                                 tency normalizes variance by p(1 − p), the max-\nbutional and sequence sub-metrics. This internal               imum possible variance for a given success rate,\naveraging prevent"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "7\n\f                               Towards a Science of AI Agent Reliability"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "• Ratio-based comparisons: Robustness metrics                    ambiguous specifications), we restrict our evalua-\n  compute accuracy ratios between perturbed and                  tion to their verified 26-task subset. We compare\n  nominal conditions, measuring relative degrada-                results on the full and clean subsets in Figure 6.\n  tion rather than absolute performance.\n                                                              Models. We evaluate 14 models spanning three\n                                                              providers, multiple capability tiers, and release dates\n              4     Experiments                               from early 2024 to late 2025: OpenAI (GPT 4o\n                                                              mini, GPT 4 Turbo, o1, GPT 5.2 (no reasoning,\n                                                              medium, xh"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "8\n\f                               Towards a Science of AI Agent Reliability\n\n• Environment perturbation: We apply format                                        Outcome Consistency (Cout )\n  changes to tool interfaces (naming conventions,\n  data and response formats) at medium intensity                    1.0\n                                                                          0.72 0.64 0.70                                                        0.70\n  (see Appendix D.3.3 for details).                                                         0.58 0.55 0.60 0.52 0.60 0.64 0.64 0.64\n\nGAIA\n• Confidence estimation: We extract confidence                      0.5"
+    }
+  ]
+}
