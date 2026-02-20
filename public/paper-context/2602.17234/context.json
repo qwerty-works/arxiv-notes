@@ -1,0 +1,282 @@
+{
+  "arxivId": "2602.17234",
+  "paperTitle": "All Leaks Count, Some Count More: Interpretable Temporal Contamination Detection in LLM Backtesting",
+  "abstract": "To evaluate whether LLMs can accurately predict future events, we need the ability to \\textit{backtest} them on events that have already resolved. This requires models to reason only with information available at a specified past date. Yet LLMs may inadvertently leak post-cutoff knowledge encoded during training, undermining the validity of retrospective evaluation. We introduce a claim-level framework for detecting and quantifying this \\emph{temporal knowledge leakage}. Our approach decomposes model rationales into atomic claims and categorizes them by temporal verifiability, then applies \\textit{Shapley values} to measure each claim&#39;s contribution to the prediction. This yields the \\textbf{Shapley}-weighted \\textbf{D}ecision-\\textbf{C}ritical \\textbf{L}eakage \\textbf{R}ate (\\textbf{Shapley-DCLR}), an interpretable metric that captures what fraction of decision-driving reasoning derives from leaked information. Building on this framework, we propose \\textbf{Time}-\\textbf{S}upervised \\textbf{P}rediction with \\textbf{E}xtracted \\textbf{C}laims (\\textbf{TimeSPEC}), which interleaves generation with claim verification and regeneration to proactively filter temporal contamination -- producing predictions where every supporting claim can be traced to sources available before the cutoff date. Experiments on 350 instances spanning U.S. Supreme Court case prediction, NBA salary estimation, and stock return ranking reveal substantial leakage in standard prompting baselines. TimeSPEC reduces Shapley-DCLR while preserving task performance, demonstrating that explicit, interpretable claim-level verification outperforms prompt-based temporal constraints for reliable backtesting.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "To evaluate whether LLMs can accurately predict future events, we need the ability to \\textit{backtest} them on events that have already resolved. This requires models to reason only with information available at a specified past date. Yet LLMs may inadvertently leak post-cutoff knowledge encoded during training, undermining the validity of retrospective evaluation. We introduce a claim-level framework for detecting and quantifying this \\emph{temporal knowledge leakage}. Our approach decomposes model rationales into atomic claims and categorizes them by temporal verifiability, then applies \\textit{Shapley values} to measure each claim&#39;s contribution to the prediction. This yields the \\textbf{Shapley}-weighted \\textbf{D}ecision-\\textbf{C}ritical \\textbf{L}eakage \\textbf{R}ate (\\textbf{Shapley-DCLR}), an interpretable metric that captures what fraction of decision-driving reasoning derives from leaked information. Building on this framework, we propose \\textbf{Time}-\\textbf{S}upervised \\textbf{P}rediction with \\textbf{E}xtracted \\textbf{C}laims (\\textbf{TimeSPEC}), which interleaves generation with claim verification and regeneration to proactively filter temporal contamination -- producing predictions where every supporting claim can be traced to sources available before the cutoff date. Experiments on 350 instances spanning U.S. Supreme Court case prediction, NBA salary estimation, and stock return ranking reveal substantial leakage in standard prompting baselines. TimeSPEC reduces Shapley-DCLR while preserving task performance, demonstrating that explicit, interpretable claim-level verification outperforms prompt-based temporal constraints for reliable backtesting."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Overview of the temporal leakage evaluation pipeline. Given a prediction rationale 𝑅, reference time 𝑡 ref , and task"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Architecture of TimeSPEC. Phase 1 (Generator) performs temporally-filtered search retrieving only documents"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 2: Dataset summary across three prediction tasks.                                      where 𝑝ˆ𝑖 is the predicted probability and 𝑜𝑖 ∈ {0, 1} is the"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 3: Task performance comparison. BS: Brier Score; RE:                           Table 4: Temporal leakage comparison. OLR: proportion of"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 3: Two-dimensional evaluation of prediction agents across three tasks. X-axis: transformed performance (1-BS, 1-RE, 𝜌;"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 5: Prediction-rationale consistency measured by re-prediction error. Lower values indicate predictions faithfully follow"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 6: Top-𝐾 leakage rates measuring temporal contamination among the most influential claims. Lower is better."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "All Leaks Count, Some Count More: Interpretable Temporal\n                                                      Contamination Detection in LLM Backtesting\n                                                                                       Zeyu Zhang1               Ryan Chen1        Bradly C. Stadie1,2\n                                         Abstract                                                                             and knowledge evolution [37, 38] in LLMs, while concurrent stud-\n                                         To evaluate whether LLMs can accurately predict future events,                       ies [17, 36] identify substantial leakage in financial forecasting. Yet\n                                         we need the ability to backtest them on events that have already                     existing approaches lack fine-grained attribution of which informa-\n            "
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "framework for detecting and quantifying this temporal knowledge                      a temporal verifiable assertion, and analyzes each claim’s temporal\n                                         leakage. Our approach decomposes model rationales into atomic                        provenance. A key insight is that certain claim types have determin-\n                                         claims and categorizes them by temporal verifiability, then applies                  istic leakage status. Claims stating the prediction target are leaked\n                                         Shapley values to measure each claim’s contribution to the predic-                   by definition; established background knowledge is timeless and\n                                         tion. This yields the Shapley-weighted Decision-Critical Leakage                     never leaked. This property enables cate"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "enables extraction of verbatim examples [6], while benchmark con-          Table 1: Claim taxonomy with examples and leakage detec-\ntamination inflates evaluation scores when test instances appear in        tion strategies.\npretraining corpora [5, 18]. Privacy-focused studies examine leak-\nage of personally identifiable information [13, 19]. Orthogonally,          Cat. Type                 Example                          Status           Search\ntemporal aspects of LLM knowledge have received growing atten-                 A1    Discrete Event   Company shut down on Marth 15    𝜏 (𝑐 ) ≶ 𝑡 ref    Yes\ntion: models exhibit temporal blind spots [31], limited awareness              A2    State/Measure    Stock price was $150 on Jan 1    𝜏 (𝑐 ) ≶ 𝑡 ref    Yes\n                                                                               A3    Publication      2019 report stated $5B revenue   𝜏"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Figure 1: Overview of the temporal leakage evaluation pipeline. Given a prediction rationale 𝑅, reference time 𝑡 ref , and task\ncontext, Phase 1 extracts atomic claims {𝑐𝑖 } and assigns each a category label from our taxonomy. Phases 2 and 3 execute\nin parallel: Phase 2 computes Shapley values {𝜙𝑖 } quantifying each claim’s contribution to the prediction via Monte Carlo\nsampling; Phase 3 determines leakage indicators {ℓ𝑖 } using category-based rules. Phase 4 aggregates these outputs into two\ncomplementary metrics: Overall Leakage Rate (OLR), which treats all claims equally, and Shapley-weighted Decision-Critical\nLeakage Rate (Shapley-DCLR), which weights leakage by each claim’s predictive importance."
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "rationale 𝑅 and reference time 𝑡 ref , the pipeline operates as follows:             4.2      Phase 2: Shapley Value Computation\nPhase 1 extracts claims with category labels; Phase 2 computes                       Not all claims contribute equally to a prediction—a rationale may\nShapley values quantifying each claim’s contribution (significance)                  contain ten claims but only two drive the decision. We quantify\nto the prediction; Phase 3 determines leakage status via category-                   this asymmetry using Shapley values, which provide a principled\nbased rules and external search; Phase 4 aggregates results into                     attribution of prediction outcomes to individual claims. Let 𝑣 :\ninterpretable metrics. Phases 2 and 3 execute in parallel; their out-                2𝑁 → R be a characteristic function where 𝑣 (𝑆) represents the\nputs combine in Phase 4 "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "4.1     Phase 1: Claim Extraction                                                                        ∑︁         |𝑆 |!(𝑛 − |𝑆 | − 1)!\nThe first phase transforms a free-form rationale into structured                              𝜙𝑖 =                                       [𝑣 (𝑆 ∪ {𝑐𝑖 }) − 𝑣 (𝑆)] ,   (2)\n                                                                                                                             𝑛!\nclaims suitable for temporal verification. We formalize extraction                                    𝑆 ⊆𝑁 \\{𝑐𝑖 }\nas E : 𝑅 → {(𝑐𝑖 , 𝜅𝑖 )}𝑛𝑖=1 , where each claim 𝑐𝑖 is paired with cat-\negory 𝜅𝑖 ∈ {A1, . . . , B2}. Each claim must satisfy four properties:\natomicity (one verifiable assertion per claim), self-containment (un-\n                                                                                     representing the average marginal contribution of 𝑐𝑖 acro"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "4.3    Phase 3: Leakage Detection                                              5     TimeSPEC Architecture\nThis phase determines leakage status for each claim using category-            We now present TimeSPEC—a five-phase architecture that proac-\nbased optimization (Section 3.2). The category-aware leakage indi-             tively prevents leakage during generation. Phase 1 Generator searches\ncation function is:                                                            for evidence and produces initial prediction with rationale; Phase 2\n                                                                               Supervisor extracts claims, categorizes them, and detects violations;\n                         \n                         \n                          1                      if 𝜅 (𝑐) ∈ {A4, A5},         Phase 3 Regenerator produces improved output if violations are\n          "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "For A1–A3 claims requiring search, we query external sources\nto find the determination date—the earliest time when the claim be-            5.1    Generator\ncame publicly verifiable. This differs from dates mentioned within             The Generator receives task input I and cutoff date 𝑡 ref , then ex-\nthe claim itself. For instance, “Kevin Durant averaged 26.0 PPG                ecutes temporally-filtered search through web APIs with explicit\nin 2018-19” mentions the 2018-19 season, but 𝜏 (𝑐) is April 2019               date constraints, retrieving only documents published before 𝑡 ref .\nwhen season statistics were finalized. We apply strict interpretation:         Evidence is accumulated as E = {𝑒 1, . . . , 𝑒𝑚 }, each tagged with\n𝜏strict (𝑐) = sup{𝑡 : 𝑡 consistent with temporal reference}, mapping           publication date. The phase outputs draft prediction 𝑦ˆdraft , rationale\nvagu"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "Figure 2: Architecture of TimeSPEC. Phase 1 (Generator) performs temporally-filtered search retrieving only documents\npublished before 𝑡 ref , producing a draft prediction with rationale. Phase 2 (Supervisor) extracts claims, assigns category labels,\nand apply external search to detect temporal violations. If violations exist, Phase 3 (Regenerator) produces an improved\nprediction using validated claims and diverse new queries, followed by Phase 4 (Resupervisor) validation. Phase 5 (Aggregator)\n                                                                (1)    (2)\nsynthesizes the final prediction from all validated claims Cvalid   ∪ Cvalid using category-aware reasoning under a closed-world\nconstraint."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "The Aggregator A synthesizes the final prediction from all vali-                   6.1      Tasks\ndated evidence:                                                                      We select three tasks: legal case outcome prediction, NBA salary esti-\n                                                                                     mation, and stock return ranking. Each task has a natural temporal\n                                \u0010\n                                     (1)      (2)\n                                                    \u0011                                structure where outcomes are determined after a reference date,\n                     𝑦ˆfinal = A I, Cvalid ∪ Cvalid   .                    (5)       enabling rigorous evaluation of whether models inadvertently use\n                                                                                     hindsight information.\n   "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "Table 2: Dataset summary across three prediction tasks.                                      where 𝑝ˆ𝑖 is the predicted probability and 𝑜𝑖 ∈ {0, 1} is the\n                                                                                               actual outcome. Lower values indicate better calibrated\n   Task      Type             N         Cutoff Design          Metric                          predictions; 0 indicates perfect prediction.\n   Legal     Classification    98        Pre-decision       Brier Score (BS)                 • NBA Salary (Regression). We report Relative Error (RE):\n   Salary    Regression       152        Pre-signing      Relative Error (RE)\n   Stock     Ranking          100        Period start   Spearman Correlation 𝜌                                          |𝑦ˆ − 𝑦|\n                                                                                                "
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Table 3: Task performance comparison. BS: Brier Score; RE:                           Table 4: Temporal leakage comparison. OLR: proportion of\nRelative Error; 𝜌: Spearman Correlation. Arrows indicate                             leaked claims; DCLR: Shapley-weighted leakage. Lower is\nmetric direction. Best results in bold.                                              better. Best results in bold.\n\nAgent                  Legal (BS ↓)       Salary (RE ↓)       Stock (𝜌 ↑)                                  Legal            Salary           Stock"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Superforecasting            0.205              0.256             0.543                Agent            OLR ↓ DCLR ↓ OLR ↓ DCLR ↓ OLR ↓ DCLR ↓\n Temporal Hint               0.201              0.344             0.523                Superforecasting 0.003   0.003    0.230   0.240    0.171   0.171\n TimeSPEC                    0.228              0.379             0.167                Temporal Hint    0.001   0.001    0.153   0.169    0.034   0.034\n                                                                                       TimeSPEC         0.008   0.008    0.053   0.060    0.001   0.001"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "instance. Temporal verification queries the Perplexity API to re-\ntrieve source publication dates. Additional details are provided in\nAppendix A.                                                                          uniformly low contamination confirms that legal case prediction\n                                                                                     does not inherently require post-cutoff information—the reasoning\n7     Results and Analysis                                                           involves analyzing precedents and judicial philosophy, all of which\n                                                                                     are available years before the decision date.\nWe evaluate agents along two dimensions: prediction performance\nand temporal leakage. Our analysis reveals that the relationship                        Salary Prediction. This task r"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Legal Case                                             NBA Salary                                           Stock Ranking\n                   0.30                                            0.30                                                    0.30\n                   0.25                                            0.25                                                    0.25\n                   0.20                                            0.20                                                    0.20\n    Shapley-DCLR"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "0.15                                            0.15                                                    0.15\n                   0.10                                            0.10                                                    0.10\n                   0.05                                            0.05                                                    0.05\n                   0.00                                            0.00                                                    0.00\n                   0.05                                            0.05                                                    0.05\n                       0.0   0.2    0.4   0.6       0.8     1.0        0.0       0.2       0.4      0.6    0.8     1.0         0.0      0.2      0.4    0.6     0.8      1.0\n                              Performance (1-BS)                                  Performance (1-RE)      "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Figure 3: Two-dimensional evaluation of prediction agents across three tasks. X-axis: transformed performance (1-BS, 1-RE, 𝜌;\nhigher = better prediction). Y-axis: Shapley-DCLR (lower = less leakage). The ideal region is the lower-right: accurate predictions\nwithout relying on future information. Left (Legal): All agents achieve high performance and near-zero leakage. Center (Salary):\nTimeSPEC achieves 75% leakage reduction while maintaining reasonable performance. Right (Stock): Baselines achieve high\nperformance but with substantial leakage; TimeSPEC’s lower performance with near-zero leakage reflects honest inference\nfrom pre-cutoff data. Markers: ■ Superforecasting, ▲ Temporal Hint, • TimeSPEC (Ours)."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Salary Prediction (Center). Superforecasting occupies the upper-                                 Several limitations warrant future investigation. First, Time-\nright (highest performance, highest leakage), Temporal Hint shifts                               SPEC operates entirely at inference time; leaked information per-\ndown and left (reduced leakage with moderate performance cost),                                  sists in parametric memory and is blocked rather than removed.\nand TimeSPEC achieves the lowest leakage at additional perfor-                                   Training-based approaches such as RL-based post-training may\nmance cost. The spread indicates that salary prediction benefits                                 more fundamentally address leakage at the source. Second, our case\nfrom post-cutoff information, making leakage reduction more chal-                              "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "8       Conclusion\nWe introduced a claim-level framework for detecting and quanti-\nfying temporal knowledge leakage in LLM predictions. By decom-\nposing rationales into atomic claims and applying Shapley values\nto measure predictive contribution, we derive Shapley-DCLR—an\ninterpretable metric that captures how much decision-driving rea-\nsoning arises from leaked information. To further prevent leakage,\nwe propose TimeSPEC, a multi-phase architecture that proactively\nprevents leakage through programmatic verification and iterative\nregeneration. Experiments across legal, salary, and stock predic-\ntion tasks reveal substantial leakage in prompt-based baselines and\ndemonstrate that our approach reduces leakage while preserving\ntask performance where legitimate pre-cutoff reasoning suffices.\n\fAll Leaks Count, Some Count More: Interpretable Temporal Contamination Detection in LLM Backtesting"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "References                                                                                    Processing. 12076–12100.\n [1] Oshin Agarwal and Ani Nenkova. 2022. Temporal effects on pre-trained models         [22] OpenAI. 2023. GPT-4 Technical Report. arXiv preprint arXiv:2303.08774 (2023).\n     for language processing tasks. Transactions of the Association for Computational    [23] Andreas Östling, Holli Sargeant, Huiyuan Xie, Ludwig Bull, Alexander Terenin,\n     Linguistics 10 (2022), 904–921.                                                          Leif Jonsson, Måns Magnusson, and Felix Steffek. 2023. The Cambridge Law\n [2] Anonymous. 2025. Forecasting with LLMs: A Dataset for Rapid Backtesting                  Corpus: A Dataset for Legal AI Research. In Advances in Neural Information\n     Without Temporal Contamination. In ICLR 2026 Conference Submission. Under                Process"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "A     Implementation Details\nThis section provides technical specifications for the evaluation and agents implementation, focusing on configurations for reproducibility."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "A.1      Evaluation Pipeline\n   Claim Extraction. We employ Claude Sonnet 43 for claim extraction. The model operates with temperature 𝑇 = 0 for deterministic\nextraction and max_tokens= 8000 to accommodate rationales containing numerous claims. Each extraction call receives the rationale text\nalong with task description, event description, and reference date 𝑇ref as context. The extractor outputs structured ExtractedClaim objects\ncontaining: claim text, original text span, temporal reference (if applicable), claim category (A1–A5 or B1–B2), and category reasoning.\nClaims are categorized according to the taxonomy defined in Section 3.2.\n   Shapley Value Computation. Shapley values are computed using Claude Sonnet 4 with temperature 𝑇 = 0 for reproducibility. We employ\nMonte Carlo sampling with max_samples= 100 samples per claim and a fixed random seed random_seed = 42 for reproducible sam"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "A.2      Agent Implementations\n   TimeSPEC.. TimeSPEC employs Claude Sonnet 4 with temperature 𝑇 = 0 for deterministic generation and token limits of 4000 for generator\nand regenerator outputs. The Generator iteratively calls the search tool until accumulating at least 10 results (min_search_results= 10),\nwith a maximum of 15 tool call iterations. The search tool uses Perplexity API with the sonar model, temperature 0.2, and returns up to 5\nresults per query. Results are temporally filtered: sources with publication dates after the cutoff are excluded. Separate caches maintain\ngenerator and supervisor search results. All agent outputs use Pydantic schema validation5 for reliable JSON formatting.\n   Baseline Agents. Both baseline agents employ the same Claude Sonnet 4 backbone with temperature 𝑇 = 0 and identical token limits. The\nSuperforecasting Agent makes predictions using only the LL"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "B Supplementary Experiments\nB.1 Rationale Faithfulness Validation\nOur evaluation pipeline analyzes claims extracted from agent rationales to detect temporal leakage. This approach is valid only if agents’\npredictions genuinely follow from their rationales—if predictions were made independently of the stated reasoning, analyzing rationale\nclaims would not capture the actual decision process. This experiment validates that predictions are faithful to rationales, ensuring our\nclaim-level leakage detection measures genuine temporal contamination.\n   Setup. We test whether the rationale contains sufficient information to reproduce the original prediction. For each agent output, we: (1)\nclean the rationale by removing explicit prediction statements while retaining the reasoning and evidence; (2) prompt the same backbone\nmodel (Claude Sonnet 4) with the task input and cleaned rationale to gener"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "For stock ranking, we use Mean Relative Kendall distance, which measures pairwise ranking disagreements:\n                                                                        orig   orig        repred    repred\n                                                  1 ∑︁ |{( 𝑗, 𝑘) : sgn(𝑟𝑖 𝑗 − 𝑟𝑖𝑘 ) ≠ sgn(𝑟𝑖 𝑗    − 𝑟𝑖𝑘 )}|\n                                                     𝑁\n                                            𝑑¯𝜏 =                                   𝑛 \u0001                                                      (13)\n                                                  𝑁 𝑖=1                             2\nwhere 𝑟𝑖 𝑗 denotes the rank of item 𝑗 in instance 𝑖, and the denominator normalizes to [0, 1] (0 = identical rankings, 1 = completely reversed)."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Table 5: Prediction-rationale consistency measured by re-prediction error. Lower values indicate predictions faithfully follow\nrationales, validating our evaluation pipeline.\n\nAgent                  Legal (MRE ↓)        Salary (MRE ↓)           Stock (𝑑¯𝜏 ↓)\n                                         Superforecasting            0.153%                0.243%                0.095\n                                         Temporal Hint               0.154%                0.264%                0.098\n                                         TimeSPEC                    0.271%                0.230%                0.094"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Results and Analysis. Across all agents and tasks, re-prediction errors are consistently low: MRE remains below 0.3% for both legal\nprobability and salary predictions, and ranking disagreement stays below 0.1 (fewer than 10% of pairwise comparisons differ). These results\nconfirm that all agents’ predictions faithfully follow their stated rationales. This validation establishes the foundation for our evaluation\npipeline: since predictions are grounded in rationales, detecting temporal leakage in rationale claims directly measures contamination in the\nreasoning that drives predictions."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "B.2     Leakage in Decision-Critical Claims\nThis experiment examines whether the most decision-critical claims—those with highest Shapley values—contain leaked information, directly\nmeasuring how temporal contamination affects the reasoning that drives predictions.\n   Setup. For each rationale, we rank claims by Shapley value magnitude |𝜙𝑖 | in descending order and compute the leakage rate among the\ntop-𝐾 claims:\n                                                                      𝐾\n                                                                   1 ∑︁\n                                                  Top-𝐾 Leakage =        ℓ (𝑐 (𝑖 ) ) ∈ [0, 1]                                       (14)\n                                                                   𝐾 𝑖=1\nwhere 𝑐 (𝑖 ) denotes the claim with the 𝑖-th highest Shapley magnitude. We report Top-1, Top-3, and Top-5 leakage rates averaged "
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Table 6: Top-𝐾 leakage rates measuring temporal contamination among the most influential claims. Lower is better.\n\nLegal                         Salary                          Stock\n                          Agent                  Top-1     Top-3      Top-5     Top-1     Top-3       Top-5    Top-1     Top-3   Top-5\n                          Superforecasting       0.000      0.000     0.002     0.257     0.268       0.245    0.120     0.167   0.168\n                          Temporal Hint          0.000      0.000     0.000     0.224     0.215       0.197    0.060     0.037   0.038\n                          TimeSPEC               0.010      0.003     0.008     0.073     0.062       0.061    0.000     0.000   0.000"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Results and Analysis. The three tasks exhibit distinct patterns that reflect their underlying information requirements.\n   Legal Prediction. All agents achieve near-zero Top-K leakage (≤ 0.01), with no meaningful differentiation across methods. This result\naligns with the task’s structure: legal prediction relies on precedent, statutory interpretation, and procedural reasoning—information that\nexists before case decisions.\n   Salary Prediction. This task reveals substantial differences. Superforecasting exhibits Top-1 leakage of 0.257, indicating that in roughly one-\nquarter of instances, the single most influential claim contains leaked information—likely contract details that post-date the reference cutoff.\nTemporal Hint reduces Top-1 leakage to 0.224 (13% reduction), suggesting partial mitigation through prompt-based constraints. TimeSPEC\nachieves Top-1 leakage of 0.073, a 72% reducti"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "C     Case Studies\nWe present representative cases from each task to illustrate how temporal leakage manifests in agent rationales and how our evaluation\npipeline detects contamination at the claim level."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "C.1    Legal Case Prediction\nWe examine Dobbs v. Jackson Women’s Health Organization (October Term 2021), a case challenging the constitutionality of Mississippi’s\nGestational Age Act, which bans most abortions after 15 weeks of pregnancy. The reference cutoff is June 3, 2022, prior to the Court’s\ndecision on June 24, 2022. The actual outcome was the petitioner (Mississippi) prevailing, with the Court overturning Roe v. Wade and\nPlanned Parenthood v. Casey.\n   All three agents predicted petitioner victory with varying confidence: Superforecasting predicted 𝑃 (petitioner) = 0.75, Temporal Hint\npredicted 0.65, and TimeSPEC predicted 0.85. Notably, all agents exhibited zero leakage (OLR = 0, Shapley-DCLR = 0) for this case, despite\nthe historic nature of the ruling.\n   Examining the extracted claims reveals why leakage is absent—and why legal prediction is inherently resistant to temporal c"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "C.2    NBA Salary Estimation\nWe examine the contract prediction for Malcolm Brogdon (PG), a restricted free agent from the Milwaukee Bucks entering the 2019 offseason.\nThe reference cutoff is June 15, 2019, two weeks before free agency opened. Brogdon signed with the Indiana Pacers on June 30, 2019, via\nsign-and-trade for a four-year, $85 million contract (AAV: $21.25M). Pre-cutoff projections from league executives ranged from $15M to\n$21M annually, with the Pacers, Suns, Bulls, and Mavericks mentioned as interested teams.\n   All three agents produced accurate predictions: Superforecasting predicted $21.7M (2.1% relative error), Temporal Hint predicted $21.0M\n(1.2% error), and TimeSPEC predicted $21.0M (1.2% error). However, leakage metrics diverge substantially: Superforecasting exhibited\nShapley-DCLR = 0.40, Temporal Hint showed 0.105, and TimeSPEC achieved 0.091—a fourfold difference"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "providing the exact market constraints. The 10.5% Shapley-DCLR—substantially lower than Superforecasting’s 40%—reflects that salary cap\ninformation carries less predictive weight than direct comparable contracts. Nevertheless, this demonstrates that prompt-based temporal\nconstraints reduce but do not eliminate leakage.\n   TimeSPEC’s rationale avoided team-specific speculation entirely. It explicitly cited “validated sources from both September 2018 and May\n2019” for salary cap information ($109M cap, $132.6M luxury tax) and grounded its analysis in Brogdon’s verified statistics: the 50-40-90\nshooting achievement in 2018–19, his 2016–17 rookie season numbers (10.2 PPG, 4.2 APG), and three years of NBA experience. The rationale\nemphasized “validated claims” and “proven shooting efficiency” without speculating on which team would sign him or what the contract\nstructure might be. This search"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "C.3     Stock Return Ranking\nWe examine a ranking question from the Information Technology sector covering December 2, 2019 to June 2, 2020—a period that spans\nthe COVID-19 outbreak. The five companies are Fortinet (FTNT), Synopsys (SNPS), Teledyne Technologies (TDY), Lam Research (LRCX),\nand Western Digital (WDC). The reference cutoff is December 1, 2019. Crucially, this predates any public knowledge of COVID-19: China\nfirst alerted the WHO on December 31, 2019, and the WHO declared a public health emergency on January 30, 2020. The actual ranking by\nrealized returns was FTNT (+38.5%) > SNPS (+35.1%) > TDY (+5.7%) > LRCX (+4.3%) > WDC (−7.4%).\n   The agents produced starkly different results. Both Superforecasting and Temporal Hint achieved perfect ranking correlation (Spearman\n𝜌 = 1.0), while TimeSPEC achieved 𝜌 = 0.3. However, leakage metrics invert this apparent performance gap: Supe"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "D     Prompt Specifications\nAll prompts are provided verbatim for reproducibility. Template variables are shown as {variable}.\n\f                                                                                                                                  Zhang et al.\n\nD.1   Tool Definitions\n  search_information (TimeSPEC)\n\n{\"name\": \"search_information\",\n  \"description\": \"Search web for factual evidence about performance, fundamentals, trends.\",\n  \"parameters\": {\"query\": {type: string, required}, \"purpose\": {type: string, required}}}\n\nsubmit_prediction (Baseline Agents)\n\nLegal: {probability_petitioner: float[0,1], prediction_rationale: string[min400]}\n  Salary: {predicted_salary: int[≥0], prediction_rationale: string[min400]}\n  Stock: {ranking: array[string,2-10], ranking_rationale: string[min1000]}\n\nsubmit_draft_prediction / submit_final_prediction (TimeSPEC)"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Draft (Generator/Regenerator) and Final (Aggregator) share schema per task:\n  Legal: {prediction: float[0,1], rationale: string[min400]}\n  Salary: {prediction: int[≥0], rationale: string[min400]}\n  Stock: {prediction: array[string], rationale: string[min1000]}\n\nD.2   Agent Prompts\n Shared Temporal Constraint. Used by Temporal Hint and TimeSPEC.\n\nTEMPORAL_CONSTRAINT_BLOCK\n\nCRITICAL TEMPORAL CONSTRAINT: You may ONLY use information available BEFORE {cutoff_date}. This is a strict knowledge cutoff. Do not\n  use any information, events, decisions, or developments from after this date.\n\nSuperforecasting Agent. Single-turn prediction without search.\n\nSuperforecasting Agent - Universal Template"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "System: You are {DOMAIN_ROLE}. Base analysis on SPECIFIC, VERIFIABLE facts. Do NOT recall actual outcomes.\\n\\n ANALYSIS REQUIRE-\n  MENTS: Include (1) {domain_metrics} with numbers, (2) {comparable_data} with dates/amounts. AVOID vague statements.\\n\\n RATIONALE\n  REQUIREMENTS: Must be FAITHFUL, contain SPECIFIC DATABLE facts, be VERIFIABLE. Rationale is PRIMARY output.\\n\\n OUTPUT: Call\n  submit_prediction with prediction and rationale (min {min_chars} chars).\n  User: TASK: {TASK_INSTRUCTION}\\n{input_json}\n\nTask-Specific Instantiations"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Legal: DOMAIN_ROLE=“Expert Supreme Court analyst”, TASK_INSTRUCTION=“Predict P(PETITIONER wins) as probability 0.0-1.0”, domain_\n  metrics=“precedent cases with years/holdings”, min_chars=400\n  Salary: DOMAIN_ROLE=“Expert NBA salary analyst”, TASK_INSTRUCTION=“Predict player’s salary in USD”, domain_metrics=“player stats (PPG,\n  RPG, APG), comparable contracts”, min_chars=400\n  Stock: DOMAIN_ROLE=“Expert stock analyst”, TASK_INSTRUCTION=“Rank stocks from BEST to WORST”, domain_metrics=“quarterly financials,\n  market position”, min_chars=1000\n\nTemporal Hint Agent. Identical to Superforecasting but prepends TEMPORAL_CONSTRAINT_BLOCK to system prompt.\n\nTimeSPEC.. Multi-phase architecture with search capability.\n\fAll Leaks Count, Some Count More: Interpretable Temporal Contamination Detection in LLM Backtesting\n\nGenerator Prompt"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "System: You are {DOMAIN_ROLE} with access to search tools. Knowledge cutoff: {cutoff_date}. You MUST use ONLY pre-cutoff information.\\n\\n\n     TASK: (1) Search for relevant evidence, (2) Gather {domain_data}, (3) Submit draft prediction.\\n SEARCH STRATEGY: “[entity] [time period]\n     [metric]”, “[comparable] contract/performance”\\n OUTPUT: Call submit_draft_prediction with prediction and rationale citing search results.\n     User: TASK: {TASK_INSTRUCTION}\\nCutoff: {cutoff_date}\\n{input_json}\n\nRegenerator Prompt"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "System: You are analyst regenerating prediction after temporal violations detected. Initial prediction contained unverified claims. Use ONLY verifiable\n     evidence.\\n KNOWLEDGE CUTOFF: {cutoff_date}. ALL information must be from BEFORE this date.\\n TASK: (1) Review valid evidence from\n     Layers 1-2, (2) Search NEW angles if needed, (3) Submit prediction citing evidence layers.\n     User: # REGENERATION TASK\\nPredict for: {case_input}\\nKnowledge Cutoff: {cutoff_date}\\n\\n ## LAYER 1: VALID CLAIMS\\n{valid_\n     claims}\\n\\n ## LAYER 2: VALID SEARCH RESULTS\\n{valid_searches}\\n\\n ## PREVIOUS QUERIES (avoid repeating)\\n{previous_queries}\n\nAggregator Prompt"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "System: You are analyst performing final synthesis. CRITICAL: Use ONLY facts from CASE INPUT and VALIDATED CLAIMS. Do NOT introduce ANY\n     new information from your own knowledge.\\n TASK: Synthesize validated claims into final prediction. OUTPUT: Call submit_final_prediction.\n     User: # FINAL SYNTHESIS TASK\\nInput: {case_input}\\nKnowledge Cutoff: {cutoff_date}\\n\\n ## CLAIM CATEGORIES\\n Group A (Temporally\n     Verifiable): [A1] Discrete Event, [A2] State/Measurement, [A3] Publication\\n Group B (Background): [B1] General Knowledge, [B2] Definitional\\n\\n\n     ## VALIDATED CLAIMS\\n{valid_claims}\\n\\n Synthesize into final prediction. Cite SPECIFIC facts from validated claims only.\n\nD.3     Evaluation Prompts\n   Claim Extraction (Phase 1). Extracts atomic factual claims from rationales for temporal verification.\n\nClaim Extraction Prompt"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "System: Extract all factual claims from the given rationale. Extraction must be: (1) Comprehensive - capture ALL factual assertions, (2) Faithful -\n     only information in rationale, no additions, (3) Self-contained - each claim understandable alone, (4) Atomic - one verifiable fact per claim.\\n\\n\n     CLAIM CATEGORIES:\\n Group A (Temporally Verifiable): [A1] Discrete Event (specific event occurred), [A2] State/Measurement (quantity\n     at specific time), [A3] Publication (content from document), [A4] Outcome (target event result - always leaked), [A5] Consequential (post-target\n     event - always leaked)\\n Group B (Non-Applicable): [B1] Background/General Knowledge, [B2] Definitional/Logical\\n\\n EXCLUDE: Predictions,\n     judgments, analysis, speculation, confidence statements.\\n\\n TEMPORAL REFERENCES: Handle strictly - “2023” → 2023-12-31, “Q3 2023” →\n     2023-09-30, “March 2023” →"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Shapley Value Computation (Phase 2). Regenerates predictions from claim subsets to compute marginal contributions.\n\nShapley Prediction Prompt\n\nSystem: Make prediction from claims. Call tool IMMEDIATELY with no explanation.\\n RULES: (1) Use ONLY provided claims - NO external\n     knowledge, (2) If claims insufficient: Legal→0.5, Salary→position median, Stock→preserve order, (3) Output ONLY the tool call - NO reasoning text.\n     User: Predict {task_type} using ONLY these claims.\\n\\n {task_context}\\n\\n CLAIMS:\\n{numbered_claims_list}\\n\\n OUTPUT: {output_\n     field}\\nCall submit_prediction tool.\n\nBatched Shapley Prompt (Claim ID Reference System)"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "System: Output predictions as JSON array. No explanation.\n     User: {task_context}\\n\\n CLAIMS (reference by ID):\\n[1] {claim_1}\\n[2] {claim_2}\\n...\\n\\n Predict for each SET using ONLY claims with listed\n     IDs. Empty set = default value.\\n SET 1: [1, 3, 5]\\nSET 2: [2, 4]\\nSET 3: [] (empty - default)\\n...\\n\\n OUTPUT: JSON array with exactly N objects.\\n\n     Format: [{“set”: 1, “p”: 0.63}, {“set”: 2, “p”: 0.71}, ...]\n\nLeakage Verification (Phase 3). Determines when claims became publicly available via search and date extraction.\n\f                                                                                                                                                 Zhang et al.\n\nQuery Generation Prompt"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "System: Generate search queries to find SPECIFIC DATES for when information became publicly known.\nUser: THE GOAL: Find when each claim became PUBLIC.\\n\\n CLAIMS TO VERIFY:\\n{claims_json}\\n\\n QUERY RULES: (1) Include date-related\nterms: “date”, “when”, “announced”, “released”, “decided”, (2) Be SPECIFIC to return exact dates, (3) For STATE claims, query status at that time.\\n\\n\nEXAMPLES:\\n - Event: “Court decided Booker in 2005” → “United States v. Booker Supreme Court decision date 2005”\\n - Earnings: “Dexcom Q3\n2019 revenue” → “Dexcom Q3 2019 earnings announcement date”\\n\\n OUTPUT: JSON array [{“index”: 0, “query”: “...”}, ...]\n\nDate Extraction Prompt"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "System: Determine when information became publicly available from search results.\nUser: THE GOAL: For each claim, answer “When did this information become PUBLICLY AVAILABLE?”\\n\\n CLAIMS WITH SEARCH RE-\nSULTS:\\n{extraction_data_json}\\n\\n KEY PRINCIPLES:\\n - Events (decisions, signings): Use date event occurred\\n - States (“Company had X as\nof 2019”): Use period START (e.g., 2019-01-01) if confirmed\\n - Timeless facts (legal principles): Use 1900-01-01\\n - Never use article publication date\nas event date\\n\\n OUTPUT: JSON array [{“index”: 0, “event_date”: “YYYY-MM-DD”, “confidence”: “high/medium/low/none”, “reasoning”: “...”}, ...]"
+    }
+  ]
+}
