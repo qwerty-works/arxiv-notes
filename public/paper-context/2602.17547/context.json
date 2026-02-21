@@ -1,0 +1,597 @@
+{
+  "arxivId": "2602.17547",
+  "paperTitle": "KLong: Training LLM Agent for Extremely Long-horizon Tasks",
+  "abstract": "This paper introduces KLong, an open-source LLM agent trained to solve extremely long-horizon tasks. The principle is to first cold-start the model via trajectory-splitting SFT, then scale it via progressive RL training. Specifically, we first activate basic agentic abilities of a base model with a comprehensive SFT recipe. Then, we introduce Research-Factory, an automated pipeline that generates high-quality training data by collecting research papers and constructing evaluation rubrics. Using this pipeline, we build thousands of long-horizon trajectories distilled from Claude 4.5 Sonnet (Thinking). To train with these extremely long trajectories, we propose a new trajectory-splitting SFT, which preserves early context, progressively truncates later context, and maintains overlap between sub-trajectories. In addition, to further improve long-horizon task-solving capability, we propose a novel progressive RL, which schedules training into multiple stages with progressively extended timeouts. Experiments demonstrate the superiority and generalization of KLong, as shown in Figure 1. Notably, our proposed KLong (106B) surpasses Kimi K2 Thinking (1T) by 11.28% on PaperBench, and the performance improvement generalizes to other coding benchmarks like SWE-bench Verified and MLE-bench.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "This paper introduces KLong, an open-source LLM agent trained to solve extremely long-horizon tasks. The principle is to first cold-start the model via trajectory-splitting SFT, then scale it via progressive RL training. Specifically, we first activate basic agentic abilities of a base model with a comprehensive SFT recipe. Then, we introduce Research-Factory, an automated pipeline that generates high-quality training data by collecting research papers and constructing evaluation rubrics. Using this pipeline, we build thousands of long-horizon trajectories distilled from Claude 4.5 Sonnet (Thinking). To train with these extremely long trajectories, we propose a new trajectory-splitting SFT, which preserves early context, progressively truncates later context, and maintains overlap between sub-trajectories. In addition, to further improve long-horizon task-solving capability, we propose a novel progressive RL, which schedules training into multiple stages with progressively extended timeouts. Experiments demonstrate the superiority and generalization of KLong, as shown in Figure 1. Notably, our proposed KLong (106B) surpasses Kimi K2 Thinking (1T) by 11.28% on PaperBench, and the performance improvement generalizes to other coding benchmarks like SWE-bench Verified and MLE-bench."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Performance of KLong on 5 Agentic Benchmarks. The training is tailored"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 3: Research-Factory: Pipeline of Scaling Training Data for Research Reproducing Task."
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 1: Performance Comparison on PaperBench. The bold and underlined values denote the"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 6: Ablation Studies of KLong on PaperBench. We demonstrate models’ assistant turns,"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Table 2: Performance of KLong on SWE-bench Verified."
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 3: Performance Comparison of KLong on MLE-bench. “↑” denotes that the higher"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 7: RL Training Curve of KLong on PaperBench. Left, middle, right sub-figures denote"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 8: SFT Loss of KLong on PaperBench.          Figure 9: Turns of KLong on PaperBench."
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 4: Performance of KLong on Terminal-Bench Hard."
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 5: Performance Comparison of KLong on SEC-bench."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 6: Judge Comparison for Three Models on PaperBench."
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 7: Performance of 3 Closed-source Models and 4 Open-source Models on PaperBench."
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 8: Detailed Task Performance in Ablation Studies. Bold and underlined values denote"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "KLong: Training LLM Agent for Extremely Long-horizon Tasks\n\nYue Liu1     Zhiyuan Hu1,2      Flood Sung3      Jiaheng Zhang1        Bryan Hooi1\n                                                                         1 NUS    2 MIT    3 Independent Researcher\n\nhttps://github.com/yueliu1999/KLong\n                                                                                      February 20, 2026\n\nAbstract\n                                                This paper introduces KLong, an open-source LLM agent trained to solve extremely\narXiv:2602.17547v1 [cs.AI] 19 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "long-horizon tasks1 . The principle is to first cold-start the model via trajectory-\n                                                splitting SFT, then scale it via progressive RL training. Specifically, we first activate\n                                                basic agentic abilities of a base model with a comprehensive SFT recipe. Then,\n                                                we introduce Research-Factory, an automated pipeline that generates high-quality\n                                                training data by collecting research papers and constructing evaluation rubrics.\n                                                Using this pipeline, we build thousands of long-horizon trajectories distilled from\n                                                Claude 4.5 Sonnet (Thinking). To train with these extremely long trajectories, we\n                              "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Figure 1: Performance of KLong on 5 Agentic Benchmarks. The training is tailored\n                                                to PaperBench, and generalizes long-horizon ability to the other 4 benchmarks.\n\n1 Extremely long-horizon tasks refer to those that 1) would exceed context window without context management\n\nand 2) involve long-running experiments, e.g., MLE-bench [5] and PaperBench [29].\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                         2"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1   Introduction\nLarge language models (LLMs) [4, 9, 25] become the cornerstone of intelligence, driving ad-\nvancements in various fields such as ChatBots [24]. Equipped with the abilities of memory,\ntool use, and planning, LLM agents exhibit great potential in complex interactive real-world\napplications like vibe coding [1], computer use [23], and deep research [10].\n    Long-horizon tasks, such as bug fixing [14, 21], terminal coding [31], and deep research [26],\npresent significant challenges for current LLM agents. To address these challenges, training-free,\nsystem-level solutions, like context management [2], have been proposed. To improve the\ninherent long-horizon task-solving ability of LLM agents, researchers are advancing training\ntechniques and infrastructure [30, 33].\n    However, previous pa-\npers either use models with\na limited context window\n(e.g., 32K) or focus on tasks\nt"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Figure 3: Research-Factory: Pipeline of Scaling Training Data for Research Reproducing Task.\nFirst, the search agent collects basic data of accepted papers from ICML, NeurIPS, and ICLR\nconferences. Then, the filter selects the data based on the quality and impact of the papers.\nThe PDF is converted to Markdown. The official GitHub URL is added to the blacklist.txt file\nto avoid cheating. Last, the evaluation agent designs the addendum and the rubric tree by\nanalyzing the paper and the official code implementation."
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "context window, and 3) overlapping sub-trajectories for contextual continuity. It significantly\nimproves the assistant turns, 114.90→732.70. In addition, we propose a new progressive RL,\nwhich schedules training into multiple stages with progressively extended timeouts. It further\nenhances long-horizon task-solving capability, resulting in a 6.67% performance improvement.\nExtensive experiments demonstrate the superiority and generalization of our method. The\nmain contributions of this paper are summarized as follows.\n• We introduce KLong, a well-trained open-source LLM agent for solving extremely long-horizon tasks.\n• We build Research-Factory, a pipeline for scaling training data of the research reproducing task.\n• We enhance agentic long-horizon task-solving ability via trajectory-splitting SFT and progressive RL."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2     Methodology\nThis section introduces KLong, a well-trained LLM agent for extremely long-horizon tasks. We\nfirst present the task definition and then introduce the training details of KLong."
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "2.1   Task Definition\nGiven an extremely long-horizon task T , an LLM agent A is required to solve it by analyzing\nthe task specification and interacting with an environment over a potentially large number of\nassistant turns, optionally under time constraints.\n    Take the replicating research task [29] as an example, given a research paper P , the LLM\nagent A is tasked to read the paper, summarize the core contributions, and replicate the corre-\nsponding code implementations Cˆ, within a limited time t. Within the sandbox environment,\nagent A iteratively plans, executes tool calls, and interacts with the environment, yielding\na sequence of N actions denoted by { ak }kN=1 . Besides, to prevent cheating, the official code\nrepository is added to the blacklist and banned. The replicating process is formulated as follows."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "N\n                                          { a k } k =1        N\n                                A:     P −−−−        → Cˆ, s.t. ∑ tk ≤ t.                             (1)\n                                                             k =1\n\nThen, to evaluate the quality of the replicating, a frontier judge model J is used judge the\nreplicated code based on the rubric tree K, which is written by the original authors of the paper.\nIt can be formulated as follows.\n                                         Q = J (Cˆ, K),                                        (2)\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                     4"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "where Q denotes the score of the replicating research task.\n   Among lots of extremely long-horizon tasks, reproducing research papers represents a\npinnacle of complexity and comprehensiveness, demanding expertise in machine learning\nengineering, software engineering, and extensive terminal interactions. Thus, we mainly train\nKLong to solve the reproducing research task and generalize its ability to other tasks such as\nbug fixing [21], machine learning engineering [38], terminal coding [31], and code security [16]."
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "2.2   Research-Factory\nTo efficiently train KLong on ex-\ntremely long-horizon tasks, we de-\nvelop Research-Factory, an auto-\nmated pipeline that systematically\nscales high-quality training data for\nthe research reproduction task. It\nconsists of two core components:\na search agent and an evaluation\nagent.\n    As shown in Figure 3, the search\nagent collects candidate papers from\ntop-tier conferences (e.g., ICML,\nNeurIPS, ICLR) within the past five\nyears along with associated meta-\ndata. We conduct careful decontami-\nnation to avoid including the papers\nin the test set. A filtering mechanism\nselects papers based on quality and\nimpact, ensuring the relevance and\nrigor of the dataset. The selected\nPDFs are converted to Markdown\nfor standardized processing, and of-\nficial GitHub URLs are recorded in\na blacklist to prevent leakage and\npotential hacking.\n    The evaluation agent constructs Figur"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "2.3   Trajectory-splitting Supervised Fine-tuning\nBefore training on extremely long trajectories, we first perform SFT on a base model to activate\nbasic agentic abilities. The model parameters θ are optimized as follows.\n\nLSFT = −             ∑             log Pθ (y j | x j ),                     (3)\n                                                   ( x j ,y j )∈DSFT"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "where DSFT = {( x j , y j )} jM=1 denote the SFT dataset covering common knowledge, coding,\nmathematics, and search. x j is the input context and y j is the corresponding target. It equips the\nbase model with foundational agentic abilities before training with extremely long trajectories.\n     Extremely long-horizon tasks often produce trajectories τ = (s1 , a1 , s2 , a2 , . . . , s N , a N ) that\nexceed the model’s maximum context length Lmax . Here, N denotes the number of steps, si\ndenotes the observation, and ai denotes the action. To address this challenge, we propose a\nnovel trajectory-splitting SFT, which decomposes a trajectory into overlapping sub-trajectories\n{τ (i) }iK=1 as follows.\n                                   τ ( i ) = ( s t i , a t i , . . . , s t i + L −1 , a t i + L −1 ),       (4)\nwhere L ≤ Lmax is the length of each sub-trajectory, K is the total number of sub-tra"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "and the corresponding loss is formulated as follows.\n                                                  k ti + L −1          \u0010           \u0011\n                                  LSFT = − ∑             ∑\n                                                                              (i )\n                                                                 log Pθ at | τ<t .                              (6)\n                                                 i =1   t = ti\n\nIt ensures that each sub-trajectory contains both essential early context and a truncated later\nhistory, enabling the model to learn extremely long-horizon behaviors under a limited context\nwindow. As shown in Figure 6, it increases the assistant turns from 114.90 to 732.70."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "2.4   Progressive Reinforcement Learning\nWhile trajectory-splitting SFT provides a strong\ninitialization, directly applying reinforcement\nlearning to extremely long-horizon tasks re-\nmains challenging due to sparse rewards, high\nvariance, and unstable credit assignment. We\nattempted end-to-end RL training with a 12-\nhour timeout, but performance remained un-\npromising. To address this, we propose a novel\nprogressive reinforcement learning by gradu-\nally increasing the task timeout during training.                 Figure 5: Pipeline Imbalance in Extremely\n      Formally, let πθ denote the agent policy.                   Long-horizon RL. Because full tasks are pro-\nWe define a sequence of timeouts T (1) <                          hibitively long, a fixed timeout causes rollouts\nT (2) < · · · < T ( M) , where each T (m) bounds                  to end synchronously, triggering a congested\nth"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Since τ (m) still exceed the model context limit Lmax , we further apply the trajectory-splitting\n                                                                                                     (m)\nstrategy described in Section 2.3, decomposing τ (m) into overlapping sub-trajectories {τ (m,i) }iK=1\nthat fit within the context window.\n    For each training sample at stage m, we perform n rollouts. Each rollout is split into K (m)\n                                         (m)\noverlapping sub-trajectories {τ (m,i) }iK=1 , resulting in a total of n · K (m) trajectories for policy\noptimization. It is formulated as follows.\n             (m)\n           LRL (θ ) =\n                          n K(m)\n                 1                             \u0010\n                        ∑∑ ∑\n                                                  (m,i,j)        (m,i,j)\n           −                               min "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "(m,i,j)\nwhere πθref is the reference policy from the previous training iteration, rt                               (θ ) is the likelihood\n         (m,i,j)\nratio, Ât       is the group-relative advantage across all n · K (m) trajectories, ϵ is the clipping\n                                                   (m,i,j)            (m,i,j)\nthreshold, and β weights the KL regularization. rt         (θ ) and Ât       are formulated as follows.\n                                                               (m,i,j)      (m,i,j)\n                                     (m,i,j)             πθ ( at         | st         )\n                                   rt          (θ ) =            (m,i,j)    (m,i,j)\n                                                                                          ,                                   (8)\n                                                        πθref ( at       |"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "n K     (m)\n                                                            1\n                                                                     ∑      ∑\n                               (m,i,j)                                                 ′ ′\n                             Ât       = Q(m,i,j) −           ( m )\n                                                                                  Q(m,i ,j ) ,                                (9)\n                                                          n·K       j ′ =1 i ′ =1"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "where Q(m,i,j) = J (Cˆm,i,j , K) denotes the assigned reward for sub-trajectory i in rollout j at\nstage m. The judge model outputs the reward by judging the replicated codes based on the\ncorresponding rubric tree.\n    This training design encourages the model to learn from extremely long-horizon tasks in\na stable and sample-efficient manner. By splitting trajectories and leveraging feedback from\nthe judge model across multiple rollouts, the policy sufficiently leverages samples and steadily\nimproves performance. Additionally, by using progressive RL with gradually increasing task\ntimeouts across stages, the agent learns from extremely long-horizon tasks more stably."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "2.5   Infrastructure Optimization\nTo further improve the performance and efficiency, we optimize the infrastructure from 4 aspects\nas follows.\n    Sandbox. We build a unified sandbox for hybrid cloud clusters using Kubernetes, providing\na Python-accessible, secure, and scalable code execution platform. With an ephemeral use-and-\ndestroy model, it efficiently supports 10,000+ concurrent instances. A sidecar container pattern\nmanages 25,000+ Docker images, while a proprietary pipeline continuously expands supported\nenvironments. To accelerate the replication of research tasks, we pre-install 80+ research-related\nPython packages, e.g., torch, TensorFlow, scikit-learn, and einops, by analyzing the agentic\ntrajectories regarding reproducing research.\n    Scaffolding. We build on the basic scaffolding provided by PaperBench and optimize it by\n1) enforcing mandatory paper reading and tracking, "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Table 1: Performance Comparison on PaperBench. The bold and underlined values denote the\nbest and runner-up open-source models.\n\nClosed-source Models                          Open-source Models\nTask Name\n                                  GPT-5 Thinking Claude 4.5 Sonnet Qwen3-Thinking DeepSeek-V3.2   Kimi K2     KLong\n                           Grok 4\n                                     (High)         (Thinking)         (235B)        (685B)     Thinking (1T) (106B)"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "fre                        62.34      33.23           72.22            15.83          70.70         69.55     61.04\nmechanistic-\n                           56.32      68.70           86.76            21.67          68.70         58.52     75.65\nunderstanding\nbridging-data-gaps         24.64      56.85           70.42            28.87          40.30         35.06     51.25\ntest-time-model-adaptation 15.91      48.94           64.28            44.15          62.79         65.64     80.09\nall-in-one                 18.82      39.07           57.31            01.50          60.58         28.10     70.14\nsequential-neural-\n                           52.00      73.44           92.75            46.97          59.29         57.20     80.13\nscore-estimation\nrobust-clip                37.34      49.60           36.70            23.96          35.89         35.05     42.71\nwhat-will-my-model-forget"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Average                    47.20      52.31           69.75            28.72          47.11         51.31     62.59"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "start and terminate simultaneously. As a result, judging is triggered synchronously, leading to\ncongestion in the evaluation stage and leaving rollout nodes idle during evaluation, thereby\nresulting in inefficient resource utilization. To mitigate this issue, we use rollout nodes to\nstart partial rollouts for the next iteration while the current evaluation is still in progress. Any\nunfinished rollouts are carried over and continued in the next iteration, ensuring full utilization\nof rollout nodes.\n    Judge. The official judge model of PaperBench is the closed-source o3-mini. To save costs,\nduring the training phase, we use the open-source gpt-oss-120b as the judge model. This choice\nalso helps mitigate benchmark hacking by avoiding direct optimization against the official\nevaluator. The judging requests exhibit high concurrency, stemming from both a large number\nof rollouts and substant"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "3      Experiments\nExperimental Setup. For PaperBench, we test the Code-Dev version with 12 hours timeout\nand adapt the basic agent. For MLE-bench, we test competitions in the low split. We use\nGLM-4.5-Air-Base [37] as base model.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                     8\n\nFigure 6: Ablation Studies of KLong on PaperBench. We demonstrate models’ assistant turns,\nrunning hours, and performance. “Baseline” is the base model with a comprehensive SFT.\n“Baseline+SFT” is Baseline with splitting SFT. “+RL∗H ” is the progressive RL."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "3.1   Performance\nThe main performance comparison on PaperBench is reported in Table 1. From the results,\nwe draw the following findings. 1) KLong achieves the best average performance among all\nopen-source models, surpassing the runner-up Kimi K2 Thinking (1T) by 11.28% despite using\na significantly smaller model size, 106 B. 2) KLong shows consistent improvements on tasks\nthat require sustained reasoning and long-horizon adaptation, such as test-time-model-adaptation,\nall-in-one, and lca-on-the-line. 3) Compared with closed-source models, KLong substantially\nnarrows the performance gap and even outperforms some proprietary systems on several tasks.\n4) These results indicate the superiority of our proposed method in improving the ability of\nsolving extremely long-horizon tasks."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "3.2   Ablation Study\nWe further analyze the impact of\n                                      Table 2: Performance of KLong on SWE-bench Verified.\nsplitting SFT and progressive RL\non PaperBench, as shown in Fig-\nure 6. It reports average assistant      Models           Scaffolding         Pass Rate\nturns, running hours, and overall        Baseline+SFT OpenHands 304/500 (60.80%)\nperformance across different train-\n                                         KLong            OpenHands       314/500 (62.80%)\ning stages. Table 8 reports detailed\nperformance across all tasks.\n    From the results, we draw the following findings. 1) Splitting SFT substantially improves\nperformance over the Baseline (from 38.63 to 55.92, +17.29), at the cost of increased assistant\nturns (114.9 → 732.7) and running hours (1.52 → 8.88), indicating its effectiveness in enabling\nlong-horizon behaviors. 2) Building on th"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Table 3: Performance Comparison of KLong on MLE-bench. “↑” denotes that the higher\nis better. “↓” denotes that the lower is better. The bold value denotes the better result in\none completion. “-” denotes that the agent doesn’t produce the validated submission. The\nachievements include Above Median, Bronze, Silver, and Gold Medal."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Baseline+SFT                  KLong\nCompetition ID                                    Eval Metric\n                                                                Score     Achievement    Score   Achievement\naerial-cactus-identification                          ↑         0.99958   Above Median   0.99893       -\naptos2019-blindness-detection                         ↑            -            -           -          -\ndetecting-insults-in-social-commentary                ↑            -            -           -          -\nhistopathologic-cancer-detection                      ↑            -            -           -          -\njigsaw-toxic-comment-classification-challenge         ↑         0.98045         -        0.97825       -\nmlsp-2013-birds                                       ↑         0.72911         -        0.82070       -\nplant-pathology-2020-fgvc7                            ↑        "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Figure 7: RL Training Curve of KLong on PaperBench. Left, middle, right sub-figures denote\nperformance, assistant turns, and entropy.\n\n3.3   Generalization\nThis section aims to demonstrate the generalization of KLong. The results are reported in\nTables 3,2,4,5. From these results, we draw the following conclusions.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                       10\n\nFigure 8: SFT Loss of KLong on PaperBench.          Figure 9: Turns of KLong on PaperBench."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Table 4: Performance of KLong on Terminal-Bench Hard.\n    1) KLong consistently im-\nproves performance on software\nengineering benchmarks.         On           Models            Scaffolding       Pass Rate\nSWE-bench Verified (Table 2),\n                                             Baseline+SFT       Terminus 2     7/48 (14.58%)\nKLong improves the pass rate\nfrom 60.80% to 62.80% under the              KLong              Terminus 2     8/48 (16.67%)\nsame OpenHands scaffolding. On\nTerminal-Bench Hard (Table 4), KLong increases the success rate from 14.58% to 16.67%, demon-\nstrating stronger long-horizon planning and execution in terminal environments. 2) KLong\nshows clear gains on security-oriented long-horizon tasks. On SEC-bench (Table 5), KLong\noutperforms the Baseline+SFT on both CVE and OSS-Fuzz subsets, improving the overall\naverage success rate from 5.00% to 7.67%. It indicates that t"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "3.4   Analysis Experiments\nTraining Curve.       Figure 8\n                                  Table 5: Performance Comparison of KLong on SEC-bench.\nshows SFT loss decreasing\nsmoothly, providing stable ini-\ntialization for RL. Figure 7        Models            CVE       OSS-Fuzz        Overall\nshows KLong’s RL training           Baseline+SFT 3.50%            8.00%      15/300 (5.00%)\non PaperBench. Performance\n                                    KLong             4.50%      14.00%      23/300 (7.67%)\nsteadily improves, assistant\nturns increase, and policy en-\ntropy decreases, indicating more confident, effective policies. Longer-horizon variants achieve\nhigher performance.\n    Judge Model. The original benchmark uses o3-mini as the judge model. We instead adopt\ngpt-oss-120b, along with constructed rubrics, to evaluate and assign rewards. To validate the\neffectiveness, as shown in Table 6, "
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Table 6: Judge Comparison for Three Models on PaperBench.\n     Time & Turns. As shown\nin Figure 9, the number of as-\nsistant turns rises rapidly in                               o3-mini+         gpt-oss-120b+\n                                     Models\nthe early stages, reflecting high-                       rubrics (Human)     rubrics (Agent)\nfrequency interactions during        Qwen3-235B-A22B           13.20              14.59\npaper reading, analysis, and         GPT-4.1                   29.90              33.55\ncoding. Later, the growth rate\n                                     GPT-5                     52.31              60.66\nslows because the agent shifts\nits focus to time-consuming ex-\nperiment execution. The task in Figure 9 is mechanistic-understanding.\n     Case Studies. We conduct the case studies of KLong in Section E. The trajectory consists of\nseveral stages, e.g., paper "
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "4   Related Work\nLarge Language Model Agents. LLM agents combine large language models with memory,\ntool usage, and planning. They go beyond single-turn QA to handle multi-turn interactions and\nsequential decision-making, using techniques like self-reflection, self-correction, and planning\n[11, 28]. Multi-agent scaffolds enable collaboration on complex tasks [3]. Long-horizon tasks\nsuch as bug fixing and terminal coding remain challenging. Training-free solutions like context\nmanagement and retrieval-augmented generation help but do not improve agents’ intrinsic\nlong-horizon abilities.\n    Training Long-horizon LLM Agents. Approaches to long-horizon tasks include memory-\nefficient and asynchronous RL [7, 12], iterative research strategies [6], and context management\ntools [30]. End-to-end RL frameworks allow agents to operate with constant memory [39].\nUnlike them, we focus on extremely "
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "5   Final Remarks\nWe present KLong, an LLM agent for extremely long-horizon tasks such as replicating research\nand machine learning engineering. We design Research-Factory, an automated pipeline for\nconstructing high-quality training data and evaluation rubrics. The model is trained with the\nproposed trajectory-splitting SFT and progressive RL. Experiments demonstrate the superiority\nand generalization of KLong."
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "References\n [1] Anthropic.            Claude     code:       Best     practices     for     agentic    coding.\n     https://www.anthropic.com/engineering/claude-code-best-practices, 2025.\n [2] Anthropic.               Effective      context       engineering       for      ai      agents.\n     https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents, 2025.\n [3] Anthropic.             How     we     built    our      multi-agent     research       system.\n     https://www.anthropic.com/engineering/multi-agent-research-system, 2025.\n [4] Anthropic. Introducing claude opus 4.5. https://www.anthropic.com/news/claude-opus-4-5,\n     2025.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                     12"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "[5] Jun Shern Chan, Neil Chowdhury, Oliver Jaffe, James Aung, Dane Sherburn, Evan Mays,\n     Giulio Starace, Kevin Liu, Leon Maksin, Tejal Patwardhan, et al. Mle-bench: Evaluating\n     machine learning agents on machine learning engineering. arXiv preprint arXiv:2410.07095,\n     2024.\n\n[6] Guoxin Chen, Zile Qiao, Xuanzhong Chen, Donglei Yu, Haotian Xu, Wayne Xin Zhao,\n     Ruihua Song, Wenbiao Yin, Huifeng Yin, Liwen Zhang, et al. Iterresearch: Rethinking\n     long-horizon agents via markovian state reconstruction. arXiv preprint arXiv:2511.07327,\n     2025.\n\n[7] Kevin Chen, Marco Cusumano-Towner, Brody Huval, Aleksei Petrenko, Jackson Ham-\n     burger, Vladlen Koltun, and Philipp Krähenbühl. Reinforcement learning for long-horizon\n     interactive llm agents. arXiv preprint arXiv:2502.01600, 2025."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "[8] Prateek Chhikara, Dev Khant, Saket Aryan, Taranjeet Singh, and Deshraj Yadav. Mem0:\n     Building production-ready ai agents with scalable long-term memory. arXiv preprint\n     arXiv:2504.19413, 2025.\n\n[9] Google Deepmind. Gemini 3 pro best for complex tasks and bringing creative concepts to\n     life. https://deepmind.google/models/gemini/pro/, 2025.\n\n[10] Google Deepmind. Gemini deep research. https://gemini.google/overview/deep-research/, 2025.\n\n[11] Lutfi Eren Erdogan, Nicholas Lee, Sehoon Kim, Suhong Moon, Hiroki Furuta, Gopala\n     Anumanchipalli, Kurt Keutzer, and Amir Gholami. Plan-and-act: Improving planning of\n     agents for long-horizon tasks. arXiv preprint arXiv:2503.09572, 2025."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "[12] Jiaxuan Gao, Wei Fu, Minyang Xie, Shusheng Xu, Chuyi He, Zhiyu Mei, Banghua Zhu,\n     and Yi Wu. Beyond ten turns: Unlocking long-horizon agentic search with large-scale\n     asynchronous rl. arXiv preprint arXiv:2508.07976, 2025.\n\n[13] Shengran Hu, Cong Lu, and Jeff Clune. Automated design of agentic systems. arXiv\n     preprint arXiv:2408.08435, 2024.\n\n[14] Carlos E Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and\n     Karthik Narasimhan. Swe-bench: Can language models resolve real-world github issues?\n     arXiv preprint arXiv:2310.06770, 2023.\n\n[15] Aviral Kumar, Vincent Zhuang, Rishabh Agarwal, Yi Su, John D Co-Reyes, Avi Singh, Kate\n     Baumli, Shariq Iqbal, Colton Bishop, Rebecca Roelofs, et al. Training language models to\n     self-correct via reinforcement learning. arXiv preprint arXiv:2409.12917, 2024."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "[16] Hwiwon Lee, Ziqi Zhang, Hanxiao Lu, and Lingming Zhang. Sec-bench: Automated bench-\n     marking of llm agents on real-world software security tasks. arXiv preprint arXiv:2506.11791,\n     2025.\n\n[17] Junteng Liu, Yunji Li, Chi Zhang, Jingyang Li, Aili Chen, Ke Ji, Weiyu Cheng, Zijia Wu,\n     Chengyu Du, Qidi Xu, et al. Webexplorer: Explore and evolve for training long-horizon\n     web agents. arXiv preprint arXiv:2509.06501, 2025.\n\n[18] Shukai Liu, Jian Yang, Bo Jiang, Yizhi Li, Jinyang Guo, Xianglong Liu, and Bryan Dai.\n     Context as a tool: Context management for long-horizon swe-agents. arXiv preprint\n     arXiv:2512.22087, 2025."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "[19] Pan Lu, Bowen Chen, Sheng Liu, Rahul Thapa, Joseph Boen, and James Zou. Octo-\n     tools: An agentic framework with extensible tools for complex reasoning. arXiv preprint\n     arXiv:2502.11271, 2025.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                       13"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "[20] OpenAI. Introducing simpleqa. https://openai.com/index/introducing-simpleqa/, 2024.\n[21] OpenAI. Introducing swe-bench verified. https://openai.com/index/introducing-swe-bench-\n     verified/, 2024.\n[22] OpenAI. Learning to reason with llms. https://openai.com/index/learning-to-reason-with-llms/,\n     2024.\n[23] OpenAI. Computer-using agent. https://openai.com/index/computer-using-agent/, 2025.\n[24] OpenAI. Introducing chatgpt. https://openai.com/index/chatgpt/, 2025.\n[25] OpenAI. Introducing gpt-5.2. https://openai.com/index/introducing-gpt-5-2/, 2025.\n[26] Long Phan, Alice Gatti, Ziwen Han, Nathaniel Li, Josephina Hu, Hugh Zhang, Chen\n     Bo Calvin Zhang, Mohamed Shaaban, John Ling, Sean Shi, et al. Humanity’s last exam.\n     arXiv preprint arXiv:2501.14249, 2025.\n[27] Matthew Renze and Erhan Guven. Self-reflection in llm agents: Effects on problem-solving\n     performance. arXiv"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "[37] Aohan Zeng, Xin Lv, Qinkai Zheng, Zhenyu Hou, Bin Chen, Chengxing Xie, Cunxiang\n     Wang, Da Yin, Hao Zeng, Jiajie Zhang, et al. Glm-4.5: Agentic, reasoning, and coding (arc)\n     foundation models. arXiv preprint arXiv:2508.06471, 2025.\n\n[38] Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao\n     Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. Judging llm-as-a-judge with mt-\n     bench and chatbot arena. Advances in neural information processing systems, 36:46595–46623,\n     2023."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "[39] Zijian Zhou, Ao Qu, Zhaoxuan Wu, Sunghwan Kim, Alok Prakash, Daniela Rus, Jinhua\n     Zhao, Bryan Kian Hsiang Low, and Paul Pu Liang. Mem1: Learning to synergize memory\n     and reasoning for efficient long-horizon agents. arXiv preprint arXiv:2506.15841, 2025.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                                     15"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "A      Additional Experiments\nDue to the page limitation, we list the additional experiments and analyses in this section.\n    Generalization Experiments. Tables 2, 4, and 5 present the performance of KLong on SWE-\nbench Verified, Terminal-Bench Hard, and SEC-bench, respectively. On SWE-bench Verified,\nKLong achieves a pass rate of 62.80, improving over the Baseline+SFT model (60.80) under\nthe same OpenHands scaffolding. Similarly, on the more challenging Terminal-Bench Hard,\nKLong attains 16.67, surpassing the baseline (14.58) and demonstrating its capability to handle\ncomplex terminal-based coding tasks. In the security-focused SEC-bench, KLong consistently\noutperforms the baseline across both CVE (4.5 vs. 3.5) and OSS-Fuzz (14.0 vs. 8.0), achieving an\noverall average of 7.67 compared to 5.0. These results indicate that KLong not only improves\nover prior baselines on standard software "
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "B     Detailed Related Work\nLarge Language Model Agent. Large language models (LLMs) serve as the brain of LLM agents.\nThese LLM agents are also equipped with memory [8, 35], tool usage [19, 36], and planning and\nreasoning capabilities [11, 22, 34]. Unlike single-turn question answering [20], LLM agents need\nto engage in multi-turn interactions [38] with the environment and make sequential decisions\nbased on feedback. To tackle this challenge, numerous mechanisms have been introduced in\nrecent studies, e.g., self-reflection [27, 28], self-correction [15], planning-and-execution [11],\nwhich collectively enhance the capability of LLM agents in multi-turn interaction settings.\nBesides, some works aim to build more effective scaffolds [3, 13] to facilitate collaboration\n    2 We meet a temporarily unresolvable issue due to the package conflict between Gemini 3 Pro and the inspect_ai"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "package in PaperBench scaffolding, as discussed in https://github.com/UKGovernmentBEIS/inspect_ai/issues/\n2838.\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                                      16\n\nTable 7: Performance of 3 Closed-source Models and 4 Open-source Models on PaperBench.\nThe bold value denotes the best result.\n\nClosed-source Models                       Open-source Models\nTask Name\n                                                                     DeepSeek-V3.1 Kimi K2 0711 Kimi K2 0905 KLong\n                             Gemini 3 Pro2 GPT-4.1 Claude 4 Sonnet\n                                                                        (685B)         (1T)         (1T)     (106B)"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "fre                                -         10.40       09.78           45.29        08.07        40.22     61.04\nmechanistic-\n                                   -         25.00       55.28           52.50        42.31        39.07     75.65\nunderstanding\nbridging-data-gaps                 -         08.33       41.79           24.64        23.57        45.71     51.25\ntest-time-model-adaptation         -         37.02       49.30           55.22        30.58        43.93     80.09\nall-in-one                         -         11.44       10.60           38.52        38.31        37.55     70.14\nsequential-neural-\n                                   -         71.24       63.66           66.29        40.15        76.80     80.13\nscore-estimation\nrobust-clip                        -         24.05       20.40           11.89        25.26        20.92     42.71\nwhat-will-my-model-forget       "
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "Average                            -         29.90       43.29           36.35        27.79        39.34     62.59"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "among multiple LLM agents, enabling them to solve more complex tasks. However, realistic\ntasks like bug fixing [14, 21], terminal coding [31], and deep research [26], remain long-horizon,\nposing substantial challenges for existing LLM agents. Training-free mechanisms like context\nmanagement [2, 32], sub-agents [3], and retrieval-augmented generation [8] are proposed to\nalleviate this problem. Although effective, they are typically system-level solutions and do not\nenhance agents’ inherent ability to solve long-horizon tasks.\n    Training Long-horizon LLM Agent. To enhance the ability to solve long-horizon tasks,\nresearchers are focusing on developing advanced training techniques [30] and infrastructure\n[33]. For example, a memory-efficient RL algorithm termed LOOP [7] is proposed to improve\nthe agentic performance on long-horizon tasks. [12] improves the efficiency for training the\nlong-"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Table 8: Detailed Task Performance in Ablation Studies. Bold and underlined values denote\nthe best and runner-up models, respectively. “Baseline” is the base model with a comprehensive\nSFT. “Baseline+SFT” is Baseline with splitting SFT. “+RL∗H ” is the progressive RL.\n\nTask Name                    Baseline Baseline+SFT Baseline+SFT+RL2H Baseline+SFT+RL4H Baseline+SFT+RL6H"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "fre                           28.73     53.53           74.07              76.31             61.04\n mechanistic-\n                               52.78     72.41           85.37              65.28             75.65\n understanding\n bridging-data-gaps            00.00     48.57           54.35              52.98             51.25\n test-time-model-adaptation    01.89     68.22           68.40              73.78             80.09\n all-in-one                    32.28     75.05           63.10              57.73             70.14\n sequential-neural-\n                               36.06     75.11           72.87              53.44             80.13\n score-estimation\n robust-clip                   23.18     51.11           32.50              23.35             42.71\n what-will-my-model-forget     36.44     54.08           39.56              47.17             56.93\n pinn                          52."
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Average                       38.63     55.92           57.29              58.65             62.59\n\ncontext management and involves long-running experiments, as shown in Figure 2.\n\nC       Implement Details\nFor PaperBench, we test the Code-Dev version with a 12-hour timeout and adapt the basic agent\nto all models. And the judge model is use o3-mini. For MLE-bench, we test all the competitions\nin a low split, and the timeout is set to 12 hours. For SWE-bench Verified, we test all 500 samples\nand adopt OpenHands scaffolding. For Terminal-Bench Hard, we test all 48 samples and adopt\nterminus 2 scaffolding. For the SEC-bench, we test both CVE and OSS-Fuzz sub-sets. We use\nGLM-4.5-Air-Base [37] as our base model. We use the internal SFT and RL training framework."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "D       Limitation\nWhile the proposed framework enables training learning agents on extremely long-horizon\ntasks that are otherwise infeasible under standard settings, it has several limitations.\n    1) Our approach relies on trajectory decomposition and progressive reinforcement learning\nschedules, which introduce an approximation to full-trajectory optimization. Although this\napproximation is necessary under strict context and stability constraints, it may not fully capture\nlong-range dependencies spanning distant sub-trajectories.\n    2) Training and evaluation in the extremely long-horizon regime require substantial compu-\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                                                                                                         18"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "tational resources, including long-running rollouts and large-scale infrastructure. As a result,\nreproducing our full experimental setup may be challenging for smaller research groups. We\nview this as a current limitation of the problem setting rather than the proposed method itself,\nand expect future advances in model efficiency and systems support to mitigate this issue.\n    3) Our reinforcement learning stage depends on automated judges and rubric-based evalua-\ntions to provide reward signals. While this design enables scalable training, it may introduce\nbiases or blind spots aligned with the judge models. Investigating more robust and interpretable\nreward mechanisms, as well as incorporating human feedback at scale, remains an important\ndirection for future work."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "E        Case Studies\nWe demonstrate a trajectory of KLong on lbcs task in Listing 1. We find that the trajectory mainly\nconsists of several stages, including paper reading, paper analysis, code development, running\nexperiments, and code refinement. We find a bad case in Claude 4.5 Sonnet (Thinking), in\nListing 2. The agent kills the main process and leads to the termination of the task."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "Listing 1: Extremely Long Agentic Trajectory of KLong for lbcs Task.\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - System - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| You are a helpful agent attempting to solve a task . You have several functions                                                                                              |\n| available to help with solving the task . Each message may perform one function call . |\n| You will see the result of the function right after sending the message . If you need |\n| to perform multiple actions , you can always send more messages with subsequent                                                                                              |\n| function calls . Do some reasoning before your actions , describing what function                                             "
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - User - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| You are tasked with reproducing a research paper .                                                                                                                    |\n|                                                                                                                                                                       |\n| You have been provided with a research paper located at / home / paper . The directory                                                                                |\n| contains the paper in both PDF and markdown format .                                                                                                                  |\n|                                                 "
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "|   everything within the allotted time ; you should make prioritisation decisions in           |\n|   order to do as much as possible within your allotted time .                                 |\n|                                                                                               |\n|   Do not worry if you fail to completely reproduce particular parts of the paper . You        |\n|   will be assigned partial credit , such that if only a specific part of your                 |\n|   reproduction is incorrect , only that part will fail to receive credit , while              |\n|   remaining correctly implemented parts of your work will be marked as successful .           |\n|   Note that the partial credit you will be assigned will be weighted by importance to         |\n|   the paper ' s main contributions . Use your judgement to determine what parts of the        |\n|   paper are more"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "|         calls in a single message .                                                                                                                                          |\n| - Very Important : Before you write code or reproduce the paper , you MUST read all                                                                                          |\n|         content in / home / paper / paper . md and / home / paper / addendum . md !                                                                                          |\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                                    |\n| Let me start by reading the paper and addendum to understand what I need to reproduce .|\n|                                                                                                                                                                              |\n| First , I ' ll read the paper . md file to understand the core contributions , and then                                                                                      |\n| check the addendum . md for any additional context .                                                           "
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : read_file_chunk - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| File has 863 total lines . Showing lines 1 to 50.                                                                                                                            |\n|                                                                                                                                                                              |\n| 1: \\ title {                                                                                                                                                                 |\n| 2: Refined Coreset Selection : Towards Minimal Coreset Size under                                                                                                            |\n| Model Performance Constraints              "
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                                    |\n| Let me continue reading the paper to understand what needs to be replicated .                                                                                                |\n| I need to read more of the paper and also check the addendum file .                                                                                                          |\n| </ think >                                                                                                                                                                   |\n|                          "
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : read_file_chunk - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| File has 863 total lines . Showing lines 51 to 100.                                                                                            |\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                                                                                                         21"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "|                                                                                                                                                                              |\n| 51:                                                                                                                                                                          |\n| 52: Objective formulations . We formulate the two optimization objectives                                                                                                    |\n| that we are concerned with . Without loss of generality , we consider the                                                                                                    |\n| minimization mode across the paper . The formulation is based on a bilevel                                                                                                   |\n| optimization "
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                                    |\n| Let me continue reading the paper to understand the full methodology and                                                                                                     |\n| then check the addendum .                                                                                                                                                    |\n| </ think >                                                                                                                                                                   |\n|                          "
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : read_file_chunk - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| File has 863 total lines . Showing lines 101 to 150.                                                                                           |\n|                                                                                                                                                |\n| 101: Remark 1. Compared with the trivial solution , i . e . , the form of                                                                      |\n| weighted combination in (4) , our lexicographic bilevel coreset selection                                                                      |\n| enjoys several advantages . ( i ). Our method does not need to determine the                                                                   |\n.                 "
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - User - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Reminder : You have read / home / paper / paper . md but haven ' t read                                                                                                      |\n| / home / paper / addendum . md yet . Please make sure to read                                                                                                                |\n| / home / paper / addendum . md using the read_file_chunk tool , as it contains                                                                                               |\n| important information about the paper you need to replicate .                                                                                                                |\n+ - - - - - - - - - - "
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                                    |\n| Let me continue reading the paper to understand the full scope , and then                                                                                                    |\n| check the addendum file .                                                                                                                                                    |\n| </ think >                                                                                                                                                                   |\n|                          "
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : read_file_chunk - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| File has 863 total lines . Showing lines 151 to 200.                                                                                                                         |\n|                                                                                                                                                                              |\n| 151:                                                                                                                                                                         |\n| \\ psi_ { t +1}\\ left [ f_ {2}\\ left (\\ boldsymbol { m }^{ t }\\ right ) - f_ {2}\\ left (\\ boldsymbol {                                                                        |\n| m }^{ t +1}\\ right ) >\\ gamma_ {2} \\ text {"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "| 14:                                                                                                                                                                          |\n| [ PyTorch ]( https :// pytorch . org / vision / stable / datasets . html # fashion - mnist ))                                                                                |\n| that                                                                                                                                                                         |\n| 15:           do not rely on API keys or credentials .                                                                                                                       |\n| 16:                                                                                                                                                                          |\n| 17: ### Usefu"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| Let me continue reading the addendum and then start implementing the paper .                                                                                     |\n| The paper is about \" Refined Coreset Selection \" and proposes a method called                                                                                    |\n| LBCS ( Lexicographic Bilevel Coreset Selection ).                                                                                                                |\n|                                                                          "
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "|                                                                                                                                                                              |\n|                                                                                                                                                                              |\n| read_file_chunk ( file = '/ home / paper / addendum . md ' , start_line =51 , max_lines =50)                                                                                 |\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : read_file_chunk - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| File has 60 total lines . Showing lines 51 to 60.                                                                                                                            |\n|                                                                                                                                                                              |\n| 51:           - Note that the imbalance is just injected into the training set ,                                                                                             |\n| which does                                                                                                                                                                   |\n| 52:               not include the test set "
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : search_file - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Found 6 matches for ' algorithm 2 ' in / home / paper / paper . md                                                                                 |\n|                                                                                                                                                    |\n| Showing matches 1 -5 ( Page 1 of 2)                                                                                                                |\n|                                                                                                                                                    |\n|                                                                                                                                                "
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "|   $f_ {2} $ , while $f_ {1} $ remains in $ \\ mathcal { M } _ {1}^{*} $ .                               |\n|          145: Condition 2 ( Stable moving condition ). At any step $t \\ geq 0$ , ( i )                 |\n|   if $ \\ boldsymbol { m }^{ t } \\ notin \\ mathcal { M } _ {1}^{*} $ , for all possible                 |\n|   $ \\ boldsymbol { m }^{ t } $ in the set $ \\ mathcal { S } _ {1}:=\\ left \\{\\ boldsymbol { m }^{ t }   |\n|   \\ in \\ right . $ $ \\ left .\\ mathcal { M } \\ mid f \\ left (\\ boldsymbol { m }^{ t }\\ right ) \\ leq   |\n|   f \\ left (\\ boldsymbol { m }^{0}\\ right )\\ right \\} $ , there exists $ \\ gamma_ {1} >0 $ and         |\n|   $0 <\\ eta_ {1} \\ leq 1 $ so that the algorithm satisfies :                                           |\n|          146: \\[                                                                                       |\n|                                           "
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "| >>> 572: Practical lexicographic relations . We highlight that the notations                                                                                                 |\n| of lexicographic relations in Algorithm 2 ( i . e . ,                                                                                                                        |\n| $ \\ xlongequal [\\ left ( F_ {\\ mathcal { H }}\\ right )]{ }$ ,                                                                                                                |\n| $ \\ vec {\\ prec } _ {\\ left ( F_ {\\ mathcal { H }}\\ right )} $ , and                                                                                                         |\n| $ \\ preceq_ {\\ left ( F_ {\\ mathcal { H }}\\ right )} $ ) are a bit different from those in                                                                                   |\n| the main pape"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : bash - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Reinitialized existing Git repository in / home / submission /. git /                                                                                                        |\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| Let me understand the paper better and plan the implementation :                                                                                                 |\n\fKLong: Training LLM Agent for Extremely Long-horizon Tasks                                                                                                                         27"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "|                                                                                                                                                                              |\n| 1 The paper proposes \" Lexicographic Bilevel Coreset Selection ( LBCS )\" for                                                                                                 |\n|         the problem of refined coreset selection ( RCS )                                                                                                                     |\n| 2 Key components :                                                                                                                                                           |\n|           - Bilevel optimization framework where :                                                                                                                           |\n|              "
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - User - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Info : 0:00:42 time elapsed out of 12:00:00. Remember , you only have to stop                                                                                                |\n| working when the time limit has been reached .                                                                                                                               |\n|                                                                                                                                                                              |\n| Note : Don ' t forget to git commit regularly !                                                                                                                              |\n+ - - - - - - - - - - "
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| Let me start implementing the core components . I need to :                                                                                                      |\n|                                                                                                                                                                  |\n| 1 Implement the LBCS algorithm with lexicographic bilevel optimization                                                                                           |\n| 2 Implement baseline methods ( Uniform , EL2N , GraNd , Influential , Mod"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "|   import torch                                                                               |\n|   import torch . nn as nn                                                                    |\n|   import torch . nn . functional as F                                                        |\n|                                                                                              |\n|                                                                                              |\n|   class LeNet ( nn . Module ):                                                               |\n|       \"\"\" LeNet architecture for Fashion - MNIST .\"\"\"                                        |\n|       def __init__ ( self , num_classes =10):                                                |\n|            super ( LeNet , self ). __init__ ()                                               |\n|            self . conv1 ="
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "|                   return x                                                                                                                                                   |\n|                                                                                                                                                                              |\n|                                                                                                                                                                              |\n| class ResNet18 ( nn . Module ):                                                                                                                                              |\n|           \"\"\" ResNet -18 for CIFAR -10.\"\"\"                                                                                                                                   |\n|           def"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| I need to implement the LBCS algorithm and baselines . Let me continue                                                                                           |\n| building the codebase systematically . I ' ll implement :                                                                                                        |\n|                                                                                                                                                                  |\n| 1 Core LBCS algorithm                                                    "
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "|     Compare two masks using lexicographic relations .                                          |\n|     Returns True if new mask is better than current mask .                                     |\n|     \"\"\"                                                                                        |\n|     # Check if new mask is in M1 * ( f1 within epsilon of optimal )                            |\n|     in_m1_star = f1_new <= f1_star * (1 + epsilon )                                            |\n|                                                                                                |\n|     # Primary objective : f1                                                                   |\n|     if f1_new < f1_curr :                                                                      |\n|           if in_m1_star :                                                                      |\n|        "
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "|                       loss . backward ()                                               |\n|                       optimizer . step ()                                              |\n|                                                                                        |\n|             # Evaluate on test set                                                     |\n|             self . model . eval ()                                                     |\n|             correct = 0                                                                |\n|             total = 0                                                                  |\n|             with torch . no_grad ():                                                   |\n|                   for inputs , labels in self . test_loader :                          |\n|                         inputs , labels = inputs . to ( self . device ) ,      "
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "|                                                                                                 |\n|            print ( f \" Initial : f1 ={ f1_best :.4 f } , f2 ={ f2_best } ,                      |\n|   test_acc ={ test_acc_best :.2 f }%\")                                                          |\n|                                                                                                 |\n|             # Outer loop                                                                        |\n|             for t in range ( self . T ):                                                        |\n|                 # Sample new mask by perturbing current mask                                    |\n|                 u = torch . randn (n , device = self . device )                                 |\n|                 u = u / torch . norm ( u )                                                      |\n"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "|                   inputs , labels = inputs . to ( device ) , labels . to ( device )                                                                                          |\n|                   model . zero_grad ()                                                                                                                                       |\n|                   outputs = model ( inputs )                                                                                                                                 |\n|                   loss = criterion ( outputs , labels )                                                                                                                      |\n|                   loss . backward ()                                                                                                                                         |\n|              "
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                                    |\n| I need to commit my progress regularly . Let me commit what I have so far and                                                                                                |\n| continue implementing .                                                                                                                                                      |\n| </ think >                                                                                                                                                                   |\n|                          "
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : bash - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| [ master ( root - commit ) f517e63 ] Initial setup : models and core coreset                                                                                                 |\n| selection algorithm                                                                                                                                                          |\n| 2 files changed , 344 insertions (+)                                                                                                                                         |\n| create mode 100644 src / coreset_selection . py                                                                                                                              |\n| create mode 100644 src / models "
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| Good , I ' ve made my first commit . Now I need to continue implementing . Let me                                                                                |\n| create :                                                                                                                                                         |\n|                                                                                                                                                                  |\n| 1 Data loading utilities                                                 "
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "|                   transforms . Normalize ((0.2860 ,) , (0.3530 ,))                                                                                                           |\n|           ])                                                                                                                                                                 |\n|                                                                                                                                                                              |\n|           train_dataset = torchvision . datasets . FashionMNIST (                                                                                                            |\n|                   root = data_dir , train = True , download = True , transform = transform                                                                                   |\n|           )  "
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : bash - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| 0%|                         | 0.00/26.4 M [00:00 <? , ? B / s ] 0%|                           | 32.8 k /26.4 M                                            |\n| [00:00 <02:59 , 147 kB / s ] 0%|                                        | 65.5 k /26.4 M [00:00 <03:00 , 146 kB / s ]                                     |\n| 0%|                         | 131 k /26.4 M [00:00 <02:03 , 213 kB / s ]                 1%|                  | 229 k /26.4 M                             |\n.                                                                                                                                                           .\n.                                                                    ( Omit Experiments )\n.\n.                 "
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "| Test dataset size : 10000                                                                                                                                                    |\n| Testing model ...                                                                                                                                                            |\n| Model created successfully                                                                                                                                                   |\n| All basic tests passed !                                                                                                                                                     |\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n               "
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : bash - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Traceback ( most recent call last ):                                                                                                                                         |\n|       File \"/ home / submission / test_quick . py \" , line 47 , in < module >                                                                                                |\n|           mask , f1 , f2 , acc = lbcn . optimize ( initial_mask )                                                                                                            |\n|                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^                                                                                                |\n|       File \"/ home / submission "
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - User - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Info : 0:36:55 time elapsed out of 12:00:00. Remember , you only have to stop                                                                                                |\n| working when the time limit has been reached .                                                                                                                               |\n|                                                                                                                                                                              |\n| Note : Don ' t forget to git commit regularly !                                                                                                                              |\n+ - - - - - - - - - - "
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| I ' ve been working for about 37 minutes out of 12 hours . I have plenty of                                                                                      |\n| time left . Let me continue implementing and testing the reproduction . I                                                                                        |\n| should :                                                                                                                                                         |\n|                                                                          "
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "|                                                                                                                                                                              |\n| Let me test a quick experiment to ensure everything works properly .                                                                                                         |\n| </ think >                                                                                                                                                                   |\n|                                                                                                                                                                              |\n| Let me test a quick experiment to ensure everything works :                                                                                                                  |\n|              "
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| < think >                                                                                                                                                        |\n| The timeout command seems to have hung . Let me try a simpler test to see                                                                                        |\n| what ' s happening . I should test the components individually to ensure they                                                                                    |\n| work .                                                                                                                                                           |\n| </ think >                                                               "
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "|                                                                                                                                                                              |\n| # Test evaluation                                                                                                                                                            |\n| print ( ' Testing evaluation ... ')                                                                                                                                          |\n| model . eval ()                                                                                                                                                              |\n| correct = 0                                                                                                                                                                  |\n| total = 0    "
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Tool Output : bash - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| Testing baseline method ...                                                                                                                                                  |\n| Testing uniform sampling ...                                                                                                                                                 |\n| Mask sum : 100.0                                                                                                                                                             |\n| Testing training on coreset ...                                                                                                                                              |\n| Training completed !            "
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "Listing 2: One Bad Case of Claude 45 Sonnet (Thinking) for bridging-data-gaps Task\n                                                                                          .\n                                                                                          .\n                                                                                          .\n+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - Assistant - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+\n| The classifier training is running but taking a while . Let me update the                                                                                                    |\n| ablation study to run faster for demos :                                                                                                                                     |\n| bash                "
+    }
+  ]
+}
