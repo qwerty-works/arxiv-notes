@@ -1,0 +1,87 @@
+{
+  "arxivId": "2602.17544",
+  "paperTitle": "Evaluating Chain-of-Thought Reasoning through Reusability and Verifiability",
+  "abstract": "In multi-agent IR pipelines for tasks such as search and ranking, LLM-based agents exchange intermediate reasoning in terms of Chain-of-Thought (CoT) with each other. Current CoT evaluation narrowly focuses on target task accuracy. However, this metric fails to assess the quality or utility of the reasoning process itself. To address this limitation, we introduce two novel measures: reusability and verifiability. We decouple CoT generation from execution using a Thinker-Executor framework. Reusability measures how easily an Executor can reuse the Thinker&#39;s CoT. Verifiability measures how frequently an Executor can match the Thinker&#39;s answer using the CoT. We evaluated four Thinker models against a committee of ten Executor models across five benchmarks. Our results reveal that reusability and verifiability do not correlate with standard accuracy, exposing a blind spot in current accuracy-based leaderboards for reasoning capability. Surprisingly, we find that CoTs from specialized reasoning models are not consistently more reusable or verifiable than those from general-purpose LLMs like Llama and Gemma.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "In multi-agent IR pipelines for tasks such as search and ranking, LLM-based agents exchange intermediate reasoning in terms of Chain-of-Thought (CoT) with each other. Current CoT evaluation narrowly focuses on target task accuracy. However, this metric fails to assess the quality or utility of the reasoning process itself. To address this limitation, we introduce two novel measures: reusability and verifiability. We decouple CoT generation from execution using a Thinker-Executor framework. Reusability measures how easily an Executor can reuse the Thinker&#39;s CoT. Verifiability measures how frequently an Executor can match the Thinker&#39;s answer using the CoT. We evaluated four Thinker models against a committee of ten Executor models across five benchmarks. Our results reveal that reusability and verifiability do not correlate with standard accuracy, exposing a blind spot in current accuracy-based leaderboards for reasoning capability. Surprisingly, we find that CoTs from specialized reasoning models are not consistently more reusable or verifiable than those from general-purpose LLMs like Llama and Gemma."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Table 1: Reusability Score across Datasets and Committees"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 1: Reusability Flowchart"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 3: Kendall’s 𝜏 correlation of rankings based on reusabil-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 4: Kendall’s 𝜏 correlation of rankings based on verifia-                         dataset. But with the same evaluation committee, Llama has the"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Table 5: Model Performance Metrics across Multiple Datasets (Rounded to nearest integer)"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 6: Kendall 𝜏 correlation between evaluation metrics                              a \"Solver\" to derive the answer [17]. Our Thinker-Executor frame-"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Evaluating Chain-of-Thought Reasoning through Reusability and\n                                                                 Verifiability\n                                                        Shashank Aggarwal                                              Ram Vikas Mishra                                      Dr. Amit Awekar\n                                                        ashashank@iitg.ac.in                                         ram.mishra@iitg.ac.in                                    awekar@iitg.ac.in\n                                                   Indian Institute of Technology                                Indian Institute of Technology                         Indian Institute of Technology\n                                                      Guwahati, Assam, India                                        Guwahati, Assam, India                                 Guwahati"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "narrowly focuses on target task accuracy. However, this metric fails                          between genuine reasoning and brute-force search or memoriza-\n                                         to assess the quality or utility of the reasoning process itself. To                          tion. A model might get the right answer for the wrong reasons.\n                                         address this limitation, we introduce two novel measures: reusabil-                           Yet, the community continues to use these benchmarks to judge\n                                         ity and verifiability. We decouple CoT generation from execution                              reasoning quality. This creates a blind spot. We need to evaluate the\n                                         using a Thinker-Executor framework. Reusability measures how                                  reasonin"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "The reusability score is in the range of 0 to 100. A high reusability\n                                                                          score indicates that the 𝑀𝐸 generates its answers by ignoring its\n                                                                          own thinking process and blindly reusing the CoT provided by 𝑀𝑇 .\n                                                                          A high reusability score is a desirable property of CoT as it indicates\n                                                                          that the generated CoT is not 𝑀𝑇 specific, but it can be used across\n                                                                          other models such as 𝑀𝐸 . In the context of multi-agent systems, a\n                                                                          high reusability CoT can be used to help other"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Table 1: Reusability Score across Datasets and Committees\n                   Figure 1: Reusability Flowchart\n                                                                                                                         Thinker Model\n                                                                           Dataset             Executor\n                                                                                                                Gemma      Llama    Phi      R1\ngeneral-purpose LLMs such as Llama and Gemma. This indicates\n                                                                                               Full Comm.        66.04     73.46    83.53   66.56\nthat current accuracy metrics fail to capture the true utility of CoT.     GSM8K               Strong Comm.      80.75     87.82    94.68   84.54\n                                                       "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Weak vs Strong              Full vs Weak models via the Ollama local API using default decoding strate-\n                                                  Strong vs Full\n Dataset                                                            gies. We further divided the executor committee into two subcom-\n                                                                    mittees based on size. The Strong committee consists of the five\n  GSM8K               0.6667           1.0000          0.6667\n                                                                    larger models (Gemma2-2B, Gemma-2B, Llama3.2-3B, OpenChat,\n  StrategyQA          -0.3333          1.0000          -0.3333\n                                                                    and MistralLite). The Weak committee consists of the five smaller\n  SVAMP               0.6667           1.0000          0.6667\n                 "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Table 5: Model Performance Metrics across Multiple Datasets (Rounded to nearest integer)"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "GSM8K           StrategyQA                 SVAMP                 ARC            CommonSenseQA\n                Model Name\n                                      A       R       V     A      R      V      A         R     V      A     R      V       A      R         V\n                Gemma3                 93     66      79    94      42    57      93       39    79     93     36     50     80     41        34\n                Llama3.1               78     73      71    71      43    45      82       65    72     83     43     47     68     43        37\n                Phi4-Reasoning         81     84      88    95      45    59      90       44    89     81     43     70     70     44        70\n                DeepSeek-R1            94     67      80    93      45    62      95       34    80     95     32     63     82     32        60\n                   A = Accuracy, R = Reusability, V = V"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Table 6: Kendall 𝜏 correlation between evaluation metrics                              a \"Solver\" to derive the answer [17]. Our Thinker-Executor frame-\n(A=Accuracy, R=Reusability, V=Verifiability) across Datasets.                          work generalizes the Python interpreter and the \"Solver\" to any\n                                                                                       Executor model. Han et al. proposed using \"blueprints\" where a\n           Dataset                   A vs R    R vs V      V vs A                      larger model plans for a smaller one [8]. Our Thinker-Executor\n                                                                                       framework builds upon this modularity trend.\n           GSM8K                     -0.33         0.33     0.33\n                                                                                          Current e"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "References                                                                               Generative AI Disclosure\n [1] I. Arcuschin et al. 2025. Chain-of-Thought Reasoning In The Wild Is Not Always      The authors did not use generative AI to write any part of this\n     Faithful. arXiv preprint arXiv:2503.08679 (2025).\n [2] Edward Beeching, Clementine Fourrier, N Habib, S Han, Nathan Lambert, N             paper or to create new ideas, claims, results, or interpretations.\n     Nazaremsky, Omar Sayed, Lewis Tunstall, and Thomas Wolf. 2023. Open                 Generative AI was used only for minor writing help, such as im-\n     LLM Leaderboard. https://huggingface.co/spaces/HuggingFaceH4/open_llm_\n     leaderboard.\n                                                                                         proving grammar, clarity, and fluency. All research work, analysis,\n [3] Wenhu Chen, X"
+    }
+  ]
+}
