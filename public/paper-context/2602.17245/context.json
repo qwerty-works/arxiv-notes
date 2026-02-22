@@ -1,0 +1,217 @@
+{
+  "arxivId": "2602.17245",
+  "paperTitle": "Web Verbs: Typed Abstractions for Reliable Task Composition on the Agentic Web",
+  "abstract": "The Web is evolving from a medium that humans browse to an environment where software agents act on behalf of users. Advances in large language models (LLMs) make natural language a practical interface for goal-directed tasks, yet most current web agents operate on low-level primitives such as clicks and keystrokes. These operations are brittle, inefficient, and difficult to verify. Complementing content-oriented efforts such as NLWeb&#39;s semantic layer for retrieval, we argue that the agentic web also requires a semantic layer for web actions. We propose \\textbf{Web Verbs}, a web-scale set of typed, semantically documented functions that expose site capabilities through a uniform interface, whether implemented through APIs or robust client-side workflows. These verbs serve as stable and composable units that agents can discover, select, and synthesize into concise programs. This abstraction unifies API-based and browser-based paradigms, enabling LLMs to synthesize reliable and auditable workflows with explicit control and data flow. Verbs can carry preconditions, postconditions, policy tags, and logging support, which improves \\textbf{reliability} by providing stable interfaces, \\textbf{efficiency} by reducing dozens of steps into a few function calls, and \\textbf{verifiability} through typed contracts and checkable traces. We present our vision, a proof-of-concept implementation, and representative case studies that demonstrate concise and robust execution compared to existing agents. Finally, we outline a roadmap for standardization to make verbs deployable and trustworthy at web scale.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "The Web is evolving from a medium that humans browse to an environment where software agents act on behalf of users. Advances in large language models (LLMs) make natural language a practical interface for goal-directed tasks, yet most current web agents operate on low-level primitives such as clicks and keystrokes. These operations are brittle, inefficient, and difficult to verify. Complementing content-oriented efforts such as NLWeb&#39;s semantic layer for retrieval, we argue that the agentic web also requires a semantic layer for web actions. We propose \\textbf{Web Verbs}, a web-scale set of typed, semantically documented functions that expose site capabilities through a uniform interface, whether implemented through APIs or robust client-side workflows. These verbs serve as stable and composable units that agents can discover, select, and synthesize into concise programs. This abstraction unifies API-based and browser-based paradigms, enabling LLMs to synthesize reliable and auditable workflows with explicit control and data flow. Verbs can carry preconditions, postconditions, policy tags, and logging support, which improves \\textbf{reliability} by providing stable interfaces, \\textbf{efficiency} by reducing dozens of steps into a few function calls, and \\textbf{verifiability} through typed contracts and checkable traces. We present our vision, a proof-of-concept implementation, and representative case studies that demonstrate concise and robust execution compared to existing agents. Finally, we outline a roadmap for standardization to make verbs deployable and trustworthy at web scale."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: The pillar of NLWeb: a semantic layer that improves"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Web Verbs: a function-like action layer over today’s                                                reliable and efficient composition."
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 4: Distribution of implemented verbs across 13 web-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: Implementation of the get_direction verb as a se-                                * @return DirectionResult containing travel time, distance, and route"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Verb specification for Google Maps (get_direction),"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 6: Program fragments from the two case studies. (a)                          By invoking verbs, the agent retrieves candidates for each cate-"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 7: Workflow comparison between verb-based and GUI-based agents. Verb composition leads to concise, executable"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 8: Warning messages from browser-use during execu-                                                           custom code to bridge gaps. Verbs instead expose operations as"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 9: Relative execution time (normalized by Our Proto-                                                         a local optimization but a structural necessity. It equips agents"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 2: Detailed specifications of implemented verbs (examples)."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Web Verbs: Typed Abstractions for Reliable Task Composition on\n                                                               the Agentic Web\n                                                          Linxi Jiang                                       Rui Xi                                     Zhijie Liu\n                                                   The Ohio State University                   University of British Columbia                 The Ohio State University\n                                                     jiang.3002@osu.edu                            xirui801@ece.ubc.ca                           liu.13062@osu.edu"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Shuo Chen                                    Zhiqiang Lin                                 Suman Nath\n                                                      Microsoft Research                         The Ohio State University                       Microsoft Research\n                                                   shuochen@microsoft.com                         zlin@cse.ohio-state.edu                      sumann@microsoft.com\n                                         Abstract                                                                                                                          Se\narXiv:2602.17245v1 [cs.AI] 19 Feb 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "ma\n                                                                                                                                                                                nti\n                                                                                                                                                                                      cL\n                                         The Web is evolving from a medium that humans browse to an en-              User                   Agent                                       aye\n                                                                                                                                                                                              r"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "vironment where software agents act on behalf of users. Advances                                                                   Raw\n                                         in large language models (LLMs) make natural language a practical                      Natural                  Web\n                                                                                                                                                                            Web\n\ninterface for goal-directed tasks, yet most current web agents op-                    Language              Interactions"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "erate on low-level primitives such as clicks and keystrokes. These\n                                         operations are brittle, inefficient, and difficult to verify. Comple-\n                                                                                                                 Figure 1: The pillar of NLWeb: a semantic layer that improves\n                                         menting content-oriented efforts such as NLWeb’s semantic layer\n                                                                                                                 retrieval and grounding for agents.\n                                         for retrieval, we argue that the agentic web also requires a semantic\n                                         layer for web actions. We propose Web Verbs, a web-scale set of\n                                         typed, semantically documented funct"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Coding Agent             Code Solution          Web\n                                                                                            Ve\n                                                                                               rb\n                                                                                                    La\n                                                                                                            prototype reliably solved complex multi-step tasks. We constructed\n                                                                                                      yer\n     NL\n                                                           Interaction\n                                                                                                            a benchmark of 100 diverse web tasks and achieved a 100% success\n    Task\n          "
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "/* Searches for hotels in a destination for given dates.\n              * @param destination The destination city/location                                            abstractions, establishing a strong foundation for the agentic web.\n              * @param checkinDate Check-in date (LocalDate)\n              * @param checkoutDate Check-out date (LocalDate)\n                                                                                                               Our code and data are publicly available at https://github.com/\n              * @return HotelSearchResult containing a list of hotels */                                    nlweb-ai/MSR-Web-Verbs.\n             public HotelSearchResult search_hotel(String destination, LocalDate checkinDate,\n                LocalDate checkoutDate) {\n                 Function body implements one of the following:\n                                    "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "before completion [4]. This limitation is evident in IBM CUGA [13],              on Amazon, developers implement the verb by programmatically\nthe system currently ranked first on the WebArena [33] leaderboard.              driving the browser. In both cases, agents interact only with verbs,\nWhile it achieves an average success rate of 0.617, performance                  making the distinction between API and GUI orthogonal at the call\nvaries widely across sites, and success on multi-site tasks falls to             boundary.\n0.354 despite involving fewer records.                                              To fulfill their purpose effectively, verbs should satisfy the fol-\n                                                                                 lowing essential properties:\nAvailability. Many sites expose Web APIs, but coverage is typi-\ncally partial. Public, read-only endpoints a"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "public DirectionResult get_direction(String source, String\n   destination) {                                                      Enter source\n\nAmazon\n       page.navigate(\"https://www.google.com/maps/dir/\");\n                                                                      and destination\n\nCos\n       Locator inputboxes = page.locator(\".tactile-searchbox-\n                                                                                                                  Al\n                                                                                                              Boo aska                                          her\n   input\");"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "tco\n                                                                                                                                                           at\n       Locator sourceInput = inputboxes.nth(0);\n       sourceInput.fill(source);                                                                                 king Air                               We\n                                                                                                               Redf Com                             pen\n       sourceInput.press(\"Enter\");\n                                                                                                                    in"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "E-com\n       page.waitForTimeout(1000);\n                                                                                                                                                   O\n                                                                                                                                                 ers\n       Locator destinationInput = inputboxes.nth(1);\n\nGoogleMaps Travel                 Oth\n       destinationInput.fill(destination);\n       destinationInput.press(\"Enter\");\n\nMe\n                                                                                                                                               dia Micr"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "dge\n       page.waitForLoadState();\n       Locator drivingButton= page.locator(\"div[aria-\n                                                                       Click \"Driving\"                                                                 oso\n                                                                                                                       rary                                  ft\n\nle\n                                                                                                                                                   YouSpot Teams\n   label='Driving']\");\n\nLib\n\nKnow\n       drivingButton.click();"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "page.waitForLoadState();                                                                                Open                                    Tub ify\n       String travelTime = \"N/A\";                                                                                                                         e\n\nNASA\n\nNews\n       String distance = \"N/A\";\n       String route = \"N/A\";"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Locator directions = page.locator(\"#section-directions-\n   trip-0\");\n       page.waitForTimeout(2000);\n       if (directions.count() == 0) {\n           directions = page.locator(\"#section-directions-trip-0\");\n           page.waitForTimeout(2000);                                   Read the travel\n       }\n                                                                      time and distance\n                                                                                          Figure 4: Distribution of implemented verbs across 13 web-\n       if (directions.count() > 0) {                                                      sites, organized into five categories (E-commerce, Travel,\n           travelTime = directions.locator(\".Fk3sm\").innerText();\n           distance = directions.locator(\".ivN21e\").innerText();                          Knowledge, Media, and Others).\n           route = di"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "DirectionResult result = new DirectionResult(travelTime,\n   distance, route);\n       System.out.println(result);\n       return result;\n   }\n                                                                                          /**\n                                                                                           * Gets travel information between two locations.\n                                                                                           * @param source The starting location\n                                                                                           * @param destination The destination location\nFigure 3: Implementation of the get_direction verb as a se-                                * @return DirectionResult containing travel time, distance, and route\nquence of Playwright actions with structured inputs and                                    */\noutpu"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Figure 5: Verb specification for Google Maps (get_direction),\n                                                                                          abstracting a navigation task into a structured function."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "built a Chrome extension to support the process. The extension\nrecords details of browser actions and the targeted HTML elements\nwhile we manually operate the browser. The recorded action trace\nis then used to generate a function that calls the Playwright library                        We implemented verbs for 13 widely used websites, grouped\nto perform each browser operation. We test and debug the function                         into five categories: E-commerce, Travel, Knowledge, Media, and\nto remove unnecessary steps and confirm the correctness of the                            Others.\nelement locators. Once the function reliably reproduces the action                           Figure 4 shows the distribution of verbs across these websites\ntrace, variable elements corresponding to user input are abstracted                       and categories. The complete catalog of verbs, along with"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "for (String hotel : hotels) {                                                    Furniture Shopping. The second case study considers a user\n    double totalDistance = 0.0;                                                  who has just moved into a new apartment and needs to purchase\n    for (String museum : museums) {\n        maps_google_com.DirectionResult dir =                                    essential furniture, including a bed frame, mattress, desk, chair,\n            mapsInstance.get_direction(hotel, museum);                           floor lamp, air purifier, and carpet. The user request is as follows:\n        totalDistance += parseDistance(dir.distance);\n    }\n    results.add(new HotelDistance(hotel, totalDistance));                            User Task\n}"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "(a) Hotel ranking\n                                                                                     \"I just moved into a new home and need to buy furniture,\n                                                                                     including a bed frame, mattress, desk, chair, floor lamp, air\n                                                                                     purifier, and carpet. Please find three candidate products for\nfor (List<Item> combo : allCombinations(items)) {                                    each category, and then select a combination that maximizes\n    int cost = sumPrice(combo);\n    int score = sumRating(combo);\n                                                                                     overall rating while keeping the total cost within a budget of\n    if (cost <= budget && score > bestScore) {                                       $"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "}\n    }\n                                                                                    This request combines product search with a constrained selec-\n                                                                                 tion problem. The agent must choose one item per category, stay\n                          (b) Furniture selection                                within a global budget, and maximize an objective over the entire\n                                                                                 set.\nFigure 6: Program fragments from the two case studies. (a)                          By invoking verbs, the agent retrieves candidates for each cate-\nRanking hotels by the sum of distances to selected museums.                      gory with structured fields such as price and rating, reducing the\n(b) Selecting one item per category under a total budget.             "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Loop: iterate over all combinations                          I have collected the total\n                                                                                                                      distance from each hotel          Wrong\n                                                                                                                      to all selected museums.          Answer\n                                                                                                                      Then I will compare\n                                                                                                                      these totals and sort the        Clarion\n                                                                                                                      hotels in ascending order.       Suites\n                                        "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Figure 7: Workflow comparison between verb-based and GUI-based agents. Verb composition leads to concise, executable\nprograms, while GUI-based methods expand into long traces of primitive actions."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "explicitly as concise programs, producing solutions that are com-                       Table 1: Performance on 10 representative tasks (✓= success,\npact, reproducible, and able to cover the complete search space.                        ✗= failure). B1: openai-cua-sample-app, B2: browser-use, P:\n                                                                                        Our Prototype.\n4.3    Task Evaluation\n                                                                                                        Website          Task                      B1 B2 P\nTo further validate the effectiveness of the verb layer beyond the\ncase studies, we conducted a larger-scale evaluation. We constructed                                    AlaskaAir        Flight Cost Est.          ✓   ✓   ✓\na benchmark of 100 tasks that reflect common scenarios users might                                "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Memory breakdown:                                                                                                   steps that could fail at any point, whereas the verb get_direction\n  - Agent_b3af: 61.6MB (history=50, queue=0)                                                                        encapsulates the entire operation as a single stable call that works\nConsider:\n  - Reducing max_history_size                                                                                       consistently across interface variations.\n  - Clearing completed EventBus instances with stop(clear=True)                                                        Second, verbs improve efficiency through structured com-\n  - Reducing event payload sizes\n                                                                                                                    position. Executing a task at the GUI l"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "7                                                                                     The result is faster execution and better reuse of knowledge across\n                              6\n                                                                                                      5.3x          sites.\n                              5                                                                4.5x\n                                                                                                                       Third, verbs enable verifiability of reasoning. Neither GUI\n                              4                                                                                     traces nor ad hoc APIs provide transparent evidence of what an\n                                                            3.3x                                                    agent has done. V"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "through a path. However, unlike class names, the standard should            7    Conclusion\nspecify that the “stable-public-locator” is part of a website’s public      The agentic web envisions a future where agents interact with\ninterface. Its values must remain stable, since changes would break         the web to access content and accomplish tasks reliably on be-\nbackward compatibility. The standard may also recommend using               half of users. NLWeb is an initiative that makes today’s web more\ndescriptive natural language strings, which would improve code              hospitable to these agents, with its semantic layer serving as an in-\nreadability and make elements more directly usable by agents.               termediary between the agent and the raw web. Our work extends\n   In addition, a standard should govern the registration of verbs          this idea from a focus on we"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Oh, Tristan Naumann, Amir Globerson, Kate Saenko, Moritz Hardt, and                   [24] Yueqi Song, Frank F. Xu, Shuyan Zhou, and Graham Neubig. 2025. Beyond\n     Sergey Levine (Eds.).         http://papers.nips.cc/paper_files/paper/2023/hash/           Browsing: API-Based Web Agents. In Findings of the Association for Computa-\n     5950bf290a1570ea401bf98882128160-Abstract-Datasets_and_Benchmarks.html                     tional Linguistics, ACL 2025, Vienna, Austria, July 27 - August 1, 2025 (Findings\n [7] Ben Hammersley. 2003. Content syndication with RSS - sharing headlines and                 of ACL, Vol. ACL 2025), Wanxiang Che, Joyce Nabende, Ekaterina Shutova, and\n     information using XML. O’Reilly. http://www.oreilly.de/catalog/consynrss/                  Mohammad Taher Pilehvar (Eds.). Association for Computational Linguistics,\n     index.html                               "
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Table 2: Detailed specifications of implemented verbs (examples)."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Website          Verb                     Description\n                 getFlightInfo            Extracts flight information from the current page.\nAlaskaAir\n                                          @return FlightInfoResult containing a list of flights and the price.\n                 searchFlights            Searches for flights between the given origin and destination on specified dates.\n                                          @param origin: Origin AIRPORT CODE\n                                          @param destination: Destination AIRPORT CODE\n                                          @param outboundDate: Outbound flight date\n                                          @param returnDate: Return flight date\n                                          @return SearchFlightsResult containing flight info or a message if no flights found.\n                 clearCart                Clears all "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Website               Verb                            Description\n                             getNeoLookup                    Looks up a specific Near Earth Object by its NASA JPL small body ID.\n                                                             @param asteroidId: The asteroid ID to lookup\n                                                             @return NeoResult for the specific asteroid\n                                                             @throws IOException if a network error occurs\n                                                             @throws InterruptedException if the request is interrupted.\n                             getNeoBrowse                    Retrieves a list of Near Earth Objects from the browse endpoint.\n                                                             @return List of NeoResult objects from the browse endpoint\n                   "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Website   Verb               Description\n          getSubject         Retrieve works and info with optional details.\n                             @param subject: The subject name\n                             @param details: Include detailed information (authors, publishers, etc.)\n                             @return List of SubjectInfo objects.\n          getSubject         Retrieve works and info with full customization.\n                             @param subject: The subject name\n                             @param details: Include detailed information\n                             @param limit: Number of works to include\n                             @param offset: Starting offset for pagination\n                             @return List of SubjectInfo objects.\nRedfin    searchApartments   Searches Redfin for apartments for rent in a location and price range.\n                            "
+    }
+  ]
+}
