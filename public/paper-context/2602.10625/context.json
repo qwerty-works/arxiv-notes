@@ -1,0 +1,337 @@
+{
+  "arxivId": "2602.10625",
+  "paperTitle": "To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks",
+  "abstract": "Theory of Mind (ToM) assesses whether models can infer hidden mental states such as beliefs, desires, and intentions, which is essential for natural social interaction. Although recent progress in Large Reasoning Models (LRMs) has boosted step-by-step inference in mathematics and coding, it is still underexplored whether this benefit transfers to socio-cognitive skills. We present a systematic study of nine advanced Large Language Models (LLMs), comparing reasoning models with non-reasoning models on three representative ToM benchmarks. The results show that reasoning models do not consistently outperform non-reasoning models and sometimes perform worse. A fine-grained analysis reveals three insights. First, slow thinking collapses: accuracy significantly drops as responses grow longer, and larger reasoning budgets hurt performance. Second, moderate and adaptive reasoning benefits performance: constraining reasoning length mitigates failure, while distinct success patterns demonstrate the necessity of dynamic adaptation. Third, option matching shortcut: when multiple choice options are removed, reasoning models improve markedly, indicating reliance on option matching rather than genuine deduction. We also design two intervention approaches: Slow-to-Fast (S2F) adaptive reasoning and Think-to-Match (T2M) shortcut prevention to further verify and mitigate the problems. With all results, our study highlights the advancement of LRMs in formal reasoning (e.g., math, code) cannot be fully transferred to ToM, a typical task in social reasoning. We conclude that achieving robust ToM requires developing unique capabilities beyond existing reasoning methods.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Theory of Mind (ToM) assesses whether models can infer hidden mental states such as beliefs, desires, and intentions, which is essential for natural social interaction. Although recent progress in Large Reasoning Models (LRMs) has boosted step-by-step inference in mathematics and coding, it is still underexplored whether this benefit transfers to socio-cognitive skills. We present a systematic study of nine advanced Large Language Models (LLMs), comparing reasoning models with non-reasoning models on three representative ToM benchmarks. The results show that reasoning models do not consistently outperform non-reasoning models and sometimes perform worse. A fine-grained analysis reveals three insights. First, slow thinking collapses: accuracy significantly drops as responses grow longer, and larger reasoning budgets hurt performance. Second, moderate and adaptive reasoning benefits performance: constraining reasoning length mitigates failure, while distinct success patterns demonstrate the necessity of dynamic adaptation. Third, option matching shortcut: when multiple choice options are removed, reasoning models improve markedly, indicating reliance on option matching rather than genuine deduction. We also design two intervention approaches: Slow-to-Fast (S2F) adaptive reasoning and Think-to-Match (T2M) shortcut prevention to further verify and mitigate the problems. With all results, our study highlights the advancement of LRMs in formal reasoning (e.g., math, code) cannot be fully transferred to ToM, a typical task in social reasoning. We conclude that achieving robust ToM requires developing unique capabilities beyond existing reasoning methods."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "To Think or Not To Think, That is The Question for\n                                                                  Large Reasoning Models in Theory of Mind Tasks\n\nNanxu Gong 1 * Haotian Li 2 Sixun Dong 1 Jianxun Lian 2 Yanjie Fu 1 Xing Xie 2\n\nAbstract                                 1. Introduction\n                                                 Theory of Mind (ToM) assesses whether mod-                  Theory of Mind (ToM) refers to the human capacity to infer\n                                                 els can infer hidden mental states such as be-\narXiv:2602.10625v1 [cs.AI] 11 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "the unobservable mental states of others, such as beliefs,\n                                                 liefs, desires, and intentions, which is essential          desires, and emotions, forming the foundation of social cog-\n                                                 for natural social interaction. Although recent             nition (Chen et al., 2025; Sarıtaş et al., 2025; Nguyen et al.,\n                                                 progress in Large Reasoning Models (LRMs) has               2025). It enables individuals to interpret subtle cues, an-\n                                                 boosted step-by-step inference in mathematics               ticipate behavior, and maintain meaningful communication.\n                                                 and coding, it is still underexplored whether this          Research in large-scale reasoning has recently gaine"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1\n\f           To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "models consistently outperform non-reasoning models in             soning collapse and option matching shortcuts highlights\nToM? A systematic analysis contrasting the ToM perfor-             the advancement of LRMs in formal reasoning (e.g., math,\nmance of reasoning models against non-reasoning models             code) cannot effectively lead to increasing performance in\nis essential to understand the effectiveness of reasoning          ToM, a typical task in social reasoning. Our findings sug-\ncapability and point out future directions.                        gest that strategies beneficial in formal domains, such as\n                                                                   prolonged deliberation, are often counterproductive in the\nTo fill this gap, we conduct a comprehensive study on the\n                                                                   ambiguous context of To"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "ness, we evaluate on HiToM, ToMBench, and ToMATO,                   focuses on the depth of reasoning. It tests a model’s ability\nwhich together span higher-order belief depth, a broad              to handle complex, multi-level recursive beliefs (from 0th\nmental-state taxonomy, and diverse evaluation scenarios.            to 4th-order) in narratives that include deceptive agents. (ii)\n                                                                    ToMATO (Shinoda et al., 2025) assesses ToM in realistic,\nLarge Reasoning Model Evaluation. Benchmarks for                    interactive contexts. It uses conversation-based scenarios\nLRMs span mathematics, formal logic, commonsense, code,             between role-playing agents to test how well a model can\nand agentic interaction. Math suites range from contest-style       infer mental states from dynamic, ongoing dialogues. (iii)\nand gra"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "3\n\f             To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nTable 1. Overall results of all reasoning and non-reasoning models on three benchmarks\n\nGPT Family                   DeepSeek Family                    Qwen3-8B                          Qwen3-32B\n Dataset\n             GPT-4o   GPT-o4-mini    GPT-o3   DeepSeek-V3   DeepSeek-R1    Qwen3-8B    Qwen3-8B-Reasoning   Qwen3-32B    Qwen3-32B-Reasoning\n HiToM       0.607       0.547        0.747      0.694         0.549         0.558             0.481          0.586             0.680\n ToMATO      0.822       0.792        0.817      0.782         0.749         0.705             0.648          0.732             0.714\n ToMBench    0.797       0.803        0.818      0.763         0.801         0.674             0.729          0.754             0.775"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "inantly appear in a high-response-length region, forming                   from a high of 0.838 at the lowest effort level to 0.693 at the\na massive peak around 8,000 to 10,000 characters. How-                     highest. This negative correlation is weakened on the less\never, this extreme pattern is mitigated on the ToMATO and                  complex ToMATO benchmark (Figure 2b) and ToMBench\nToMBench (Appendix C.3) benchmarks. While a distinction                    (Appendix C.5). We found that varying the reasoning effort\nbetween the length of correct and incorrect responses for                  had a negligible impact on final accuracy. This divergence\nDeepSeek-R1 still exists on ToMATO, the separation is less                 on two benchmarks demonstrates that the extensive reason-\npronounced, the error count is lower, and the distributions                ing failure is triggered b"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "(a) Response analysis          (b) Orders and lengths in HiToM\nFigure 1. The distribution of the length and correctness of reason-               (a) Qwen3-8B on HiToM           (b) Qwen3-8B on ToMATO\ning model responses."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "4.1.2. M ORE R EASONING D OES N OT L EAD TO B ETTER\n       P ERFORMANCE\nThe previous experiment suggests model reasoning response\nlengths correlate with failure, which may suggest extensive\nreasoning can backfire on the ToM performance. To verify\nand explore the phenomenon, we conducted experiments                             (c) Qwen3-32B on HiToM           (d) Qwen3-32B on ToMATO\non proprietary reasoning models and open-source reasoning\nmodels to explicitly control their reasoning for comparison.               Figure 3. Performance comparison under different token length\n                                                                           limitations. Dash lines show original model performance without\nStudy of Proprietary Reasoning Models. We control how                      token limitation. Stars show token limits with best performance.\nmuch proprietary models reason through a "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "4\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nFigure 4. Overlap between reasoning and non-reasoning models’ correct answers. This example is from Qwen3-32B variants on HiToM."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "thought to force the LLM to derive an answer. We report              we show the comparison between Qwen3-32B and Qwen3-\nthe performance in Figure 3. Interestingly, we find that             32B-Reasoning on HiToM in Figure 4. In low-complexity\nimposing a token limit acts as a performance catalyst on             scenarios like Order 0 and Order 1, the models are largely in\ncomplex HiToM tasks. For example, by restricting Qwen3-              agreement, correctly answering a shared set of 233 and 135\n8B-Reasoning to think up to 1,500 tokens, we achieved a              samples, respectively. However, a significant divergence\nscore of 0.706, surpassing both the non-reasoning and rea-           emerges at Order 2, where their complementary strengths\nsoning modes. Even on simpler benchmarks like ToMATO,                become apparent with 87 overlapping correct answers but\nmanaging token length"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "5\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "processes of current reasoning models may be flawed or                4.2. Probing Reasoning Failure and Intervention\nmisaligned with the unique demands of ToM tasks, which                     Strategies in ToM\nleads to the observed failure of reasoning.\n                                                                     As we have identified a series of problems in ToM reasoning,\n                                                                     we develop two intervention strategies to further verify and\n                                                                     mitigate the problems in this section. First, we leverage\n                                                                     Slow-to-Fast reasoning to investigate the potential of an\n                                                                     adaptive cognitive strategy. Building on it, we design Think-\n"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "6\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\n(a) Accuracy comparison                            (b) Behavior comparison with an example case\n                        Figure 6. The comparison of model performance when options are provided or not.\n\nFigure 7. Overview of the Slow-to-Fast (S2F) and Think-to-Match (T2M) techniques.\n\ntion to the natural reasoning process, resulting in negligible\noverall improvement or even a slight decline in performance.\nIt suggests that the adaptive reasoning should be achieved\nby considering both deliberation efforts and question com-\nplexity, implying more future research on genuine ToM\nreasoning capability."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "4.2.2. T HINK - TO -M ATCH\nBuilding on S2F, we introduce T2M to prevent option match-                           Figure 8. T2M performance.\ning shortcuts. In the thinking phase, T2M removes answer\noptions, compelling the model to perform first-principles            ended, such as inferring potential activities that a person\nreasoning constrained only by the S2F monitor. In the subse-         might invite another to do. These questions can have a large\nquent matching phase, options are reintroduced, prompting            answer space, meaning that models can take various think-\nthe model to align its generated deduction with the can-             ing directions to generate many more potentially correct\ndidates. This approach ensures decisions are grounded in             answers than those provided as options. As a result, with-\nindependent reasoning rather than superficial heuristics. As    "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "7\n\f             To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nTable 2. S2F performance across various reasoning models."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Qwen3-8B                  Qwen3-32B             R1-Distill-Qwen-7B         R1-Distill-Qwen-32B         R1-Distill-Llama-8B\n Benchmark\n              Vanilla          S2F          Vanilla       S2F         Vanilla         S2F         Vanilla        S2F         Vanilla        S2F\n HiToM         0.481      0.557 (+15.8%)     0.680    0.682 (+0.3%)   0.353      0.397 (+12.5%)   0.571     0.701 (+22.8%)   0.396     0.451 (+13.9%)\n ToMATO        0.648       0.700 (+8.0%)     0.714    0.724 (+1.4%)   0.490       0.505 (+3.1%)   0.706      0.708 (+0.3%)   0.586      0.578 (-1.4%)\n ToMBench      0.729      0.731 (+0.3%)      0.775    0.777 (+0.3%)   0.559       0.560 (+0.2%)   0.773      0.769 (-0.5%)   0.655      0.626 (-4.4%)"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "them consistently. Beyond the benchmark designs, it further                     reasoning tends to amplify noise and induce perspective\nvalidates that ToM reasoning heavily relies on options to                       drift, often overwriting correct initial intuitions.\nguide thinking directions, implying that current LRMs may\n                                                                                Multiple Choice Helps Formal Reasoning, Hurts ToM\nnot fully obsess genuine deductive ToM reasoning capabil-\n                                                                                Reasoning. A second critical distinction lies in the impact\nity. It calls for efforts to develop dedicated training methods\n                                                                                of multiple-choice options. As we demonstrated in Figure\nto enhance ToM reasoning in the future.\n    "
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "8\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nFigure 9. Cases to illustrate the different performance of T2M on HiToM and ToMBench."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "where prolonged deliberation backfires, and a reliance on               Brockman, G., et al. Evaluating large language models\nbrittle option-matching shortcuts. These findings highlight a           trained on code. arXiv preprint arXiv:2107.03374, 2021.\nfundamental divergence between the requirements of formal\nand social reasoning, showing that strategies successful in           Chen, R., Jiang, W., Qin, C., and Tan, C. Theory of mind\nlogic-based tasks become liabilities in ambiguous social con-           in large language models: Assessment and enhancement.\ntexts. This implies that improving ToM is not about simply              arXiv preprint arXiv:2505.00026, 2025.\nscaling existing analytical methods but requires developing\nunique capabilities. Our intervention methods with Slow-to-           Chen, Z., Wu, J., Zhou, J., Wen, B., Bi, G., Jiang, G., Cao,\nFast (S2F) reasoning and the Thin"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H.,\nImpact Statement                                                        Kaiser, L., Plappert, M., Tworek, J., Hilton, J., Nakano,\n                                                                        R., et al. Training verifiers to solve math word problems.\nWe acknowledge that ToM capabilities in AI models (e.g.,\n                                                                        arXiv preprint arXiv:2110.14168, 2021.\nLRMs) may carry potential risks, including deceptive ma-\nnipulation, unwarranted anthropomorphism, and privacy                 Deng, X., Gu, Y., Zheng, B., Chen, S., Stevens, S., Wang,\nencroachment. To understand and mitigate the risks, it is               B., Sun, H., and Su, Y. Mind2web: Towards a general-\ncritical to gain more understanding of the related capabilities         ist agent for the web. Advances"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "References                                                            Guo, D., Yang, D., Zhang, H., Song, J., Wang, P., Zhu,\n                                                                        Q., Xu, R., Zhang, R., Ma, S., Bi, X., et al. Deepseek-\nAustin, J., Odena, A., Nye, M., Bosma, M., Michalewski,                 r1 incentivizes reasoning in llms through reinforcement\n  H., Dohan, D., Jiang, E., Cai, C., Terry, M., Le, Q., and             learning. Nature, 645(8081):633–638, 2025.\n  Sutton, C. Program synthesis with large language models.\n  arXiv preprint arXiv:2108.07732, 2021.                              Han, S., Schoelkopf, H., Zhao, Y., Qi, Z., Riddell, M.,\n                                                                        Zhou, W., Coady, J., Peng, D., Qiao, Y., Benson, L., et al.\nChan, C., Jiayang, C., Yim, Y., Deng, Z., Fan, W., Li, H.,              Folio: Natural "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "9\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika, M.,           Shinoda, K., Hojo, N., Nishida, K., Mizuno, S., Suzuki,\n  Song, D., and Steinhardt, J. Measuring massive multitask              K., Masumura, R., Sugiyama, H., and Saito, K. Tomato:\n  language understanding. In International Conference on                Verbalizing the mental states of role-playing llms for\n  Learning Representations (ICLR), 2021.                                benchmarking theory of mind. In Proceedings of the\n                                                                        AAAI Conference on Artificial Intelligence, volume 39,\nJimenez, C. E., Yang, J., Wettig, A., Yao, S., Pei, K., Press,          pp. 1520–1528, 2025.\n  O., and Narasimhan, K. Swe-bench: Can language mod-\n  els resolve real-world github issues? In 12th Interna-              Shridhar, M., Thomason, J., Gordon, D., Bisk, Y., Han,"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Sclar, M., Dwivedi-Yu, J., Fazel-Zarandi, M., Tsvetkov, Y.,           Wu, Y., He, Y., Jia, Y., Mihalcea, R., Chen, Y., and Deng, N.\n  Bisk, Y., Choi, Y., and Celikyilmaz, A. Explore theory               Hi-tom: A benchmark for evaluating higher-order theory\n  of mind: program-guided adversarial data generation for              of mind reasoning in large language models. In Find-\n  theory of mind reasoning. In The Thirteenth International            ings of the Association for Computational Linguistics:\n  Conference on Learning Representations.                              EMNLP 2023, pp. 10691–10706, 2023.\n\n10\n\f           To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Xu, H., He, Y., Zhu, L., Zhao, R., and Du, J. Opentom:\n A comprehensive benchmark for evaluating theory-of-\n  mind reasoning capabilities of large language models. In\n The 62nd Annual Meeting of the Association for Com-\n  putational Linguistics. Association for Computational\n  Linguistics (ACL), 2024.\nYang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B.,\n  Yu, B., Gao, C., Huang, C., Lv, C., et al. Qwen3 technical\n  report. arXiv preprint arXiv:2505.09388, 2025.\nZhang, J., Dong, R., Wang, H., Ning, X., Geng, H., Li, P.,\n  He, X., Bai, Y., Malik, J., Gupta, S., et al. Alphaone:\n  Reasoning models thinking slow and fast at test time.\n  arXiv preprint arXiv:2505.24863, 2025.\nZheng, C., Liu, S., Li, M., Chen, X.-H., Yu, B., Gao,\n  C., Dang, K., Liu, Y., Men, R., Yang, A., et al.\n  Group sequence policy optimization. arXiv preprint\n  arXiv:2507.18071, 2025."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Zhou, P., Madaan, A., Potharaju, S. P., Gupta, A., McKee,\n  K. R., Holtzman, A., Pujara, J., Ren, X., Mishra, S.,\n  Nematzadeh, A., et al. How far are large language mod-\n  els from agents with theory-of-mind? arXiv preprint\n  arXiv:2310.03051, 2023.\n\nZiabari, A. S., Ghazizadeh, N., Sourati, Z., Karimi-\n  Malekabadi, F., Piray, P., and Dehghani, M. Reasoning\n  on a spectrum: Aligning llms to system 1 and system 2\n  thinking. arXiv preprint arXiv:2502.12470, 2025.\n\n11\n\f              To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nA. LLM Usage Statement\nWe used LLMs (e.g., ChatGPT) only for grammar and wording edits."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "B. Reproducibility Statement\nTo facilitate reproducibility, we provide our source code at https://anonymous.4open.science/r/\nToM-Reasoning-312B/. We also provide our hyperparameters for LLMs in Section 3.1 and the pseudo-code of\nintervention methods in Section D.1.\n\nC. Detailed Experimental Results\nC.1. When Reasoning Models Fail to Outperform?\n\nTable 3. Performance of models on HiToM (reasoning orders) and ToMBench (taxonomy categories)."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "HiToM                                                                 ToMBench\n Model\n                                Order 0      Order 1       Order 2      Order 3      Order 4      Belief    Desire      Emotion         Intention     Knowledge        Non\n                                                                               GPT Family\n GPT-o4-mini                     1.000        0.731          0.460        0.293    0.249          0.916        0.678        0.769         0.824           0.648       0.770\n GPT-o3                          0.996        0.912          0.733        0.625    0.467          0.923        0.689        0.786         0.856           0.617       0.803\n GPT-4o                          0.979        0.692          0.571        0.408    0.383          0.909        0.661        0.762         0.847           0.624       0.782\n                                     "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Table 4. ToMATO fine-grained accuracy by order and taxonomy\n                                           1st-Order                                           2nd-Order                                               All\n Model\n                       belief   desire   emotion intention    knowledge    belief   desire   emotion intention    knowledge    belief   desire   emotion intention   knowledge\n Qwen3-32B             0.773    0.848     0.772    0.802        0.747      0.599    0.731     0.727    0.658        0.680      0.685    0.782     0.749    0.735       0.714\n Qwen3-32B-Reasoning   0.773    0.859     0.788    0.751        0.696      0.586    0.724     0.713    0.617        0.663      0.679    0.783     0.750    0.689       0.680\n Qwen3-8B              0.717    0.830     0.760    0.810        0.686      0.595    0.703     0.705    0.660        0.606      0.656    0.759     0.732    0."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Moving beyond overall performance comparison, this section provides a fine-grained analysis along two axes: the reasoning\norder and taxonomy. The benchmarks test different reasoning complexities, as ToMBench requires 1st-order reasoning,\nToMATO up to 2nd-order, and HiToM up to 4th-order. Their taxonomic scope also expands from the belief-focused HiToM\nto the more comprehensive ToMBench, which covers 6 mental state dimensions. Our results confirm that model proficiency\nis not uniform: it degrades with higher-order reasoning and varies across different mental states. To simplify our discussion,\nthe remaining discussion will be mainly around ToMBench for comparing different ToM dimensions and HiToM for\ndiscussing orders (Table 3) . The findings are also supported by our results on ToMATO (Table 4)."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "C.1.1. R EASONING L OSES D OMINANCE IN H IGH -O RDER I NFERENCE .\nTable 3 shows the detailed performance on different reasoning orders. In low-complexity scenarios (Orders 0-1), reasoning\nmodels exhibit a general performance advantage. For example, DeepSeek-R1 achieves an accuracy of 0.988 on 1st-\norder tasks. However, this trend becomes less consistent as reasoning complexity increases to Orders 2-4, where certain\nnon-reasoning models begin to demonstrate comparable or superior performance. A stark example can be seen in that\n\n12\n\f               To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nTable 5. General, cross-benchmark error taxonomy with simplified definitions and examples that highlight faulty model thinking. Each\nrow uses a distinct highlight color."
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Error Type                       Description                                             Example\n  Evidence Grounding Error         Prediction is not grounded on the evidence or cites     Thinking: “Choose red basket; it sounds plausible.”\n                                   an entity that is not supported by the given context.   Fault: red basket is not in the evidence set; no justification links it\n                                                                                           to the task options.\n  State Tracking Error             Timeline or observability is tracked incorrectly.       Thinking: “The last move puts it in X, so Owen believes X.”\n                                                                                           Fault: Owen had already left before the last move; belief should freeze\n                                                                       "
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "DeepSeek-V3 achieves a robust score of 0.608 on 4th-order tasks, while the performance of the reasoning-focused DeepSeek-\nR1 collapses to 0.196. Similarly, the reasoning process does not facilitate consistently superior performance, as exemplified\nby the comparison between Qwen3-8B and Qwen-8B-reasoning. A more in-depth analysis of these behaviors is in Section\n4.1.1."
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "C.1.2. R EASONING ’ S B ENEFITS VARY ACROSS TAXONOMY\nWe also study the influence of taxonomy on the performance of LLMs, as shown in Table 3. A consistent advantage for\nreasoning models emerges in categories requiring the inference of structured, propositional attitudes. For example, in Belief\nand Intention, reasoning models and models under reasoning mode like GPT-o3 and Qwen3-8B-reasoning consistently\noutperform the non-reasoning models, suggesting explicit thinking path is particularly effective for tracking cognitive states.\nHowever, this performance gap diminishes when assessing some mental states. Most notably, in the Desire category, the\nnon-reasoning Qwen3-32B is tied for the top score at 0.689. These results reveal that the improvements from current\nreasoning capabilities are selective, rather than universal. While they may enhance some aspects of ToM, they fail to provide\na dis"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "C.2. Identifying Reasoning Error Types\nTo understand why models fail, we move from quantitative scoring to a qualitative analysis of their reasoning processes.\nBy manually inspecting the chain-of-thought outputs for incorrect predictions, we identified five recurring and distinct\ncategories of reasoning failures, beside the option-related one reported in our main paper (Section 4.1.4). These categories,\nwhich form a general, cross-benchmark error taxonomy, are defined and exemplified in Table 5.\nEvidence Grounding Errors. This is one of the most fundamental types of failure, where the model’s reasoning path\ndeviates from the provided context. An Evidence Grounding Error occurs when a model bases its conclusion on information\nthat is not present in the evidence or makes a decision by citing an entity that cannot be factually supported by the scenario.\nAs the example in Table 5 shows, this"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "13\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "another agent’s perspective and instead defaults to its own. A Perspective Attribution Error occurs when the model answers\nfrom the wrong point of view—often its own ”all-seeing” one—or confuses whose mental state is being queried. This\nfrequently manifests as egocentric projection, where the model imputes its own knowledge onto an agent (e.g., ”I, the model,\nknow it is in Y, therefore Agent B must think it is in Y”). This shows a breakdown in handling nested beliefs and maintaining\nthe crucial distinction between objective reality and an agent’s subjective perception.\nDiscourse Misinterpretation. This category of error highlights a model’s lack of pragmatic understanding in social\ncommunication. A Discourse Misinterpretation occurs when the model treats non-factual speech acts—such as claims,\nquestions, jokes, or rhetorical statements—as literal updates to the world state or shared know"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "C.3. Response Length Distribution\nThe response length distributions for the models are presented for each benchmark: HiToM in Figure 10, ToMATO in Figure\n11, and ToMBench in Figure 12. A clear trend emerges when comparing these distributions in order of task complexity. The\ndistinct pattern of failure we have identified—where errors cluster in an extremely high response-length region—is most\npronounced on the most complex benchmark, HiToM. This effect is noticeably mitigated on ToMATO and is least apparent\non ToMBench. This progression provides strong corroborating evidence for our hypothesis: the counterproductive slow\nthinking that leads to reasoning collapse is a failure mode that is specifically triggered and amplified by high task complexity.\nWe do not present GPT-o3 and GPT-o4-mini in this analysis as their genuine reasoning processes are not disclosed."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "14\n\fTo Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\n(a) DeepSeek-R1                               (b) Qwen3-32B-Reasoning\n\n(c) Qwen3-8B-Reasoning\n                         Figure 10. Response Length Distribution on HiToM.\n\n(a) DeepSeek-R1                               (b) Qwen3-32B-Reasoning\n\n(c) Qwen3-8B-Reasoning\n                        Figure 11. Response Length Distribution on ToMATO.\n\n15\n\fTo Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\n(a) DeepSeek-R1                               (b) Qwen3-32B-Reasoning\n\n(c) Qwen3-8B-Reasoning\n                       Figure 12. Response Length Distribution on ToMBench.\n\n16\n\f            To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "C.4. Order and Length\nWe provide the heatmaps of incorrect answers on different orders and response lengths on HiToM in Figure 13.\n\n(a) Qwen3-32B-Reasoning                            (b) Qwen3-8B-Reasoning\n                                           Figure 13. Order and Length on HiToM\n\nC.5. Reasoning Effort\nWe provide the results of different reasoning efforts on ToMBench in Figure 14. The findings are similar to those on\nToMATO: increasing the reasoning effort does not lead to a significant change in performance. This reinforces our conclusion\nthat the detrimental effects of slow thinking are specifically triggered by high task complexity. On less complex benchmarks\nlike ToMBench and ToMATO, the reasoning collapse failure mode is not induced, and therefore, additional computational\neffort is neither beneficial nor harmful.\n\nFigure 14. Resoning effort on ToMBench."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "C.6. Token Control\nWe provide the performance under different thinking budgets of R1-Distill-Qwen-7B in Figure 15.\n\nC.7. Correct Answer Overlap\nWe provide the results of correct answer overlap on HiToM in Figure 16 and on ToMATO in Figure 17. They aligns with the\nobservation in Figure 4, where the overlap between correct answers of reasoning and non-reasoning models in the same\nfamily grows when the order is higher. The results imply the complementary advantages of two types of models.\n\n17\n\f          To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\n(a) R1-Distill-Qwen-7B on HiToM                      (b) R1-Distill-Qwen-7B on ToMATO\nFigure 15. Performance comparison under different token length limitations. The dash lines show the original model performance\n\n(a) DeepSeek Family\n\n(b) Qwen3-8B"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "(c) GPT Family\n                                        Figure 16. Correct Answer Overlap on HiToM\n\n18\n\fTo Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\n(a) DeepSeek Family                                     (b) Qwen3-8B\n\n(c) Qwen3-32B                                         (d) GPT Family\n                          Figure 17. Correct Answer Overlap on ToMATO\n\n19\n\f           To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "D. Method\nD.1. Pseduo-code\nWe provide pseudo-code of S2F and T2M in Algorithm 1 and 2 respectively for reproducibility. Specifically, we set\nthe threshold of “wait” count to 3 in our experiments. As S2F intervention requires token-level generation control, we\nconduct these experiments on open-source models. To analyse comprehensively, we use Qwen3 models and introduce two\nR1-Distill-Qwen variants."
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "Algorithm 1 Slow-to-Fast Reasoning\n 1: Input: Prompt x, LLM fθ , threshold τ , target token w = “wait”, preset sentence Sins , max length Lmax\n 2: Output: Generated text Y\n 3: Y ← ””; c ← 0; f inished ← false\n 4: while not f inished do\n 5:   p(·) ← fθ (x ⊕ Y )\n 6:   t⋆ ← arg maxt p(t)\n 7:   if c ≥ τ − 1 and t⋆ = w then\n 8:      Y ← Y ⊕ Sins\n 9:      c←0\n10:   else\n11:      sample t ∼ Decode(p(·))\n12:      Y ←Y ⊕t\n13:      if t = w then\n14:         c←c+1\n15:      end if\n16:      if t is EOS or length(Y ) ≥ Lmax then\n17:         f inished ← true\n18:      end if\n19:   end if\n20: end while\n21: return Y\n\n20\n\f           To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "Algorithm 2 Think-to-Match\n 1: Inputs: base prompt xbase (prompt without options), options string O, LLM fθ , threshold τ , target token w = “wait”,\n    preset sentence Sins , max length Lmax\n 2: Output: Generated text Y\n 3: Sfull ← Sins ⊕ O\n 4: Y ← ””; c ← 0; f inished ← false; inserted ← false\n 5: while not f inished do\n 6:   p(·) ← fθ (xbase ⊕ Y )\n 7:   t⋆ ← arg maxt p(t)\n 8:   if (c ≥ τ − 1) and (t⋆ = w) and not inserted then\n 9:       Y ← Y ⊕ Sfull\n10:       c ← 0; inserted ← true\n11:       continue\n12:   end if\n13:   if (t⋆ =< /think >) and not inserted then\n14:       Y ← Y ⊕ Sfull\n15:       c ← 0; inserted ← true\n16:       continue\n17:   end if\n18:   sample t ∼ Decode(p(·))\n19:   Y ←Y ⊕t\n20:   if t = w then\n21:       c←c+1\n22:   end if\n23:   if t = ⟨END⟩ or length(Y ) ≥ Lmax then\n24:       f inished ← true\n25:   end if\n26: end while\n27: return Y"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "D.2. Case Study\nWe provide detailed cases of reasoning process of T2M on the three benchmarks."
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "Case on HiToM\n   Story: “The following story happens in chronological order. You will be given a multiple-choice question and a note\n   at the end. First give step-by-step analysis about the question. Then output the answer.\n   1 Sophia, Jacob, Lily, Lucas and Alexander entered the bathroom.\n   2 The green pepper is in the blue suitcase.\n   3 Sophia moved the green pepper to the blue bottle.\n   4 Sophia exited the bathroom.\n   5 Jacob made no movements and stayed in the bathroom for 1 minute.\n   6 Jacob exited the bathroom.\n   7 Lily moved the green pepper to the green pantry.\n   8 Lily exited the bathroom.\n   9 Lucas made no movements and stayed in the bathroom for 1 minute.\n   10 Lucas exited the bathroom.\n   11 Alexander moved the green pepper to the blue suitcase.\n   12 Alexander exited the bathroom.\n   13 Sophia, Jacob, Lily, Lucas and Alexander entered the waiting room.”"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "Question: “Where is the green pepper really?”\n\n21\n\f        To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks\n\nChoices: “A. blue suitcase, B. red bottle, C. green pantry, D. green envelope, E. blue bottle, F. red cupboard, G.\ngreen cupboard, H. green bathtub, I. green basket, J. green crate, K. blue crate, L. blue bathtub, M. blue cupboard,\nN. red suitcase, O. red container”\n\nResponse:\n<think>\nOkay, let’s try to figure out where the green pepper is. The story is in chronological order, so I need to follow each\nstep carefully.\n\nFirst, the initial state: The green pepper is in the blue suitcase. That’s step 2. Then, step 3 says Sophia\nmoves it to the blue bottle. So after that, the green pepper is in the blue bottle. Then Sophia exits (step 4)."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Next, Jacob stays for a minute (step 5) and exits (step 6). No movement here, so the green pepper re-\nmains in the blue bottle. Then Lily moves it to the green pantry (step 7), so now it’s in the green pantry. She exits\n(step 8).\n\nThen Lucas stays for a minute (step 9) and exits (step 10). No movement, so the green pepper is still in\nthe green pantry. Then Alexander moves it to the blue suitcase (step 11), so now it’s back in the blue suitcase. He\nexits (step 12).\n\nFinally, everyone enters the waiting room (step 13). The question is asking where the green pepper really\nis. The last action was Alexander moving it to the blue suitcase. So the final location should be the blue suitcase.\nLet me check again to make sure I didn’t miss any steps.\n\nYes, step 11 is the last movement. So the answer should be blue suitcase."
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Now I need to choose an answer based on my intuition from: A. blue suitcase, B. red bottle, C. green pantry, D.\ngreen envelope, E. blue bottle, F. red cupboard, G. green cupboard, H. green bathtub, I. green basket, J. green crate,\nK. blue crate, L. blue bathtub, M. blue cupboard, N. red suitcase, O. red container\n</think>\n\nAnswer: A. blue suitcase"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Case on ToMATO\nConversation: Liam Johnson: “Hi!”\nEthan Johnson: “Hi, how are you?”\nLiam Johnson: “Ethan, I’ve noticed you’ve been a bit distant lately, is everything okay?”\nEthan Johnson: “Yeah, everything’s fine, just been really busy with the restaurant and some personal stuff, you know\nhow it is.”\nLiam Johnson: “Come on, Ethan, we’ve been friends for years, I can tell when something’s bothering you. What’s\nreally going on?”\nEthan Johnson: “Alright, alright... to be honest, I’ve been having some trouble making ends meet, the restaurant’s\nbeen slow and I’m falling behind on some bills, but I’ll figure it out, I always do.”\nLiam Johnson: “Ethan, you’re not going to ’figure it out’ on your own, you need a plan and some guidance. Let me\ntake a look at your finances and we can go over some options together, okay?”\nEthan Johnson: “Man, I appreciate that, Liam, but I don’t want to be a burden"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "22\n\f        To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "let’s take a close look at your expenses and see where we can cut back, okay?”\nEthan Johnson: “Aww, man, you’re a lifesaver, Liam. Yeah, let’s dig in and see where I can tighten the belt, I’m sure\nthere’s some fat to trim. And don’t worry, you’ll be eating like a king at my place for a long time to come.”\nLiam Johnson: “Alright, let’s get to work then. I’ll start going over the numbers and we can discuss some options.\nAnd don’t make promises you can’t keep, just focus on getting back on your feet, okay?”\nEthan Johnson: “Yeah, yeah, got it, thanks for keeping me grounded, Liam. I’ll let you do your magic with the\nnumbers, and I’ll focus on getting the restaurant back on track. You’re right, one step at a time.”\nLiam Johnson: “That’s the spirit, Ethan. Just remember, I’m not a miracle worker, you need to be effort too. Let’s\nschedule a follow-up meeting for next week and we’ll reassess whe"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "a0: “He feels a sense of dry amusement at Ethan’s joke, but also a bit of unease about the seriousness of\nhis financial situation”\na1: “He feels a bit frustrated that Ethan is not being open about his struggles, and he’s worried that he might be\nhiding something”\na2: “He feels a bit anxious about bringing up the sensitive topic of Ethan’s financial struggles, but he want to help\nhis friend”\na3: “He feels a sense of relief that Ethan is finally opening up and accepting help, but also a bit of irritation that he\ndidn’t listen to him sooner”\n\nq: “How does Liam feel when he says “Come on, Ethan, we’ve been friends for years, I can tell when\nsomething’s bothering you. What’s really going on?”\n\nresponse:\n<think>\nOkay, let’s see. The question is about how Liam feels when he says that specific line. Let me look at the conversation\nagain."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "So, Liam starts by greeting Ethan. Then Ethan says he’s been busy with the restaurant and personal stuff.\nLiam responds with “Come on, Ethan... What’s really going on?” That line seems like Liam is pushing Ethan to be\nhonest.\n\nEarlier, Ethan had said he’s been busy, but Liam is pointing out that they’ve been friends for years and he\ncan tell something’s up. So Liam is probably feeling concerned or worried about Ethan. He’s trying to get Ethan to\nopen up because he’s noticed something’s wrong."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Looking at the options, even though the options aren’t listed here, the possible answers would likely be\nemotions like concern, frustration, patience, or maybe anger. But based on the context, Liam is a friend trying to\nhelp, so it’s more about concern and wanting to support Ethan. He’s not angry, but rather trying to get Ethan to talk.\nSo the answer is probably that Liam feels concerned or worried."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Now I need to choose an answer based on my intuition from: [A] He feels a sense of dry amusement at\nEthan’s joke, but also a bit of unease about the seriousness of his financial situation\n[B] He feels a bit frustrated that Ethan is not being open about his struggles, and he’s worried that he might be hiding\nsomething\n[C] He feels a bit anxious about bringing up the sensitive topic of Ethan’s financial struggles, but he want to help his\nfriend\n[D] He feels a sense of relief that Ethan is finally opening up and accepting help, but also a bit of irritation that he\ndidn’t listen to him sooner\n</think>\n\nAnswer: B\n\n23\n\f        To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Case on ToMBench\nSTORY: “Zhang Wei is the performance champion of the department, but he encounters some challenges in his\nrecent project, which causes his performance to be not good. Li Yun is the department manager, he always supports\nZhang Wei, hoping to fight for the best evaluation for him in the year-end review. Chen Tao is Zhang Wei’s colleague,\nhe also hopes to get promoted in the year-end review. This afternoon, Li Yun quickly browses Zhang Wei’s review\nform in the office. When Zhang Wei passes by Li Yun’s office, Li Yun looks up at him and nods to him. Zhang Wei\ngives a slight smile to Li Yun and continues to walk past. Chen Tao sees all this in the tea room not far away.”\n\nQUESTION: “Why does Li Yun nod to Zhang Wei?”"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "OPTION-A: “Li Yun just sees Zhang Wei’s review form and thinks his performance is good.”\nOPTION-B: “Li Yun wants to tell Zhang Wei that he gets a high evaluation.”\nOPTION-C: “Li Yun is greeting Zhang Wei.”\nOPTION-D: “Li Yun nods to Zhang Wei unintentionally.”\n\nANSWER: “B”\n\nmap: {“A”: “D”, “B”: “C”, “C”: “A”, “D”: “B”}\n\noutput:\n<think>\nOkay, let’s try to figure out why Li Yun nodded to Zhang Wei. So, the story says that Zhang Wei is the performance\nchampion of the department, but he’s having some challenges in his recent project, which is affecting his performance.\nLi Yun is the department manager who supports Zhang Wei and wants to fight for the best evaluation for him in the\nyear-end review. Chen Tao is another colleague who also wants to get promoted."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Now, the key moment is when Li Yun quickly browses Zhang Wei’s review form in the office. Then,\nwhen Zhang Wei passes by Li Yun’s office, Li Yun nods at him, and Zhang Wei gives a slight smile and continues\nwalking. Chen Tao sees this from the tea room.\n\nSo, why would Li Yun nod to Zhang Wei? Let’s think. Since Li Yun is the manager and wants to help\nZhang Wei get the best evaluation, maybe he’s trying to show support. But why nod specifically? Maybe because\nhe just looked at Zhang Wei’s review form. If he’s looking at the form, perhaps he’s checking Zhang Wei’s\nperformance or the evaluation. But since Zhang Wei is having challenges, maybe Li Yun is trying to encour-\nage him. Alternatively, maybe Li Yun is trying to signal that he’s aware of Zhang Wei’s situation and is supporting him."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Alternatively, could it be that Li Yun is trying to get Zhang Wei to know that he’s being considered for a\ngood evaluation? Or maybe Li Yun is trying to make sure that Zhang Wei’s performance isn’t overlooked despite the\nrecent challenges. The nod could be a gesture of support or a reminder that Li Yun is on his side.\n\nAnother angle: since Chen Tao is also hoping for promotion, maybe there’s some competition. But the\nquestion is about Li Yun’s action towards Zhang Wei. The story says Li Yun always supports Zhang Wei and wants\nto fight for the best evaluation. So the nod is likely a supportive gesture."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "But why would Li Yun look at the review form before nodding? Maybe he’s checking the form and\nwants to confirm that Zhang Wei’s performance is being considered, or maybe he’s trying to influence the evaluation.\nThe nod could be a way to communicate that he’s aware of Zhang Wei’s situation and is advocating for him.\n\nAlternatively, maybe Li Yun is trying to get Zhang Wei to acknowledge his support, but the story says\nZhang Wei just gives a slight smile and continues. So the nod is probably a sign of support or encouragement.\n\nLooking at the answer options, even though they aren’t listed here, the options would likely be something\nlike: A. To show support, B. To check his performance, C. To compete with Chen Tao, D. To inform about the review.\n\n24\n\f        To Think or Not To Think, That is The Question for Large Reasoning Models in Theory of Mind Tasks"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "But since the options aren’t given, based on the story, the most logical answer is that Li Yun is supporting Zhang Wei,\nso the answer would be something like A. But since the user hasn’t provided the options, I have to assume that the\nanswer is based on the given context. The answer is likely related to support or advocacy for Zhang Wei’s evaluation.\nSo the answer index would be the one that matches that reasoning.\n\nNow I need to choose an answer based on my intuition from: A. Li Yun nods to Zhang Wei unintention-\nally. B. Li Yun is greeting Zhang Wei. C. Li Yun just sees Zhang Wei’s review form and thinks his performance is\ngood. D. Li Yun wants to tell Zhang Wei that he gets a high evaluation.\n</think>\n\nFinal Answer: D\n\n25"
+    }
+  ]
+}

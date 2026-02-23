@@ -9,15 +9,13 @@
     "lint:security": "python3 scripts/security_lint.py",
     "astro": "astro"
   },
-  "dependencies": {
-    "@astrojs/mdx": "^4.3.13",
-    "@astrojs/rss": "^4.0.15",
-    "@astrojs/sitemap": "^3.7.0",
-    "astro": "^5.17.1"
-  },
   "devDependencies": {
+    "@astrojs/mdx": "4.3.13",
+    "@astrojs/rss": "4.0.15",
+    "@astrojs/sitemap": "3.7.0",
     "@astrojs/tailwind": "^6.0.2",
     "@tailwindcss/typography": "^0.5.15",
+    "astro": "5.17.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",

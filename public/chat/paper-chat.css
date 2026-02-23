@@ -36,6 +36,7 @@
 .paperChat__composer{display:flex; gap:10px; padding:10px 10px; border-top:1px solid rgba(127,127,127,.18)}
 .paperChat__textarea{flex:1; resize:none; border-radius:12px; border:1px solid rgba(127,127,127,.22); padding:10px; font-size:16px; background: rgba(255,255,255,.8); color:inherit}
 .paperChat__send{border:none; border-radius:12px; padding:10px 12px; background: rgba(15,23,42,.85); color:#fff; cursor:pointer}
+.paperChat__send:disabled{opacity:.55; cursor:not-allowed}
 @media (prefers-color-scheme: dark){
   .paperChat__send{background: rgba(255,255,255,.16); color:#fff}
   .paperChat__textarea{background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14)}

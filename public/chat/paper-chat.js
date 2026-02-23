@@ -1,4 +1,8 @@
 // Paper chat (BYO OpenAI key) — client-only
+// Goals:
+// - token efficient: retrieval + short context + small turn memory
+// - conversational, with receipts
+// - no HTML rendering (textContent only)
 
 const $ = (id) => document.getElementById(id);
 
@@ -31,17 +35,21 @@ const modalTitle = $('paperChatModalTitle');
 const modalBody = $('paperChatModalBody');
 const modalClose = $('paperChatModalClose');
 
-let lastChunksSent = [];
-
 const LS_KEY = 'paperChat.encKey.v1';
 
+let lastChunksSent = [];
 let sessionKey = null; // decrypted API key for this tab
 let sessionPass = null;
 
-function toast(text){
-  // reuse existing site styles? keep minimal
-  console.log(text);
-}
+// Lightweight turn memory (kept small intentionally)
+const turnMemory = []; // [{q, a}]
+const MAX_TURNS = 3;
+
+// Client-side cooldown to avoid accidental spam
+let nextAllowedAt = 0;
+const COOLDOWN_MS = 1500;
+
+function nowMs(){ return Date.now(); }
 
 function open(){
   elRoot.dataset.state = 'open';
@@ -57,12 +65,6 @@ function close(){
   elRoot.dataset.state = 'closed';
   drawer.style.display = 'none';
 }
-
-fab?.addEventListener('click', () => {
-  if (elRoot.dataset.state === 'open') close();
-  else open();
-});
-closeBtn?.addEventListener('click', close);
 
 function hasStored(){
   return !!localStorage.getItem(LS_KEY);
@@ -82,6 +84,25 @@ function renderGate(){
   if (hasStored()) showGate('unlock');
   else showGate('gate');
 }
+
+fab?.addEventListener('click', () => {
+  if (elRoot.dataset.state === 'open') close();
+  else open();
+});
+closeBtn?.addEventListener('click', close);
+
+// Escape closes the drawer
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && elRoot.dataset.state === 'open') close();
+});
+
+// Composer: Enter sends, Shift+Enter newline
+q?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendBtn?.click?.();
+  }
+});
 
 // --- crypto helpers (passphrase-based encryption)
 async function deriveKey(passphrase, saltBytes){
@@ -209,94 +230,91 @@ async function loadContext(arxivId){
   return j;
 }
 
+// --- retrieval
+const STOPWORDS = new Set([
+  'the','a','an','and','or','but','if','then','else','when','what','why','how','to','of','in','on','for','with','as','at','by','from',
+  'is','are','was','were','be','been','being','it','this','that','these','those','we','they','you','i','me','my','your','our','their',
+  'can','could','should','would','may','might','will','do','does','did'
+]);
+
 function tokenize(s){
   return (s||'')
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g,' ')
     .split(/\s+/)
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((w)=>w.length>2 && !STOPWORDS.has(w));
 }
 
 function scoreChunk(qTokens, chunk){
   const t = tokenize(chunk.text);
-  const set = new Set(t);
+  if (!t.length) return 0;
+  const tf = new Map();
+  for (const w of t) tf.set(w, (tf.get(w)||0)+1);
   let score = 0;
   for (const w of qTokens){
-    if (set.has(w)) score += 1;
+    const c = tf.get(w);
+    if (c) score += 1 + Math.min(0.5, 0.15*(c-1));
   }
-  if (chunk.type === 'abstract') score *= 1.3;
-  if (chunk.type === 'caption') score *= 1.2;
+  // Small boosts
+  if (chunk.type === 'abstract') score *= 1.35;
+  if (chunk.type === 'caption') score *= 1.20;
+  // Penalize very short chunks
+  if ((chunk.text||'').length < 120) score *= 0.8;
   return score;
 }
 
 function pickChunks(question, ctx, maxChunks=6, maxChars=900){
-  const qTokens = tokenize(question).slice(0, 60);
-  const scored = (ctx.chunks||[])
+  const qTokens = tokenize(question).slice(0, 70);
+  const chunks = (ctx.chunks||[]);
+
+  // Always consider abstract for broad questions
+  const abs = chunks.find((c)=>c.type==='abstract');
+
+  const scored = chunks
     .map((c)=>({ c, s: scoreChunk(qTokens,c) }))
-    .sort((a,b)=>b.s-a.s)
-    .filter((x)=>x.s>0);
+    .sort((a,b)=>b.s-a.s);
 
   const out=[];
+  const seen = new Set();
+
+  if (abs) {
+    out.push({ id: abs.id, type: abs.type, text: (abs.text||'').slice(0, maxChars) });
+    seen.add(abs.id);
+  }
+
   for (const x of scored){
     if (out.length>=maxChunks) break;
+    if (!x.s || x.s <= 0) continue;
+    if (seen.has(x.c.id)) continue;
     out.push({
       id: x.c.id,
       type: x.c.type,
       text: (x.c.text||'').slice(0, maxChars)
     });
+    seen.add(x.c.id);
   }
-  return out;
+
+  // If we only got abstract and nothing else matched, return empty to avoid hallucinations.
+  if (out.length === 1 && abs) {
+    const absOnly = out[0].text;
+    // If question tokens don't intersect abstract tokens, treat as no match.
+    const absT = new Set(tokenize(absOnly));
+    const hit = qTokens.some((w)=>absT.has(w));
+    if (!hit) return [];
+  }
+
+  return out.slice(0, maxChunks);
 }
 
-// --- chat
+// --- UI helpers
 function addMsg(role, text){
   const d = document.createElement('div');
   d.className = `paperChat__msg paperChat__msg--${role}`;
   d.textContent = text;
   msgs.appendChild(d);
   msgs.scrollTop = msgs.scrollHeight;
-}
-
-async function askOpenAI({ apiKey, model, question, ctxChunks }){
-  const sys = [
-    'You are a helpful assistant. Answer conversationally.',
-    'Use ONLY the provided context chunks. If the answer is not in the context, say you do not know.',
-    'After your answer, include a short "Receipts" section listing the chunk ids you used (max 4).',
-    'Keep the answer concise.'
-  ].join('\n');
-
-  const ctxText = ctxChunks.map((c)=>`[${c.id} | ${c.type}]\n${c.text}`).join('\n\n');
-
-  const body = {
-    model,
-    input: [
-      { role: 'system', content: [{ type: 'input_text', text: sys }] },
-      { role: 'user', content: [{ type: 'input_text', text: `Context:\n${ctxText}\n\nQuestion: ${question}` }] }
-    ],
-    max_output_tokens: 350,
-    temperature: 0.2,
-  };
-
-  const r = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(body)
-  });
-  if (!r.ok) {
-    const txt = await r.text();
-    throw new Error(txt || 'openai_failed');
-  }
-  const data = await r.json();
-  const out = (data.output_text || '').trim();
-  return out;
-}
-
-function extractReceipts(answer){
-  // naive: parse chunk ids like [c12] not guaranteed. We'll instead show chunks we provided.
-  return null;
+  return d;
 }
 
 function openModal(chunkId){
@@ -325,9 +343,144 @@ receiptsBody?.addEventListener('click', (e)=>{
   openModal(id);
 });
 
+function parseReceiptIds(answer){
+  // Expect a line like: Receipts: b-1, cap-0, abs-0
+  const m = answer.match(/\n?Receipts\s*:\s*([^\n]+)/i);
+  if (!m) return [];
+  return m[1]
+    .split(/[,\s]+/g)
+    .map((s)=>s.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function renderReceipts(chunks, usedIds){
+  lastChunksSent = chunks;
+  const map = new Map(chunks.map((c)=>[c.id, c]));
+
+  const ids = (usedIds && usedIds.length)
+    ? usedIds.filter((id)=>map.has(id)).slice(0,4)
+    : chunks.slice(0,4).map((c)=>c.id);
+
+  receiptsWrap.hidden = ids.length === 0;
+  receiptsBody.innerHTML = '';
+
+  for (const id of ids){
+    const c = map.get(id);
+    if (!c) continue;
+    const div = document.createElement('div');
+    div.className = 'paperChat__receipt';
+    div.setAttribute('data-id', c.id);
+    div.innerHTML = `<div class="paperChat__receiptId">${c.id}</div><div class="paperChat__receiptText"></div>`;
+    div.querySelector('.paperChat__receiptText').textContent = c.text.slice(0, 240) + (c.text.length>240?'…':'');
+    receiptsBody.appendChild(div);
+  }
+}
+
+function memoryBlock(){
+  if (!turnMemory.length) return '';
+  // keep tiny
+  return turnMemory.map((t,i)=>`Turn ${i+1}: Q=${t.q} | A=${t.a}`).join('\n');
+}
+
+async function askOpenAIStream({ apiKey, model, question, ctxChunks }){
+  const sys = [
+    'You are a helpful assistant. Answer conversationally.',
+    'Use ONLY the provided context chunks. If the answer is not in the context, say you do not know.',
+    'At the end, include a single line: Receipts: <chunk-id-1>, <chunk-id-2> (max 4 ids).',
+    'Keep the answer concise.'
+  ].join('\n');
+
+  const ctxText = ctxChunks.map((c)=>`[${c.id} | ${c.type}]\n${c.text}`).join('\n\n');
+  const mem = memoryBlock();
+
+  const userText = [
+    mem ? `Recent chat (compressed):\n${mem}` : null,
+    `Context:\n${ctxText}`,
+    `Question: ${question}`
+  ].filter(Boolean).join('\n\n');
+
+  const body = {
+    model,
+    input: [
+      { role: 'system', content: [{ type: 'input_text', text: sys }] },
+      { role: 'user', content: [{ type: 'input_text', text: userText }] }
+    ],
+    max_output_tokens: 350,
+    temperature: 0.2,
+    stream: true,
+  };
+
+  const r = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const txt = await r.text();
+    throw new Error(txt || 'openai_failed');
+  }
+
+  const reader = r.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buf = '';
+  let out = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+
+    // SSE-like: split on newlines
+    const lines = buf.split('\n');
+    buf = lines.pop() || '';
+
+    for (const line of lines) {
+      const ln = line.trim();
+      if (!ln.startsWith('data:')) continue;
+      const data = ln.slice(5).trim();
+      if (!data || data === '[DONE]') continue;
+      try {
+        const evt = JSON.parse(data);
+        // Responses API: incremental text can appear in output_text_delta
+        const delta = evt?.type === 'response.output_text.delta'
+          ? (evt.delta || '')
+          : (evt?.delta || '');
+        if (delta) {
+          out += delta;
+        }
+      } catch {
+        // ignore partial json
+      }
+    }
+  }
+
+  return out.trim();
+}
+
+function normalizeApiError(e){
+  const msg = (e?.message || String(e) || '').slice(0, 900);
+  if (/401|invalid_api_key|Incorrect API key/i.test(msg)) return 'Auth error: your API key was rejected.';
+  if (/429|rate limit/i.test(msg)) return 'Rate limited by OpenAI. Try again in a bit.';
+  if (/context_missing/i.test(msg)) return 'Missing paper context.json for this post.';
+  return `Error: ${msg}`;
+}
+
 sendBtn?.addEventListener('click', async () => {
+  if (!sessionKey) {
+    renderGate();
+    return;
+  }
+
   const question = q.value.trim();
   if (!question) return;
+
+  if (nowMs() < nextAllowedAt) return;
+  nextAllowedAt = nowMs() + COOLDOWN_MS;
+
   const arxivId = currentArxivId();
   if (!arxivId) return alert('Open a paper page first');
 
@@ -335,37 +488,37 @@ sendBtn?.addEventListener('click', async () => {
   q.value='';
   sendBtn.disabled = true;
 
+  const assistantEl = addMsg('assistant', '');
+
   try{
     const ctx = await loadContext(arxivId);
     const chunks = pickChunks(question, ctx);
     if (!chunks.length) {
-      addMsg('assistant', "I couldn’t find anything relevant in the stored context for this question.");
+      assistantEl.textContent = "I couldn’t find relevant context for that question in the stored paper text.";
       sendBtn.disabled = false;
       return;
     }
 
-    const answer = await askOpenAI({
+    const answer = await askOpenAIStream({
       apiKey: sessionKey,
       model: 'gpt-4.1-mini',
       question,
       ctxChunks: chunks
     });
-    addMsg('assistant', answer);
 
-    // receipts UI: show the chunks we sent
-    lastChunksSent = chunks.slice(0,4);
-    receiptsWrap.hidden = false;
-    receiptsBody.innerHTML = '';
-    for (const c of lastChunksSent){
-      const div = document.createElement('div');
-      div.className = 'paperChat__receipt';
-      div.setAttribute('data-id', c.id);
-      div.innerHTML = `<div class="paperChat__receiptId">${c.id}</div><div class="paperChat__receiptText"></div>`;
-      div.querySelector('.paperChat__receiptText').textContent = c.text.slice(0, 220) + (c.text.length>220?'…':'');
-      receiptsBody.appendChild(div);
-    }
+    assistantEl.textContent = answer;
+
+    const ids = parseReceiptIds(answer);
+    renderReceipts(chunks, ids);
+
+    // store tiny memory
+    const memQ = question.slice(0, 220);
+    const memA = answer.replace(/\s+/g,' ').slice(0, 240);
+    turnMemory.push({ q: memQ, a: memA });
+    while (turnMemory.length > MAX_TURNS) turnMemory.shift();
+
   } catch (e){
-    addMsg('assistant', 'Error: ' + (e?.message || String(e)));
+    assistantEl.textContent = normalizeApiError(e);
   } finally {
     sendBtn.disabled = false;
   }

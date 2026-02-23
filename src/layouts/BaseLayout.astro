@@ -73,7 +73,8 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
           <div id="paperChatGate" class="paperChat__gate" hidden>
             <div class="paperChat__gateTitle">Enable chat</div>
             <div class="paperChat__gateBody">
-              <p>Bring your own OpenAI API key. It stays in your browser.</p>
+              <p>Bring your own OpenAI API key. It stays in your browser (never sent to our servers).</p>
+              <p class="paperChat__muted" style="margin-top:8px">Don’t paste secrets or private keys into the chat. Prompts may be stored by your AI provider.</p>
               <label class="paperChat__label">API key</label>
               <input id="paperChatApiKey" class="paperChat__input" type="password" inputmode="text" autocomplete="off" placeholder="sk-..." />
 

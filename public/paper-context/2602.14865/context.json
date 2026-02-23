@@ -1,0 +1,57 @@
+{
+  "arxivId": "2602.14865",
+  "paperTitle": "EmbeWebAgent: Embedding Web Agents into Any Customized UI",
+  "abstract": "Most web agents operate at the human interface level, observing screenshots or raw DOM trees without application-level access, which limits robustness and action expressiveness. In enterprise settings, however, explicit control of both the frontend and backend is available. We present EmbeWebAgent, a framework for embedding agents directly into existing UIs using lightweight frontend hooks (curated ARIA and URL-based observations, and a per-page function registry exposed via a WebSocket) and a reusable backend workflow that performs reasoning and takes actions. EmbeWebAgent is stack-agnostic (e.g., React or Angular), supports mixed-granularity actions ranging from GUI primitives to higher-level composites, and orchestrates navigation, manipulation, and domain-specific analytics via MCP tools. Our demo shows minimal retrofitting effort and robust multi-step behaviors grounded in a live UI setting. Live Demo: this https URL",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Most web agents operate at the human interface level, observing screenshots or raw DOM trees without application-level access, which limits robustness and action expressiveness. In enterprise settings, however, explicit control of both the frontend and backend is available. We present EmbeWebAgent, a framework for embedding agents directly into existing UIs using lightweight frontend hooks (curated ARIA and URL-based observations, and a per-page function registry exposed via a WebSocket) and a reusable backend workflow that performs reasoning and takes actions. EmbeWebAgent is stack-agnostic (e.g., React or Angular), supports mixed-granularity actions ranging from GUI primitives to higher-level composites, and orchestrates navigation, manipulation, and domain-specific analytics via MCP tools. Our demo shows minimal retrofitting effort and robust multi-step behaviors grounded in a live UI setting. Live Demo: this https URL"
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 2: EmbeWebAgent pipeline. The frontend shim exposes curated ARIA observations and a per-page function registry via a Web-"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 3: One page of the chemistry analysis UI used in our demo.   Figure 4: Testing interface. Integration tests evaluate action cor-"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "EmbeWebAgent: Embedding Web Agents into Any Customized UI\n\nChenyang Ma1,2∗ , Clyde Fare1 , Matthew Wilson1† , Dave Braines1\n                                                                    1\n                                                                      IBM Research Europe, UK 2 University of Oxford\n                                                 chenyang.ma@cs.ox.ac.uk, clyde.fare@gmail.com, {matthew.wilson, dave braines}@uk.ibm.com\n                                                                                                     Live Demo\n\nAbstract\n                                                                                                                         (a) Interface-Level Web Agent\narXiv:2602.14865v1 [cs.AI] 16 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Most web agents operate at the human interface\n                                                 level, observing screenshots or raw DOM trees                                   Screenshots / DOM trees\n                                                 without application-level access, which limits ro-\n                                                 bustness and action expressiveness. In enterprise\n                                                 settings, however, explicit control of both the fron-\n                                                 tend and backend is available. We present Em-                                     Human-like actions\n                                                 beWebAgent, a framework for embedding agents\n                                                 directly into existing UIs using lightweight fron-\n                                                 tend "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1       Motivation and Contributions\n                                         Recent advances in large language models (LLMs) and large          Figure 1: (a) Interface-level agent (screenshots/DOM trees, sim-\n                                         multimodal models (LMMs) [OpenAI, 2024; Llama3Team,                ulated clicks) vs. (b) Embedded agent (EmbeWebAgent) with\n                                         2024] have catalyzed research on autonomous web agents             ARIA labels as observations and explicit UI actions.\n                                         across coding, system operation, and research tooling [Ning\n                                         et al., 2025]. Most web agents operate at the interface            can reduce the complexity of the tasks the agent needs to ac-\n                                         level, perceiving content via screenshots [Zheng et"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Event-driven                                                                                                 Orchestrator"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "WebSocket\n                    ARIA Text Extraction                                       ARIA Text\n                                                                               Processing     Shared State\n                                           On demand                  Server\n                     Action Execution                                                           Session ID                        Memory\n                                                                                               WebSocket        LLM Agent                   ReAct            ReAct        CoT\n       Web UI\n                    User Query Sending\n                                           On demand                                          ARIA, Actions      Workflow\n                                                                                               Chat history                        "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Figure 2: EmbeWebAgent pipeline. The frontend shim exposes curated ARIA observations and a per-page function registry via a Web-\nSocket. The backend maintains session state, filters actions according to the current page, and coordinates a multi-agent workflow to infer\nnavigation and manipulation actions, as well as invoke domain tools (via MCP or web APIs)."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "navigation URLs; and a per-page function registry that                                  demo, the frontend shim requires ∼150 lines of code, and the\n      restrict actions to those valid for the current page.                                   function registry requires ∼200 lines.\n    • Minimal, Stack-Agnostic Integration. A small fron-                                      Backend (Reasoning & Control). The backend handles\n      tend shim, while keeping all agent reasoning and work-                                  reasoning, planning, and action inference. A session-scoped\n      flows in the backend.                                                                   state maintains the latest observations, the page-filtered func-\n                                                                                              tion set corresponding to the current URL, recent chat history,\n  "
+    }
+  ]
+}

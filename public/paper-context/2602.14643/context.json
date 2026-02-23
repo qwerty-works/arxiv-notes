@@ -1,0 +1,362 @@
+{
+  "arxivId": "2602.14643",
+  "paperTitle": "Arbor: A Framework for Reliable Navigation of Critical Conversation Flows",
+  "abstract": "Large language models struggle to maintain strict adherence to structured workflows in high-stakes domains such as healthcare triage. Monolithic approaches that encode entire decision structures within a single prompt are prone to instruction-following degradation as prompt length increases, including lost-in-the-middle effects and context window overflow. To address this gap, we present Arbor, a framework that decomposes decision tree navigation into specialized, node-level tasks. Decision trees are standardized into an edge-list representation and stored for dynamic retrieval. At runtime, a directed acyclic graph (DAG)-based orchestration mechanism iteratively retrieves only the outgoing edges of the current node, evaluates valid transitions via a dedicated LLM call, and delegates response generation to a separate inference step. The framework is agnostic to the underlying decision logic and model provider. Evaluated against single-prompt baselines across 10 foundation models using annotated turns from real clinical triage conversations. Arbor improves mean turn accuracy by 29.4 percentage points, reduces per-turn latency by 57.1%, and achieves an average 14.4x reduction in per-turn cost. These results indicate that architectural decomposition reduces dependence on intrinsic model capability, enabling smaller models to match or exceed larger models operating under single-prompt baselines.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Large language models struggle to maintain strict adherence to structured workflows in high-stakes domains such as healthcare triage. Monolithic approaches that encode entire decision structures within a single prompt are prone to instruction-following degradation as prompt length increases, including lost-in-the-middle effects and context window overflow. To address this gap, we present Arbor, a framework that decomposes decision tree navigation into specialized, node-level tasks. Decision trees are standardized into an edge-list representation and stored for dynamic retrieval. At runtime, a directed acyclic graph (DAG)-based orchestration mechanism iteratively retrieves only the outgoing edges of the current node, evaluates valid transitions via a dedicated LLM call, and delegates response generation to a separate inference step. The framework is agnostic to the underlying decision logic and model provider. Evaluated against single-prompt baselines across 10 foundation models using annotated turns from real clinical triage conversations. Arbor improves mean turn accuracy by 29.4 percentage points, reduces per-turn latency by 57.1%, and achieves an average 14.4x reduction in per-turn cost. These results indicate that architectural decomposition reduces dependence on intrinsic model capability, enabling smaller models to match or exceed larger models operating under single-prompt baselines."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Arbor: A Framework for Reliable Navigation of\n                                         Critical Conversation Flows\n                                         Luís Silva, Diogo Gonçalves, Catarina Farinha, Clara Matos and Luís Ungaro\n\nSword Health\n\nAbstract\n                                             Large language models struggle to maintain strict adherence to structured workflows in high-stakes\n                                             domains such as healthcare triage. Monolithic approaches that encode entire decision structures\narXiv:2602.14643v2 [cs.AI] 17 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "within a single prompt are prone to instruction-following degradation as prompt length increases,\n                                             including lost-in-the-middle effects and context window overflow. To address this gap, we present\n                                             Arbor, a framework that decomposes decision tree navigation into specialized, node-level tasks.\n                                             Decision trees are standardized into an edge-list representation and stored for dynamic retrieval.\n                                             At runtime, a directed acyclic graph (DAG)-based orchestration mechanism iteratively retrieves\n                                             only the outgoing edges of the current node, evaluates valid transitions via a dedicated LLM call,\n                                             and delegates response generation to a separa"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1   Introduction\n                                         Many healthcare triage systems rely on structured decision trees to standardize assessments, reduce variability,\n                                         and encode clinical guidelines. These workflows capture expert knowledge as sequences of questions and\n                                         conditional branches, helping ensure consistent and clinically aligned guidance regardless of variability in\n                                         patient communication (Abad-Grau et al., 2008).\n                                         However, traditional rule-based systems that execute these trees struggle to handle the nuance and ambiguity\n                                         of natural language. This often results in rigid interactions that manage ambiguity poorly and disrupt\n                                         conversatio"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "• Information retrieval degradation. As prompt length increases, models exhibit the well-known lost-in-\n  the-middle effect, where relevant information embedded in long contexts is poorly attended to, regardless\n  of task complexity. Context window limits further prevent large decision trees from being fully encoded\n  in a single prompt. This is a fundamental perceptual limitation: even if the model were capable of perfect\n  reasoning, it would still fail to reliably access the relevant portions of a long prompt (Hong, 2025; Liu et al.,\n  2024).\n• Violation of separation of concerns. Independent of prompt length, single prompting requires the model\n  to simultaneously understand the decision tree structure, track conversational state, evaluate transition\n  conditions, and generate natural language responses, all within a single inference pass and without any\n  form of specialization. Thi"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2    Related Work\nPrior work has attempted to combine LLMs with structured decision logic, each addressing part of the\nproblem but leaving gaps that motivate Arbor’s design.\nThe most direct approach embeds clinical guidelines or decision trees directly into LLM prompts. Oniani et al.\n(2024) encode COVID-19 outpatient guidelines as recursive binary decision trees and if–else chain-of-thought\ntemplates, showing improved consistency over zero-shot prompting on synthetic cases. However, these\nmethods operate within single-turn, prompt-scoped control: the full structure must fit within the context\nwindow and is reprocessed at every turn. As decision trees grow, this approach hits fundamental limits:\ncontext window overflow, lost-in-the-middle degradation, and increasing per-turn cost.\nTo reduce this burden, a second line of work externalizes control flow from the LLM. Shaposhnikov et al.\n(202"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "operate in single-turn or topic-scoped settings rather than maintaining persistent state across a multi-turn\nconversation navigating a large decision structure.\nThe principle that externalizing structure improves LLM reasoning has also been validated in broader\nreasoning frameworks. Tree-of-Thoughts (Yao et al., 2023) and Graph-of-Thoughts (Besta et al., 2024) generate\nand evaluate multiple candidate reasoning branches, improving performance on planning tasks through\nlookahead and backtracking. Neuro-symbolic approaches treat decision trees as callable oracles within LLM\nworkflows, preserving rule traceability (Kiruluta, 2025). However, these target single-inference reasoning\nproblems rather than persistent, stateful conversation management.\nAcross these systems, a common high-level design pattern emerges: the branching structure is externalized,\nand the model’s context is restricted to "
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3     Framework Architecture\nArbor’s architecture follows a decomposition principle. The system is organized into two core components: a\ntree standardization pipeline that converts the decision tree into a queryable edge-list representation, and\na graph-based agent that maintains conversational state, evaluates transitions, and generates user-facing\nmessages at runtime."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Figure 1 Overview of the proposed Arbor architecture, consisting of decision tree processing (shown at the bottom), an\nevaluation phase (top left), and a message generation phase (top right). The processing phase normalizes raw sources\ninto an edge-list database, which enables the evaluation phase to dynamically retrieve outgoing edges. The evaluation\nphase then evaluates transitions via iterative LLM calls and updates the current node until no further transitions are\ntaken. The message generation phase selects the appropriate prompt and produces the user-facing response."
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3.1    Processing the Decision Tree\nThe framework begins by transforming the raw decision tree into a queryable, list-based representation that\nenables dynamic, node-level retrieval at runtime. First, any decision tree is parsed and standardized into\nan edge-list format, where every edge corresponds to a single possible transition and is assigned a unique\nidentifier.\n\n3\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "In practice, clinical decision trees originate from heterogeneous sources and formats, including spreadsheets,\nconfiguration files, and legacy rule representations. To avoid coupling the agent logic to any specific upstream\nschema, Arbor introduces a lightweight normalization step that converts each source-specific representation\ninto a canonical edge-list format. This transformation is performed offline, independently of the agent’s\nexecution loop, and is only required when the decision tree schema is updated. By standardizing all inputs\ninto a universal intermediate representation, the reasoning and orchestration components remain agnostic to\nhow the decision tree was originally authored or stored.\nThe resulting edge list is then ingested into a scalable, low-latency retrieval system, in which each indexed\ndocument represents a self-contained unit of transition logic and includes sever"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Transitions\n    Transition Key                              Transition unique ID\n    Node from key                               Source node – the identifier of the originating node\n    Node to key                                 Target node – where the flow goes if answer matches\n    Question                                    The condition or prompt shown at this edge\n    Answer                                      The answer/condition required to follow transition\n    Extra context                               Auxiliary text or business logic\n    Flags                                       Domain-specific metadata\n\nTable 1 Edge list document."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "To ensure graph integrity during decision tree ingestion, the pipeline performs a structural validation step\nbefore the edge list is indexed for retrieval. This validation includes:\n• Orphan node detection. By analyzing the set of reachable nodes from the designated entry point of the\n  tree, the system identifies and rejects unreachable nodes or subgraphs, ensuring that no clinical content\n  exists in an inaccessible state.\n• Reference integrity validation. The pipeline verifies that every transition targets a defined node identifier\n  (Ntarget ∈ {Nall }), preventing runtime failures caused by edges referencing non-existent nodes.\n• Unescapable loop detection. The system applies a strongly connected component (SCC) analysis using\n  Kosaraju’s algorithm to identify cyclic subgraphs. Cycles that lack an outgoing edge to a node outside the\n  component are flagged as unescapable loops, ensu"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "3.2    Agent\nThe conversational flow is orchestrated as a stateful graph using LangGraph (LangChain, 2024). The agent\noperates as a state machine, with its position within the decision tree explicitly tracked as the current node\nand persisted in a database to ensure continuity across turns.\nAccordingly, each interaction executes a loop composed of two primary steps: transition evaluation and\nmessage generation.\n\n4\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "3.2.1   Step 1: Dynamic Retrieval and Transition Evaluation\nThis component constitutes the agent’s decision-making core. To evaluate a user response, the agent queries\nthe storage system using the current node identifier, retrieving all outgoing edges associated with that node.\nThese edges define the set of admissible transitions from the current state.\nThe retrieved context is then passed to an LLM configured specifically for transition evaluation. Inputs to\nthis step are (see Figure 8 for the evaluator prompt):\n• Current node and edges: The active question and its candidate transitions.\n• Conversation history: The most recent user–agent exchanges.\n• External context: Structured, non-conversational state required for correct transition evaluation, such as\n  eligibility constraints, risk flags, or profile attributes that cannot be reliably inferred from dialogue alone.\nThe LLM’s task is "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "3.2.2    Step 2: Message Generation\nOnce the evaluation step identifies the appropriate node, a second, independent LLM call is used to generate\nthe user-facing message. Prior to generation, the system selects the appropriate prompt template based on\nthe current node configuration. This step is dedicated exclusively to communication, governing how the\nagent responds to the user while advancing the conversation through the decision tree.\nTo produce a relevant and natural response, the generation prompt is provided with the content associated\nwith the current node (see Figure 9), as determined in Step 1. It also receives the transition reasoning, that\nis, the chain-of-thought explanation produced by the evaluation LLM for why it remained at this node. In\naddition, the prompt includes the conversation history to date and relevant patient information to provide\nthe necessary context.\nIn Arbo"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "3.2.3    Design Rationale\nThis architectural separation between evaluation (Step 1) and generation (Step 2) addresses several limitations\nof a single-pass approach and introduces additional flexibility.\n\n5\n\f                       Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Using a single LLM call to handle both strict logical evaluation and open-ended message generation can\nbe brittle. When a prompt simultaneously asks the model to reason carefully, satisfy multiple constraints,\nand produce fluent natural language, the model often fails to meet all objectives. It may follow the logic but\nproduce stilted text, or sound natural while drifting off the correct path (Deng et al., 2025; Madaan et al.,\n2023).\nDecomposing the workflow into two distinct tasks provides several advantages:\n• Task specialization. Each prompt is optimized for a single objective rather than overburdened with\n  heterogeneous requirements. The evaluation prompt is designed for precise logical assessment, while the\n  generation prompt focuses on producing natural, contextually appropriate language.\n• Independent configurations. The two steps can operate under different model settings. The "
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "4       Evaluation and Results\n4.1     Step 1: Dynamic Retrieval and Transition Evaluation\nTo evaluate the standard single-prompt baseline against the proposed framework, we measured how ef-\nfectively each approach replicated expert behavior under realistic conditions. Specifically, we assessed\npath-following accuracy, latency, cost, and message quality. This comparison allows us to determine whether\ndecomposing the decision process into separate evaluation and generation steps yields measurable improve-\nments over providing the model with the full decision context in a single prompt."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "4.1.1    Dataset Construction\nWe constructed an evaluation dataset from recorded written conversations between clinicians and patients\nnavigating a triage workflow drawn from a deployed use case. The dataset consists of 20 complete conver-\nsations that reached a terminal state. The selection reflects a realistic distribution of cases, including both\nstraightforward and complex scenarios, short and extended interactions, and diverse paths through the\ndecision tree.\nTo establish a reliable ground truth, the dataset was manually annotated. For each conversational turn, the\nannotation consisted of identifying two specific states:\n• Current node: The position in the decision tree prior to the patient response.\n• Target node: The correct next node that should be reached given the patient message.\nThis process resulted in a dataset of 174 distinct conversational turns, each representing a singl"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "6\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "of this evaluation, we assume a single reference path for each turn and treat any deviation from that path\nas an error, including cases where the model requests clarification when the annotated path advances. We\nacknowledge that in ambiguous scenarios, both advancing and requesting clarification could reasonably be\nconsidered valid behaviors; however, enforcing a single reference path enables consistent and reproducible\ncomparison across models.\nThe decision tree used in this evaluation contains 449 nodes and 980 edges, with a maximum depth of 19 and\nan average of 2.04 outgoing edges per node. When fully serialized, the tree occupies approximately 119,990\ntokens, measured using the o200k_base tokenizer. Results should therefore be interpreted in the context of a\nworkflow of this size and structural complexity. We hypothesize that for larger decision trees, the relative\nperformance gains "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "4.1.2   Experimental Setup\nWe conducted a head-to-head evaluation of the two architectures using a diverse set of foundation models\nselected to represent a broad range of capabilities. To examine the impact of advanced reasoning, GPT-5\n(OpenAI, 2025b) was evaluated under varying levels of reasoning effort (minimal, medium, and high).\nGPT-4.1 (OpenAI, 2025a) was included as a baseline representative of non-reasoning models. In addition,\nClaude Sonnet 4.5 (Anthropic, 2025) and Gemini 3 Pro (DeepMind, 2025b) were evaluated as large proprietary\nmodels, with Gemini 3 Flash (DeepMind, 2025a) serving as a smaller proprietary alternative. Finally, to\nrepresent the open-weights landscape, we evaluated DeepSeek V3.1 (DeepSeek-AI et al., 2025) alongside\ntwo variants of the Qwen3 family, Qwen3 30B Instruct and Qwen3 235B Instruct (Yang et al., 2025), enabling\na controlled comparison of model capacit"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "4.1.3   Evaluation Metrics\nWe designed our metrics to capture both clinically relevant decision correctness and the practical viability of\ndeploying structured conversational workflows at scale:\n\n7\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "• Turn accuracy: The percentage of turns for which the agent converged to the correct target node at the\n  end of the evaluation loop, independent of the number of transitions executed within the turn. Turn-level\n  accuracy directly reflects the correctness of individual triage decisions and allows comparison across\n  conversations of varying length and complexity.\n• Latency: The average time per turn, measured in seconds, from user input to agent response. We analyze\n  end-to-end per-turn latency to assess the runtime implications of multi-step architectures. This captures\n  practical deployment tradeoffs, as sequential LLM calls introduce inherent overhead that must be evaluated\n  against the latency incurred by the single-prompt baseline, which processes large context windows at\n  every turn (Li et al., 2023).\n• Cost: Computed based on total token usage per turn, including both input "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "4.1.4   Results and Discussion\nNavigation Accuracy & Consistency\nAccurate navigation through the decision tree is the most critical requirement for clinical triage, as incorrect\ntransitions directly compromise safety and correctness. We evaluate this capability using turn accuracy,\nwhich measures the model’s ability to select the correct transition at each decision point. As shown in Figure\n2, we report mean accuracy and standard deviation across five independent runs.\n\nFigure 2 Turn Accuracy. Bars show mean turn accuracy over five runs, error bars indicate the standard deviation."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Under the single-prompt baseline, navigation accuracy varies widely across models and shows a strong\ndependence on intrinsic model capability and reasoning abilities. Performance is highest among models\nwith stronger reasoning settings, with GPT-5-high and GPT-5-medium reaching 82.76% (±1.3%) and 80.6%\n(±0.9%), respectively. However, this robustness does not generalize across large proprietary models. Claude\nSonnet 4.5 attains only 43.3% (± 3.8%), indicating that scale alone is insufficient when complex decision\nlogic must be internalized and executed implicitly within a single prompt. Reducing reasoning effort further\nexposes this fragility, with GPT-5-minimal dropping to 62.76% (± 2.0%), while non-reasoning baselines\nperform worst overall, as exemplified by GPT-4.1 at 51.7% (± 3.8%).\n\n8\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "The Gemini models exhibit similar sensitivity, while also highlighting the role of efficiency-oriented design.\nGemini 3 Pro reaches 74.6% (± 2.5%) under the single-prompt setup, whereas the smaller Gemini 3 Flash\nachieves a higher 83.9% (± 0.4%). This inversion suggests that efficiency-optimized models can remain\ncompetitive when reasoning demands are moderate, but overall performance remains variable and tightly\ncoupled to prompt complexity rather than being structurally robust.\nThese limitations become most pronounced in the open-weights setting. DeepSeek V3.1 and Qwen3 235B\nachieve only 38.3% (± 2.4%) and 55.2% (± 2.0%) accuracy, respectively, while Qwen3 30B collapses to\n14.9% (± 2.0%). As model capacity decreases, the single-prompt approach degrades sharply, indicating that\nwithout architectural support, smaller and open-weights models are largely unable to reliably navigate large,\n"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Figure 3 Latency per Turn. Bars show mean response latency (in seconds) over five runs. The y-axis is in log scale.\n\nAs shown in Figure 3, latency behavior varies substantially across models. For some proprietary reasoning\nmodels, such as Claude Sonnet 4.5, the single-prompt baseline is faster (9.10 s versus 17.83 s), reflecting the\noverhead of multiple inference calls in the architectural approach. However, this pattern does not generalize.\n\n9\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "For GPT-4.1, the proposed framework achieves lower latency (5.08 s versus 14.08 s), indicating that reductions\nin prompt size can outweigh the cost of sequential execution.\nMore importantly, the single-prompt baseline exhibits pronounced latency volatility, particularly for open-\nweights models. While absolute latency for these models is deployment-dependent, the relative comparison\nremains informative, as both approaches were evaluated under identical serving conditions. Under the\nsingle-prompt setup, DeepSeek V3.1 incurs an average latency of 81.48 s per turn, compared to 5.90 s within\nthe framework, representing more than an order-of-magnitude increase. Similar, though less extreme, effects\nare observed for Qwen3 235B.\nThese results indicate that while multi-step architectures introduce predictable overhead, large-context single-\nprompt approaches can incur severe and highly model-dep"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Figure 4 Cost per Turn. Bars show the average cost per conversational turn in US Dollars ($). The y-axis is in log scale."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "As shown in Figure 4, the economic impact of the proposed framework is substantial. By restricting the\ncontext window to the active decision node, the framework achieves an order-of-magnitude reduction in per-\nturn cost across all models. For example, GPT-5-high decreases from $0.175 per turn under the single-prompt\nbaseline to $0.030 under the framework. This efficiency substantially lowers the operational cost of using\nmore capable, higher-cost reasoning models, while rendering per-turn costs for lightweight models, such as\nGemini 3 Flash and Qwen3 30B, effectively negligible.\nWe expect this cost advantage to grow further as decision trees increase in size, where single-prompt\napproaches incur proportionally higher token overhead at every turn (Li et al., 2023).\nFinally, this separation of concerns enables hybrid model strategies, in which high-cost models may be\nreserved for the reaso"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "10\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nAggregate Performance Summary\nTo quantify the global impact of the architecture independent of any specific model, we averaged performance\nmetrics across all evaluated models. This aggregate view, presented in Table 2, highlights the structural\nadvantage of the proposed framework over the single-prompt baseline.\n\nMetric              Arbor (Mean ± SD)          Single-prompt (Mean ± SD)             Performance Delta\n        Turn Accuracy        88.23% (± 7.66%)                 58.80% (± 22.59%)                 +29.42 points\n        Cost per Turn        $0.012 (± $0.011)                 $0.166 (± $0.125)                14.4x Cheaper\n        Latency per Turn      14.51s (± 8.82s)                 33.84s (± 27.23s)                 57.1% Faster\n\nTable 2 Aggregate performance comparison."
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "On average, the framework improves navigation accuracy by 29 percentage points, increasing mean turn\naccuracy from 58.80% (± 22.59%) to 88.23% (± 7.66%). The significantly lower standard deviation in the\nArbor configuration quantitatively confirms that the architecture stabilizes performance, neutralizing the\nhigh variance typically seen across different model families. The most pronounced effect is observed in cost\nefficiency, where the average per-turn cost drops from $0.166 to $0.012, representing a 14.4x reduction. Latency\nalso improves substantially, with mean per-turn latency decreasing from 33.84s to 14.51s, corresponding to a\n57.1% reduction.\nBeyond these aggregate gains, Arbor demonstrates consistent architectural robustness across diverse model\ncategories. Performance improvements are not confined to a specific class of models, but are observed\nacross both open-weights and prop"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "4.2     Step 2: Message Generation\nHaving established that the proposed framework significantly outperforms the single-prompt baseline in\nnavigation accuracy, cost, and latency, a critical remaining question is whether this structural decomposi-\ntion compromises conversational naturalness. In particular, we examine whether separating retrieval and\ngeneration into discrete steps leads to stilted or robotic responses.\nTo address this, we evaluated message quality in isolation using a controlled setup designed to eliminate\nnode-selection bias. When the navigation paths of the two strategies diverge, the resulting messages address\nfundamentally different topics, rendering direct comparisons of text quality invalid. We therefore restricted\nthis evaluation to turns in which both strategies selected the same correct next node, enabling a controlled\ncomparison of conversational fluency."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "4.2.1    Experimental Setup\nGPT-5-minimal was used for both strategies to control for model-specific effects, as it demonstrated the\nstrongest overall performance in the prior navigation experiments. Because this evaluation focuses on relative\nmessage quality under identical navigation outcomes, using a single model is sufficient to isolate the effect of\narchitectural decomposition.\nAn evaluation set was constructed from recorded historical conversations, providing both the single-prompt\nbaseline and the proposed framework with identical conversation history, current node context, and member\ninformation. For each turn, both agents were tasked with selecting the next node and generating a response.\nWe then filtered the results to identify turns in which both strategies successfully selected the correct next\nnode. From these aligned turns, we constructed a sample of 50 real triage use case"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "11\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nresponses, one generated by the single-prompt baseline and one by the proposed framework, resulting in a\ntotal of 100 messages."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "4.2.2    Evaluation\nThree licensed physical therapists, with clinical experience ranging from 4 to 18 years, independently\nevaluated each message. The panel included specialists in women’s health, vestibular rehabilitation, and\northopedics. Physical therapists were selected as annotators because the decision tree and conversational con-\ntext are grounded in physical therapy triage, requiring domain-specific clinical judgment to assess correctness,\nsafety, and appropriateness. Annotators were provided with the full conversation transcript, member context,\nincluding eligibility and background information, and the specific informational requirements associated\nwith the target node.\nEvaluation proceeded in two stages. First, annotators assigned a binary acceptance label based on clinical\nand conversational validity. For a message to be accepted, it was required to clearly fulfill the intent "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "4.2.3    Results and Discussion\nFigure 5 shows that the proposed framework achieved a 97.3% acceptance rate, while the single-prompt\nstrategy achieved 100%. Both results indicate a high level of clinical acceptability. Rejected messages were\nrare and were mainly due to minor annotation disagreements or unmet expectations outside the agent’s\navailable capabilities, rather than unsafe clinical guidance. However, safety was not separately quantified\nbeyond navigation correctness and expert acceptance criteria.\n\nFigure 5 Message Approval Rate. Bars show the percentage of messages rated as clinically acceptable by physical\ntherapists for each strategy."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Among accepted messages, average quality scores were closely aligned, as shown in Figure 6. The framework\nachieved a mean score of 3.67, slightly higher than the single-prompt mean of 3.62. Given the modest sample\nsize and substantial overlap between score distributions, we applied a Wilcoxon signed-rank test for paired\nsamples as a robustness check rather than as a high-power test for small effects. The test statistic is defined as\n\n12\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nNr\n                                            W = ∑[sgn(x2,i − x1,i ) ⋅ Ri ]\n                                                  i=1"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "where Nr is the number of non-zero differences, sgn is the sign function and Ri is the rank of the absolute\ndifference ∣x2,i − x1,i ∣.\nThe test yielded a statistic of W = 416.5 and a p-value of 0.455 (p > 0.05), indicating that the observed\ndifference is not statistically significant. Consistent with the overlapping distributions, this result does not\nindicate a statistically significant difference and primarily serves to rule out the presence of a large effect in\nmessage quality, rather than to detect subtle differences under limited statistical power.\n\nFigure 6 Average Quality Score. Bars show the mean quality rating of accepted messages on a scale of 1 to 4. Error bars\nindicate standard deviation.\n\nScore histograms across the 1–4 scale exhibited nearly identical distributions for both strategies, with\ncomparable proportions of high-scoring messages, as shown in Figure 7."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Figure 7 Quality score distribution. Bars show the frequency count of assigned quality scores (1-4) for accepted\nmessages, grouped by strategy.\n\nTaken together, these results indicate that when both strategies operate from the same correct node, physical\ntherapists rate their generated messages as comparably high in quality. Under these controlled conditions,\n\n13\n\f                        Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nthe proposed framework preserves conversational quality while delivering the previously demonstrated\ngains in navigation accuracy, latency, and cost."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "5    Discussion\nThe results provide strong evidence that, in high-stakes conversational workflows, a decomposition-based\narchitecture yields more stable and predictable outcomes than relying solely on raw model capacity within a\nsingle prompt. While large context windows theoretically allow language models to process entire decision\ntree structures, our findings show that the accuracy of results generated via single prompting is dependent\nupon the model’s intrinsic reasoning capabilities. In contrast, the proposed decomposition framework\nimproves navigation accuracy while simultaneously reducing cost and latency, highlighting the importance\nof architectural support over prompt-level scaling alone."
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Contextual Isolation and Search Space Reduction\nSingle prompting offers fundamental implications by requiring the model to reason over the entire decision\ntree simultaneously; this naive approach forces a global search over a large and heterogeneous decision space,\nincreasing susceptibility to errors and unstable behavior.\nBy contrast, the proposed framework enforces contextual isolation. At each step, only the current node and\nits outgoing edges are exposed to the model, effectively constraining the action space. This restriction reduces\nthe likelihood of invalid transitions, as the model cannot select paths that are not explicitly represented in the\nretrieved context. As a result, hallucinated transitions to unrelated parts of the tree are structurally eliminated\nrather than mitigated through prompt instructions.\nDecomposing triage into localized decision steps further reduces reasonin"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "Efficiency and Scalability\nThe observed reductions in cost and latency stem from a fundamental architectural difference between the\ntwo approaches. The single-prompt baseline is inherently context-dependent: its per-turn cost and latency\nscale with the total size of the decision tree, as the full structure must be reprocessed at every interaction.\nAs clinical protocols grow in complexity, this creates an increasing per-turn overhead that directly impacts\noperational feasibility.\nIn contrast, the proposed framework is context-size invariant. Because only the immediate neighborhood of\nthe current node is retrieved, the size of the model input remains bounded regardless of the overall tree size.\nThis ensures that cost and latency remain stable as protocols expand, enabling the system to scale to larger\nand more complex workflows without degrading performance or requiring prompt redesign."
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "Debuggability and Operational Control\nBeyond performance gains, decomposition substantially improves system debuggability by reducing the\nblack-box nature of single-prompt approaches (Ramlochan, 2023). In single prompting, failures are opaque\nand tightly coupled to large, unstructured system prompts, making root-cause analysis difficult and error\ncorrection risky. In contrast, the proposed framework localizes failures to specific transitions or nodes,\nenabling engineers and domain experts to identify, inspect, and correct issues without impacting unrelated\nparts of the workflow.\nThis localized failure structure supports targeted updates to individual nodes or edges, reducing the risk of\nregressions and enabling iterative refinement. In high-stakes domains such as clinical triage, this level of\noperational control is not merely advantageous but essential for safe deployment and ongoing ma"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "14\n\f                       Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "6    Limitations and Future Work\nWhile the proposed framework demonstrates substantial improvements in navigation accuracy, cost, and\nlatency relative to single prompting, several limitations and opportunities for further optimization remain.\nAlthough the framework often outperforms the single-prompt baseline in latency, applications with strict\nreal-time constraints, such as voice-based interactions, may be more sensitive to the sequential inference\nsteps introduced by decomposed evaluation. Future work could explore strategies to reduce end-to-end\nresponse time while accepting carefully bounded reliability tradeoffs. Potential approaches include:\n• Reducing the length of chain-of-thought reasoning in evaluation prompts to lower token-processing\n  overhead without altering the core architecture.\n• Leveraging smaller or faster models for straightforward transitions, or distilling special"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "7    Conclusion\nThis work examines the challenge of deploying large language models within structured clinical workflows\nthat demand both conversational naturalness and strict procedural adherence. We introduce a decomposition-\nbased architecture that separates retrieval, logical evaluation, and response generation into distinct compo-\nnents, enabling reliable navigation of complex decision trees. Evaluation on authentic triage conversations\ndemonstrates that this approach consistently outperforms single-prompt baselines in navigation accuracy,\nlatency, and cost, while preserving high message quality.\nRather than requiring a model to simultaneously process an entire decision structure, track conversational\nstate, evaluate transition conditions, and generate user-facing responses, constraining reasoning to localized\ndecisions within an orchestrated framework yields substantially more stab"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "15\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "References\nMaría M Abad-Grau, Jorge Ierache, Claudio Cervino, and Paola Sebastiani. Evolution and challenges in the design of\n computational systems for triage assistance. Journal of biomedical informatics, 41(3):432–441, 2008.\nAnthropic. Claude sonnet 4.5 system card. System card, Anthropic, sep 2025. URL https://assets.anthropic.com/m\n /12f214efcc2f457a/original/Claude-Sonnet-4-5-System-Card.pdf.\nMaciej Besta, Nils Blach, Ales Kubicek, Robert Gerstenberger, Michal Podstawski, Lukas Gianinazzi, Joanna Gajda,\n Tomasz Lehmann, Hubert Niewiadomski, Piotr Nyczyk, and Torsten Hoefler. Graph of thoughts: Solving elaborate\n problems with large language models. Proceedings of the AAAI Conference on Artificial Intelligence, 38(16):17682–17690,\n March 2024. ISSN 2159-5399. doi: 10.1609/aaai.v38i16.29720. URL http://dx.doi.org/10.1609/aaai.v38i16.29720.\nJunying Chen, Chi Gui, Anningzhe Gao, Ke Ji,"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "16\n\f                          Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Fatma Őzcan, Abdul Quamar, Jaydeep Sen, Chuan Lei, and Vasilis Efthymiou. State of the art and open challenges in\n  natural language interfaces to data. In Proceedings of the 2020 ACM SIGMOD international conference on management of\n  data, pp. 2629–2636, 2020.\nSunil Ramlochan. The black box problem: Opaque inner workings of large language models, oct 2023. URL https:\n  //promptengineering.org/the-black-box-problem-opaque-inner-workings-of-large-language-models/.\nVladimir Shaposhnikov, Aleksandr Nesterov, Ilia Kopanichuk, Ivan Bakulin, Egor Zhelvakov, Ruslan Abramov, Ekaterina\n  Tsapieva, Iaroslav Bespalov, Dmitry V. Dylov, and Ivan Oseledets. Clarity: Clinical assistant for routing, inference, and\n  triage, 2025. URL https://arxiv.org/abs/2510.02463.\nGemma Team, Aishwarya Kamath, Johan Ferret, and Shreya Pathak et al. Gemma 3 technical report, 2025. URL\n  https://arxiv.org/abs/2503.197"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "17\n\f                                       Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nA       System Prompts\n\nArbor transition evaluator prompt (excerpt)\n # Role\n You are a Pain Specialist (PS) who works for Sword Health, a digital health company that provides various programs for pain management. (...)\n Your task is to review the ongoing conversation between yourself and the service user (who may also be referred to interchangeably as patient or member), evaluate the current\n node in the decision tree, and determine the most appropriate next step.\n You are not responsible for drafting or sending messages to the patient during this phase."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "# Task Instructions\n - Review the conversation, current node, member context, domain knowledge, your information as the Pain Specialist, and the available paths.\n - If the main task of the current node is fully completed and you have enough information, select and respond with the key of the most appropriate path from \"Available Triage\n Paths\".\n - Before selecting a path, ensure that you have sufficient information to confidently choose a single path and discard all others (including the current node).\n - If the task is not completed or information is missing, respond with next_state = ’{{ stay_key }}’."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "# Node Transition Criteria\n - Do not transition if you are unsure whether the node requirements are met or if any part of the *Question Example* remains unaddressed.\n - Do not transition based on assumptions or uncertainties that prevent you from being fully confident in the decision. In such cases, remain on the current node and seek\n clarification.\n (...)\n\n# Scratchpad Guidelines\n Before making your decision, write a scratchpad explaining your reasoning. This explanation will be used to inform the next message in the conversation.\n - Clearly specify any missing information and why it is needed.\n - If staying in the current node, state exactly what prevents transition.\n (...)"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "# Member Context\n Relevant information about the member to guide decisions:\n (...)\n - Member Name: {{ member_context.member_name }}\n - Member Birthdate: {{ member_context.member_birthdate }}\n - Member Local Time: {{ member_local_time }}\n - Eligible Programs: (...)\n - Enrolled Programs: (...)\n\n# Current Decision Tree Node\n This section describes the node you are currently evaluating in the decision tree:\n {\n   *Key*: ’{{ stay_key }}’,\n   *Question Example*: ’{{ question }}’,\n   *Question Explanation*: ’{{ question_explanation }}’,\n   *Additional Node Context*: ’{{ tree_context }}’,\n }\n\n# Available Triage Paths\n This section lists all possible next steps (nodes) you can transition to from the current node. (...)\n Paths: {{ nodes }}\n\n# Current conversation:\n {\n {{ conversation }}\n }\n\nFigure 8 Arbor transition evaluator system message (excerpt)."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "18\n\f                                     Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nArbor message generation prompt (excerpt)\n # Role\n You are a Pain Specialist (PS) who works for Sword Health, a digital health company that provides various programs for pain management. (...)\n Your role is to draft clinically and friendly appropriate messages to send to the user.\n\n# Task Instructions\n - Review the conversation, current decision tree node, the member context, your information as the Pain Specialist, and your reasoning.\n - Use the *Question Example* and *Question Explanation* as your primary guidance when crafting the message.\n - If your reasoning identifies missing or incomplete information, recommend next steps or clarify what is needed.\n (...)"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "# Guidelines\n - Maintain a natural conversational flow.\n - Show understanding of the member’s situation.\n - If the member expresses difficulty, pain, or distress, acknowledge it.\n (...)\n - Do not restate, paraphrase, or repeat the member’s own words, diagnosis, or statements.\n - Do not repeat questions already addressed in the conversation.\n (...)\n\n# Member Context\n Relevant information about the member to guide your message:\n - Member Name: {{ member_context.member_name }}\n (...)\n\n# Current Decision Tree Node\n {\n   *Question Example*: ’{{ question }}’,\n   *Question Explanation*: ’{{ question_explanation }}’,\n   *Additional Node Context*: ’{{ tree_context }}’,\n }\n\n# PS Reasoning\n Your assessment and analysis for staying on this node, including what information is missing, needs clarification and important points to include in your message:\n {{ evaluator_scratchpad }}"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "# Current conversation:\n {\n {{ conversation }}\n }\n\nFigure 9 Arbor message generation system message (excerpt).\n\n19\n\f                                     Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Single-prompt system message (excerpt)\n # Role\n You are a Pain Specialist (PS) working for Sword Health. Your role in this triage is to navigate the decision tree (DT) and draft messages that guide the member through it in a\n clinically sound, warm, and natural way.\n Every call has the responsibility to:\n 1. Traverse the decision tree deciding based on the current chat history in which node you are.\n 2. Decide if the current node is fully addressed; if not, remain here and generate the message for this node.\n 3. Traverse to the next child node whose answer cannot yet be inferred.\n 4. Craft the message for the final node you land on.\n Output both:\n - message: what to send to the member.\n - new_current_node: the node key you ended at."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "# Traversal Instructions\n - Use the conversation history to check if a node’s question is already answered.\n - Always check children of the current node in the full DT.\n - Never guess or assume an answer; if unsure, stay at that node and ask for clarification.\n\n# Message Crafting Guidelines\n - Use the node’s question example and explanation to guide what to ask or communicate.\n - Ask only one question per message and end with a question unless it’s the last node.\n - Show empathy and adapt to the member’s emotional state.\n - Avoid repeating words or already asked questions.\n - Keep the message natural, engaging, and clinically appropriate.\n\n# Member Context\n - Name: {{ member_context.member_name }}\n - Birthdate: {{ member_context.member_birthdate }}\n - Local Time: {{ member_local_time }}\n - Eligible Programs: (...)\n - Enrolled Programs: (...)\n\n# Full Decision Tree\n [\n   ...\n ]"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "# Current conversation:\n {\n {{ conversation }}\n }\n\nFigure 10 Single-prompt baseline system message (excerpt). The full decision tree is omitted for brevity.\n\n20\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows\n\nB    Result Tables"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Model                       Strategy      Turn Accuracy        Turn Accuracy STD\n                  GPT-5-minimal               Arbor             92.07%                    1.7%\n                  GPT-5-minimal               Baseline          62.76%                    2.0%\n                  Claude Sonnet 4.5           Arbor             91.15%                    2.1%\n                  Claude Sonnet 4.5           Baseline          43.33%                    3.8%\n                  GPT-5-medium                Arbor             90.80%                    0.8%\n                  GPT-5-medium                Baseline          80.57%                    2.6%\n                  GPT-5-high                  Arbor             90.80%                    0.7%\n                  GPT-5-high                  Baseline          82.76%                    1.3%\n                  GPT-4.1                     Arbor        "
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Table 3 Turn accuracy results used in Figure 2."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Model                      Strategy     Latency per Turn (Mean) (s)           Latency per Turn (Median) (s)\n     GPT-4.1                    Arbor                       5.08                                      4.97\n     GPT-4.1                    Baseline                   14.08                                      9.74\n     DeepSeek V3.1              Arbor                       5.90                                      4.24\n     DeepSeek V3.1              Baseline                   81.48                                     77.92\n     GPT-5-minimal              Arbor                       8.40                                      7.07\n     GPT-5-minimal              Baseline                   10.74                                      9.82\n     Gemini 3 Flash             Arbor                      17.15                                     15.66\n     Gemini 3 Flash             Baseline   "
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "Table 4 Latency results used in Figure 3.\n\n21\n\f                         Arbor: A Framework for Reliable Navigation of Critical Conversation Flows"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Model                       Strategy      Cost per Turn (USD)\n                            Gemini 3 Flash              Arbor                 $0.0025\n                            Gemini 3 Flash              Baseline              $0.0693\n                            DeepSeek V3.1               Arbor                $0.00025\n                            DeepSeek V3.1               Baseline              $0.0756\n                            GPT-5-minimal               Arbor                 $0.0078\n                            GPT-5-minimal               Baseline              $0.1545\n                            GPT-4.1                     Arbor                 $0.0098\n                            GPT-4.1                     Baseline             $0.2435\n                            GPT-5-medium                Arbor                 $0.0168\n                            GPT-5-medium                Baseline "
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Table 5 Cost results used in Figure 4.\n\nStrategy     Score 1     Score 2     Score 3     Score 4     Mean      STD\n                       Arbor             1         5           35         104        3.67      0.58\n                       Baseline          0         5           47          98        3.62      0.55\n\nTable 6 Quality score distribution used in Figure 7 with calculated mean and standard deviation.\n\n22"
+    }
+  ]
+}
