@@ -1,0 +1,1112 @@
+{
+  "arxivId": "2602.15532",
+  "paperTitle": "Quantifying construct validity in large language model evaluations",
+  "abstract": "The LLM community often reports benchmark results as if they are synonymous with general model capabilities. However, benchmarks can have problems that distort performance, like test set contamination and annotator error. How can we know that a benchmark is a reliable indicator of some capability that we want to measure? This question concerns the construct validity of LLM benchmarks, and it requires separating benchmark results from capabilities when we model and predict LLM performance.\nBoth social scientists and computer scientists propose formal models - latent factor models and scaling laws - for identifying the capabilities underlying benchmark scores. However, neither technique is satisfactory for construct validity. Latent factor models ignore scaling laws, and as a result, the capabilities they extract often proxy model size. Scaling laws ignore measurement error, and as a result, the capabilities they extract are both uninterpretable and overfit to the observed benchmarks.\nThis thesis presents the structured capabilities model, the first model to extract interpretable and generalisable capabilities from a large collection of LLM benchmark results. I fit this model and its two alternatives on a large sample of results from the OpenLLM Leaderboard. Structured capabilities outperform latent factor models on parsimonious fit indices, and exhibit better out-of-distribution benchmark prediction than scaling laws. These improvements are possible because neither existing approach separates model scale from capabilities in the appropriate way. Model scale should inform capabilities, as in scaling laws, and these capabilities should inform observed results up to measurement error, as in latent factor models. In combining these two insights, structured capabilities demonstrate better explanatory and predictive power for quantifying construct validity in LLM evaluations.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "The LLM community often reports benchmark results as if they are synonymous with general model capabilities. However, benchmarks can have problems that distort performance, like test set contamination and annotator error. How can we know that a benchmark is a reliable indicator of some capability that we want to measure? This question concerns the construct validity of LLM benchmarks, and it requires separating benchmark results from capabilities when we model and predict LLM performance.\nBoth social scientists and computer scientists propose formal models - latent factor models and scaling laws - for identifying the capabilities underlying benchmark scores. However, neither technique is satisfactory for construct validity. Latent factor models ignore scaling laws, and as a result, the capabilities they extract often proxy model size. Scaling laws ignore measurement error, and as a result, the capabilities they extract are both uninterpretable and overfit to the observed benchmarks.\nThis thesis presents the structured capabilities model, the first model to extract interpretable and generalisable capabilities from a large collection of LLM benchmark results. I fit this model and its two alternatives on a large sample of results from the OpenLLM Leaderboard. Structured capabilities outperform latent factor models on parsimonious fit indices, and exhibit better out-of-distribution benchmark prediction than scaling laws. These improvements are possible because neither existing approach separates model scale from capabilities in the appropriate way. Model scale should inform capabilities, as in scaling laws, and these capabilities should inform observed results up to measurement error, as in latent factor models. In combining these two insights, structured capabilities demonstrate better explanatory and predictive power for quantifying construct validity in LLM evaluations."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: High-level picture of my contribution. My proposed model, the structured"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: The scale of language model training, 2010 to 2025. The dashed black line"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 1: BIG-Bench Hard subtasks in my dataset."
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: Illustrated three-parameter item response curve. This curve represents"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 4: Raw BBH score correlation matrix. The correlation metric is Spearman’s rank"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 5: Logistic scaling law fits for two subtasks. Ruin names has the highest ob-"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 6: BBH score residuals correlation matrix. Score residuals are taken from the"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 7: Scree plots for BBH score matrices."
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 2: Fit measures for the four tested EFA models. The Str. column indicates"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Figure 8: Linear latent factor model results. This model corresponds to Equation (13a)"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 9: Structured capabilities model results. This model corresponds to Equa-"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 3: Prediction errors for held-out subtasks. Each column shows the mean-"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Figure 10: Parameter estimates for the observational scaling law model. The heldout"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Figure 11: Parameter estimates for the structured capabilities model. The held-out"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Figure 12: Variance explained by estimated capabilities. For both models the held-out"
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Table 4: All mentioned benchmark datasets, with citations."
+    },
+    {
+      "id": "cap-16",
+      "type": "caption",
+      "text": "Figure 13: Raw BBH scores against log-parameter size. The red line represents a"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "U NIVERSITY OF OXFORD\n\nQuantifying construct validity in large language model evaluations\narXiv:2602.15532v1 [cs.AI] 17 Feb 2026\n\nRyan Othniel Kearns\n\nSt Catherine’s College\n                                                                     Supervisor: Prof. Adam Mahdi\n\nThesis submitted in partial fulfilment of the requirement for the degree of MSc in Social\n                                                 Data Science at the Oxford Internet Institute at the University of Oxford.\n\nTrinity Term 2025                                                          12348 words\n\f                                       Abstract"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "The large language model research community often reports benchmark results as\nif they are synonymous with general model capabilities. For example, an LLM per-\nforming well on a mathematics benchmark is taken to have a general mathematical\nreasoning ability. However, benchmarks can have problems that distort performance,\nlike test set contamination and annotator error. How can we know that a benchmark\nis a reliable indicator of some capability that we want to measure? This question con-\ncerns the construct validity of LLM benchmarks, and it requires separating bench-\nmark results from capabilities when we model and predict LLM performance.\nBoth social scientists and computer scientists propose formal models for identifying\nthe capabilities underlying benchmark scores. Social scientists adapt latent factor\nmodels, used for modelling human cognitive capabilities, to explain LLM bench-\nmark"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "2   Background                                                                               7\n    2.1   Scaling laws and LLM capabilities . . . . . . . . . . . . . . . . . . . . .        7\n    2.2   Quantifying construct validity . . . . . . . . . . . . . . . . . . . . . . .      10\n    2.3   Related work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      13\n    2.4   Research questions . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      17"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "3   Methods                                                                                 19\n    3.1   Experimental design . . . . . . . . . . . . . . . . . . . . . . . . . . . .       19\n    3.2   Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    21\n    3.3   Techniques and models . . . . . . . . . . . . . . . . . . . . . . . . . . .       24\n    3.4   Validation and experimentation . . . . . . . . . . . . . . . . . . . . . . .      27\n\n4   Results                                                                                 31\n    4.1   Preliminary data analysis . . . . . . . . . . . . . . . . . . . . . . . . . .     31\n    4.2   Comparison to exploratory factor analysis . . . . . . . . . . . . . . . . .       36\n    4.3   Comparison to observational scaling laws . . . . . . . . . . . . . . . . .        39"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "5   Discussion                                                                              44\n    5.1   Principal findings . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    44\n    5.2   Interpretation of results . . . . . . . . . . . . . . . . . . . . . . . . . . .   44\n    5.3   Relation to other studies . . . . . . . . . . . . . . . . . . . . . . . . . .     46\n    5.4   Limitations and future work . . . . . . . . . . . . . . . . . . . . . . . .       47\n    5.5   Implications . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    48\n\n6   Conclusion                                                                              50\n\nReferences                                                                                  51\n\fA List of mentioned benchmarks                                                           68"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "B Default mathematical notation                                                          70\n\nC BIG-Bench Hard task descriptions                                                       73\n\nD Transformed matrix derivation                                                          81\n\nE Parameter scaling laws for all BBH subtasks                                            82"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "List of Figures\n   1    High-level picture of my contribution . . . . . . . . . . . . . . . . . . .       6\n   2    The scale of language model training, 2010 to 2025 . . . . . . . . . . . .        8\n   3    Illustrated three-parameter item response curve . . . . . . . . . . . . . .      24\n   4    Raw BBH score correlation matrix . . . . . . . . . . . . . . . . . . . . .       32\n   5    Logistic scaling law fits for two subtasks . . . . . . . . . . . . . . . . . .   33\n   6    BBH score residuals correlation matrix . . . . . . . . . . . . . . . . . . .     34\n   7    Scree plots for BBH score matrices . . . . . . . . . . . . . . . . . . . . .     35\n   8    Linear latent factor model results . . . . . . . . . . . . . . . . . . . . . .   37\n   9    Structured capabilities model results . . . . . . . . . . . . . . . . . . . .    38\n   10   Parameter estimates for the observational scalin"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "List of Tables\n   1    BIG-Bench Hard subtasks in our dataset . . . . . . . . . . . . . . . . . .       22\n   2    Fit measures for the four tested EFA models . . . . . . . . . . . . . . . .      36\n   3    Prediction errors for held-out subtasks . . . . . . . . . . . . . . . . . . .    40\n   4    All mentioned benchmark datasets, with citations . . . . . . . . . . . . .       69\n\f1       INTRODUCTION\n\n1        Introduction\n\n1.1      Large language models: A “superhuman” intelligence?"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "When we claim that large language models (LLMs) possess ‘scientific knowledge,’ or\n‘mathematical reasoning abilities,’ how do we justify these claims?1 One method is anec-\ndotal: individuals can ask an LLM some science or mathematics questions and come\naway with an impression of the model’s abilities. This justification is neither very scal-\nable nor scientific. A more robust method, and the standard method for modern AI\nsystems, is to use a benchmark dataset: a curated selection of questions and answers\nthat gives an objective measure of an LLM’s performance. Popular benchmarks measure\nLLM performance on mathematics problems (Cobbe et al., 2021; Hendrycks et al., 2021;\nGlazer et al., 2024), scientific questions (Rein et al., 2024; Wang et al., 2025), common-\nsense language puzzles (Talmor et al., 2019; Sakaguchi et al., 2021), and code generation\ntasks (Chen et al., 2021; Jimenez et al."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "1.2      The evaluation crisis\n\nUnfortunately, benchmarks often give unreliable accounts of LLM capabilities. Datasets\ncan suffer contamination, which occurs when a model is exposed to benchmark data\n    1\n     In this thesis, I intend ‘single quotations’ to be read as scare quotes. “Double quotations” will indicate\ndirect quotation from a cited source. I will also use boldface to signify definitions for terms and italics for\ngeneral emphasis.\n\n1\n\f1     INTRODUCTION                1.3   Can construct validity solve the evaluation crisis?"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "during training. Models can achieve unrealistic benchmark results by memorising data\nthrough such exposure (Zhou et al., 2023b; Yang et al., 2023). Popular benchmarks can\nbe gamified by influential model providers. For example, Singh et al. (2025) show that\nselective reporting of commercial model results has distorted model comparisons on the\nChatbot Arena leaderboard (Chiang et al., 2024). Benchmark scores can also give er-\nroneous performance estimates simply due to human error when labelling the correct\nanswers (Kocijan et al., 2023). Even different choices of evaluation metrics can lead to\nconflicting accounts of whether LLM capabilities are “emergent” in certain benchmark\nresults (Schaeffer et al., 2023; Burnell et al., 2023b). Finally, even when datasets are la-\nbelled correctly, reported fairly, and withheld from contamination, LLM performance can\nchallenge our expectations. Sever"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "1.3    Can construct validity solve the evaluation crisis?\n\nGiven all of the problems facing benchmarks, what can be done to secure reliable esti-\nmates of LLM capabilities? According to one emerging narrative in AI research, the so-\nlution can come from approaching the problem like social scientists (Wallach et al., 2024;\nSalaudeen et al., 2025). To see this possibility, we must first observe that problems like\ncontamination, gamification, and annotator error affect the reliability of benchmarks—but\nreliable benchmarks are not, in themselves, our ultimate goal. We seek reliable estimates\nof LLM capabilities, and our benchmarks only serve to estimate these capabilities. Users\n\n2\n\f1     INTRODUCTION                                                           1.4   The gap"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "and policymakers do not really care whether a system performs well on any particular\nmathematical benchmark. They care whether the system can do mathematics, as ulti-\nmately this general capability determines if an LLM can file our taxes, price our insur-\nance, or teach mathematics to our children. If we had only one mathematical benchmark,\nwe would indeed be in trouble, but this is not our situation. We have many benchmarks\nthat claim to measure mathematical reasoning. Even if individual benchmarks have prob-\nlems, though many separate measurements, we should be able to improve our estimation\nof mathematical reasoning capabilities simply by the law of large numbers.\nIt is in this respect that the social sciences can help LLM evaluation. Our problem is\nsimilar to one faced in disciplines like psychology. Psychology studies abstract phenom-\nena, like personality traits, and their measurem"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "1.4    The gap\n\nFormal models for construct validity amount to opinionated versions of dimensionality\nreduction: they aim to relate a large number of indicators (benchmark scores) to a smaller\nnumber of constructs (capability estimates). Separate studies from social scientists and\n\n3\n\f1   INTRODUCTION                                                             1.4   The gap"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "computer scientists try their hand at this modelling challenge with existing LLM bench-\nmark results. The social scientists (Burnell et al., 2023a; Ilić & Gignac, 2024) attempt to\ndirectly apply latent factor models, the models of human cognitive capabilities already\nin use for construct validity (Fabrigar & Wegener, 2012; Kline, 2016). In parallel, com-\nputer scientists approach this problem with their own established methods for predicting\nLLM performance. Ruan et al. (2024) introduce observational scaling laws, adapting\nthe neural scaling laws that predict LLM performance as a function of their size (Ka-\nplan et al., 2020; Henighan et al., 2020; Hoffmann et al., 2022). In place of size, Ruan\net al. (2024) use principal component analysis (PCA) to reduce a collection of benchmark\nscores down to “capability vectors” that they plug into scaling laws to predict novel task\nperformance.\nBo"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "4\n\f1     INTRODUCTION                                                 1.5   My contribution\n\n1.5    My contribution"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "This thesis presents the structured capabilities model, the first model to extract inter-\npretable and generalisable capabilities from a large collection of LLM benchmark results.\nThe structured capabilities model combines latent factor models with observational scal-\ning laws, avoiding the deficiencies that both approaches present on their own.\nIn fitting this model to benchmark results from the OpenLLM Leaderboard, I observe\nimprovements that are communicable to both social scientists and computer scientists\ninterested in modelling LLM capabilities. To social scientists interested in formal models\nof LLM capabilities, I demonstrate a more parsimonious model, with better fit statistics,\nthan the common latent factor model for extracting capabilities from benchmark results.\nTo computer scientists interested in predicting future model performance, I demonstrate\nimproved out-of-distributio"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "5\n\f1   INTRODUCTION                                                 1.5   My contribution\n\nFigure 1: High-level picture of my contribution. My proposed model, the structured\ncapabilities model, addresses problems in both latent factor and observational scaling\nlaw approaches. These existing approaches do not sufficiently separate model scale from\ncapability estimates, which harms both their explanatory and their predictive power.\n\n6\n\f2       BACKGROUND\n\n2       Background\n\n2.1      Scaling laws and LLM capabilities"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "This thesis concerns valid measurements of LLM capabilities. We observe these capabili-\nties in an LLM’s ‘behaviour.’ Despite appearances, we should not begin by assuming that\nLLM behaviour aligns with our intuitions for human behaviour. We first have to under-\nstand what LLMs are, which begins with the language modelling task they are trained to\nperform (McCoy et al., 2023).\nA language model is any model for producing natural language (Blank, 2023).2 In nat-\nural language processing (NLP), a subfield of AI, language models are machine learning\nsystems optimised to predict the next word in a sequence. This predictive task is called\nthe language modelling task (Jurafsky & Martin, 2025). Systems succeed at the lan-\nguage modelling task if their predicted next words match the distributional features of\nreal natural language. As with other machine learning applications, success is determined"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "7\n\f2   BACKGROUND                                    2.1   Scaling laws and LLM capabilities\n\nFigure 2: The scale of language model training, 2010 to 2025. The dashed black line\nshows the introduction of the Transformer in 2017. The solid red lines show trends for\ntraining compute before the Transformer (order of magnitude increase every 5 years) and\nafter the Transformer (order of magnitude increase every 1.2 years). Influential LLMs are\nannotated on the plot with red points. Data from Epoch AI (Epoch AI, 2025)."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "breakthrough. For Transformer language models on general Internet text data, it happens\nthat increasing the number of parameters, the training dataset size, and the amount of com-\nputation—in the correct ratios—yields smooth improvements at the language modelling\ntask according to a power-law relationship. These findings are known as neural scaling\nlaws (Kaplan et al., 2020; Henighan et al., 2020; Hoffmann et al., 2022), and faith in their\npredictive power is largely responsible for the explosion in AI capital investment so far\nthrough the 2020s.\nIn their original formulation (Kaplan et al., 2020), scaling laws are situated squarely in\nthe language of the Common Task Framework. Increased scale at training time yields\npower-law improvements in predictive accuracy at testing time, specifically on data from\nthe same distribution as seen in training. However, the original ambition of AI rese"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "8\n\f2       BACKGROUND                                          2.1    Scaling laws and LLM capabilities"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "tion—sentiment analysis, summarisation, and inference, among others—can be reframed\nas language modelling tasks using question-answer pairs, and Radford et al. (2019) show\nthat scaling LLMs with Internet text data appears to improve performance on all of these\ntasks. All of a sudden, our AI systems appear to possess a broad and increasingly useful\nset of linguistic skills. Bommasani et al. (2022) name this new class of systems “foun-\ndation models” to reflect their generality of application,3 and provides some of the first\ncommentary on the societal prospects of such domain-general AI systems.\nThe introduction of “foundation models” as a term represents an important step away from\nthe Common Task Framework, and with it a focus on LLMs’ test-time predictive accuracy.\nFrom here, attention shifts towards a focus on LLM capabilities as something like gen-\nuine cognitive capabilities (Srivast"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "9\n\f2     BACKGROUND                                        2.2   Quantifying construct validity\n\nthe way that LLM capabilities are—literally—written into law: Article 51 the European\nUnion’s Artificial Intelligence Act, entering into force in August 2025, specifies that\n\n[a] general-purpose AI model shall be classified as a general-purpose AI\n       model with systemic risk if... it has high impact capabilities evaluated on the\n       basis of appropriate technical tools and methodologies, including indicators\n       and benchmarks. (European Parliament, 2024)"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "The scope of “high impact capabilities” is thus handed over for the technical experts to\ndecide. We still face Ganguli et al. (2022)’s dichotomy—predictable improvements from\nscale on one hand, emergent capabilities on the other—and critiques in the form of Bender\n& Koller (2020) and Raji et al. (2021) about the validity of their evaluation techniques.\nIt is time to address “high impact capabilities” using tools and techniques from the social\nsciences (Wallach et al., 2024).\n\n2.2    Quantifying construct validity"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "In social science language, an LLM capability is a construct—a theoretical quantity that\ncannot be directly measured (in the way a person’s height can be directly measured). Core\nto measurement theory in the social sciences is the separation between the measurements\nfor constructs and the constructs themselves (Cronbach & Meehl, 1955; Messick, 1998;\nSalaudeen et al., 2025). The objects of study in the social sciences—the constructs—can\nbe abstract. Psychology studies constructs like openness to experience; sociology studies\nconstructs like radicalisation. A core assumption to the methodological practice of each\nfield is that such constructs cannot be measured exhaustively or without error. Where\nthese constructs are quantified, they are modelled to be latent variables whose values\nare informed by observable indicators, typically responses to surveys or behavioural tests.\nIdeally, an indi"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "10\n\f2       BACKGROUND                                                 2.2    Quantifying construct validity"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "AIME 2024, MathBench, and more.4 For these benchmarks to be identifiably mea-\nsuring the same thing—mathematical reasoning—there should be some degree of conver-\ngence in their scores. If MATH and FrontierMath both measure mathematical skill,\nand some LLM performs above average on MATH, we should expect it to perform above\naverage on FrontierMath. However, this convergence in scores should be to some\ndegree localised. If every benchmark score correlates highly with every other score—that\nis, if MATH performance is no better correlated to FrontierMath than any arbitrary\nbenchmark for geography or history trivia—then we will struggle to justify that MATH\nand FrontierMath benchmark any specific ‘mathematical’ attribute of LLMs in place\nof some more general ‘benchmark performance’ attribute. In other words, even if an\nLLM can recognisably solve mathematical problems, we do not have the evide"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "holds for each survey participant.5 Here x is a p × 1-vector of observed responses, f is a\nk × 1-vector of latent factor scores, L is a p × k matrix of pattern coefficients (also called\nfactor loadings), and e is a p × 1-vector of error terms (Kline, 2016). Equation (1) states\nthat observed responses (x) result from some influence (L) of underlying latent constructs\n    4\n      In several places, I am going to list many benchmarks in succession, and it hinders readability to include\nall of the necessary inline citations. Readers should consult Appendix A for a description and citation of all\nbenchmarks mentioned in this thesis.\n    5\n      All of my mathematical notation will follow Goodfellow et al.’s textbook, Deep Learning (2016).\nAppendix B contains a table of the notation copied over from the textbook."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "11\n\f2   BACKGROUND                                         2.2   Quantifying construct validity"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "(f ) mediated by some error (e). This model is the simplest possible model for connecting\nmeasurements to the constructs they purport to measure. Given empirical survey data, we\ncould estimate the latent factor values with techniques including likelihood optimisation.\nThe survey demonstrates construct validity if the indicators and latent constructs have\nsuitable convergent and discriminant correlations. If indicators xa and xb should both\nmeasure construct fc , and indicator xd should not, we should expect both La,c > 0 and\nLb,c > 0 (convergent validity) and Ld,c < La,c and Ld,c < Lb,c (discriminant validity) to\nresult from the model estimates.\nFactor analysis models can be exploratory (Fabrigar & Wegener, 2012) or confirma-\ntory (Kline, 2016). An exploratory model freely estimates all pattern coefficients in\nL, while a confirmatory model sets Li,j ← 0 for particular coefficients. Thus,"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "12\n\f2       BACKGROUND                                                                      2.3    Related work"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "only release LLMs that perform well in internal testing. Studies like Singh et al. (2025)\nhave already shown how such selective reporting can distort the statistical properties of\nbenchmark results. Another reason is the temporal variance of such a population. While\nestimates of human capabilities, like IQ, do drift slowly over time (Trahan et al., 2014),\nthe population of LLMs is more volatile and competitive, making it difficult to identify\nstable and reproducible factors (Zhou et al., 2025). A third reason is the scaling laws\nreviewed above. Unlike humans, LLMs have observable design parameters that strongly\ninfluence their performance on most tasks. These scaling parameters are not capabilities,\nbut they can affect significant variance in observed benchmark scores. Statistical mod-\nels using latent factors to capture LLM capabilities should be wary to account for these\neffects, as th"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "2.3      Related work\n\nLatent factor models of LLM capabilities"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "In the first application of latent factor modelling for LLM capabilities, Burnell et al.\n(2023a) fit an exploratory factor model using performance on the HELM benchmark, utils-\ning a sample of 29 LLMs. Models in their sample range in size from 410 million pa-\nrameters (Cohere small v20220720 (Cohere, 2022)) to 530 billion parameters (TNLG\nv2 (Smith et al., 2022)) and were released between June 2021 and January 2023. The\nfirst author, a cognitive scientist, annotated each of the 34 HELM tasks with the capability\nthe task elicited, including cognitive abilities like “Inductive reasoning,” “Domain knowl-\nedge,” and “Comprehension” (5). Fitting three latent factors to explain their benchmark\nresults, Burnell et al.’s model fit statistics are below the conventionally acceptable thresh-\nold in social science,6 though the authors note that they expect this from the small size\nof their sample. N"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "13\n\f2       BACKGROUND                                                                2.3   Related work"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "soning,” like GSM8K and MATH, and “Inductive reasoning,” like BBQ, among others. The\nfinal factor they label “Comprehension,” and it loads on a diverse set of annotated cogni-\ntive capabilities, including “Domain knowledge” (HellaSwag; WikiFact), “Compre-\nhension” (NaturalQuestions; XSUM), “Commonsense reasoning,” (OpenbookQA)\nand “Deductive reasoning” (bAbI; Dyck). The “Comprehension” capability explains the\nlargest proportion of communal variance in the measured scores (33%) and it correlates\nthe largest with other factors (0.43 with Language modeling; 0.51 with Reasoning) and\nwith the log of the LLM parameter count (0.70).8 Notably, Burnell et al. also observe\na largely positive correlation manifold across their benchmarks, with the mean inter-task\ncorrelation r = 0.56, meaning that each pair of benchmark results is moderately corre-\nlated on average.\nIlić & Gignac (2024) conduct a s"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "14\n\f2   BACKGROUND                                                            2.3   Related work\n\nObservational scaling laws"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "In parallel, Ruan et al. (2024) develop a method for estimating LLM capabilities that\ngeneralises neural scaling laws. The original scaling laws apply to test-set predictive\nerror—specifically, the cross-entropy loss on the test set (Kaplan et al., 2020). This error\nis an unbounded positive quantity where lower is better. Our subject matter, benchmarks,\nare instead scored on the interval [0, 1] where higher is better. Previous studies resolve this\ndiscrepancy (Finnveden, 2020; Owen, 2024), adapting scaling laws to predict individual\nbenchmark scores. Owen (2024) finds that a logistic link function between model scale\nand benchmark performance is the most accurate. For a model i trained with ci total\nfloating point operations (FLOps), Owen (2024) estimates a benchmark score bi ∈ [0, 1]\nas\n                                    bi = σ(β log(ci ) + α)."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Ruan et al. (2024)’s observational scaling laws take the same logistic form as the bench-\nmark scaling laws in Owen (2024). However, in place of scale, observational scaling laws\nmodel benchmark performance for model i as a function of k distinct capabilities via a\n“capability vector” si ∈ Rk , such that\n\nbi ≈ σ(β ⊤ si + α)\n\ninstead. As with scaling laws, each model’s capability vector is a function of the model’s\nscale, except that the vector coefficients for converting scale into capabilities are shared\nacross the entire model family. If model i belongs to family f , si is given by\n\nsi ≈ tf log(ci ) + vf ."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "For example, Llama 3.1 8B and Llama 3.1 405B would share the vectors tf and vf in\nvirtue of belonging to the same “Llama 3.1” model family, despite having different values\nof training compute ci . What makes these scaling laws “observational” is that the capa-\nbility vectors are estimated using a shared, low-dimensional representation of observed\nbenchmark scores. In traditional scaling laws, the coefficients mapping model scale to\ntest-set error are estimated individually for each model family.\nRuan et al. collect 7 benchmark scores for 77 models using data from the OpenLLM\nLeaderboard and EvalPlus (Liu et al., 2023). To convert these scores to capabilities, they\ndirectly set the capability vectors to be the first k = 3 principal components of their\nbenchmark score matrix. Specifically, if bi is a p × 1-vector of model i’s benchmark"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "15\n\f2   BACKGROUND                                                          2.3   Related work\n\nscores, Ruan et al. set\n                                       si ← W bi ,                                      (2)"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "where W is a k × p-matrix of principal component weights for all benchmark scores\nacross the sample of 77 LLMs. The authors find that k = 3 delivers the best results, equal\nto the number of latent factors in Burnell et al. (2023a). These first three components\nexplain 96.7% of the variance in Ruan et al.’s observed results, with the first component\nexplaining ~80%. They show that their derived principal component scores can be used\nto fit observational scaling laws for complex tasks beyond the 7 benchmarks included in\ntheir score matrix, including some of the “emergent” capabilities in Wei et al. (2022).\nTheir method uses only scores from the lower end of the performance distribution, al-\nlowing their model to extrapolate future performance. These observational scaling laws\noutperform conventional, compute- and parameter count-based scaling laws in terms of\npredictive accuracy."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Latent factor models and PCA\n\nThe latent factor modelling approaches, Burnell et al. (2023b) and Ilić & Gignac (2024),\nseem to have mostly explanatory goals—they aim to find clear representations of LLM\ncapabilities that reflect benchmark data. By contrast, Ruan et al. have a mostly predic-\ntive goal—they aim to find representations of LLM capabilities that generalise to other\nbenchmarks.\nNonetheless, there is a remarkable similarity between the latent factor models of capabil-\nities in Burnell et al. (2023a) and Ilić & Gignac (2024) (Equation (1)) and Ruan et al.’s\nPCA decomposition approach (Equation (2)). Say that B is the p×m-matrix representing\np benchmarks scores for a population of m LLMs. In matrix formulation, the latent factor\nmodel assumes\n                                       B = LF + E,                                    (3)"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "where pattern coefficients L are unchanged from Equation (1), F is a k × m matrix\nalternative for factor scores f , and E is a p × m-matrix alternative for error terms e. PCA\ninstead utilises the decomposition\n\nB⊤W = T ⊤\n                                          B = WT,\n\nwhere W is a p × p matrix of principal component weights and T is a p × m matrix of\nprincipal component scores. The columns of W are the eigenvectors of B ⊤ B, and the\n\n16\n\f2        BACKGROUND                                                            2.4    Research questions\n\nfirst column vector W:,1 maximises the explained variance in B by satisfying\n                                                          X\n                                   W:,1 = arg max              (B:,i · w)2\n                                                 ∥w∥=1\n                                                           i"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "and is therefore the first principal component (Gewers et al., 2022). For dimensionality\nreduction, we can use the approximation\n\nB ≈ W:,:k T:k,:                                              (5)"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "which represents B using the top k principal components.10 This is how Ruan et al.\n(2024) achieve their version of pattern coefficients in the p × k matrix W:,:k . Since W:,:k\nresembles the pattern coefficient matrix L, we can see Equation (2) as equivalent to Equa-\ntion (1) with E = 0.11 In other words, construed as a model of common factors, PCA\nimplicitly assumes that all variance is common variance and that there are no item-specific\nerrors, including measurement errors. In the context of LLM benchmarks, this assumption\nstates that LLM performances are not distorted by the unique phrasing of instructions or\noutput format requirements in individual benchmarks. In contrast, the latent factor model\nallows for item-specific errors with the matrix E. To be precise, the model will estimate\np separate covariance parameters for each benchmark, then represent each row of E us-\ning normally-di"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "2.4       Research questions"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "I have now explained latent factor models and observational scaling laws in some math-\nematical detail. Both techniques can take a collection of LLM benchmark scores and\nestimate the capabilities behind these scores. Given benchmark scores B, latent factor\nmodels provide factor scores F as capabilities, while observational scaling laws provide\nprincipal component scores T:k,: . It should also be apparent that each approach deploys\nsome domain knowledge that the other is missing. Observational scaling laws leverage\n    10\n      The term W:,:k represents a minor abuse of Goodfellow et al. (2016)’s matrix notation. The intended\nreading is Pythonic: W:,:k represents all rows and the first k columns of the matrix W . It is the p × k slice\nof a p × p matrix.\n   11\n      This reformulation applies with the caveat that the pattern coefficient vectors W:,j for each ‘factor’ j\nare orthonormal, whi"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "17\n\f2    BACKGROUND                                                  2.4   Research questions\n\nmodel scale, including the results from Finnveden (2020) and Owen (2024) that show that\nbenchmark performance is decently explained by model scale on its own. Latent factor\nmodels ignore scaling laws, so they lose out on this predictive utility. Yet, latent factor\nmodels appear to capture a correct assumption about the individual error signals in bench-\nmarks: the model’s error terms capture these signals, providing the factors with cleaner\nestimates of general capabilities.\nFrom these observations, I would like to determine if these are real deficiencies in these\nmodels, and if the supposed advantages of each approach can be conferred to the other. I\npropose two research questions:"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "A. Does providing latent factor models with information about model scale improve\n       their fit and explanatory power?\n\nB. Does providing observational scaling laws with latent factor capability estimates\n       improve their predictions for novel benchmarks?\n\n18\n\f3        METHODS\n\n3        Methods\n\n3.1       Experimental design\n\nIn this section, I propose two experiments to address my two research questions. The first\nexperiment compares latent factor models against an alternative model; the second exper-\niment compares observational scaling laws against an alternative model. The alternative\nmodel in each case is my structured capabilities model, a hybrid of the two. I will define\nthe structured capabilities model in Section 3.3.\n\nExperiment A: Parameter size as an upstream cause of LLM capabilities"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Following Burnell et al. (2023a) and Ilić & Gignac (2024), my model uses factor analytic\nmethods from the social sciences to decompose observed benchmark results into common\ncapability scores. Adopting factor analysis from social science provides a measured and\nproven explanatory basis for the estimated capabilities. However, I believe that the omis-\nsion of learnings from the AI scaling law literature makes these models deficient in some\ntestable ways.\nFirst, both Burnell et al. and Ilić & Gignac’s experiments share the ‘pure measurement’\nmodelling assumption embodied in Equation (3), where the only variables influencing\nbenchmark scores are the latent capability parameters F and L and the error terms E.\nBoth experiments report a large positive correlation between benchmarks and a dominant\nsingular latent factor that correlates strongly with model size. These results look suspi-\ncious"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "19\n\f3   METHODS                                                        3.1   Experimental design\n\nSecond, standard factor analysis models as in Burnell et al. and Ilić & Gignac explain\nindicator variables (e.g., benchmark performances) as linear responses to upstream latent\nfactors. However, we know from Owen (2024) that linear functions fare poorly for pre-\ndicting benchmark performance. If I hypothesise that model size is a common upstream\ncause of model capabilities, I should also expect that the shape of this response is not\nlinear, but logistic. I will transform my benchmark data to model a logistic relationship to\nsee if the model fit improves.\n\nExperiment B: Latent factors as generalisable LLM capabilities"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "The structured capabilities model proposed above resembles observational scaling laws:\nit explains LLM capabilities with using model size, and it does so with logistic relation-\nships. However, the approach differs in estimating capability scores as latent factor scores\ninstead of principal component weights.\nIn Section 2.3, I covered how latent factor and PCA decomposition encode different as-\nsumptions about communal and item-specific variance. The social sciences advocate mea-\nsurement models like factor analysis models over data-driven techniques like PCA for the\nexplanation of common causes. This preference is grounded in the improved hypothesis\ntesting abilities and theoretical grounding of the measurement models. However, I also\nsuspect that latent factor modelling offers an improvement over PCA more desirable in\ncomputer science literature, which is an improved generalisation of "
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "20\n\f3     METHODS                                                                   3.2   Data\n\n3.2    Data\n\nThe OpenLLM Leaderboard"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "I source benchmark results from the OpenLLM Leaderboard, a popular leaderboard pro-\nviding standardised and open-source evaluation of LLMs (Fourrier et al., 2024b). The\nv2 rendition of the OpenLLM Leaderboard evaluates LLMs on six popular benchmarks:\nBIG-Bench Hard (BBH), IFEval, MATH, GPQA, MuSR, and MMLU-PRO. As of 13\nMarch 2025, the OpenLLM Leaderboard v2 is no longer taking submissions. The creators\ncite its obsolescence in the face of improving LLM reasoning and agentic capabilities,\nwhich their chosen six benchmarks do not assess (Fourrier, 2025). At the time of closure,\nthe v2 Leaderboard reported evaluations for 4, 576 LLMs across the aforementioned six\nbenchmarks.\nThe OpenLLM Leaderboard v2 represents a complete and thorough experiment in pub-\nlic LLM evaluation. The 4, 576 LLMs represent 64 distinct architectures and range in\nsize from below 1 to above 140 billion parameters. A"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "BIG-Bench Hard\n\nOf the six benchmarks on the OpenLLM Leaderboard, I take scores on the BBH bench-\nmark for my experiments. BBH, short for BIG-Bench Hard (Suzgun et al., 2023), is a\n\n21\n\f3   METHODS                                                                    3.2    Data"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Subtask                            # Questions    # Multiple-choice options\n      Boolean expressions                         250                             2\n      Causal judgement                            187                             2\n      Date understanding                          250                             6\n      Disambiguation QA                           250                             3\n      Formal fallacies                            250                             2\n      Geometric shapes                            250                            11\n      Hyperbaton                                  250                             2\n      2 Logical deduction                         750                             7\n      Movie recommendation                        250                             6\n      Navigate                                    250               "
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Table 1: BIG-Bench Hard subtasks in my dataset."
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "curated subset of the most challenging tasks from the BIG-bench dataset (Srivastava\net al., 2023). BIG-bench is the result of a broad community effort spanning teams from\nOpenAI and Google as well as the greater AI and software communities. 450 authors,\nrepresenting 132 institutions, contributed 204 tasks (Srivastava et al., 2023, 2). These\ntasks are diverse in both difficulty and scope, including problems drawn from biology and\nphysics, common-sense reasoning and logic puzzles, and problems designed to test social\nbias. All BIG-bench tasks are evaluated by a team of relevant human experts to both\nvalidate problem construction and provide a human baseline.\nTo create BBH, Suzgun et al. select 23 BIG-bench tasks where no LLM outperformed\nthe average human rater, filtering additionally for sufficiently large sample sizes (>100\nexamples) and straightforward evaluation metrics (either exact m"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "22\n\f3   METHODS                                                                     3.2   Data\n\nBBH is a popular benchmark that has enjoyed considerable attention in the scaling law lit-\nerature. Wei et al. (2022)’s claims of “emergent capabilities” in LLMs used BBH subtasks\nfor their experiments, and Owen (2024)’s scaling laws predicted performance on BBH\nsubtasks. In addition, Ruan et al. (2024) used BBH data to fit their observational scaling\nlaws, while Burnell et al. (2023a) and Ilić & Gignac (2024) used related collections of\nbenchmark tasks (HELM and mostly MMLU, respectively).\n\nData collection"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "The OpenLLM Leaderboard itself reports only one aggregate BBH score. The leader-\nboard attempts to normalise each task by difficulty, though in a previous experiment I\nshowed that subtasks remain a significant fixed effect for individual question scores, even\nafter their contributions are normalised (Kearns, 2025). I therefore collect and aggregate\nsubtask accuracies from the raw evaluation results available on HuggingFace.\nOn the OpenLLM Leaderboard, four original BBH tasks are not reported for all mod-\nels (Dyck languages, Multi-step arithmetic, Salient translation error detection, and Word\nsorting). Two are split into three separate tasks based on their complexity level (Logi-\ncal deduction and Tracking shuffled objects). I recombine these results, yielding a final\ndataset of p = 19 benchmark indicator variables instead of 23. I also find that 181 of\nthe 4, 576 models included in the "
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Formal notation and scoring\n\nAs in Section 2.3, I will write the p×m matrix B to represent the performance across p =\n19 benchmarks for each of m = 4, 395 models. Each benchmark score is a real number\nin the interval [0, 1] representing the average accuracy across all subtask questions. All\nBBH tasks on the OpenLLM Leaderboard are presented as multiple choice questions.\nSubtasks range from having 2 to 19 possible options (see Table 1). The evaluation harness\nscores the model according to the multiple choice letter that the model assigns the highest\nprobability, meaning that LLMs never fail to provide an answer.\nFor each of the m models, I also collect the available metadata for the model’s parameter\nsize. I denote parameter size with the variable n, such that model j with benchmark scores\nB:,j has nj parameters."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "23\n\f3     METHODS                                                3.3     Techniques and models\n\nFigure 3: Illustrated three-parameter item response curve. This curve represents\nEquation (7). “Difficulty” (β = 0) represents how difficult an item is relative to others\nby affecting a lateral transformation in p(θ) across all ability scores. “Discrimination”\n(α = 1) represents the item’s ability to differentiate a narrow range of ability scores by\n                                           d\naffecting the slope of the sigmoidal curve dθ p(θ). “Guessing probability” (c = 1/5 = 0.2)\nrepresents the rate of success at limθ→0 p(θ), which for multiple-choice questions will be\nthe odds of guessing correctly from 1/c options.\n\n3.3    Techniques and models\n\nThe logistic model"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Specifying the logistic model for experiment A requires unpacking the assumptions be-\nhind Owen (2024)’s logistic model in more detail. Benchmark scores Bi,j are bounded by\n[0, 1], but since LLMs always provide one answer, even random guessing achieves an ex-\npected accuracy above 0 on multiple choice questions. Thus, Owen does not predict raw\nscores with a form as simple as Bi,j = σ(α + β log(nj )), because this relationship will\npredict Bi,j → 0 for the smallest models. Instead, for a subtask i with #MC multiple-\nchoice options, the worst models should achieve an expected accuracy of ci := 1/#MC\nthrough random guessing. Owen (2024) fixes this problem by subtracting ci from ob-\nserved performances and fitting a logistic function with a linear offset to compensate for\nadjusting the range. This model takes the form\n                                                     \u0001\n                   "
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "However, I want to adapt a more elegant model from the social sciences to achieve the\nsame estimation within the original interval [0, 1]. This model is the three-parameter\nlogistic model from Item Response Theory (Embretson & Reise, 2013), which gives the\nprobability of correctly answering a singular multiple choice question, accounting for\nrandom guessing. Typically, this model depends on an individual j’s latent ability score,\n\n24\n\f3      METHODS                                                   3.3     Techniques and models"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "θj :\n                                                    1 − ci\n                           pi (θj ) = ci +                                                 (7)\n                                             1 + exp[−αi (θj − βi )]\nIn the case that i represents a singular test item (that is, a singular multiple choice ques-\ntion), the parameters βi , αi , and ci have specific interpretations. Figure 3 illustrates the\neffects of these parameters on the item’s response curve, pi . Observing the similarity\nbetween Owen (2024)’s Equation (6) and item response theory’s Equation (7), I would\nlike to substitute log(nj ) for θj in Equation (7) to predict the entire subtask score Bi,j .\nEven though Equation (7) is defined for singular questions, I can adapt it to entire average\nscores with some simplifying assumptions.\nIndividual multiple choice question scores are dichotomous: the model either answe"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "Binom(q, pi (θj ))\n                                                          ,\n                                             q\n\nwith expected value            \u0014                    \u0015\n                                 Binom(q, pi (θj ))\n                              E                       = pi (θj ),\n                                       q\nmeaning that Equation (7) can be utilised to represent model j’s expected score across an\nentire subtask as a function of the ability parameter θj . Thus, we can simply swap log(nj )\nin for θj to get a logistic model similar to Owen (2024)’s:\n\n1 − ci\n                         Bi,j = ci +                                 .                     (8)\n                                       1 + exp[−αi (log(nj ) − βi )]"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Equation (8) has the advantage of ranging over the original interval [0, 1] without any\noffset, plus the nice interpretations for βi , αi , and ci described in Figure 3 as applied to\nBBH subtasks.\n\nThe structured capabilities model\n\nAt this stage, I can formally define the structured capabilities model that I will use for\nthe two experiments. The structured capabilities model resembles the fully latent model\nin Equation (3), except it allows model size to directly influence the latent capability\n\n25\n\f3   METHODS                                                       3.3   Techniques and models\n\nestimates. The model replaces the factor value matrix F like so:\n\nB = L[wn log n] + E                                     (9)"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Here n = [n1 , . . . , nm ] is a vector of each model’s parameter size and log is the natural\nlogarithm applied elementwise. wn is a k × 1-vector of regression coefficients that deter-\nmine how model size affects each LLM capability. Under this model, each LLM j will\nhave a vector of capability scores equal to wn log(nj ) + ϵ, where ϵ is a residual error term\nthat occurs because of E. Thus, model size affects each model capability, as in a scaling\nlaw, but model- and capability-specific errors affect this relationship, as in a measurement\nmodel.\nThis relationship is not yet entirely faithful to scaling laws, however, since the relationship\nbetween model size and performance is linear. I hypothesised that a logistic relationship\nwill better fit the data. Above, I provided an adapted three-parameter logistic model\n(Equation (8)) that uses model size nj as the predictor for subtask performa"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "1 − ci\n                  Bi,: = ci +                                               .             (10)\n                                1 + exp[−αi (Li,: [wn log n] + Ei,: − βi )]\n\nUnfortunately, lavaan does not support this kind of nonlinearity in its model syntax.\nThis model also resembles a multidimensional item-response theory model (Reckase,\n2009), which handles nonlinearity and is definable in R with the mirt package (Chalmers,\n2012). To my knowledge, though, this package cannot handle the structural coefficients\nthat I need. Thus, I instead apply the inverse operation to the data matrix B, yielding a\ntransformed matrix B ′ . It is equivalent to Equation (10) to represent each row Bi,: with"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "\u0014           \u0015\n                                 ′            1        Bi,: − ci\n                                Bi,: = βi +      log              ,                       (11)\n                                              αi       1 − Bi,:\nand then to use the structural equation\n\nB ′ = L[wn log n] + E                                  (12)\n\n26\n\f3        METHODS                                                 3.4    Validation and experimentation\n\nto model the logistic relationship between capabilities and benchmark scores.13 I apply\nthe transformation from Equation (11) on the OpenLLM Leaderboard data matrix before\nloading the data into R, where I can then model the linear response in Equation (12) with\nlavaan syntax. This final equation represents the structured capabilities model that I\npropose to combine latent factor models and observational scaling laws."
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "3.4         Validation and experimentation\n\nExperiment A: Parameter size as an upstream cause of LLM capabilities\n\nMy hypotheses for experiment A are testable by comparing the structured capabilities\nmodel against a pure latent factor model. In Section 3.3, I show how to introduce the struc-\ntural parameter for model size (Equation (9)), and also how to transform the data matrix\nto model the logistic relationship between capabilities and performance (Equation (11)\nand Equation (12)). To consolidate my equations into one place, I will be comparing the\nfollowing four models to test these two alterations:"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "B = LF + E                                              (13a)\n                                           B = L[wn log n] + E                                     (13b)\n                                          B ′ = LF + E                                             (13c)\n                                          B ′ = L[wn log n] + E                                    (13d)"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "I believe that the pure latent factor models, Equation (13a) and Equation (13c), will fit\na dominant factor serving as a proxy for model size. As these measurement models are\nunconstrained, likelihood optimisation should compel them to fit a parameter to the fea-\nture explaining the greatest variance in the data, and this feature will turn out to be model\nsize. I believe that this occurs for the pure measurement models in the studies by Burnell\net al. (2023a) and Ilić & Gignac (2024), specifically Burnell et al.’s “Comprehension”\nfactor and Ilić & Gignac’s “Artificial General Ability” factor. In this model comparison,\nthe effect should be visually apparent in the values of the pattern coefficient matrix L.\nThe pure measurement models should estimate factors with a high pattern coefficients on\nall indicators; that is, large values of L:,k′ for the offending factor k ′ . I can compare th"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "27\n\f3   METHODS                                           3.4   Validation and experimentation\n\nbe better explanatory models in virtue of being more parsimonious than their unrestricted\nequivalents. ‘Parsimonious’ has a precise definition for statistical models—a more likely\nmodel with a simpler structure is more parsimonious. This criterion balances model fit\nwith model complexity. My hypothesis is directly testable by comparing parsimonious\nfit indices between each pair of models. I will compare the Akaike (Akaike, 1974) and\nBayesian (Schwarz, 1978) information criteria (AIC and BIC), each of which balances\nmodel fit against complexity to quantify parsimony. These are defined as\n\nAIC := 2d − 2 ln(ℓ̂)\n                                BIC := d ln(m) − 2 ln(ℓ̂),"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "where d is the number of parameters estimated by the model, m is the sample size, and\nℓ̂ is the maximised value of the likelihood function for the model. Lower values of both\ncriteria are better. The latent factor models Equation (13a) and Equation (13c) estimate\nk factor loadings for each of the p benchmarks, plus p unique error variances for each\nbenchmark and k2 covariance terms between factor pairs. So, these models estimate a\n                    \u0001"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "total of                                      \u0012 \u0013\n                                               k\n                             d=k×p+p+              parameters.\n                                               2\nOur structured models Equation (13b) and Equation (13d) estimate the same parameters,\nplus an additional k for the regression coefficients in wn . For these structural models to\nbe more parsimonious, the improvement to the likelihood ℓ̂ must be great enough to offset\nthis increase in parameters d.\nI also hypothesise that a logistic relationship between LLM capabilities and benchmark\nscores should outperform a linear relationship, which is the typical standard for latent\nfactor models. If my software packages allowed me to model the logistic relationship di-\nrectly on the raw data B, I could compare the model fits with a likelihood-ratio test. Un-\nfortunately, since I must instead "
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "28\n\f3   METHODS                                                        3.4    Validation and experimentation\n\nmetrics respond differently to features of the experimental setup, like sample size,14 social\nscience literature generally advises that models are acceptable at CFI ≥ 0.9; RMSEA ≤\n0.10; SRMR ≤ 0.10, and excellent at CFI ≥ 0.95; RMSEA ≤ 0.06; SRMR ≤ 0.06 (Finch\n& West, 1997; Hu & Bentler, 1998, 1999; Clark & Watson, 2019).\n\nExperiment B: Latent factors as generalisable LLM capabilities"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "In experiment A above, I test my model’s assumptions that differ from latent factor mod-\nels: the structural parameter for model size and the logistic relationship between capabil-\nities and benchmark scores. In experiment B, I want to test how the model’s assumptions\ncompare to observational scaling laws. This involves comparing latent variables to prin-\ncipal components as representations of LLM capability dimensions. For two reasons, I\ncannot use a comparative fit test for this comparison. First, while latent factors provide a\ntestable model of the observed benchmark data, PCA is not testable. Second, computer\nscience literature tends to prefer improvements to predictive accuracy over explanatory\nmeasures like fit indices, so I will prefer to demonstrate improvement in predictive accu-\nracy.\nI will compare the two models using an out-of-fold prediction procedure. For each of\np′ ∈ {1, "
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "Bi̸′=p′ ,: = L[wn log n] + E                                         (15a)\n                                       Bi̸=p′ ,: = W:,:k T:k,:                                             (15b)"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "The structured capabilities model Equation (15a) fits a k × m matrix of model capability\nscores equal to wn log n + ϵ. The PCA model fits a k × m matrix of principal component\n‘capability’ scores equal to T:k,: . Which estimate of capabilities generalises better to the\nunseen subtask p′ ? To answer, I will split the held-out scores Bp′ ′ ,: into separate training\nand test sets, btrain\n                p′    and btest        train\n                           p′ , where bp′    consists of the bottom 80% of scores. I will use\n    14\n       For example, RSMR appears more robust in situations where residuals are correlated (Montoya &\nEdwards, 2021) and scales differently with sample size compared to RMSEA (Shi et al., 2020).\n    15\n       Note that the PCA approach uses Bi̸=p′ ,: , not Bi̸′=p′ ,: . Ruan et al. (2024)’s observational scaling laws\nfit the PCA decomposition directly to the raw ben"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "29\n\f3   METHODS                                               3.4   Validation and experimentation\n\nthe training set to fit k-length vectors of coefficients via linear regression:\n\nbtrain\n                                      p′    = lp′ wn log n                              (16a)\n                                     btrain\n                                      p′    = wp′ T:k,:                                 (16b)\n\nThe vectors lp′ and wp′ , like the row vectors of L and W:,:k , encode the importance of\neach of the k capabilities for subtask p′ . I can use each of these and the learned capability\nscores to predict the held-out performances btestp′ . To match the presentation in Ruan et al.\n(2024), I will compare each approach using its mean-squared error (MSE). I will also\ncompare a simple scaling law approach, per Owen (2024), as a baseline predictive model:"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "btrain\n                                     p′    = α + β log n                                  (17)\n\n30\n\f4        RESULTS\n\n4         Results\n\n4.1       Preliminary data analysis\n\nInter-item correlations"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "For an initial investigation into the relationship between subtask performances, I plot the\ninter-item correlation between subtask scores in Figure 4. Consistent with Burnell et al.\n(2023a) and Ilić & Gignac (2024), there is a strong positive manifold to my dataset—the\naverage inter-item Spearman correlation is ρ = 0.64.16 Similar tasks like Penguins in a\ntable and Reasoning about colored objects, both of which involve recalling attributes from\nstructured lists, have correlations as high as ρ = 0.93. At the opposite extreme, dissimilar\ntasks like Sports understanding and Web of lies have correlations as low as ρ = 0.11,\nthough due to the large sample size, all correlations are significant.\n\nPredicting subtask performance with model size"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "Next, to observe the baseline of Owen (2024)’s logistic scaling law model on my dataset,\nI fit Equation (8) to each collection of raw subtask scores Bi,: . R2 values range from very\nmild values—0.12 for the Web of lies task—to moderate values—0.52 for the Ruin names\ntask. Tasks also show a spread of different difficulty βi and discrimination coefficients αi ,\ndemonstrating different rates of improvement from scale. Figure 5 provides a side-by-side\ncomparison of Web of lies and Ruin names, and Appendix E displays the logistic fits for\nall 19 subtasks.\n\nInter-item residual correlations"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "My next step investigates correlations between benchmarks alongside the impact of model\nscale. I reinvestigate the inter-item correlation by rank-correlating the residuals of the esti-\nmates from Equation (8). In subtracting the best-fit explanation of performance according\nto log-parameter size, I can effectively control for the parameter size, and can informally\ndepict the residual relationship between subtasks. I display the updated correlation matrix\nin Figure 6. The average inter-item correlation reduces from ρ = 0.64 to ρ = 0.48, and\n    16\n     Burnell et al. (2023a) and Ilić & Gignac (2024) both report Pearson instead of Spearman correlation.\nHowever, I am not interested in any parametric relationships at this stage. Owen (2024)’s sigmoidal scal-\ning laws suggest that model subtask performances might not relate in a linear fashion, and in any case,\nI am interested in whether the"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "31\n\f4   RESULTS                                               4.1   Preliminary data analysis\n\nFigure 4: Raw BBH score correlation matrix. The correlation metric is Spearman’s rank\ncorrelation ρ. The labels along the y-axis are acronym abbreviations for the full subtask\nnames, which are given along the x-axis.\n\n32\n\f4   RESULTS                                                 4.1   Preliminary data analysis\n\nFigure 5: Logistic scaling law fits for two subtasks. Ruin names has the highest ob-\nserved correlation with the logistic fit (R2 = 0.52); Web of lies has the lowest correlation\n(R2 = 0.12).\n\nsome item pairs are now slightly anti-correlated. However, ρ = 0.48 remains a moderately\npositive correlation manifold.\n\nParallel analysis for the number of factors"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "I next conduct Horn’s parallel analysis on the raw score and residual matrices from the\nprevious processing steps. Horn’s parallel analysis compares the eigenvalues of each real\ndata matrix to the eigenvalues of Monte Carlo-simulated matrices of the same size. On\nthe assumption that the Monte Carlo-simulated eigenvalues represent a component of the\nvariance attributable to sampling error, subtracting these and retaining the positive ranks\ncan provide an estimate for the correct number of latent factors for the dataset (Horn,\n1965). In other words, this process calculates an estimate for the ‘dimensionality’ of\nthe benchmark data, as in the number of separable factors that may be contributing to\nobserved scores. I utilise this technique to determine k, the number of latent factors my\nmodels will estimate. Burnell et al. (2023a) uses the same technique to determine their\nnumber of latent f"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "33\n\f4   RESULTS                                                4.1   Preliminary data analysis\n\nFigure 6: BBH score residuals correlation matrix. Score residuals are taken from the\nlogistic fits against the log-parameter size displayed in Figure 13. The correlation metric\nis Spearman’s rank correlation coefficient, ρ. The labels along the y-axis are acronym\nabbreviations for the full subtask names, which are given along the x-axis.\n\n34\n\f4     RESULTS                                                            4.1    Preliminary data analysis\n\n(a) Scree plot for raw score matrix, recommending to retain 5 factors.\n\n(b) Scree plot for score residuals after controlling for parameter size, recommending to retain 6 factors.\n\nFigure 7: Scree plots for BBH score matrices.\n\n35\n\f4     RESULTS                              4.2    Comparison to exploratory factor analysis"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "Eq.   Str.   Log.   χ2 ↓    CFI ↑    RMSEA ↓       SRMR ↓      AIC ↓       BIC ↓\n    (13a)   ✗       ✗     2984    0.9737     0.0876       0.0134    -217242     -216578\n    (13b)   ✓       ✗     3615    0.9680     0.0894       0.0163    -220369     -219673\n    (13c)   ✗       ✓     1547    0.9836     0.0623       0.0110     222038      222703\n    (13d)   ✓       ✓     2127    0.9782     0.0679       0.0135     218743      219439"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "Table 2: Fit measures for the four tested EFA models. The Str. column indicates\nwhether the model includes model parameter size log(n) as a structural regression param-\neter. The Log. column indicates whether the dataset uses the transformed matrix B ′ in\nplace of B. The fourth row, with Equation (13d), shows the structured capabilities model.\nHighlighted boldface values for χ2 , CFI, RMSEA, and SRMR indicate the best overall\nmodel, since these absolute model fit metrics share the same range. Highlighted boldface\nvalues for AIC and BIC indicate the most parsimonious model for a given data matrix,\neither B or B ′ , where the likelihood is comparable.\n\n4.2     Comparison to exploratory factor analysis"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "For experiment A, Table 2 summarises the fit statistics for the four models I compare.\nAll four models provide acceptable fit according to the conventional interpretation from\nHu & Bentler (1999), with CFI ≥ 0.95, RMSEA ≤ 0.10, and SRMR ≤ 0.06. The\nbest-fit model is (13c), which utilises the logit-transformed data B ′ but not the structural\nparameter wn log n. Modelling the transformed data B ′ in place of B results in better\nfit statistics, as shown by the reduction in χ2 , RMSEA, and SRMR and the increase in\nCFI from models (13a) and (13b) to models (13c) and (13d). The fit measures are better\nfor pure measurement models (13a) and (13c) compared to their structured counterparts\n(13b) and (13d). However, in both cases, the structured models perform better according\nto parsimonious fit indices AIC and BIC.\nFigures 8 and 9 provide a visual comparison of the parameter estimates for models "
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "36\n\f4   RESULTS                                    4.2    Comparison to exploratory factor analysis\n\n(a) Heatmap of pattern coefficients per factor.\n\n(b) Proportions of communal variance explained by each factor.\n\n(c) Logistic relationship between log-parameter size and factor scores for each factor.\n\nFigure 8: Linear latent factor model results. This model corresponds to Equation (13a)\nfrom Experiment A. Factor 1 dominates, explaining the largest proportion of the total\nvariance (0.72) and correlating strongest with parameter size (R2 = 0.474). Factor 2\nloads strongest on some more challenging subtasks (like Tracking shuffled objects) and\nalso correlates strongly with model size (R2 = 0.419).\n\n37\n\f4   RESULTS                                    4.2    Comparison to exploratory factor analysis\n\n(a) Heatmap of pattern coefficients per factor."
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "(b) Proportions of communal variance explained by each factor.\n\n(c) Logistic relationship between log-parameter size and factor scores for each factor.\n\nFigure 9: Structured capabilities model results. This model corresponds to Equa-\ntion (13d) from Experiment A. Factors 1 and 2 share appreciable proportions of the total\nvariance (0.41 and 0.36), followed by factor 3 (0.14). All three of these factors correlate\nstrongly with parameter size (R2 = 0.379, 0.554, 0.416).\n\n38\n\f4        RESULTS                                       4.3    Comparison to observational scaling laws"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "moderately with model size (R2 = 0.416).17\nModel (13c) is not depicted, though it learns a similar factor structure and coefficients to\n(13d), which is the same logistic model with the structural model size parameter. Model\n(13c)’s three dominant factors explain 41%, 37%, and 14% of the communal variance, and\ncorrelate with model size at R2 = 0.534, 0.372, and 0.385. Like model (13d), this model’s\ntwo remaining factors have minimal correlation with model size and minimal communal\nvariance explained.\n\n4.3         Comparison to observational scaling laws"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "Table 3 lists the mean-squared prediction errors for the structured capability estimates\n(Equation (16a)), the observational scaling law capability estimates (Equation (16b)), and\nthe pure scaling law model (Equation (17)). We list the error on the training set btrainp′\nas MSEtrain , and on the test set btest\n                                    p′  as MSEtest . All three methods perform worse at\npredicting the held-out bp′ than they do on btrain\n                          test\n                                                 p′ . The pure scaling law model is the\nworst performing out-of-fold prediction model with an average MSEtrain of 1.699 and\nan average MSEtest of 3.561. Between the structured capabilities and the observational\nscaling law capability estimates, the former approach outperforms the latter on 15 of the\n19 heldout subtasks in terms of MSEtrain . The same holds for MSEtest "
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "39\n\f4     RESULTS                                 4.3   Comparison to observational scaling laws"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "MSEtrain                   MSEtest\n    Withheld subtask                   SC      OSL       Size     SC      OSL       Size\n    Boolean expressions               1.056    1.153     2.487   0.206     0.239    1.144\n    Causal judgement                  0.476    0.469     0.846   0.338     0.293    0.687\n    Date understanding                0.464    0.462     1.419   0.250     0.149    1.022\n    Disambiguation QA                 1.536    1.519     2.592   0.608     0.680    1.764\n    Formal fallacies                  0.961    0.984     1.490   0.862     1.092    4.411\n    Geometric shapes                  0.937    0.965     1.891   0.370     0.467    1.277\n    Hyperbaton                        0.994    0.993     1.921   2.472     2.339    4.394\n    Logical deduction                 0.147    0.156     0.945   0.096     0.103    1.326\n    Movie recommendation              0.348    0.362    "
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Table 3: Prediction errors for held-out subtasks. Each column shows the mean-\nsquared error for predicting held-out subtasks with each different capability estimation\nmethod. SC refers to my structured capabilities model with latent factor capability esti-\nmates (Equation (16a)). OSL refers to the PCA decomposition approach from Ruan et al.\n(2024)’s observational scaling laws (Equation (16b)). Size refers to Owen (2024)’s logis-\ntic scaling laws using model parameter size (Equation (17)). Highlighted boldface values\nindicate the lowest errors for each of MSEtrain and MSEtest ."
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "estimates that Geometric shapes loads similarly on the first and second factors, each of\nwhich shows a mild positive correlation with Geometric shapes scores (Figure 11 (b)).\nFinally, multiple factors show a logistic shape when compared with log-parameter size\n(Figure 11 (c)).\nWe also compare the proportions of variance explained in each model when predicting\nheld-out Geometric shapes subtask scores (Figure 12). In the observational scaling law\nmodel, the first principal component dominates, explaining 76% of the variance in the\nobserved benchmark scores (Figure 12 (a)). Across all 18 other out-of-fold experiments,\nthis first principal component variance is never lower than 73%. In the structured capabil-\nities model, the factor loadings are more evenly spread. The largest three factors together\nexplain 84% of the variance (Figure 12 (b))."
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "40\n\f4   RESULTS                                     4.3    Comparison to observational scaling laws\n\n(a) Heatmap of principal component weights per subtask, including held-out Geometric shapes task. The\nweights for the held-out Geometric shapes task are estimated using the training set btrain\n                                                                                     p′    .\n\n(b) Models’ principal component scores against their raw Geometric Shapes subtask accuracy.\n\n(c) Models’ log-parameter sizes against their principal component scores.\n\nFigure 10: Parameter estimates for the observational scaling law model. The heldout\ntask to predict is Geometric shapes.\n\n41\n\f4   RESULTS                                       4.3    Comparison to observational scaling laws"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "(a) Heatmap of latent factor loadings per subtask. The factor loadings for the held-out Geometric shapes task\nare estimated using the training set btrain\n                                      p′    .\n\n(b) Models’ latent factor scores against their raw Geometric shapes subtask accuracy.\n\n(c) Models’ log-parameter sizes against their latent factor scores.\n\nFigure 11: Parameter estimates for the structured capabilities model. The held-out\ntask to predict is Geometric shapes.\n\n42\n\f4   RESULTS                                    4.3    Comparison to observational scaling laws\n\n(a) Proportion of variance explained per principal component.\n\n(b) Proportion of communal variance explained per latent factor, equivalent to the proportional sum of\nsquared factor loadings.\n\nFigure 12: Variance explained by estimated capabilities. For both models the held-out\ntask to predict is Geometric Shapes."
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "43\n\f5     DISCUSSION\n\n5      Discussion\n\n5.1     Principal findings\n\nMy results highlight the shortcomings of existing models for LLM capabilities. Both la-\ntent factor models and observational scaling laws mistake LLM scale for a capability, and\nthis mistake limits their explanatory and predictive power. In comparison, the novel struc-\ntured capabilities model outperforms both alternatives, providing a more parsimonious fit\nthan latent factor models and better predictive generalisation than observational scaling\nlaws.\n\n5.2     Interpretation of results"
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "Latent factor models and observational scaling laws conflate scale with capabilities.\nIn two experiments, latent factor models and observational scaling laws both fit a dom-\ninant factor or principal component that correlates with LLMs’ log-parameter size. In\nexperiment A, the pure latent factor model estimates a single dominant factor explaining\n72% of the communal variance across factor loadings. This factor bears a logistic rela-\ntionship to the log-parameter size, with R2 = 0.474—a larger correlation than any other\nestimated factor. This correlation appears moderate, but it is close to the highest corre-\nlations between log-parameter size and individual benchmark performance I observed in\nFigure 13, which are the basis for the effectiveness of Owen (2024)’s scaling laws. In\nexperiment B, the observational scaling law model consistently finds the first principal\ncomponent to explain o"
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "The structured capabilities model outperforms both alternatives. My experimental\nresults show that the two previous models of LLM capabilities are more than just theoret-\n\n44\n\f5   DISCUSSION                                               5.2   Interpretation of results"
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "ically inelegant—they are statistically suboptimal on the metrics that their designers care\nabout. In experiment A, replacing the standard linear latent factor model with a logistic\nmodel improves the absolute fit indices, and adding a structural parameter for parameter\nsize improves the Akaike and Bayesian information criteria. In simpler terms, the stan-\ndard latent factor model is both a worse fit and a less parsimonious model of the LLM\nbenchmark data. The same structural regression model that outperforms the latent factor\nmodel also beats observational scaling laws at predicting out-of-distribution performance.\nIn experiment B, across 19 out-of-fold prediction experiments for each of our BBH sub-\ntasks, the structured capabilities model beats observational scaling laws on the majority of\nsubtasks and achieves lower average mean-squared errors on both training and test data."
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "The structured capabilities model captures capabilities with explanatory and predic-\ntive power. Beyond objective improvements to model fit and predictive performance,\nthe structured capabilities model gives an interpretable picture of how the capabilities be-\nhind BBH subtask performance emerge with scale. I consider these to be construct valid\ncapability estimates as far as we can estimate these from BBH benchmark tasks alone.\nFigure 9 shows the factor loadings and factor scores for 5 capabilities across the BBH\nsubtasks. There are three major factors that explain descending proportions of variance.\nThese factors all correlate with parameter size, but they do so according to logistic curves\nwith different difficulty and discrimination parameters. Specifically, each next factor\nshows a steeper curve that begins increasing at a larger parameter size than the previous\nfactor. These factor"
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "45\n\f5     DISCUSSION                                              5.3   Relation to other studies\n\n5.3     Relation to other studies"
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "My results comment directly on previous studies Burnell et al. (2023a) and Ilić & Gignac\n(2024) that used latent factor models to estimate LLM capabilities. I replicated Burnell\net al.’s exploratory factor analysis method on the BBH benchmark dataset. I find their\ntechnique underperforms the structured capabilities model in terms of both model fit and\nparsimony. Burnell et al.’s model achieves acceptable fit on our dataset. Their own re-\nported model fit is poor, though I expect the improved result is due to the much larger\nsample size—4, 395 in place of 29 models. However, an analysis of our replicated model\nreveals the same deficiencies I hypothesised: the pure latent factor model fits a singular\nfactor with a large proportion of variance explained, a high loading across all benchmarks,\nand a strong correlation with model size. In the structured capabilities model, the explicit\ninclus"
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "46\n\f5     DISCUSSION                                           5.4   Limitations and future work\n\n5.4     Limitations and future work"
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "This experimental setup has several limitations that I must discuss in context with the\nresults.\nFirst, I only estimate latent factors through exploratory factor analysis—I do not conduct\na confirmatory factor analysis. This choice places notable limitations on the interpretabil-\nity of my identified capabilities. In exploratory factor analysis, beyond deciding on the\nnumber of factors with Horn’s parallel test (Section 3.2), my factors are free to estimate\nany relationships supported by the data. Ilić & Gignac (2024)’s experiment instead uses\nconfirmatory factor analysis, and this approach allows for a stricter kind of hypothesis\ntesting that incorporates real theories about cognitive capabilities. If I want my latent\nfactors to represent capabilities in a more theory-driven fashion, future work should move\nfrom an exploratory to a confirmatory approach following the best social scient"
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "47\n\f5     DISCUSSION                                                          5.5   Implications\n\n5.5     Implications"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "In this thesis, I demonstrate a statistical model that can extract interpretable and general-\nisable capabilities from LLM benchmark results. This contribution has implications for\nanyone interested in solving the LLM evaluation crisis. My new method provides the\nfirst viable option for quantifying construct validity for LLM evaluations in a reputable\nfashion.\nGiven the fluency with which modern LLMs produce natural language, and the rich cog-\nnitive science theories we possess around ‘intelligence’ and ‘reasoning’ in humans, we\nmay be tempted to apply our cognitive theories to LLMs in a kind of ‘top-down’ fashion.\nWe might think that a mathematics benchmark measures a ‘mathematical reasoning’ ca-\npability in LLMs because we would recognise this proficiency in humans who performed\nwell on the benchmark. Yet LLMs and humans are different cognitive systems. Humans\nare not trained on data i"
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "48\n\f5   DISCUSSION                                                          5.5   Implications"
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "Polo et al. (2024) show the potential benefits of successful social science techniques ap-\nplied to benchmarks: we can run smaller evaluations with better statistical guarantees, and\nwe can provide stronger safety and alignment guarantees for frontier systems in health-\ncare, education, and judicial settings.\nFor AI policymakers, these experiments highlight the importance of cross-disciplinary\ncollaboration when it comes to understanding large language models. From both a cogni-\ntive science and a computer science perspective, these new AI systems are unprecedented\nand exciting. As Ganguli et al. (2022) argue, their surprising behaviours should be cause\nfor policy and governance concerns. If siloed approaches to understanding their capabil-\nities will be suboptimal, it is essential that the scientific community’s recommendations\ninvolve all relevant disciplines. My aim in this thesis is "
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "49\n\f6   CONCLUSION\n\n6    Conclusion"
+    },
+    {
+      "id": "b-117",
+      "type": "body",
+      "text": "LLM evaluation faces an ongoing crisis. To trust our evaluations—whether to understand\nLLM capabilities, or to predict how benchmarks will translate to the real world—we need\nformal models that identify general capabilities from our benchmark scores. This thesis\npresents the structured capabilities model, first model capable of extracting interpretable\nand generalisable capabilities. Two experiments demonstrate the model’s improvements\nover existing alternatives from both social science and computer science.\nI sample the largest publicly available population of LLMs, 4, 395 models uploaded to the\nOpenLLM Leaderboard, and collect performances on 19 subtasks from the BBH dataset.\nI use this collection of benchmark scores to fit three formal models of LLM capabili-\nties. Two models represent the latest developments in separate subdisciplines of AI re-\nsearch—latent factor models, inspired b"
+    },
+    {
+      "id": "b-118",
+      "type": "body",
+      "text": "50\n\fREFERENCES\n\nReferences\nH. Akaike. A new look at the statistical model identification. IEEE Transactions on\n  Automatic Control, 19(6):716–723, 1974. doi: 10.1109/TAC.1974.1100705.\n\nAhmed Alaa, Thomas Hartvigsen, Niloufar Golchini, Shiladitya Dutta, Frances Dean,\n  Inioluwa Deborah Raji, and Travis Zack. Medical large language model bench-\n  marks should prioritize construct validity, 2025. URL https://arxiv.org/abs/\n  2503.10694. arXiv: 2503.10694 [cs.CL].\n\nAndrew M. Bean, Rebecca Payne, Guy Parsons, Hannah Rose Kirk, Juan Ciro, Rafael\n  Mosquera, Sara Hincapié Monsalve, Aruna S. Ekanayaka, Lionel Tarassenko, Luc\n  Rocher, and Adam Mahdi. Clinical knowledge in LLMs does not translate to human\n  interactions, 2025. URL https://arxiv.org/abs/2504.18919."
+    },
+    {
+      "id": "b-119",
+      "type": "body",
+      "text": "Emily M. Bender and Alexander Koller. Climbing towards NLU: On Meaning, Form, and\n  Understanding in the Age of Data. In Proceedings of the 58th Annual Meeting of the\n  Association for Computational Linguistics, pp. 5185–5198, Online, 2020. Association\n  for Computational Linguistics. doi: 10.18653/v1/2020.acl-main.463. URL https:\n  //www.aclweb.org/anthology/2020.acl-main.463.\n\nEmily M. Bender, Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell.\n  On the dangers of stochastic parrots: Can language models be too big? In Proceedings\n  of the 2021 ACM Conference on Fairness, Accountability, and Transparency, FAccT\n  ’21, pp. 610–623, New York, NY, USA, 2021. Association for Computing Machinery.\n  ISBN 9781450383097. doi: 10.1145/3442188.3445922. URL https://doi.org/\n  10.1145/3442188.3445922."
+    },
+    {
+      "id": "b-120",
+      "type": "body",
+      "text": "Peter M Bentler. Comparative fit indexes in structural models. Psychological bulletin,\n  107(2):238, 1990.\n\nIdan A. Blank. What are large language models supposed to model? Trends in Cognitive\n  Sciences, 27(11):987–989, November 2023. ISSN 1364-6613. doi: 10.1016/j.tics.\n  2023.08.006. URL https://doi.org/10.1016/j.tics.2023.08.006."
+    },
+    {
+      "id": "b-121",
+      "type": "body",
+      "text": "Rishi Bommasani, Drew A. Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney\n  von Arx, Michael S. Bernstein, Jeannette Bohg, Antoine Bosselut, Emma Brunskill,\n  Erik Brynjolfsson, Shyamal Buch, Dallas Card, Rodrigo Castellon, Niladri Chatterji,\n  Annie Chen, Kathleen Creel, Jared Quincy Davis, Dora Demszky, Chris Donahue,\n  Moussa Doumbouya, Esin Durmus, Stefano Ermon, John Etchemendy, Kawin Etha-\n  yarajh, Li Fei-Fei, Chelsea Finn, Trevor Gale, Lauren Gillespie, Karan Goel, Noah\n  Goodman, Shelby Grossman, Neel Guha, Tatsunori Hashimoto, Peter Henderson, John\n  Hewitt, Daniel E. Ho, Jenny Hong, Kyle Hsu, Jing Huang, Thomas Icard, Saahil\n  Jain, Dan Jurafsky, Pratyusha Kalluri, Siddharth Karamcheti, Geoff Keeling, Fereshte\n  Khani, Omar Khattab, Pang Wei Koh, Mark Krass, Ranjay Krishna, Rohith Kuditipudi,\n  Ananya Kumar, Faisal Ladhak, Mina Lee, Tony Lee, Jure Leskovec, Isabelle Leve"
+    },
+    {
+      "id": "b-122",
+      "type": "body",
+      "text": "51\n\fREFERENCES\n\nNarayanan, Ben Newman, Allen Nie, Juan Carlos Niebles, Hamed Nilforoshan, Julian\n  Nyarko, Giray Ogut, Laurel Orr, Isabel Papadimitriou, Joon Sung Park, Chris Piech,\n  Eva Portelance, Christopher Potts, Aditi Raghunathan, Rob Reich, Hongyu Ren, Frieda\n  Rong, Yusuf Roohani, Camilo Ruiz, Jack Ryan, Christopher Ré, Dorsa Sadigh, Shiori\n  Sagawa, Keshav Santhanam, Andy Shih, Krishnan Srinivasan, Alex Tamkin, Rohan\n  Taori, Armin W. Thomas, Florian Tramèr, Rose E. Wang, William Wang, Bohan Wu,\n  Jiajun Wu, Yuhuai Wu, Sang Michael Xie, Michihiro Yasunaga, Jiaxuan You, Matei\n  Zaharia, Michael Zhang, Tianyi Zhang, Xikun Zhang, Yuhui Zhang, Lucia Zheng, Kait-\n  lyn Zhou, and Percy Liang. On the opportunities and risks of foundation models, 2022.\n  URL https://arxiv.org/abs/2108.07258."
+    },
+    {
+      "id": "b-123",
+      "type": "body",
+      "text": "Samuel R. Bowman and George Dahl. What Will it Take to Fix Benchmarking in Nat-\n  ural Language Understanding? In Proceedings of the 2021 Conference of the North\n  American Chapter of the Association for Computational Linguistics: Human Language\n  Technologies, pp. 4843–4855. Association for Computational Linguistics, 2021. doi:\n  10.18653/v1/2021.naacl-main.385. URL https://aclanthology.org/2021.\n  naacl-main.385."
+    },
+    {
+      "id": "b-124",
+      "type": "body",
+      "text": "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Pra-\n  fulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell,\n  Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Re-\n  won Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris\n  Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess,\n  Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever,\n  and Dario Amodei. Language models are few-shot learners. In H. Larochelle,\n  M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Advances in neural in-\n  formation processing systems, volume 33, pp. 1877–1901. Curran Associates, Inc.,\n  2020. URL https://proceedings.neurips.cc/paper_files/paper/\n  2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf."
+    },
+    {
+      "id": "b-125",
+      "type": "body",
+      "text": "Sébastien Bubeck, Varun Chandrasekaran, Ronen Eldan, Johannes Gehrke, Eric Horvitz,\n  Ece Kamar, Peter Lee, Yin Tat Lee, Yuanzhi Li, Scott Lundberg, Harsha Nori, Hamid\n  Palangi, Marco Tulio Ribeiro, and Yi Zhang. Sparks of Artificial General Intelli-\n  gence: Early experiments with GPT-4, April 2023. URL http://arxiv.org/\n  abs/2303.12712. arXiv:2303.12712 [cs].\n\nRyan Burnell, Han Hao, Andrew R. A. Conway, and Jose Hernandez Orallo. Revealing\n  the structure of language model capabilities, 2023a. URL http://arxiv.org/\n  abs/2306.10062."
+    },
+    {
+      "id": "b-126",
+      "type": "body",
+      "text": "Ryan Burnell, Wout Schellaert, John Burden, Tomer D. Ullman, Fernando Martinez-\n  Plumed, Joshua B. Tenenbaum, Danaja Rutar, Lucy G. Cheke, Jascha Sohl-Dickstein,\n  Melanie Mitchell, Douwe Kiela, Murray Shanahan, Ellen M. Voorhees, Anthony G.\n  Cohn, Joel Z. Leibo, and Jose Hernandez-Orallo. Rethink reporting of evaluation re-\n  sults in AI. Science, 380(6641):136–138, 2023b. doi: 10.1126/science.adf6369. URL\n  https://www.science.org/doi/abs/10.1126/science.adf6369.\n  tex.eprint: https://www.science.org/doi/pdf/10.1126/science.adf6369.\n\n52\n\fREFERENCES"
+    },
+    {
+      "id": "b-127",
+      "type": "body",
+      "text": "Kenrick Cai and Jaspreet Singh. Google clinches milestone gold at global math com-\n  petition, while OpenAI also claims win. Reuters, July 2025. URL https://www.\n  reuters.com/world/asia-pacific/.\nJohn B. Carroll. Psychometrics, intelligence, and public perception. Intelligence,\n  24(1):25–52, January 1997. ISSN 0160-2896. doi: 10.1016/s0160-2896(97)\n  90012-x. URL https://linkinghub.elsevier.com/retrieve/pii/\n  S016028969790012X.\nRaymond B. Cattell and John L. Horn. A check on the theory of fluid and crystal-\n  lized intelligence with description of new subtest designs. Journal of Educational\n  Measurement, 15(3):139–164, 1978. ISSN 00220655, 17453984. URL http:\n  //www.jstor.org/stable/1433661.\nR. Philip Chalmers. Mirt: A Multidimensional Item Response Theory Package for the\n  R Environment. Journal of Statistical Software, 48(6), 2012. ISSN 1548-7660. doi:\n  10.18637/jss.v048.i06. URL"
+    },
+    {
+      "id": "b-128",
+      "type": "body",
+      "text": "53\n\fREFERENCES"
+    },
+    {
+      "id": "b-129",
+      "type": "body",
+      "text": "Lee J Cronbach and Paul E Meehl. Construct validity in psychological tests. Psychologi-\n  cal bulletin, 52(4):281, 1955. Publisher: American Psychological Association.\nJ M Digman. Personality Structure: Emergence of the Five-Factor Model. Annual Re-\n  view of Psychology, 41(1):417–440, January 1990. ISSN 0066-4308, 1545-2085. doi:\n  10.1146/annurev.ps.41.020190.002221. URL https://www.annualreviews.\n  org/doi/10.1146/annurev.ps.41.020190.002221.\nDavid Donoho. 50 Years of Data Science. Journal of Computational and Graphi-\n  cal Statistics, 26(4):745–766, October 2017. ISSN 1061-8600, 1537-2715. doi: 10.\n  1080/10618600.2017.1384734. URL https://www.tandfonline.com/doi/\n  full/10.1080/10618600.2017.1384734.\nSusan E. Embretson and Steven P. Reise. Item Response Theory for Psychologists.\n  Psychology Press, 1st edition, September 2013. ISBN 978-1-4106-0526-9. doi:\n  10.4324/9781410605269. UR"
+    },
+    {
+      "id": "b-130",
+      "type": "body",
+      "text": "54\n\fREFERENCES"
+    },
+    {
+      "id": "b-131",
+      "type": "body",
+      "text": "Clémentine Fourrier.  It’s been a wild ride, folks :) (end of the Open LLM\n  Leaderboard),   2025.        URL https://huggingface.co/spaces/\n  open-llm-leaderboard/open_llm_leaderboard/discussions/\n  1135.\nClémentine Fourrier, Nathan Habib, Alina Lozovskaya, Konrad Szafer, and Thomas Wolf.\n  Open LLM leaderboard v2, 2024b. URL https://huggingface.co/spaces/\n  open-llm-leaderboard/open_llm_leaderboard.\nCarl Benedikt Frey and Michael Osborne. Generative AI and the Future of Work: A\n  Reappraisal. The Brown Journal of World Affairs, XXX(1):1–17, 2023.\nDeep Ganguli, Danny Hernandez, Liane Lovitt, Amanda Askell, Yuntao Bai, Anna\n  Chen, Tom Conerly, Nova Dassarma, Dawn Drain, Nelson Elhage, Sheer El Showk,\n  Stanislav Fort, Zac Hatfield-Dodds, Tom Henighan, Scott Johnston, Andy Jones,\n  Nicholas Joseph, Jackson Kernian, Shauna Kravec, Ben Mann, Neel Nanda, Ka-\n  mal Ndousse, Catherine Olsson,"
+    },
+    {
+      "id": "b-132",
+      "type": "body",
+      "text": "55\n\fREFERENCES\n\nIan Goodfellow, Yoshua Bengio, Aaron Courville, and Yoshua Bengio. Deep learning,\n  volume 1. MIT Press, 2016.\n\nBen Goodrich, Vinay Rao, Peter J Liu, and Mohammad Saleh. Assessing the factual\n  accuracy of generated text. In proceedings of the 25th ACM SIGKDD international\n  conference on knowledge discovery & data mining, pp. 166–175, 2019.\n\nSidney Greenbaum. ICE: The international corpus of english. English Today, 7(4):3–7,\n  1991.\n\nDan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang,\n  Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the\n  MATH dataset. In Thirty-fifth Conference on Neural Information Processing Systems\n  Datasets and Benchmarks Track (Round 2), 2021."
+    },
+    {
+      "id": "b-133",
+      "type": "body",
+      "text": "Tom Henighan, Jared Kaplan, Mor Katz, Mark Chen, Christopher Hesse, Jacob Jackson,\n  Heewoo Jun, Tom B. Brown, Prafulla Dhariwal, Scott Gray, Chris Hallacy, Benjamin\n  Mann, Alec Radford, Aditya Ramesh, Nick Ryder, Daniel M. Ziegler, John Schulman,\n  Dario Amodei, and Sam McCandlish. Scaling laws for autoregressive generative mod-\n  eling, 2020. URL https://arxiv.org/abs/2010.14701."
+    },
+    {
+      "id": "b-134",
+      "type": "body",
+      "text": "Jordan Hoffmann, Sebastian Borgeaud, Arthur Mensch, Elena Buchatskaya, Trevor Cai,\n  Eliza Rutherford, Diego de Las Casas, Lisa Anne Hendricks, Johannes Welbl, Aidan\n  Clark, Tom Hennigan, Eric Noland, Katie Millican, George van den Driessche, Bogdan\n  Damoc, Aurelia Guy, Simon Osindero, Karen Simonyan, Erich Elsen, Oriol Vinyals,\n  Jack W. Rae, and Laurent Sifre. Training compute-optimal large language models. In\n  Proceedings of the 36th International Conference on Neural Information Processing\n  Systems. Curran Associates Inc., 2022. ISBN 978-1-71387-108-8.\n\nJohn L. Horn. A Rationale and Test for the Number of Factors in Factor Analy-\n  sis. Psychometrika, 30(2):179–185, June 1965. ISSN 0033-3123, 1860-0980. doi:\n  10.1007/bf02289447. URL https://www.cambridge.org/core/product/\n  identifier/S003331230004165X/type/journal_article."
+    },
+    {
+      "id": "b-135",
+      "type": "body",
+      "text": "Li-tze Hu and Peter M. Bentler. Fit indices in covariance structure modeling: Sensitivity\n  to underparameterized model misspecification. Psychological Methods, 3(4):424–453,\n  December 1998. ISSN 1939-1463, 1082-989X. doi: 10.1037/1082-989x.3.4.424. URL\n  https://doi.apa.org/doi/10.1037/1082-989X.3.4.424.\n\nLi-tze Hu and Peter M. Bentler. Cutoff criteria for fit indexes in covariance structure\n  analysis: Conventional criteria versus new alternatives. Structural Equation Model-\n  ing: A Multidisciplinary Journal, 6(1):1–55, January 1999. ISSN 1070-5511, 1532-\n  8007. doi: 10.1080/10705519909540118. URL http://www.tandfonline.\n  com/doi/abs/10.1080/10705519909540118.\n\nHuggingFace. HuggingFace Spaces, July 2025. URL https://huggingface.co/\n  spaces?sort=likes.\n\n56\n\fREFERENCES"
+    },
+    {
+      "id": "b-136",
+      "type": "body",
+      "text": "David Ilić and Gilles E. Gignac. Evidence of interrelated cognitive-like capabilities\n  in large language models: Indications of artificial general intelligence or achieve-\n  ment? Intelligence, 106:101858, 2024. ISSN 01602896. doi: 10.1016/j.intell.2024.\n  101858.      URL https://linkinghub.elsevier.com/retrieve/pii/\n  S0160289624000527.\n\nAbigail Z. Jacobs. Measurement as governance in and for responsible AI, 2021. URL\n  https://arxiv.org/abs/2109.05658.\n\nAbigail Z. Jacobs and Hanna Wallach. Measurement and Fairness. In Proceedings of the\n  2021 ACM Conference on Fairness, Accountability, and Transparency, pp. 375–385.\n  ACM, March 2021. ISBN 978-1-4503-8309-7. doi: 10.1145/3442188.3445901. URL\n  https://dl.acm.org/doi/10.1145/3442188.3445901."
+    },
+    {
+      "id": "b-137",
+      "type": "body",
+      "text": "Bowen Jiang, Yangxinyu Xie, Zhuoqun Hao, Xiaomeng Wang, Tanwi Mallick, Weijie J\n  Su, Camillo Jose Taylor, and Dan Roth. A Peek into Token Bias: Large Language Mod-\n  els Are Not Yet Genuine Reasoners. In Proceedings of the 2024 Conference on Empir-\n  ical Methods in Natural Language Processing, pp. 4722–4756, Miami, Florida, USA,\n  2024. Association for Computational Linguistics. doi: 10.18653/v1/2024.emnlp-main.\n  272. URL https://aclanthology.org/2024.emnlp-main.272.\n\nCarlos E Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and\n  Karthik R Narasimhan. SWE-bench: Can language models resolve real-world github\n  issues? In The Twelfth International Conference on Learning Representations, 2024.\n  URL https://openreview.net/forum?id=VTF8yNQM66."
+    },
+    {
+      "id": "b-138",
+      "type": "body",
+      "text": "Daniel Jurafsky and James H. Martin. N-Gram Language Models, chapter 3, pp. 1–26.\n  Online manuscript, 3rd edition, January 2025. URL https://web.stanford.\n  edu/~jurafsky/slp3/.\n\nJared Kaplan, Sam McCandlish, Tom Henighan, Tom B. Brown, Benjamin Chess, Re-\n   won Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. Scaling Laws\n   for Neural Language Models, 2020. URL https://arxiv.org/abs/2001.\n   08361.\n\nAndrej Karpathy. My reaction is that there is an evaluation crisis. I don’t really know what\n  metrics to look at right now., March 2025. URL https://x.com/karpathy/\n  status/1896266683301659068.\n\nRyan Othniel Kearns. Testlet effects in the difficulty of BIG-Bench Hard tasks, January\n  2025. Summative assessment for Applied Analytical Statistics, Michaelmas 2024, Ox-\n  ford Internet Institute, University of Oxford."
+    },
+    {
+      "id": "b-139",
+      "type": "body",
+      "text": "Rex B. Kline. Specification and Identification of Confirmatory Factor Analysis Models,\n  pp. 188–211. Principles and Practice of Structural Equation Modeling. The Guilford\n  Press, fourth edition, 2016. ISBN 978-1-4625-2336-8.\n\nVid Kocijan, Ernest Davis, Thomas Lukasiewicz, Gary Marcus, and Leora Morgenstern.\n  The defeat of the Winograd Schema Challenge. Artificial Intelligence, 325:103971,\n\n57\n\fREFERENCES\n\nDecember 2023. ISSN 00043702. doi: 10.1016/j.artint.2023.103971. URL https:\n  //linkinghub.elsevier.com/retrieve/pii/S0004370223001170.\n\nTakeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa.\n  Large language models are zero-shot reasoners. Advances in neural information pro-\n  cessing systems, 35:22199–22213, 2022."
+    },
+    {
+      "id": "b-140",
+      "type": "body",
+      "text": "Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh,\n  Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, et al. Nat-\n  ural questions: A benchmark for question answering research. Transactions of the\n  Association for Computational Linguistics, 7:453–466, 2019."
+    },
+    {
+      "id": "b-141",
+      "type": "body",
+      "text": "Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Ya-\n  sunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, Benjamin New-\n  man, Binhang Yuan, Bobby Yan, Ce Zhang, Christian Alexander Cosgrove, Christo-\n  pher D Manning, Christopher Re, Diana Acosta-Navas, Drew Arad Hudson, Eric Ze-\n  likman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue\n  WANG, Keshav Santhanam, Laurel Orr, Lucia Zheng, Mert Yuksekgonul, Mirac Suz-\n  gun, Nathan Kim, Neel Guha, Niladri S. Chatterji, Omar Khattab, Peter Henderson,\n  Qian Huang, Ryan Andrew Chi, Sang Michael Xie, Shibani Santurkar, Surya Ganguli,\n  Tatsunori Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav Chaudhary, William Wang,\n  Xuechen Li, Yifan Mai, Yuhui Zhang, and Yuta Koreeda. Holistic evaluation of lan-\n  guage models. Transactions on Machine Learning Research, 2023. ISSN 2835-8856."
+    },
+    {
+      "id": "b-142",
+      "type": "body",
+      "text": "Mark Liberman. Obituary: Fred Jelinek. Computational Linguistics, 36(4):595–599,\n December 2010. doi: 10.1162/coli_a_00032. URL https://aclanthology.\n org/J10-4001/.\n\nStephanie Lin, Jacob Hilton, and Owain Evans. TruthfulQA: Measuring how models\n  mimic human falsehoods. In Smaranda Muresan, Preslav Nakov, and Aline Villavi-\n  cencio (eds.), Proceedings of the 60th annual meeting of the association for compu-\n  tational linguistics (volume 1: Long papers), pp. 3214–3252, Dublin, Ireland, 2022.\n  Association for Computational Linguistics. doi: 10.18653/v1/2022.acl-long.229. URL\n  https://aclanthology.org/2022.acl-long.229/. tex.join_key: 248."
+    },
+    {
+      "id": "b-143",
+      "type": "body",
+      "text": "Hongwei Liu, Zilong Zheng, Yuxuan Qiao, Haodong Duan, Zhiwei Fei, Fengzhe Zhou,\n  Wenwei Zhang, Songyang Zhang, Dahua Lin, and Kai Chen. MathBench: Eval-\n  uating the theory and application proficiency of LLMs with a hierarchical mathe-\n  matics benchmark. In Lun-Wei Ku, Andre Martins, and Vivek Srikumar (eds.),\n  Findings of the Association for Computational Linguistics: ACL 2024, pp. 6884–\n  6915, Bangkok, Thailand, August 2024. Association for Computational Linguistics.\n  doi: 10.18653/v1/2024.findings-acl.411. URL https://aclanthology.org/\n  2024.findings-acl.411/.\n\nJiawei Liu, Chunqiu Steven Xia, Yuyao Wang, and Lingming Zhang. Is your code gener-\n   ated by ChatGPT really correct? rigorous evaluation of large language models for code\n   generation. In Thirty-seventh Conference on Neural Information Processing Systems,\n   2023. URL https://openreview.net/forum?id=1qvx610Cu7."
+    },
+    {
+      "id": "b-144",
+      "type": "body",
+      "text": "58\n\fREFERENCES\n\nThang Luong and Edward Lockhart. Advanced version of Gemini with Deep Think offi-\n  cially achieves gold-medal standard at the International Mathematical Olympiad, July\n  2025. URL https://deepmind.google/discover/blog/.\n\nMathematical Association of America. American invitational mathematics examina-\n tion - AIME, February 2024. URL https://maa.org/math-competitions/\n american-invitational-mathematics-examination-aime.\n\nHarry Mayne, Yushi Yang, and Adam Mahdi. Can sparse autoencoders be used to decom-\n  pose and interpret steering vectors? In MINT: Foundation Model Interventions, 2024.\n  URL https://openreview.net/forum?id=QRpzG4b5dz.\n\nBryan McCann, Nitish Shirish Keskar, Caiming Xiong, and Richard Socher. The natural\n  language decathlon: Multitask learning as question answering, 2018. URL https:\n  //arxiv.org/abs/1806.08730."
+    },
+    {
+      "id": "b-145",
+      "type": "body",
+      "text": "John McCarthy, Marvin L. Minsky, Nathaniel Rochester, and Claude E. Shannon.\n  A proposal for the Dartmouth Summer Research Project on Artificial Intelligence,\n  August 31, 1955. AI Magazine, 27(4):12, December 2006. doi: 10.1609/\n  aimag.v27i4.1904.   URL https://ojs.aaai.org/aimagazine/index.\n  php/aimagazine/article/view/1904.\n\nR. Thomas McCoy, Shunyu Yao, Dan Friedman, Matthew Hardy, and Thomas L. Grif-\n  fiths. Embers of Autoregression: Understanding Large Language Models Through the\n  Problem They are Trained to Solve, September 2023. URL http://arxiv.org/\n  abs/2309.13638. arXiv:2309.13638 [cs].\n\nSamuel Messick. Test Validity: A Matter of Consequence. Social Indicators Research,\n  45(1/3):35–44, 1998. ISSN 03038300. doi: 10.1023/A:1006964925094. URL http:\n  //link.springer.com/10.1023/A:1006964925094."
+    },
+    {
+      "id": "b-146",
+      "type": "body",
+      "text": "Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. Can a suit of ar-\n  mor conduct electricity? Anew dataset for open book question answering. In Ellen\n  Riloff, David Chiang, Julia Hockenmaier, and Jun’ichi Tsujii (eds.), Proceedings of the\n  2018 Conference on Empirical Methods in Natural Language Processing, pp. 2381–\n  2391, Brussels, Belgium, October-November 2018. Association for Computational\n  Linguistics. doi: 10.18653/v1/D18-1260. URL https://aclanthology.org/\n  D18-1260/.\n\nSeyed Iman Mirzadeh, Keivan Alizadeh, Hooman Shahrokhi, Oncel Tuzel, Samy Bengio,\n  and Mehrdad Farajtabar. GSM-Symbolic: Understanding the limitations of mathemat-\n  ical reasoning in large language models. In The thirteenth international conference on\n  learning representations, 2025. URL https://openreview.net/forum?id=\n  AjXkRZIvjB."
+    },
+    {
+      "id": "b-147",
+      "type": "body",
+      "text": "Moran Mizrahi, Guy Kaplan, Dan Malkin, Rotem Dror, Dafna Shahaf, and Gabriel\n Stanovsky. State of what art? A call for multi-prompt LLM evaluation. Transactions of\n the Association for Computational Linguistics, 12:933–949, 2024. doi: 10.1162/tacl_\n a_00681. URL https://aclanthology.org/2024.tacl-1.52/.\n\n59\n\fREFERENCES\n\nFrancesco Maria Molfese, Luca Moroni, Luca Gioffré, Alessandro Scirè, Simone Co-\n  nia, and Roberto Navigli. Right answer, wrong score: Uncovering the inconsistencies\n  of LLM evaluation in multiple-choice question answering. In Wanxiang Che, Joyce\n  Nabende, Ekaterina Shutova, and Mohammad Taher Pilehvar (eds.), Findings of the\n  Association for Computational Linguistics: ACL 2025, pp. 18477–18494, Vienna, Aus-\n  tria, July 2025. Association for Computational Linguistics. ISBN 979-8-89176-256-5.\n  URL https://aclanthology.org/2025.findings-acl.950/."
+    },
+    {
+      "id": "b-148",
+      "type": "body",
+      "text": "Amanda K. Montoya and Michael C. Edwards. The Poor Fit of Model Fit for Selecting\n Number of Factors in Exploratory Factor Analysis for Scale Evaluation. Educational\n and Psychological Measurement, 81(3):413–440, June 2021. ISSN 0013-1644, 1552-\n 3888. doi: 10.1177/0013164420942899. URL https://journals.sagepub.\n com/doi/10.1177/0013164420942899.\n\nShashi Narayan, Shay B. Cohen, and Mirella Lapata. Don’t give me the details, just\n  the summary! Topic-aware convolutional neural networks for extreme summariza-\n  tion. In Ellen Riloff, David Chiang, Julia Hockenmaier, and Jun’ichi Tsujii (eds.),\n  Proceedings of the 2018 Conference on Empirical Methods in Natural Language\n  Processing, pp. 1797–1807, Brussels, Belgium, October-November 2018. Associa-\n  tion for Computational Linguistics. doi: 10.18653/v1/D18-1206. URL https:\n  //aclanthology.org/D18-1206/."
+    },
+    {
+      "id": "b-149",
+      "type": "body",
+      "text": "David Owen. How predictable is language model benchmark performance?            arXiv\n  preprint arXiv:2401.04757, 2024.\n\nAlicia Parrish, Angelica Chen, Nikita Nangia, Vishakh Padmakumar, Jason Phang, Jana\n  Thompson, Phu Mon Htut, and Samuel Bowman. BBQ: A hand-built bias benchmark\n  for question answering. In Smaranda Muresan, Preslav Nakov, and Aline Villavicen-\n  cio (eds.), Findings of the Association for Computational Linguistics: ACL 2022, pp.\n  2086–2105, Dublin, Ireland, May 2022. Association for Computational Linguistics.\n  doi: 10.18653/v1/2022.findings-acl.165. URL https://aclanthology.org/\n  2022.findings-acl.165/."
+    },
+    {
+      "id": "b-150",
+      "type": "body",
+      "text": "Long Phan, Alice Gatti, Ziwen Han, Nathaniel Li, Josephina Hu, Hugh Zhang, Sean Shi,\n  Michael Choi, Anish Agrawal, Arnav Chopra, Adam Khoja, Ryan Kim, Jason Hausen-\n  loy, Oliver Zhang, Mantas Mazeika, Daron Anderson, Tung Nguyen, Mobeen Mah-\n  mood, Fiona Feng, Steven Y. Feng, Haoran Zhao, Michael Yu, Varun Gangal, Chelsea\n  Zou, Zihan Wang, Jessica P. Wang, Pawan Kumar, Oleksandr Pokutnyi, Robert Ger-\n  bicz, Serguei Popov, John-Clark Levin, Mstyslav Kazakov, Johannes Schmitt, Geoff\n  Galgon, Alvaro Sanchez, Yongki Lee, Will Yeadon, Scott Sauers, Marc Roth, Chi-\n  dozie Agu, Søren Riis, Fabian Giska, Saiteja Utpala, Zachary Giboney, Gashaw M.\n  Goshu, Joan of Arc Xavier, Sarah-Jane Crowson, Mohinder Maheshbhai Naiya, Noah\n  Burns, Lennart Finke, Zerui Cheng, Hyunwoo Park, Francesco Fournier-Facio, John\n  Wydallis, Mark Nandor, Ankit Singh, Tim Gehrunger, Jiaqi Cai, Ben McCarty, Dar-\n "
+    },
+    {
+      "id": "b-151",
+      "type": "body",
+      "text": "60\n\fREFERENCES\n\nlor D. Hartman, Paolo Rissone, Jaehyeok Jin, Jack Wei Lun Shi, Chris G. Willcocks,\n  Joshua Robinson, Aleksandar Mikov, Ameya Prabhu, Longke Tang, Xavier Alapont,\n  Justine Leon Uro, Kevin Zhou, Emily de Oliveira Santos, Andrey Pupasov Maksimov,\n  Edward Vendrow, Kengo Zenitani, Julien Guillod, Yuqi Li, Joshua Vendrow, Vladyslav\n  Kuchkin, and Ng Ze-An. Humanity’s last exam. CoRR, abs/2501.14249, January 2025.\n  URL https://doi.org/10.48550/arXiv.2501.14249.\n\nFelipe Maia Polo, Lucas Weber, Leshem Choshen, Yuekai Sun, Gongjun Xu, and Mikhail\n  Yurochkin. tinyBenchmarks: Evaluating LLMs with fewer examples. In Proceedings\n  of the 41st international conference on machine learning, ICML’24. JMLR.org, 2024.\n  Place: Vienna, Austria Number of pages: 24 tex.articleno: 1396."
+    },
+    {
+      "id": "b-152",
+      "type": "body",
+      "text": "Chris Potts. Reliable characterizations of NLP systems as a social responsibility. Keynote\n  talk, ACL-IJCNLP, August 2021. URL https://youtu.be/t_A36DDcG_0?\n  si=XK7V7zBf8p38B5PY.\n\nAlec Radford, Jeffery Wu, Rewon Child, David Luan, Dario Amodei, and Ilya\n  Sutskever.   Language Models are Unsupervised Multitask Learners, Febru-\n  ary 2019. URL https://cdn.openai.com/better-language-models/\n  language_models_are_unsupervised_multitask_learners.pdf.\n\nInioluwa Deborah Raji, Emily Denton, Emily M. Bender, Alex Hanna, and Amanda-\n   lynne Paullada. AI and the everything in the whole wide world benchmark. In Thirty-\n   Fifth Conference on Neural Information Processing Systems Datasets and Bench-\n   marks Track (Round 2), 2021. URL https://openreview.net/forum?id=\n   j6NxpQbREA1."
+    },
+    {
+      "id": "b-153",
+      "type": "body",
+      "text": "M.D. Reckase. Multidimensional Item Response Theory. Springer New York, 2009. ISBN\n 978-0-387-89975-6 978-0-387-89976-3. doi: 10.1007/978-0-387-89976-3. URL\n http://link.springer.com/10.1007/978-0-387-89976-3.\n\nDavid Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe Pang,\n  Julien Dirani, Julian Michael, and Samuel R. Bowman. GPQA: A graduate-level\n  google-proof q&a benchmark. In First Conference on Language Modeling, 2024. URL\n  https://openreview.net/forum?id=Ti67584b98."
+    },
+    {
+      "id": "b-154",
+      "type": "body",
+      "text": "Anka Reuel, Benjamin Bucknall, Stephen Casper, Timothy Fist, Lisa Soder, Onni Aarne,\n  Lewis Hammond, Lujain Ibrahim, Alan Chan, Peter Wills, Markus Anderljung, Ben\n  Garfinkel, Lennart Heim, Andrew Trask, Gabriel Mukobi, Rylan Schaeffer, Mauricio\n  Baker, Sara Hooker, Irene Solaiman, Sasha Luccioni, Nitarshan Rajkumar, Nicolas\n  Moës, Jeffrey Ladish, David Bau, Paul Bricman, Neel Guha, Jessica Newman, Yoshua\n  Bengio, Tobin South, Alex Pentland, Sanmi Koyejo, Mykel Kochenderfer, and Robert\n  Trager. Open problems in technical AI governance. Transactions on Machine Learning\n  Research, 2025. ISSN 2835-8856. URL https://openreview.net/forum?\n  id=1nO4qFMiS0. Survey Certification."
+    },
+    {
+      "id": "b-155",
+      "type": "body",
+      "text": "Yves Rosseel. Lavaan: An R package for structural equation modeling. Journal of\n  Statistical Software, 48(2):1–36, 2012. doi: 10.18637/jss.v048.i02. URL https:\n  //www.jstatsoft.org/index.php/jss/article/view/v048i02.\n\n61\n\fREFERENCES\n\nYangjun Ruan, Chris J. Maddison, and Tatsunori Hashimoto. Observational scaling\n  laws and the predictability of langauge model performance. In The Thirty-eighth An-\n  nual Conference on Neural Information Processing Systems, 2024. URL https:\n  //openreview.net/forum?id=On5WIN7xyD.\n\nKeisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. WinoGrande:\n  An adversarial winograd schema challenge at scale. Communications of the ACM, 64\n  (9):99–106, September 2021. ISSN 0001-0782, 1557-7317. doi: 10.1145/3474381.\n  URL https://dl.acm.org/doi/10.1145/3474381."
+    },
+    {
+      "id": "b-156",
+      "type": "body",
+      "text": "Olawale Salaudeen, Anka Reuel, Ahmed Ahmed, Suhana Bedi, Zachary Robertson,\n  Sudharsan Sundar, Ben Domingue, Angelina Wang, and Sanmi Koyejo. Measure-\n  ment to meaning: A validity-centered framework for ai evaluation, 2025. URL\n  https://arxiv.org/abs/2505.10573.\n\nRylan Schaeffer, Brando Miranda, and Sanmi Koyejo. Are emergent abilities of large\n  language models a mirage? In A. Oh, T. Naumann, A. Globerson, K. Saenko,\n  M. Hardt, and S. Levine (eds.), Advances in neural information processing sys-\n  tems, volume 36, pp. 55565–55581. Curran Associates, Inc., 2023. URL https:\n  //proceedings.neurips.cc/paper_files/paper/2023/file/\n  adc98a266f45005c403b8311ca7e8bd7-Paper-Conference.pdf.\n\nMark A Schmuckler. What is ecological validity? a dimensional analysis. Infancy, 2(4):\n 419–436, 2001."
+    },
+    {
+      "id": "b-157",
+      "type": "body",
+      "text": "W. J. Schneider and K. S. McGrew. The Cattell–Horn–Carroll theory of cognitive abil-\n  ities. In D. P. Flanagan and E. M. McDonough (eds.), Contemporary Intellectual As-\n  sessment: Theories, Tests, and Issues, pp. 73–163. The Guilford Press, 4 edition, 2018.\n\nGideon Schwarz. Estimating the Dimension of a Model. The Annals of Statis-\n  tics, 6(2), March 1978. ISSN 0090-5364. doi: 10.1214/aos/1176344136. URL\n  https://projecteuclid.org/journals/annals-of-statistics/\n  volume-6/issue-2/Estimating-the-Dimension-of-a-Model/10.\n  1214/aos/1176344136.full."
+    },
+    {
+      "id": "b-158",
+      "type": "body",
+      "text": "Dexin Shi, Alberto Maydeu-Olivares, and Yves Rosseel. Assessing Fit in Ordinal Factor\n  Analysis Models: SRMR vs. RMSEA. Structural Equation Modeling: A Multidisci-\n  plinary Journal, 27(1):1–15, January 2020. ISSN 1070-5511, 1532-8007. doi: 10.\n  1080/10705511.2019.1611434. URL https://www.tandfonline.com/doi/\n  full/10.1080/10705511.2019.1611434.\n\nLeonard J Simms and David Watson. The construct validation approach to personality\n  scale construction. Handbook of research methods in personality psychology, pp. 240–\n  258, 2007.\n\nShivalika Singh, Yiyang Nan, Alex Wang, Daniel D’Souza, Sayash Kapoor, Ahmet\n  Üstün, Sanmi Koyejo, Yuntian Deng, Shayne Longpre, Noah A. Smith, Beyza Er-\n  mis, Marzieh Fadaee, and Sara Hooker. The leaderboard illusion, 2025. URL\n  https://arxiv.org/abs/2504.20879.\n\n62\n\fREFERENCES"
+    },
+    {
+      "id": "b-159",
+      "type": "body",
+      "text": "Shaden Smith, Mostofa Patwary, Brandon Norick, Patrick LeGresley, Samyam Rajbhan-\n  dari, Jared Casper, Zhun Liu, Shrimai Prabhumoye, George Zerveas, Vijay Korthikanti,\n  Elton Zhang, Rewon Child, Reza Yazdani Aminabadi, Julie Bernauer, Xia Song, Mo-\n  hammad Shoeybi, Yuxiong He, Michael Houston, Saurabh Tiwary, and Bryan Catan-\n  zaro. Using DeepSpeed and Megatron to train Megatron-Turing NLG 530B, a large-\n  scale generative language model, 2022. URL https://arxiv.org/abs/2201.\n  11990.\nC. Spearman. “General Intelligence,” Objectively Determined and Measured. The Amer-\n  ican Journal of Psychology, 15(2):201, April 1904. ISSN 00029556. doi: 10.2307/\n  1412107.     URL https://www.jstor.org/stable/1412107?origin=\n  crossref.\nZayne Rea Sprague, Xi Ye, Kaj Bostrom, Swarat Chaudhuri, and Greg Durrett. MuSR:\n  Testing the limits of chain-of-thought with multistep soft reasoning. In The Twel"
+    },
+    {
+      "id": "b-160",
+      "type": "body",
+      "text": "63\n\fREFERENCES"
+    },
+    {
+      "id": "b-161",
+      "type": "body",
+      "text": "Gonzalo Jaimovitch-Lopez, Gregor Betz, Guy Gur-Ari, Hana Galijasevic, Hannah\n Kim, Hannah Rashkin, Hannaneh Hajishirzi, Harsh Mehta, Hayden Bogar, Henry Fran-\n cis Anthony Shevlin, Hinrich Schuetze, Hiromu Yakura, Hongming Zhang, Hugh Mee\n Wong, Ian Ng, Isaac Noble, Jaap Jumelet, Jack Geissinger, Jackson Kernion, Jacob\n Hilton, Jaehoon Lee, Jaime Fernández Fisac, James B Simon, James Koppel, James\n Zheng, James Zou, Jan Kocon, Jana Thompson, Janelle Wingfield, Jared Kaplan,\n Jarema Radom, Jascha Sohl-Dickstein, Jason Phang, Jason Wei, Jason Yosinski, Jeka-\n terina Novikova, Jelle Bosscher, Jennifer Marsh, Jeremy Kim, Jeroen Taal, Jesse Engel,\n Jesujoba Alabi, Jiacheng Xu, Jiaming Song, Jillian Tang, Joan Waweru, John Bur-\n den, John Miller, John U. Balis, Jonathan Batchelder, Jonathan Berant, Jörg Frohberg,\n Jos Rozen, Jose Hernandez-Orallo, Joseph Boudeman, Joseph Guerr, Joseph Jones,\n "
+    },
+    {
+      "id": "b-162",
+      "type": "body",
+      "text": "64\n\fREFERENCES"
+    },
+    {
+      "id": "b-163",
+      "type": "body",
+      "text": "Hwan Lee, Spencer Torene, Sriharsha Hatwar, Stanislas Dehaene, Stefan Divic, Ste-\n  fano Ermon, Stella Biderman, Stephanie Lin, Stephen Prasad, Steven Piantadosi, Stu-\n  art Shieber, Summer Misherghi, Svetlana Kiritchenko, Swaroop Mishra, Tal Linzen,\n  Tal Schuster, Tao Li, Tao Yu, Tariq Ali, Tatsunori Hashimoto, Te-Lin Wu, Théo Des-\n  bordes, Theodore Rothschild, Thomas Phan, Tianle Wang, Tiberius Nkinyili, Timo\n  Schick, Timofei Kornev, Titus Tunduny, Tobias Gerstenberg, Trenton Chang, Trishala\n  Neeraj, Tushar Khot, Tyler Shultz, Uri Shaham, Vedant Misra, Vera Demberg, Victoria\n  Nyamai, Vikas Raunak, Vinay Venkatesh Ramasesh, vinay uday prabhu, Vishakh Pad-\n  makumar, Vivek Srikumar, William Fedus, William Saunders, William Zhang, Wout\n  Vossen, Xiang Ren, Xiaoyu Tong, Xinran Zhao, Xinyi Wu, Xudong Shen, Yadol-\n  lah Yaghoobzadeh, Yair Lakretz, Yangqiu Song, Yasaman Bahri, Yejin Choi"
+    },
+    {
+      "id": "b-164",
+      "type": "body",
+      "text": "James H Steiger. Structural model evaluation and modification: An interval estimation\n  approach. Multivariate behavioral research, 25(2):173–180, 1990.\n\nMirac Suzgun, Sebastian Gehrmann, Yonatan Belinkov, and Stuart M Shieber. Memory-\n augmented recurrent neural networks can learn generalized dyck languages. arXiv\n preprint arXiv:1911.03329, 2019.\n\nMirac Suzgun, Nathan Scales, Nathanael Schärli, Sebastian Gehrmann, Yi Tay,\n Hyung Won Chung, Aakanksha Chowdhery, Quoc V. Le, Ed H. Chi, Denny Zhou,\n and Jason Wei. Challenging big-bench tasks and whether chain-of-thought can solve\n them. In ACL (Findings), pp. 13003–13051, 2023. URL https://doi.org/10.\n 18653/v1/2023.findings-acl.824."
+    },
+    {
+      "id": "b-165",
+      "type": "body",
+      "text": "Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. CommonsenseQA:\n  A question answering challenge targeting commonsense knowledge. In Jill Burstein,\n  Christy Doran, and Thamar Solorio (eds.), Proceedings of the 2019 conference of\n  the north American chapter of the association for computational linguistics: Hu-\n  man language technologies, volume 1 (long and short papers), pp. 4149–4158, Min-\n  neapolis, Minnesota, June 2019. Association for Computational Linguistics. doi:\n  10.18653/v1/N19-1421. URL https://aclanthology.org/N19-1421/.\n\nLisa H. Trahan, Karla K. Stuebing, Jack M. Fletcher, and Merrill Hiscock. The Flynn\n  effect: A meta-analysis. Psychological Bulletin, 140(5):1332–1360, 2014. ISSN\n  1939-1455, 0033-2909. doi: 10.1037/a0037173. URL http://doi.apa.org/\n  getdoi.cfm?doi=10.1037/a0037173."
+    },
+    {
+      "id": "b-166",
+      "type": "body",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N\n  Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is All you Need. Advances in\n  Neural Information Processing Systems, 31, 2017.\n\n65\n\fREFERENCES\n\nPablo Villalobos, Anson Ho, Jaime Sevilla, Tamay Besiroglu, Lennart Heim, and Marius\n  Hobbhahn. Will we run out of data? Limits of LLM scaling based on human-generated\n  data, 2024. URL https://arxiv.org/abs/2211.04325."
+    },
+    {
+      "id": "b-167",
+      "type": "body",
+      "text": "Anton Voronov, Lena Wolf, and Max Ryabinin. Mind your format: Towards consis-\n  tent evaluation of in-context learning improvements. In Lun-Wei Ku, Andre Mar-\n  tins, and Vivek Srikumar (eds.), Findings of the Association for Computational Lin-\n  guistics: ACL 2024, pp. 6287–6310, Bangkok, Thailand, August 2024. Associa-\n  tion for Computational Linguistics. doi: 10.18653/v1/2024.findings-acl.375. URL\n  https://aclanthology.org/2024.findings-acl.375/."
+    },
+    {
+      "id": "b-168",
+      "type": "body",
+      "text": "Hanna Wallach, Meera Desai, Nicholas Pangakis, A. Feder Cooper, Angelina Wang,\n  Solon Barocas, Alexandra Chouldechova, Chad Atalla, Su Lin Blodgett, Emily Corvi,\n  P. Alex Dow, Jean Garcia-Gathright, Alexandra Olteanu, Stefanie Reed, Emily Sheng,\n  Dan Vann, Jennifer Wortman Vaughan, Matthew Vogel, Hannah Washington, and Abi-\n  gail Z. Jacobs. Evaluating generative AI systems is a social science measurement chal-\n  lenge. In NeurIPS 2024 Workshop on Evaluating Evaluations (EvalEval), 2024. URL\n  https://arxiv.org/pdf/2411.10939v1.\n\nAlex Wang, Yada Pruksachatkun, Nikita Nangia, Amanpreet Singh, Julian Michael, Felix\n  Hill, Omer Levy, and Samuel Bowman. Superglue: A stickier benchmark for general-\n  purpose language understanding systems. Advances in neural information processing\n  systems, 32, 2019."
+    },
+    {
+      "id": "b-169",
+      "type": "body",
+      "text": "Xiting Wang, Liming Jiang, José Hernández-Orallo, Luning Sun, David Stillwell, Fang\n  Luo, and Xing Xie. Evaluating general-purpose AI with psychometrics. CoRR,\n  abs/2310.16379, 2023. URL https://doi.org/10.48550/arXiv.2310.\n  16379.\n\nYubo Wang, Xueguang Ma, Ge Zhang, Yuansheng Ni, Abhranil Chandra, Shiguang Guo,\n  Weiming Ren, Aaran Arulraj, Xuan He, Ziyan Jiang, et al. MMLU-Pro: A more robust\n  and challenging multi-task language understanding benchmark. Advances in Neural\n  Information Processing Systems, 37:95266–95290, 2025."
+    },
+    {
+      "id": "b-170",
+      "type": "body",
+      "text": "Jason Wei, Yi Tay, Rishi Bommasani, Colin Raffel, Barret Zoph, Sebastian Borgeaud,\n  Dani Yogatama, Maarten Bosma, Denny Zhou, Donald Metzler, Ed H. Chi, Tat-\n  sunori Hashimoto, Oriol Vinyals, Percy Liang, Jeff Dean, and William Fedus. Emer-\n  gent abilities of large language models. Transactions on Machine Learning Re-\n  search, 2022. ISSN 2835-8856. URL https://openreview.net/forum?id=\n  yzkSU5zdwD.\n\nJason Weston, Antoine Bordes, Sumit Chopra, Alexander M Rush, Bart Van Merriënboer,\n  Armand Joulin, and Tomas Mikolov. Towards AI-complete question answering: A set\n  of prerequisite toy tasks. arXiv preprint arXiv:1502.05698, 2015.\n\nShuo Yang, Wei-Lin Chiang, Lianmin Zheng, Joseph E. Gonzalez, and Ion Stoica. Re-\n  thinking Benchmark and Contamination for Language Models with Rephrased Sam-\n  ples, 2023. URL https://arxiv.org/abs/2311.04850. Version Number:\n  2.\n\n66\n\fREFERENCES"
+    },
+    {
+      "id": "b-171",
+      "type": "body",
+      "text": "Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. HellaSwag:\n  Can a machine really finish your sentence? In Anna Korhonen, David Traum, and\n  Lluís Màrquez (eds.), Proceedings of the 57th Annual Meeting of the Association\n  for Computational Linguistics, pp. 4791–4800, Florence, Italy, July 2019. Associ-\n  ation for Computational Linguistics. doi: 10.18653/v1/P19-1472. URL https:\n  //aclanthology.org/P19-1472/.\n\nJeffrey Zhou, Tianjian Lu, Swaroop Mishra, Siddhartha Brahma, Sujoy Basu, Yi Luan,\n   Denny Zhou, and Le Hou. Instruction-following evaluation for large language models,\n   2023a. URL https://arxiv.org/abs/2311.07911.\n\nKun Zhou, Yutao Zhu, Zhipeng Chen, Wentong Chen, Wayne Xin Zhao, Xu Chen, Yankai\n  Lin, Ji-Rong Wen, and Jiawei Han. Don’t Make Your LLM an Evaluation Benchmark\n  Cheater, 2023b. URL http://arxiv.org/abs/2311.01964."
+    },
+    {
+      "id": "b-172",
+      "type": "body",
+      "text": "Lexin Zhou, Lorenzo Pacchiardi, Fernando Martínez-Plumed, Katherine M. Collins,\n  Yael Moros-Daval, Seraphina Zhang, Qinlin Zhao, Yitian Huang, Luning Sun,\n  Jonathan E. Prunty, Zongqian Li, Pablo Sánchez-García, Kexin Jiang Chen, Pablo\n  A. M. Casares, Jiyun Zu, John Burden, Behzad Mehrbakhsh, David Stillwell, Manuel\n  Cebrián, Jindong Wang, Peter Henderson, Sherry Tongshuang Wu, Patrick C. Kyl-\n  lonen, Lucy Cheke, Xing Xie, and José Hernández-Orallo. General scales unlock\n  AI evaluation with explanatory and predictive power. CoRR, abs/2503.06378, March\n  2025. URL https://doi.org/10.48550/arXiv.2503.06378. tex.cdate:\n  1740787200000 tex.publtype: informal.\n\n67\n\fAPPENDIX"
+    },
+    {
+      "id": "b-173",
+      "type": "body",
+      "text": "A      List of mentioned benchmarks\nIn some places in the text, it aids readability to enumerate benchmark names without giv-\ning their citations. We style all benchmark names in monospace to make their mentions\nvisually apparent. Table 4 gives a list of all benchmarks mentioned in this paper along\nwith their descriptions and citations."
+    },
+    {
+      "id": "b-174",
+      "type": "body",
+      "text": "Benchmark                     Dataset description                         Citation\n GSM8K                         Grade school-level arithmetic word          Cobbe et al. (2021)\n                               problems.\n MATH                          Challenging high school-level compe-        Hendrycks et al. (2021)\n                               tition mathematics problems.\n FrontierMath                  Unpublished, expert-level research          Glazer et al. (2024)\n                               mathematics problems.\n GPQA                          “Google-Proof Q&A.” PhD-level biol-         Rein et al. (2024)\n                               ogy, physics, and chemistry multiple\n                               choice questions.\n MMLU-Pro                      Broad knowledge and reasoning bench-        Wang et al. (2025)\n                               mark with questions spanning 14 aca-\n"
+    },
+    {
+      "id": "b-175",
+      "type": "body",
+      "text": "68\n\fAPPENDIX"
+    },
+    {
+      "id": "b-176",
+      "type": "body",
+      "text": "XSUM                      News summarisation using online arti-      Narayan et al. (2018)\n                           cles from the BBC.\n OpenbookQA                Q&A using elementary science facts.        Mihaylov et al. (2018)\n bAbI                      Short stories about characters, followed   Weston et al. (2015)\n                           by reading comprehension questions.\n Dyck                      Completing Dyck sentences: prop-           Suzgun et al. (2019)\n                           erly nested sequences of characters\n                           {}[]().\n BBH                       “BIG-Bench Hard.” 23 difficult tasks       Suzgun et al. (2023)\n                           selected from BIG-bench.\n IFEval                    “Instruction-Following      Evaluation.”   Zhou et al. (2023a)\n                           Prompts with formatting requirements,\n                           wo"
+    },
+    {
+      "id": "b-177",
+      "type": "body",
+      "text": "Table 4: All mentioned benchmark datasets, with citations.\n\n69\n\fAPPENDIX\n\nB       Default mathematical notation\nWe utilise the following mathematical notation throughout this work. This table of nota-\ntion is copied from the ICLR 2024 submission guidelines, and appears originally in the\ntextbook Deep Learning (Goodfellow et al., 2016), available at https://github.\ncom/goodfeli/dlbook_notation/.\n                               Numbers and Arrays"
+    },
+    {
+      "id": "b-178",
+      "type": "body",
+      "text": "a                   A scalar (integer or real)\n a                   A vector\n A                   A matrix\n A                   A tensor\n In                  Identity matrix with n rows and n columns\n I                   Identity matrix with dimensionality implied by\n                     context\n e(i)                Standard basis vector [0, . . . , 0, 1, 0, . . . , 0] with a\n                     1 at position i\n diag(a)             A square, diagonal matrix with diagonal entries\n                     given by a\n a                   A scalar random variable\n a                   A vector-valued random variable\n A                   A matrix-valued random variable\n                                         Sets and Graphs"
+    },
+    {
+      "id": "b-179",
+      "type": "body",
+      "text": "A                       A set\n R                       The set of real numbers\n {0, 1}                  The set containing 0 and 1\n {0, 1, . . . , n}       The set of all integers between 0 and n\n [a, b]                  The real interval including a and b\n (a, b]                  The real interval excluding a but including b\n A\\B                     Set subtraction, i.e., the set containing the ele-\n                         ments of A that are not in B\n G                       A graph\n P aG (xi )              The parents of xi in G\n                                              Indexing\n\n70\n\fAPPENDIX"
+    },
+    {
+      "id": "b-180",
+      "type": "body",
+      "text": "ai                   Element i of vector a, with indexing starting at 1\na−i                  All elements of vector a except for element i\nAi,j                 Element i, j of matrix A\nAi,:                 Row i of matrix A\nA:,i                 Column i of matrix A\nAi,j,k               Element (i, j, k) of a 3-D tensor A\nA:,:,i               2-D slice of a 3-D tensor\nai                   Element i of the random vector a\n                                       Calculus\ndy\n                     Derivative of y with respect to x\ndx\n∂y\n                     Partial derivative of y with respect to x\n∂x\n∇x y                 Gradient of y with respect to x\n∇X y                 Matrix derivatives of y with respect to X\n∇X y                 Tensor containing derivatives of y with respect to\n                     X\n∂f\n                     Jacobian matrix J ∈ Rm×n of f : Rn → Rm\n∂x\n∇2x f (x) or H(f )(x"
+    },
+    {
+      "id": "b-181",
+      "type": "body",
+      "text": "Probability and Information Theory\n\n71\n\fAPPENDIX"
+    },
+    {
+      "id": "b-182",
+      "type": "body",
+      "text": "P (a)                A probability distribution over a discrete variable\np(a)                 A probability distribution over a continuous vari-\n                     able, or over a variable whose type has not been\n                     specified\na∼P                  Random variable a has distribution P\nEx∼P [f (x)] or Ef (x)Expectation of f (x) with respect to P (x)\nVar(f (x))           Variance of f (x) under P (x)\nCov(f (x), g(x))     Covariance of f (x) and g(x) under P (x)\nH(x)                 Shannon entropy of the random variable x\nDKL (P ∥Q)           Kullback-Leibler divergence of P and Q\nN (x; µ, Σ)          Gaussian distribution over x with mean µ and co-\n                     variance Σ\n                                      Functions\nf :A→B               The function f with domain A and range B\nf ◦g                 Composition of the functions f and g\nf (x; θ)             A fun"
+    },
+    {
+      "id": "b-183",
+      "type": "body",
+      "text": "72\n\fAPPENDIX\n\nC      BIG-Bench Hard task descriptions\nIn the following list, we provide the task descriptions as given in the original BIG-Bench\nHard paper by Suzgun et al. (2023). Our list below is a subset of the list in Appendix A\nof Suzgun et al. (2023). Each example is the first example in the OpenLLM Leaderboard\ndataset for that subtask.\n\n1. Boolean Expressions: Evaluate the truth value of a random Boolean expression\n       consisting of Boolean constants (True, False) and basic Boolean operators (and,\n       or, and not).\n\nExample: Evaluate the result of a random Boolean expression.\n\nQ: not ( ( not not True ) ) is\n\nA: False\n\n2. Causal Judgement: Given a short story (involving moral, intentional, or counter-\n       factual analysis), determine how a typical person would answer a causal question\n       about the story.\n\nExample: Answer questions about causal attribution."
+    },
+    {
+      "id": "b-184",
+      "type": "body",
+      "text": "Q: How would a typical person answer each of the following questions\n            about causation?\n            Frank T., had an ongoing dispute with his neighbor over a stretch of land\n            and one day decided to shoot his neighbor in the body. Frank T. had\n            no experience with guns, his hand slipped on the barrel of the gun, and\n            the shot went wild. Nonetheless, the bullet bounced off a large boulder\n            several feet away and hit the neighbor’s body, causing significant injury.\n            Did Frank T. intentionally shoot his neighbor in the body?\n            Options:\n            - Yes\n            - No\n\nA: No"
+    },
+    {
+      "id": "b-185",
+      "type": "body",
+      "text": "3. Date Understanding: Given a small set of sentences about a particular date, answer\n       the provided question (e.g., “The concert was scheduled to be on 06/01/1943, but\n       was delayed by one day to today. What is the date yesterday in MM/DD/YYYY?”).\n\nExample: Infer the date from context.\n\nQ: Today is Christmas Eve of 1937. What is the date 10 days ago in\n            MM/DD/YYYY?\n            Options:\n\n73\n\fAPPENDIX\n\n(A) 12/14/2026\n         (B) 12/14/1950\n         (C) 12/14/2007\n         (D) 12/14/1937\n         (E) 07/14/1938\n         (F) 12/14/1988\n\nA: (D)"
+    },
+    {
+      "id": "b-186",
+      "type": "body",
+      "text": "4. Disambiguation QA: Given a sentence with an “ambiguous” pronoun, either deter-\n    mine whether the sentence is inherently ambiguous (i.e., the thing that the pronoun\n    refers to cannot be inferred by given information) or, if the pronoun can be im-\n    plicitly deduced, state the antecedent of the pronoun (i.e., the noun to which the\n    pronoun refers).\n\nExample: Clarify the meaning of sentences with ambiguous pronouns.\n\nQ: In the following sentences, explain the antecedent of the pronoun\n         (which thing the pronoun refers to), or state that it is ambiguous.\n         Sentence: The chief told the counselor that they took the day off.\n         Options:\n         (A) The chief took the day off\n         (B) The counselor took the day off\n         (C) Ambiguous\n\nA: (A)"
+    },
+    {
+      "id": "b-187",
+      "type": "body",
+      "text": "5. Formal Fallacies: Given a context involving a set of statements (generated by\n    one of the argument schemes), determine whether an argument—presented infor-\n    mally—can be logically deduced from the provided context.\n\nExample: Distinguish deductively valid arguments from formal falla-\n         cies.\n\nQ: “It is not always easy to see who is related to whom – and in which\n         ways. The following argument pertains to this question: To begin with,\n         Lesley is a close friend of Fernando. Moreover, being a close friend\n         of Fernando or a schoolmate of Lowell is sufficient for being a great-\n         grandfather of Leroy. It follows that Lesley is a great-grandfather of\n         Leroy.”\n         Is the argument, given the explicitly stated premises, deductively valid\n         or invalid?\n         Options:\n         - valid\n         - invalid\n\n74\n\fAPPENDIX\n\nA: valid"
+    },
+    {
+      "id": "b-188",
+      "type": "body",
+      "text": "6. Geometric Shapes: Given a full SVG path element containing multiple commands,\n    determine the geometric shape that would be generated if one were to execute the\n    full path element.\n\nExample: Name geometric shapes from their SVG paths.\n\nQ: This SVG path element <path d=“M 31.00,73.00 L 32.00,59.00 L\n         44.00,50.00 L 49.00,41.00 L 64.00,37.00 L 71.00,55.00 L 64.00,76.00 L\n         52.00,61.00 L 31.00,73.00”/> draws a\n         Options:\n         (A) circle\n         (B) heptagon\n         (C) hexagon\n         (D) kite\n         (E) line\n         (F) octagon\n         (G) pentagon\n         (H) rectangle\n         (I) sector\n         (J) triangle\n\nA: (F)\n\n7. Hyperbaton: Given two English-language sentences, determine the one with the\n    correct adjective order.\n\nExample: Order adjectives correctly in English sentences."
+    },
+    {
+      "id": "b-189",
+      "type": "body",
+      "text": "Q: Which sentence has the correct adjective order:\n         Options:\n         (A) rubber terrible ship\n         (B) terrible rubber ship\n\nA: (B)\n\n8. Logical Deduction: Deduce the order of a sequence of objects based on the clues\n    and information about their spacial relationships and placements.\n\nExample: A logical deduction task which requires deducing the order of\n         a sequence of objects.\n\nQ: The following paragraphs each describe a set of three objects arranged\n         in a fixed order. The statements are logically consistent within each para-\n         graph. In a golf tournament, there were three golfers: Amy, Eli, and Eve.\n         Eve finished above Amy. Eli finished below Amy.\n\n75\n\fAPPENDIX\n\nOptions:\n          (A) Amy finished last\n          (B) Eli finished last\n          (C) Eve finished last\n\nA: (B)"
+    },
+    {
+      "id": "b-190",
+      "type": "body",
+      "text": "9. Movie Recommendation: Given a list of movies a user might have watched and\n     liked, recommend a new, relevant movie to the user out of the four potential choices\n     user might have.\n\nExample: Recommend movies similar to the given list of movies.\n\nQ: Find a movie similar to Star Wars Episode IV - A New Hope, Indiana\n          Jones and the Last Crusade, Star Wars Episode V - The Empire Strikes\n          Back, The Big Lebowski:\n          Options:\n          (A) Tetsuo\n          (B) the Ironman\n          (C) The Princess Bride\n          (D) The Barkley Marathons The Race That Eats Its Young\n          (E) Bug\n\nA: (C)\n\n10. Navigate: Given a series of navigation steps to an agent, determine whether the\n     agent would end up back at its initial starting point.\n\nExample: Given a series of navigation instructions, determine whether\n          one would end up back at the starting point."
+    },
+    {
+      "id": "b-191",
+      "type": "body",
+      "text": "Q: If you follow these instructions, do you return to the starting point?\n          Turn left. Turn around. Turn left. Take 7 steps. Take 2 steps. Take 4\n          steps. Take 8 steps.\n          Options:\n          - Yes\n          - No\n\nA: No\n\n11. Object Counting: Given a collection of possessions that a person has along with\n     their quantities (e.g., three pianos, two strawberries, one table, and two watermel-\n     ons), determine the number of a certain object/item class (e.g., fruits).\n\nExample: Questions that involve enumerating objects and asking the\n          model to count them.\n\n76\n\fAPPENDIX\n\nQ: I have a blackberry, a clarinet, a nectarine, a plum, a strawberry, a\n          banana, a flute, an orange, and a violin. How many fruits do I have?\n\nA: 6"
+    },
+    {
+      "id": "b-192",
+      "type": "body",
+      "text": "12. Penguins in a Table: Given a unique table of penguins (and sometimes some new\n     information), answer a question about the attributes of the penguins.\n\nExample: Answer questions about a table of penguins and their at-\n          tributes.\n\nQ: Here is a table where the first line is a header and each subsequent\n          line is a penguin: name, age, height (cm), weight (kg) Louis, 7, 50, 11\n          Bernard, 5, 80, 13 Vincent, 9, 60, 11 Gwen, 8, 70, 15 For example: the\n          age of Louis is 7, the weight of Gwen is 15 kg, the height of Bernard is\n          80 cm. We now add a penguin to the table:\n          James, 12, 90, 12\n          How many penguins are less than 8 years old?\n          Options:\n          (A) 1\n          (B) 2\n          (C) 3\n          (D) 4\n          (E) 5\n\nA: (B)"
+    },
+    {
+      "id": "b-193",
+      "type": "body",
+      "text": "13. Reasoning about Colored Objects: Given a context, answer a simple question\n     about the color of an object on a surface.\n\nExample: Answer extremely simple questions about the colors of ob-\n          jects on a surface.\n\nQ: On the nightstand, there is a red pencil, a purple mug, a burgundy\n          keychain, a fuchsia teddy bear, a black plate, and a blue stress ball. What\n          color is the stress ball?\n          Options:\n          (A) red\n          (B) orange\n          (C) yellow\n          (D) green\n          (E) blue\n          (F) brown\n          (G) magenta\n          (H) fuchsia\n\n77\n\fAPPENDIX\n\n(I) mauve\n          (J) teal\n          (K) turquoise\n          (L) burgundy\n          (M) silver\n          (N) gold\n          (O) black\n          (P) grey\n          (Q) purple\n          (R) pink"
+    },
+    {
+      "id": "b-194",
+      "type": "body",
+      "text": "A: (E)\n 14. Ruin Names: Given an artist, band, or movie name, identify a one-character edit to\n     the name that changes the meaning of the input and makes it humorous.\n          Example: Select the humorous edit that ‘ruins’ the input movie or mu-\n          sical artist name.\n\nQ: Which of the following is a humorous edit of this artist or movie\n          name: ‘whitesnake’?\n          Options:\n          (A) whitesnape\n          (B) whitesnapke\n          (C) whitesnuake\n          (D) mwhitesnake"
+    },
+    {
+      "id": "b-195",
+      "type": "body",
+      "text": "A: (A)\n 15. Snarks: Given two nearly-identical sentences, determine which one is sarcastic.\n          Example: Determine which of two sentences is sarcastic.\n          According to Cambridge University Dictionary, sarcasm is “the use of\n          remarks that clearly mean the opposite of what they say, made in or-\n          der to hurt someone’s feelings or to criticize something in a humorous\n          way.” Sarcastic sentences often contain satirical or ironic utterances, hy-\n          perboles, ambivalent or witty remarks.\n\nQ: Which statement is sarcastic?\n          Options:\n          (A) Yes, because having interests and actively researching them is a huge\n          waste\n          (B) Yes, because having interests and actively researching them is a huge\n          deal\n\nA: (A)\n\n78\n\fAPPENDIX"
+    },
+    {
+      "id": "b-196",
+      "type": "body",
+      "text": "16. Sports Understanding: Determine whether a factitious sentence related to sports\n     is plausible.\n          Example: Determine whether an artificially constructed sentence relat-\n          ing to sports is plausible or not.\n\nQ: Is the following sentence plausible? “Bam Adebayo scored a reverse\n          layup in the Western Conference Finals.”\n\nA: yes\n 17. Temporal Sequences: Given a series of events and activities a person has com-\n     pleted in the course of a day, determine what time, during the day, they might have\n     been free to perform another activity.\n          Example: Task description: Answer questions about which times certain\n          events could have occurred."
+    },
+    {
+      "id": "b-197",
+      "type": "body",
+      "text": "Q: Today, Emily went to the museum. Between what times could they\n          have gone?\n          We know that:\n          Emily woke up at 1pm.\n          Elizabeth saw Emily reading at the library from 2pm to 4pm.\n          Jessica saw Emily watching a movie at the theater from 4pm to 5pm.\n          Leslie saw Emily waiting at the airport from 5pm to 6pm.\n          William saw Emily buying clothes at the mall from 6pm to 7pm.\n          The museum was closed after 7pm.\n          Between what times could Emily have gone to the museum?\n          Options:\n          (A) 1pm to 2pm\n          (B) 6pm to 7pm\n          (C) 5pm to 6pm\n          (D) 2pm to 4pm"
+    },
+    {
+      "id": "b-198",
+      "type": "body",
+      "text": "A: (A)\n 18. Tracking Shuffled Objects: Given the initial positions of a set of objects and a\n     series of transformations (namely, pairwise swaps) applied to them, determine the\n     final positions of the objects.\n          Example: A task requiring determining the final positions of a set of\n          objects given their initial positions and a description of a sequence of\n          swaps.\n\nQ: Alice, Bob, and Claire are playing a game. At the start of the game,\n          they are each holding a ball: Alice has a yellow ball, Bob has a blue ball,\n          and Claire has a pink ball.\n\n79\n\fAPPENDIX"
+    },
+    {
+      "id": "b-199",
+      "type": "body",
+      "text": "As the game progresses, pairs of players trade balls. First, Claire and\n          Alice swap balls. Then, Alice and Bob swap balls. Finally, Claire and\n          Bob swap balls. At the end of the game, Bob has the\n          Options:\n          (A) yellow ball\n          (B) blue ball\n          (C) pink ball\n\nA: (A)\n\n19. Web of Lies: Evaluate the truth value of a random Boolean function expressed as a\n     natural-language word problem.\n\nExample: Evaluate a random boolean function expressed as a word\n          problem.\n\nQ: Question: Fidel tells the truth. Jerry says Fidel tells the truth. Vina\n          says Jerry tells the truth. Millicent says Vina lies. Raymond says Milli-\n          cent lies. Does Raymond tell the truth?\n\nA: Yes\n\n80\n\fAPPENDIX"
+    },
+    {
+      "id": "b-200",
+      "type": "body",
+      "text": "D     Transformed matrix derivation\nBeginning with\n                                                  1 − ci\n                  Bi,: = ci +\n                                1 + exp[−αi (Li,: [wn log n] + Ei,: − βi )]\n        ′\nwe set Bi,: = Li,: [wn log n] + Ei,: and solve for this quantity:"
+    },
+    {
+      "id": "b-201",
+      "type": "body",
+      "text": "1 − ci\n                                    Bi,: = ci +                       ′\n                                                                               \u0001\n                                                1 + exp − αi (Bi,:       − βi )\n                                                      1 − ci\n                           Bi,: − ci =                         ′\n                                                                         \u0001\n                                           1 + exp − αi (Bi,:     − βi )\n                           ′\n                                      \u0001     1 − ci\n           1 + exp − αi (Bi,:  − βi ) =\n                                           Bi,: − ci\n                                 ′          1 − ci\n                        e−αi (Bi,: −βi ) =           −1\n                                           Bi,: − ci\n                                              \u0014      "
+    },
+    {
+      "id": "b-202",
+      "type": "body",
+      "text": "This equivalence means modelling something like the odds-ratio of expected success on\nindividual subtask questions instead of the average score itself using a logistic response.\n\n81\n\fAPPENDIX\n\nE     Parameter scaling laws for all BBH subtasks\nFigure 13 shows the result of fitting logistic scaling law model Equation (8) for all p = 19\nBBH subtasks in my dataset.\n\n82\n\fAPPENDIX\n\nFigure 13: Raw BBH scores against log-parameter size. The red line represents a\nlogistic fit using the functional form of Equation (8). R2 values range from 0.12 (Web of\nlies) to 0.52 (Ruin names).\n\n83"
+    }
+  ]
+}

@@ -1,0 +1,407 @@
+{
+  "arxivId": "2602.12276",
+  "paperTitle": "Agentic Test-Time Scaling for WebAgents",
+  "abstract": "Test-time scaling has become a standard way to improve performance and boost reliability of neural network models. However, its behavior on agentic, multi-step tasks remains less well-understood: small per-step errors can compound over long horizons; and we find that naive policies that uniformly increase sampling show diminishing returns. In this work, we present CATTS, a simple technique for dynamically allocating compute for multi-step agents. We first conduct an empirical study of inference-time scaling for web agents. We find that uniformly increasing per-step compute quickly saturates in long-horizon environments. We then investigate stronger aggregation strategies, including an LLM-based Arbiter that can outperform naive voting, but that can overrule high-consensus decisions. We show that uncertainty statistics derived from the agent&#39;s own vote distribution (entropy and top-1/top-2 margin) correlate with downstream success and provide a practical signal for dynamic compute allocation. Based on these findings, we introduce Confidence-Aware Test-Time Scaling (CATTS), which uses vote-derived uncertainty to allocate compute only when decisions are genuinely contentious. CATTS improves performance on WebArena-Lite and GoBrowse by up to 9.1% over React while using up to 2.3x fewer tokens than uniform scaling, providing both efficiency gains and an interpretable decision rule.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Test-time scaling has become a standard way to improve performance and boost reliability of neural network models. However, its behavior on agentic, multi-step tasks remains less well-understood: small per-step errors can compound over long horizons; and we find that naive policies that uniformly increase sampling show diminishing returns. In this work, we present CATTS, a simple technique for dynamically allocating compute for multi-step agents. We first conduct an empirical study of inference-time scaling for web agents. We find that uniformly increasing per-step compute quickly saturates in long-horizon environments. We then investigate stronger aggregation strategies, including an LLM-based Arbiter that can outperform naive voting, but that can overrule high-consensus decisions. We show that uncertainty statistics derived from the agent&#39;s own vote distribution (entropy and top-1/top-2 margin) correlate with downstream success and provide a practical signal for dynamic compute allocation. Based on these findings, we introduce Confidence-Aware Test-Time Scaling (CATTS), which uses vote-derived uncertainty to allocate compute only when decisions are genuinely contentious. CATTS improves performance on WebArena-Lite and GoBrowse by up to 9.1% over React while using up to 2.3x fewer tokens than uniform scaling, providing both efficiency gains and an interpretable decision rule."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Agentic Test-Time Scaling for WebAgents\n\nNicholas Lee * 1 Lutfi Eren Erdogan * 1 Chris Joseph John 1 Surya Krishnapillai 1 Michael W. Mahoney 1 2 3\n                                                                                 Kurt Keutzer 1 Amir Gholami 1 2"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract                                     button, typing into a form, or issuing a search query, based\n                                                                                                               on the current observation and the history of what it has\n                                              Test-time scaling has become a standard way\n                                                                                                               already done (Patil et al., 2024; Schick et al., 2023; Erdogan\n                                              to improve performance and boost reliability of\n                                                                                                               et al., 2024). The sequential nature of these tasks makes\narXiv:2602.12276v1 [cs.AI] 12 Feb 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "neural network models. However, its behavior\n                                                                                                               reliability much more challenging than simpler single-shot\n                                              on agentic, multi-step tasks remains less well-\n                                                                                                               question answering: a single poor decision can send the\n                                              understood: small per-step errors can compound\n                                                                                                               trajectory into an unrecoverable state, and small per-step\n                                              over long horizons; and we find that naive policies\n                                                               "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Preprint. February 13, 2026.                                            2. High-Variance Decisions. Using majority voting\n\n1\n\f                                            Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "when the votes exhibit very high variance and voting              test-time compute. Self-consistency decoding (Wang et al.,\n     results are close is often not helpful. This particularly         2023) demonstrated substantial gains on reasoning tasks by\n     happens when the model has to solve a hard step, or               sampling multiple chain-of-thought traces (Wei et al., 2022;\n     when there are multiple plausible actions that can com-           Kojima et al., 2022) and taking a majority vote over final\n     pete. In these cases, simply sampling more actions and            answers, treating it as an ensemble problem. Subsequent\n     taking a majority vote can be ineffective, especiallly            work has explored richer aggregation strategies including\n     when votes spread across many distinct options with               ranked voting and diversity-aware selection (Wang et al."
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2\n\f                                             Agentic Test-Time Scaling for WebAgents\n\nMajority Vote                   Arbiter                   Confidence-Aware Test-Time Scaling (CATTS)\n\nBase Model                   Base Model                                   Base Model\n\nCandidates                  Candidates                                    Candidates\n                  Candidates\n                 Candidates                   Candidates\n                                             Candidates                                     Candidates\n                                                                                           Candidates\n\nYes                     No\n                Majority Vote                   Arbiter                 Maj. Vote           Confident?           Arbiter\n\nSelected Action              Selected Action                               Selected Action"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Figure 1. Comparing agentic inference-time scaling methods. Visual comparison of selection strategies at each agent step. Left:\nMajority Voting samples N candidates and selects the most frequent action via argmax over vote distribution pt ( a). Center-Left: Arbiter\nsamples N candidates and uses an additional LLM call to reason over candidates and select the best action. Center-Right: CATTS\nconditionally invokes the arbiter only when vote-derived uncertainty (entropy Ht or margin ∆t ) exceeds threshold τ, otherwise falls back\nto majority voting."
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Evaluation of these methods relies on increasingly realistic            adaptation of inference-time scaling to web agents: sam-\nbenchmarks. For web navigation, environments range from                 pling multiple candidate actions and aggregating them, pro-\nearly workflow-based tasks (Shi et al., 2017) to modern                 gressively refining the selection mechanism based on em-\nsuites spanning e-commerce, forums, and content manage-                 pirical failure modes. We find that uniformly allocating\nment (Zhou et al., 2023; Koh et al., 2024; Deng et al., 2023;           inference-time compute inconsistently and inefficiently af-\nYao et al., 2022; Nakano et al., 2021; Drouin et al., 2024;             fects performance, and that the distribution of the actions\nBoisvert et al., 2024), while computer-use benchmarks ex-               themselves is an effective test-time signal f"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3\n\f                                                Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "vast majority of the tokens consumed come from the input                Table 1. Static inference-time scaling with majority vote.\n                                                                        Success rates on WebArena-Lite (WA) and GoBrowse (GB) un-\nprompt. All results are averaged across three different seeds           der varying candidate counts N. Scaling from N =1 to N =20\nunless otherwise noted.                                                 yields diminishing returns: on WebArena-Lite, the final doubling\n                                                                        (N =10 → N =20) produces negligible gain despite 2× tokens; on\nAction Clustering and Vote Distributions. At each time                  GoBrowse, gains are smaller and non-monotonic. This motivates\nstep t, the agent observes ot and samples N candidate ac-               stronger selection mechanisms "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "We parse candidates into structured actions to obtain a set                    N =1      38.8%        96K      86.9%       47K\n                                                                               N =5      42.4%       460K      87.8%      249K\nof action clusters At . Let nt ( a) denote the number of candi-\n                                                                               N =10     43.2%       920K      88.0%      481K\ndates assigned to cluster a ∈ At . This induces a distribution                 N =20     43.0%       1.8M      87.8%      995K\nover the sampled actions\n                                    nt ( a)\n                        pt ( a) =           ,                 (2)       compute yields diminishing returns. Scaling from N =1 to\n                                      N\n                                                                        N =10 improves suc"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "at = arg max pt ( a).                    (3)                 at = A RBITER (ot , At , {nt ( a)} a∈At ).        (4)\n                                a∈At"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "We refer to this as majority voting (or frequency voting).              In all experiments, the arbiter uses the same model as the\nMost importantly, the compute allocation is uniform: the                agent (gpt-oss-120b), and semantic deduplication is\nsame number of candidates N is sampled at every step,                   applied prior to selection. See Appendix B for implementa-\nand the same selection rule in Eq. 3 is applied throughout              tion details.\nthe trajectory.\n                                                                        Observation: Arbitration Improves Over Majority Vote.\nObservation: Majority Vote Yields Diminishing Returns.                  Replacing frequency voting with an arbiter yields a consis-\nAs we can see in Table 1, for both WebArena-Lite and GoB-               tent improvement over static majority voting across both\nrowse, we find that simpl"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "4\n\f                                             Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Table 2. Arbiter scaling (N =5). Comparison of majority voting,       Table 3. DeepConf variants on WebArena-Lite and GoBrowse.\nsingle arbiter call (K =1), and Arbiter Scaling (K >1) on both        Success rates for three confidence estimation methods across vary-\nbenchmarks. On WebArena-Lite, Arbiter Scaling improves from           ing candidate counts N. All variants can improve over majority\n42.8% (K =1) to 44.6% (K =10), a +1.8% gain, but K =20 degrades       voting baselines (WA: 43.2%, GB: 88.0% at N =10). Average\nto 42.0%. On GoBrowse, scaling yields steady improvement from         trace achieves 43.8% on WA at N =10, while on GoBrowse, av-\n88.6% (K =1) to 89.6% (K =20). Success rates are averaged over        erage trace at N =20 reaches 90.3%. Unlike CATTS, DeepConf\n3 runs.                                                               requires access to token-level log probabilit"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Arbiter Scaling. Because the arbiter model itself is an\nLLM call, we can also apply inference-time scaling to the\nselection mechanism. With “Arbiter Scaling,” we query K\nindependent selectors and aggregate their chosen actions by           3.4. DeepConf-Style Confidence Filtering\nmajority vote:\n                                                                      We additionally evaluated DeepConf-style confidence-aware\n                       1 K \u0002                                          filtering (Fu et al., 2025), which leverages model-internal\n         at = arg max ∑ I S ELECT j (·)= a .               (5)\n                                          \u0003\n                  a∈At K j=1                                          confidence signals to dynamically filter out low-quality rea-\n                                                                      soning traces during inference. DeepC"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "5\n\f                                               Agentic Test-Time Scaling for WebAgents\n\n4. Using Vote-Derived Uncertainty as a\n                                                                                                      Successful Tasks\n   Test-Time Signal                                                                                   Failed Tasks\n                                                                                            0.6\nWe saw (in Section 3.3) that replacing frequency voting with"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Entropy\nan arbiter improves average performance, and that scaling\nthe selectors can improve performance further (see Table 2).                                0.4\nHowever, closer inspection of trajectories revealed a con-\nsistent pattern: the selector is most helpful on contentious\nsteps, where multiple plausible actions compete, but it can\nbe harmful on high-consensus steps where candidates al-\nready agree. On such steps, arbitration risks overriding a                                  0.8\n\nProbability Margin\ncorrect consensus action (see Figure 7). This motivates the\nmain question of this subsection: Can we distinguish be-                                    0.7\ntween regimes where arbitration improves decisions and\nwhere it introduces harmful overrides?\n                                                                                            0.6"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "4.1. Analyzing Action Distributions\n                                                                                            0.5\nGiven the vote distribution pt (·) over action clusters At , we                                   0      2        4         6      8   10\ncompute two uncertainty statistics:                                                                                   Step Index"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Ht = − ∑ pt ( a) log pt ( a),                 (6)       Figure 2. Uncertainty profiles over trajectory steps. Entropy\n                           a∈At                                        Ht (top) and probability margin ∆t (bottom) versus step index,\n                                                                       separated by successful (blue) and failed (orange) runs, averaged\n                             (1)         (2)\n               ∆ t = p t ( a t ) − p t ( a t ),              (7)       across all experiments on both WebArena-Lite and GoBrowse.\n                                                                       Failed tasks consistently exhibit higher entropy and lower margins\n        (1)          (2)                                               throughout, with the gap widening at later steps. Successful tasks\nwhere at and at are the highest- and second-highest-        "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Uncertainty profiles differ between successful and failed              To quantify this pattern, we analyzed all 495 task-runs from\ntrajectories. We compare successful and failed tasks by                our arbiter experiments, classifying each task by whether\ntheir uncertainty statistics across steps. Let T be the number         the arbiter overrode the majority vote on any high-consensus\nof steps in a trajectory, and define task-level averages               step (∆t > 0.7). Figure 3 summarizes the results. Tasks\n                                                                       without high-consensus overrides succeed at 46.9%, com-\n                     1 T                       T                       pared to 35.0% for tasks with at least one such override:\n                                    ¯ = 1 ∑ ∆t .\n                     T t∑\n              H̄ =         Ht ,     ∆            "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "6\n\f                                                                       Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Table 4. CATTS results. We report success rates and token us-\n                                                                          Overall            age for majority vote, always-arbitrate, and CATTS at N =10.\n          Task Success Rate (%)                                           44.0%              CATTS with entropy gating (H; τ =0.2 for WebArena-Lite,\n                                           46.9%                                             τ =0.5 for GoBrowse) achieves 47.9% and 90.2% respectively,\n                                  40\n                                                                                             resulting in a 4.7% and 2.2% gain over majority vote. Margin-\n                                                       36.6%                                 gated CATTS (∆) achieves similar performance on GoBrowse\n                                        "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "WebArena-Lite           GoBrowse\n                                   0\n                                           0           1         2+                          Method                   Success     Tokens     Success   Tokens\n                                        Number of High-Consensus Overrides                   Majority vote            43.2%       920K       88.0%     481K\n                                                                                             Always-arbitrate         44.0%       762K       88.3%     443K\nFigure 3. High-consensus override analysis. Task success rate\ndecreases as the number of high-consensus overrides (∆t > 0.7)                               CATTS (H, best τ)        47.9%       745K       90.2%     422K\nincreases, showing a dose-response pattern. The red dashed line                              CATTS (∆, best τ)        47.9%       405K       9"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "(ent)               (mrg)\n         Net Arbiter Advantage"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Ut        = Ht ,   Ut         = 1 − ∆t .        (10)\n                                   10\n                                                   +5.6%       +4.1%     +4.4%\n                                                                                             Both entropy-gated and margin-gated CATTS improved\n                                    0                                                        the accuracy–compute tradeoff in our experiments. For\n                                                                                             both settings, we tuned τ via running a simple grid over\n                                          -4.4%\n                                  −10                                                        thresholds (e.g., τ ∈ {0.2, 0.3, . . . , 0.8}) and report results\n                                                                                  "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "7\n\f                                                       Agentic Test-Time Scaling for WebAgents\n\nWebArena-Lite                                                               GoBrowse\n               0.48                                                                          0.905\n\n0.47                                                                          0.900\n\n0.46                                                                          0.895\n\n0.45                                                                          0.890\nSuccess Rate\n\nSuccess Rate\n               0.44                                                                          0.885"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "0.43                       Majority Vote                                      0.880\n                                          Arbiter (K=1)\n               0.42                       Arbiter Scaling                                    0.875\n                                          CATTS (Entropy)\n               0.41                       CATTS (Margin)                                     0.870\n                                          DeepConf\n               0.40                       Pareto Frontier                                    0.865\n\n0.25   0.50      0.75   1.00    1.25   1.50   1.75                         0.0   0.2      0.4       0.6         0.8     1.0\n                                    Total Tokens / Episode          1 × 106                                  Total Tokens / Episode         1 × 106"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Figure 5. Accuracy–compute frontier across all methods. Success rate versus total tokens per episode on WebArena-Lite (left) and\nGoBrowse (right). Each point represents a different configuration: Majority Vote varies N ∈ {1, 3, 5, 10, 20}; Arbiter shows K =1 (one\nArbiter used) with varying N; Arbiter Scaling shows increasing K at fixed N =5; CATTS (Entropy/Margin) sweeps thresholds τ at\nN =10; DeepConf varies N ∈ {3, 5, 10, 20}. CATTS achieves Pareto improvements: on WebArena-Lite, it reaches 47.9% success at\n∼750K tokens (vs. 43.2% for Majority Vote at 920K tokens). DeepConf also performs strongly, achieving competitive accuracy at lower\ntoken budgets than majority vote."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "4.4. Discussion                                                                        errors tend to compound rather than self-correct. In this\n                                                                                       contentious regime, arbitration can add value by using the\nA key observation from our experiments is that inference-\n                                                                                       observation to reason about plausible candidates.\ntime scaling behaves differently in long-horizon tool use\nthan in single-shot reasoning. In our setting, per-step candi-\ndate sampling produces a distribution over actions, which                              5. Conclusion\nfalls into two different regimes.\n                                                                                      We present a systematic study of inference-time scaling for\n            "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "8\n\f                                         Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "thermore, we appreciate the support from Google Cloud,               Trans. Mach. Learn. Res., 2023, 2023. URL https:\nthe Google TRC team Prof. David Patterson, along with                //openreview.net/forum?id=YfZ4ZPt8zd.\nsupport from Google Gemini team, and Divy Thakkar.\nProf. Keutzer’s lab is also sponsored by funding through           Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H.,\nBDD and BAIR. We also acknowledge support by the Di-                 Kaiser, L., Plappert, M., Tworek, J., Hilton, J., Nakano,\nrector, Office of Science, Office of Advanced Scientific             R., et al. Training verifiers to solve math word problems.\nComputing Research, of the U.S. Department of Energy                 arXiv preprint arXiv:2110.14168, 2021.\nunder Contract No. DE-AC02-05CH11231. MWM would\nalso like to acknowledge DARPA, DOE, NSF, and ONR.                 Cuadron, A., Li, D., "
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Impact Statement                                                   Deng, X., Gu, Y., Zheng, B., Chen, S., Stevens, S., Wang,\n                                                                     B., Sun, H., and Su, Y. Mind2web: Towards a general-\nThis paper presents work whose goal is to advance the field\n                                                                     ist agent for the web. Advances in Neural Information\nof Machine Learning. There are many potential societal\n                                                                     Processing Systems, 36:28091–28114, 2023.\nconsequences of our work, none which we feel must be\nspecifically highlighted here.                                     Drouin, A., Gasse, M., Caccia, M., Laradji, I. H., Verme,\n                                                                     M. D., Marty, T., Vázquez, D., Chapados, N., and La-\nRef"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Byerly, A. and Khashabi, D. How effective is self-                 Fu, Y., Wang, X., Tian, Y., and Zhao, J. Deep think with\n  consistency for long-context problems?, 2024. URL                  confidence, 2025. URL https://arxiv.org/abs/\n  https://arxiv.org/abs/2411.01101.                                  2508.15260.\n\nChen, W., Ma, X., Wang, X., and Cohen, W. W. Pro-                  Gandhi, A. and Neubig, G. Go-browse: Training web\n  gram of thoughts prompting: Disentangling compu-                   agents with structured exploration, 2025. URL https:\n  tation from reasoning for numerical reasoning tasks.              //arxiv.org/abs/2506.03533.\n\n9\n\f                                          Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Gao, L., Dai, Z., Pasupat, P., Chen, A., Chaganty, A. T., Fan,          CoRR, abs/2205.00445, 2022. doi: 10.48550/ARXIV.\n  Y., Zhao, V. Y., Lao, N., Lee, H., Juan, D., and Guu, K.              2205.00445. URL https://doi.org/10.48550/\n  RARR: researching and revising what language models                   arXiv.2205.00445.\n  say, using language models. In Rogers, A., Boyd-Graber,\n  J. L., and Okazaki, N. (eds.), Proceedings of the 61st              Kim, S., Moon, S., Tabrizi, R., Lee, N., Mahoney, M. W.,\n  Annual Meeting of the Association for Computational                   Keutzer, K., and Gholami, A. An llm compiler for parallel\n  Linguistics (Volume 1: Long Papers), ACL 2023, Toronto,               function calling. In Forty-first International Conference\n  Canada, July 9-14, 2023, pp. 16477–16508. Association                 on Machine Learning, 2024.\n  for Computational Linguistics"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Guo, Z., Cheng, S., Wang, H., Liang, S., Qin, Y.,                     Li, M., Song, F., Yu, B., Yu, H., Li, Z., Huang, F., and\n  Li, P., Liu, Z., Sun, M., and Liu, Y. Stabletool-                     Li, Y. Api-bank: A benchmark for tool-augmented llms.\n  bench: Towards stable large-scale benchmarking on                     CoRR, abs/2304.08244, 2023. doi: 10.48550/ARXIV.\n  tool learning of large language models. In Find-                      2304.08244. URL https://doi.org/10.48550/\n  ings of the Association for Computational Linguis-                    arXiv.2304.08244.\n  tics: ACL 2024, pp. 11143–11156, Bangkok, Thailand,                 Liu, E. Z., Guu, K., Pasupat, P., Shi, T., and Liang, P. Rein-\n August 2024. Association for Computational Linguis-                    forcement learning on web interfaces using workflow-\n  tics. URL https://aclanthology.org/2024.                      "
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "10\n\f                                          Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "E., and Hashimoto, T. B. s1: Simple test-time scaling.                Sun, M. Toolllm: Facilitating large language models to\n  In Proceedings of the 2025 Conference on Empirical                    master 16000+ real-world apis. In The Twelfth Interna-\n  Methods in Natural Language Processing, pp. 20286–                    tional Conference on Learning Representations, ICLR\n  20332, 2025.                                                          2024, Vienna, Austria, May 7-11, 2024. OpenReview.net,\n                                                                        2024. URL https://openreview.net/forum?\nMurty, S., Manning, C. D., Shaw, P., Joshi, M., and Lee,                id=dHng2O0Jjr.\n K. BAGEL: Bootstrapping agents by guiding exploration\n with language. In Salakhutdinov, R., Kolter, Z., Heller,             Rawles, C., Li, A., Rodriguez, D., Riva, O., and Lillicrap, T.\n K., Welle"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "11\n\f                                             Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Wan, G., Wu, Y., Chen, J., and Li, S. Reasoning aware self-                 Learning Representations (ICLR), 2023b. URL https:\n consistency: Leveraging reasoning paths for efficient llm                  //openreview.net/forum?id=WE_vluYUL-X.\n sampling, 2024. URL https://arxiv.org/abs/\n 2408.17017.                                                              Zelikman, E., Wu, Y., Mu, J., and Goodman, N. Star: Boot-\n                                                                            strapping reasoning with reasoning. Advances in Neural\nWang, G., Xie, Y., Jiang, Y., Mandlekar, A., Xiao, C.,                      Information Processing Systems, 35:15476–15488, 2022.\n Zhu, Y., Fan, L., and Anandkumar, A. Voyager: An\n open-ended embodied agent with large language models.                    Zhang, C., Yang, Z., Liu, J., Li, Y., Han, Y., Chen, X.,\n Trans. Mach. Learn. Res., 2024, 2024. U"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Yao, S., Chen, H., Yang, J., and Narasimhan, K. Web-\n  shop: Towards scalable real-world web interaction with\n  grounded language agents. Advances in Neural Informa-\n  tion Processing Systems, 35:20744–20757, 2022.\n\nYao, S., Yu, D., Zhao, J., Shafran, I., Griffiths, T. L., Cao, Y.,\n  and Narasimhan, K. R. Tree of thoughts: Deliberate prob-\n  lem solving with large language models. In Advances in\n  Neural Information Processing Systems (NeurIPS), 2023a.\n  URL https://arxiv.org/abs/2305.10601.\n\nYao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan,\n  K. R., and Cao, Y. React: Synergizing reasoning and act-\n  ing in language models. In International Conference on\n\n12\n\f                                         Agentic Test-Time Scaling for WebAgents\n\nA. Agent Design Decisions\nA.1. Action Space\nOur agents use a minimal action space with 8 tools designed for web navigation:"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "• click(element id): Click on a DOM element by its unique identifier\n   • type text(element id, text): Enter text into an input field without submitting\n   • hover(element id): Hover over an element to reveal tooltips or dropdown menus\n   • scroll(direction): Scroll the page up or down to reveal more content\n   • select dropdown option(element id, value): Select an option from a dropdown menu\n   • search(element id, text): Type text and submit (equivalent to type + Enter)\n   • go back(): Navigate to the previous page in browser history\n   • exit(message): Terminate the episode with a final answer or status message\n\nAll element-targeting tools require an element id parameter that corresponds to an injected integer id attribute in the\nDOM. This simplifies element identification compared to CSS selectors or XPaths."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "A.2. Error Handling and Validation\nThe agent framework includes several error checks that provide feedback during the retry loop:\n\n• MustCallExactlyOneToolCheck: Ensures exactly one function call per step\n   • InvalidActionSchemaCheck: Validates that function arguments match the expected schema\n   • ElementMustExistCheck: Verifies that referenced element IDs exist in the current DOM\n   • MustProvideReasoningCheck: Requires the agent to provide reasoning in the analysis channel\n   • RepeatingActionLoopCheck: Detects and prevents repeated ineffective actions\n\nWhen a check fails, the agent receives an error message and has up to 5 retry attempts to produce a valid action.\n\nA.3. Conversation Format\nEach agent turn follows a structured format with the GPT-OSS Harmony interface:"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "1. System message: Establishes agent role and channel usage\n  2. Developer message: Provides detailed instructions and constraints\n  3. User message: Contains the task, current HTML state, and any error feedback\n  4. Assistant response: Analysis in the analysis channel, function call in commentary\n  5. Tool observation: Result of the action with updated HTML state\n\nThe conversation history preserves prior reasoning and actions but only includes full HTML in the most recent tool\nobservation to manage context length. This allows the agent to reference its own reasoning trajectory while grounding\ndecisions in the current page state.\n\nB. Agent Prompts\nThis section provides the key prompts used in our system components."
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "B.1. Base Agent (ReAct Executor)\nThe base agent uses a channel-based prompting format with separate channels for reasoning (analysis) and action\nemission (commentary). The system prompt establishes the agent’s role:\n\nYou are a web-execution agent that completes browser tasks by emitting function\n     calls in each step.\n     How each step works:\n\n13\n\f                                         Agentic Test-Time Scaling for WebAgents\n\n• Inputs you’ll see each step: User task (overall goal), prior reasoning and\n          function calls, latest HTML snapshot of current page state.\n        • What you must produce: First write analysis (detailed reasoning), then emit\n          exactly one function call in commentary.\n     Channels:      analysis → deep reasoning; commentary → one function call."
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "The developer prompt provides detailed instructions for element targeting, function-calling discipline, and recovery from\nerrors:\n\nElement targeting via numeric id (must-follow):\n        • The environment injects a special id attribute that is an integer string (e.g.,\n          ‘‘15’’).\n        • When a function requires an element, supply this integer id exactly as shown in\n          the latest HTML.\n        • Do not provide CSS selectors, XPaths, inner text, or made-up ids.\n     Recovery and loop-avoidance:\n        • Do not repeat an ineffective action more than once.\n        • After an error or no-op, re-analyze the latest HTML before choosing a different\n          action.\n\nB.2. Semantic Deduplicator\nThe semantic deduplicator clusters equivalent actions before voting. Its prompt instructs:"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "You are a deterministic semantic action deduplicator for a web-navigation system.\n     Context:\n        • All inputs in one call are the same action type (TYPE | SEARCH | STOP).\n        • All inputs act on the same element target (already checked upstream).\n        • Your task: group semantically equivalent actions and pick a representative per\n          group.\n     What ‘‘equivalent’’ means:\n        • Same intent after trivial normalization (case, spacing, punctuation) and minor\n          paraphrase/synonymy.\n        • Do NOT merge items that change intent/topic (e.g., ‘‘apple store’’ ̸= ‘‘apple\n          id login’’).\n        • If unsure, keep them separate (prefer false negatives over false positives).\n     Output format:        Clusters:      [[rep index, other idx, ...], [rep index2, ...]]"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "B.3. Arbiter\nThe arbiter selects the best action from deduplicated candidates. Its prompt specifies:\n\nYou are an expert web-navigation action arbiter.\n     You will receive: User intent, previous actions, current page state (cleaned\n     HTML), candidate actions.\n     Decision Criteria:\n       1. Progress toward intent: Prefer actions that concretely advance the task\n       2. Relevance: Target visible, relevant elements from the current HTML\n       3. Avoid repetition: Don’t repeat failed or redundant actions\n       4. Context awareness: Consider current page state and previous actions\n       5. Feasibility: Ensure the action is executable on the current page\n     Output Format:\n     Thoughts: <reasoning about which action is best>\n     Pick: <number from 1 to N>\n     Confidence: <decimal from 0.0 to 1.0>"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "14\n\f                                        Agentic Test-Time Scaling for WebAgents\n\nB.4. External Planner (Plan-and-Act)\nFor the Plan-and-Act baseline, we use a two-agent system where an external planner generates high-level plans and a\nseparate executor agent follows them. The planner’s system prompt establishes its role:"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "You are a web-navigation agent that normally completes browser tasks by thinking\n    in an analysis channel and then emitting exactly one function call (using the\n    provided tools) per step.\n    In this role, you are acting as the Planner in a two-agent system:\n    - You see the overall User task, your earlier plans, the executed tool calls, and\n     the latest HTML snapshot (inside the most recent tool observation).\n    - A separate Executor agent will later read your plan and actually perform the\n     function calls in the browser.\n    For this planner turn:\n    - Use the analysis channel for deep, step-by-step reasoning and scratchpad.\n    - Use the final channel to output a clear, concrete plan for the next actions.\n    - Do not actually call tools in this turn; only describe how the tools should be\n     used in the future steps."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "The developer prompt provides additional guidance on plan quality:"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Planner reasoning guidance:\n       • Think step by step and deeply in your own natural style.\n       • Focus on the next several actions and how to verify progress on the page.\n       • Ground your plan in: the user task, prior plans, executed tool calls and their\n         results, the latest HTML.\n       • Avoid unsupported assumptions about elements or states that you have not\n         observed.\n    Recovery and loop-avoidance:\n       • Do not repeat plans or actions that failed or produced no state change.\n       • When something did not work, explicitly include recovery steps: different id,\n         scroll, search, hover, go back, or another sensible control.\n       • Clarify how the Executor should adapt if the page does not look as expected.\n    Referencing future actions:\n       • Refer to tools by their names (for example: click, type text, hover, scroll,\n         select dropdown"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "C. Benchmark Characteristics and LLM-as-Judge Reliability\nBenchmark difficulty comparison. WebArena-Lite and the GoBrowse-style benchmark differ substantially in task\ndifficulty and evaluation methodology:\n\n• WebArena-Lite (165 tasks): Uses programmatic success checks that verify specific page states or database entries.\n    Tasks often require longer trajectories with precise multi-step reasoning. Average trajectory length is approximately\n    8–12 steps, and success rates are generally lower (40–47% in our experiments).\n  • GoBrowse-style (341 tasks): Uses an LLM-as-judge evaluation protocol. Tasks tend to be shorter and more straightfor-\n    ward, with average trajectory lengths of 4–6 steps. Success rates are substantially higher (86–90% in our experiments),\n    reflecting easier task specifications."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "15\n\f                                             Agentic Test-Time Scaling for WebAgents\n\nThe higher baseline performance on GoBrowse means there is less room for improvement from inference-time scaling\nmethods. Nevertheless, CATTS achieves consistent gains on both benchmarks, suggesting the underlying principles\ngeneralize across difficulty levels."
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "LLM-as-judge reliability. For the GoBrowse-style benchmark, we employ the LLM-as-judge evaluation protocol intro-\nduced in the original GoBrowse work. Based on validation studies reported in that work, the judge achieves approximately\n90% agreement with human evaluations on task success determination. This reliability level is comparable to inter-annotator\nagreement on similar web navigation benchmarks.\nWhile LLM-as-judge evaluation introduces some noise compared to programmatic checks, the 90% agreement rate suggests\nthat relative comparisons between methods (e.g., CATTS vs. majority voting) remain valid. The consistent improvement\npattern observed on both benchmarks (WebArena-Lite with programmatic evaluation and GoBrowse with LLM-as-judge)\nprovides additional confidence in our findings."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "D. Semantic Deduplication Ablation\nTable 5 demonstrates the importance of semantic deduplication for majority voting. Without deduplication (“Before fixes”),\nincreasing the number of candidates N can hurt performance on GoBrowse: accuracy drops from 83.3% at N =1 to 80.1%\nat N =32. This counterintuitive result occurs because semantically equivalent actions (e.g., “N/A” vs. “Not found”, or minor\nrephrasing of search queries) split votes, causing the majority vote to select incorrect minority actions.\nAfter applying semantic deduplication (“After fixes”), scaling behavior normalizes and performance improves. For ReAct\nat N =8, accuracy increases from 83.3% to 84.5%. The per-website breakdown shows consistent improvements across\ndomains, with particularly large gains on Reddit (84.8%→94.9%) where text input variations are common.\nTable 5. Impact of semantic deduplication on GoBrowse. Withou"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "After Deduplication (per-website)\n                        Setting   Before     Overall    GitLab     Map      Reddit    Shopping     Shop.Admin\n                         ReAct\n                        N =1      83.3%      83.3%      84.7%     76.3%     84.8%       89.8%         82.7%\n                        N =8      83.3%      84.5%      81.9%     77.6%     94.9%       86.4%         84.0%\n                        N =16     81.8%      82.1%      83.3%     73.7%     94.8%       88.1%         74.7%\n                        N =32     80.1%        –          –         –         –           –             –\n                         Plan&Act\n                        (1, 1)  82.4%        82.4%        –         –         –           –             –\n                        (2, 4)  81.2%        81.2%        –         –         –           –             –\n                        (4, 2)  84.2%        85.3"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "This ablation addresses a potential concern that semantic deduplication artificially inflates results. On the contrary, the data\nshows that deduplication is required for majority voting to function as intended. Without it, the method exhibits behavior\nwhere more samples lead to worse outcomes. The improvement from deduplication (e.g., 80.1%→84.5% at N =8) reflects\nthe restoration of correct voting semantics, and is not an artificial boost."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "E. Plan-and-Act Scaling Results\nWe evaluated Plan-and-Act agents (Erdogan et al., 2025) with factorized candidate-generation budgets to determine whether\nnon-monotonic scaling is specific to ReAct-style agents or a more general phenomenon. Let P denote the number of plan\ncandidates sampled and A the number of action candidates per plan, yielding total budget C = P × A. Table 6 presents\nresults on GoBrowse.\nThe results mirror what we observe with ReAct: scaling up compute via more samples does not reliably improve performance.\nIn fact, performance decreases from 83.3% to 80.6% when moving from budget C =1 to C =8. This establishes that the\nnon-monotonic scaling phenomenon affects multiple agent architectures, providing additional motivation for the dynamic\n\n16\n\f                                             Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Table 6. Plan-and-Act scaling on WebArena-Lite and GoBrowse. Success rates under different budget allocations ( P, A) with total\ncompute C = P × A. Non-monotonic scaling is evident on both benchmarks: on WebArena-Lite, (2, 4) achieves the best result (43.2%)\nbut (4, 4) drops to 43.0% despite 2× the budget; on GoBrowse, the baseline (1, 1) achieves 83.3%, while (2, 4) with 8× the budget drops\nto 80.6%. This confirms that the non-monotonic scaling phenomenon affects multiple agent architectures, not just ReAct, strengthening\nthe motivation for dynamic compute allocation."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "( P, A)   Budget C        WA           GB      Tokens\n                                          (1, 1)         1       38.8%       83.3%       104K\n                                          (2, 4)         8       43.2%       80.6%       731K\n                                          (4, 4)        16       43.0%       81.5%       1.4M\n\ncompute allocation approach developed in Section 4.2.\n\nF. Complete Arbiter Scaling Results\nTable 7 presents the complete arbiter scaling results on WebArena-Lite across all combinations of candidate count N ∈\n{3, 5, 10, 20} and arbiter scaling factor K ∈ {1, 5, 10, 20}. Success rates are averaged over 3 independent runs."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Table 7. Complete arbiter scaling on WebArena-Lite. Success rates for all ( N, K ) configurations, averaged over 3 runs. Best result for\neach N is bolded. The optimal arbiter scaling factor K varies by candidate count N: small N benefits from high K (N =3, K =20: 45.7%),\nwhile larger N prefers moderate K (N =10, K =5: 44.6%). No single ( N, K ) dominates, and gains from arbiter scaling plateau or decline\nbeyond optimal K. This non-monotonic behavior motivates selective arbiter use via dynamic gating rather than uniform high-K allocation."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Arbiter Scaling Factor K\n                                        Candidates N      K =1       K =5        K =10        K =20\n                                            N =3         43.0%      41.2%        43.4%    45.7%\n                                            N =5         42.8%      44.2%        44.6%    42.0%\n                                            N =10        44.0%      44.6%        42.0%    43.0%\n                                            N =20        43.2%      42.8%        44.0%    43.6%"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "G. RSA and PlanRSA Full Results\nWe evaluated Recursive Self-Aggregation (RSA) (Venkatraman et al., 2025) as an alternative to single-round arbitration.\nRSA iteratively refines candidates over T rounds, with K aggregation calls per round. Building ontop of Plan-and-Act,\nwe combine it with RSA to create PlanRSA, where we apply RSA at the plan level. Table 8 presents results across all\nconfigurations tested on WebArena-Lite.\n\nTable 8. Full RSA and PlanRSA results on WebArena-Lite. RSA applies iterative refinement at the action level, while PlanRSA applies\nit at the plan level for Plan-and-Act agents. Despite substantially higher compute costs (up to 80 LLM calls per step), RSA achieves\nat best comparable performance to single-round arbitration. PlanRSA underperforms all baselines, suggesting that aggregation noise\naccumulates more severely at higher levels of abstraction."
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Method                       N/P        K   T     Success      Calls/Step\n                                  Baselines\n                                 Majority Vote                 10        –   –        43.2%           10\n                                 Arbiter (K =1)                10        1   –        44.0%           11\n                                 CATTS (entropy, best)         10        1   –        47.9%           ∼7\n                                  RSA (action-level aggregation)\n                                 RSA                           8         2   2        41.0%           24\n                                 RSA                           8         2   4        41.0%           40\n                                 RSA                          16         4   2        42.0%           48\n                                 RSA                          16         4   4        4"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "17\n\f                                           Agentic Test-Time Scaling for WebAgents"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Analysis. RSA with N =16, K =4, T =4 achieves 43.6%, comparable to single-round arbitration (44.0%) but at ∼7× the\ncompute cost per step. The marginal benefit of additional aggregation rounds is minimal: increasing T from 2 to 4 improves\nperformance by only 0–1.6% while roughly doubling compute. We hypothesize that RSA’s iterative refinement, designed for\nsingle-shot reasoning tasks where solutions can be progressively improved, does not transfer well to per-step action selection\nwhere the “correct” answer depends heavily on environmental context that cannot be improved through reasoning alone.\nPlanRSA performs substantially worse than all baselines (35.2% vs. 43.2% for majority vote). Notably, the selection method\nwithin PlanRSA (arbiter vs. random) makes no difference, suggesting the bottleneck is the plan aggregation process itself\nrather than final selection. This may reflect error a"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "H. Threshold Sensitivity Analysis\nTables 9 and 10 present the full threshold sweep results for CATTS on WebArena-Lite across different values of N ∈\n{3, 5, 10, 20}. Both entropy-gated and margin-gated variants show robust performance across a range of thresholds\nτ ∈ {0.2, 0.3, . . . , 0.8}. The best-performing threshold for each N is highlighted in bold.\n\nTable 9. Entropy-gated CATTS threshold sweep on WebArena-Lite. Success rates across different candidate counts (N) and threshold\nvalues (τ). Best-performing threshold for each N is bolded. Baseline majority vote success rates: N =3: 40.2%, N =5: 42.8%, N =10:\n43.2%, N =20: 43.8%. Most configurations outperform their respective baselines, demonstrating robustness to threshold choice. Peak\ngains occur at N =10 (τ =0.2: 47.9%, +4.7% over baseline) and N =20 (τ =0.7: 47.3%, +3.5%)."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Threshold τ     N =3     N =5     N =10     N =20\n                                            0.2       44.2%     43.0%    47.9%     43.6%\n                                            0.3       43.0%     44.2%    46.7%     44.2%\n                                            0.4       46.7%     45.5%    44.2%     46.1%\n                                            0.5       43.0%     45.5%    45.5%     40.6%\n                                            0.6       44.2%     45.5%    46.1%     43.0%\n                                            0.7       44.2%     44.2%    47.3%     47.3%\n                                            0.8       42.4%     45.5%    45.5%     42.4%"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Table 10. Margin-gated CATTS threshold sweep on WebArena-Lite. Success rates across different candidate counts (N) and threshold\nvalues (τ). Best-performing threshold for each N is bolded. Baseline majority vote success rates: N =3: 40.2%, N =5: 42.8%, N =10:\n43.2%, N =20: 43.8%. Margin-gated CATTS shows similar robustness to entropy-gated variant, with peak performance at N =5 (τ =0.5:\n47.9%, +5.1%) and N =20 (τ =0.7: 47.9%, +4.1%). The optimal threshold varies by N, but most settings achieve meaningful gains."
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Threshold τ     N =3     N =5      N =10    N =20\n                                           0.2        44.8%     45.5%    45.5%     44.8%\n                                           0.3        43.6%     45.5%    42.4%     46.7%\n                                           0.4        46.1%     45.5%    46.1%     44.2%\n                                           0.5        43.0%     47.9%    44.8%     44.2%\n                                           0.6        43.6%     44.2%    44.2%     46.7%\n                                           0.7        44.2%     44.2%    44.2%     47.9%\n                                           0.8        47.3%     46.1%    46.1%     44.2%"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "The results demonstrate that CATTS is relatively robust to the choice of threshold across different values of N. For\nentropy-gated CATTS, the best thresholds vary by N but most configurations outperform the majority vote baseline. For\nmargin-gated CATTS, similar robustness is observed with peak performance typically at τ ∈ {0.4, 0.5, 0.7, 0.8}. In practice,\na default threshold of τ = 0.5 provides good performance across both benchmarks without extensive tuning."
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "I. Vote Distribution Analysis\nFigure 6 presents the detailed analysis of vote distributions across all decision steps from our experiments. This analysis\nprovides empirical support for the two-regime interpretation discussed in Section 4.4.\nThe distributions reveal several key patterns: (1) Right-skewed top-1 probability: Approximately 42% of steps exhibit near-\ndeterministic consensus with top-1 probability exceeding 0.9, indicating that many decisions fall into a redundant regime.\n\n18\n\f                                              Agentic Test-Time Scaling for WebAgents\n\n(A) Top-1 Probability Distribution                                    (B) Normalized Entropy Distribution\n                    Mean = 0.762                                                                                      Mean = 0.474\n\n40000                                                               40000"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "30000                                                               30000\nCount\n\nCount\n        20000                                                               20000\n\n10000                                                               10000"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "0                                                                   0\n                    0.2       0.4       0.6        0.8       1.0                    0.0    0.2       0.4     0.6      0.8       1.0\n                            Top-1 Probability                                                    Normalized Entropy\nFigure 6. Vote distribution profiles across all steps. Histograms aggregated over all decision steps from N =10 experiments on\nWebArena-Lite. (A) Top-1 probability distribution shows strong right skew: ∼42% of steps have near-deterministic consensus (top-1\nprobability >0.9), and mean top-1 probability is 0.762. This indicates many steps fall into a redundancy regime where additional\ncandidates duplicate the dominant action. (B) Normalized entropy distribution is bimodal (mean 0.474): ∼40% of steps have zero entropy\n(perfect consensus), while ∼49% of steps have entropy >0.6, i"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "(2) Bimodal entropy: The normalized entropy distribution is bimodal (mean 0.474), with approximately 40% of steps at\nzero entropy (perfect consensus) and approximately 49% showing entropy above 0.6. (3) Two-regime interpretation: The\ndistributions strongly support the two-regime interpretation from Section 4.4: a large fraction of steps are routine (high\nconsensus) while a comparable fraction are contentious (genuine uncertainty), motivating dynamic compute allocation.\nThese empirical profiles directly motivate the dynamic gating approach in CATTS: by allocating extra arbitration compute to\nthe high-entropy tail while preserving consensus on the dominant low-entropy steps, we can improve the accuracy–compute\ntradeoff without the overhead of uniform scaling."
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "J. Failure Node Examples\nThis section provides a concrete example from our experiments where the arbiter’s override of high-consensus decisions led\nto task failure. Theis example illustrate the core failure mode discussed in Section 4: when the vote distribution already\nexhibits strong agreement (high margin ∆t , low entropy Ht ), arbitration introduces override risk rather than improving\ndecision quality.\nFigure 7 presents an example from a WebArena-Lite task requiring the agent to find “Meat Substitutes” in an online grocery\nstore. At a critical decision point, the sampled candidates show 90% consensus for “Scroll Down”, the correct action, since\nthe target category lies below the current viewport. However, the arbiter overrides this strong consensus and selects “Click\nPantry Staples,” a minority action that navigates to an incorrect category and derails the trajectory.\nThis failure pa"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "19\n\f                                                Agentic Test-Time Scaling for WebAgents\n\nQuery: Buy highest rated\n                           meat substitute product.                          Thought: The majority\n                                                                              action is too generic.\n                                                                            Clicking “Pantry Staples”\n                                                   Scroll Down               will take me to the meat\n                                                                                    substitutes.\n\nScroll Down\n                           Base Model                                        Arbiter Model              Task Failed\n                                                   Scroll Down\n\nClick “Pantry\n                                                    Staples”"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "Figure 7. Arbiter failure on high-consensus step. Example trajectory where the sampled candidates exhibit strong consensus (e.g.,\n9/10 votes for one action), but the arbiter overrides the majority and selects a minority action, leading to task failure. This illustrates that\narbitration can be harmful when vote-derived uncertainty is already low.\n\n20"
+    }
+  ]
+}

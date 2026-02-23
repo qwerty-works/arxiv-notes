@@ -1,0 +1,402 @@
+{
+  "arxivId": "2602.10999",
+  "paperTitle": "CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion",
+  "abstract": "Agentic coding requires agents to effectively interact with runtime environments, e.g., command line interfaces (CLI), so as to complete tasks like resolving dependency issues, fixing system problems, etc. But it remains underexplored how such environment-intensive tasks can be obtained at scale to enhance agents&#39; capabilities. To address this, based on an analogy between the Dockerfile and the agentic task, we propose to employ agents to simulate and explore environment histories, guided by execution feedback. By tracing histories of a healthy environment, its state can be inverted to an earlier one with runtime failures, from which a task can be derived by packing the buggy state and the corresponding error messages. With our method, named CLI-Gym, a total of 1,655 environment-intensive tasks are derived, being the largest collection of its kind. Moreover, with curated successful trajectories, our fine-tuned model, named LiberCoder, achieves substantial absolute improvements of +21.1% (to 46.1%) on Terminal-Bench, outperforming various strong baselines. To our knowledge, this is the first public pipeline for scalable derivation of environment-intensive tasks.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Agentic coding requires agents to effectively interact with runtime environments, e.g., command line interfaces (CLI), so as to complete tasks like resolving dependency issues, fixing system problems, etc. But it remains underexplored how such environment-intensive tasks can be obtained at scale to enhance agents&#39; capabilities. To address this, based on an analogy between the Dockerfile and the agentic task, we propose to employ agents to simulate and explore environment histories, guided by execution feedback. By tracing histories of a healthy environment, its state can be inverted to an earlier one with runtime failures, from which a task can be derived by packing the buggy state and the corresponding error messages. With our method, named CLI-Gym, a total of 1,655 environment-intensive tasks are derived, being the largest collection of its kind. Moreover, with curated successful trajectories, our fine-tuned model, named LiberCoder, achieves substantial absolute improvements of +21.1% (to 46.1%) on Terminal-Bench, outperforming various strong baselines. To our knowledge, this is the first public pipeline for scalable derivation of environment-intensive tasks."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Yusong Lin 1 2 Haiyang Wang B 1 Shuzhe Wu 1 Lue Fan 3 Feiyang Pan 1 Sanyuan Zhao B 2 Dandan Tu B 1\n                                                                 1                                  2\n                                                                   Huawei Technologies Co., Ltd       Beijing Institute of Technology\n                                                                      3\n                                                                        Institute of Automation, Chinese Academy of Sciences\n                                                                  {linyusong4, haiyang.wang, wushuzhe2, panfeiyang, tudandan}@huawei.com\n                                                                               zhaosanyuan@bit.edu.cn      lue.fan@ia.ac.cn\n                                             § Code: https://github.com/LiberCoders/CLI-Gym                "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "LiberCoder-235B-A22B\n                                                                 Git Commits                                    Agent Explorations\n                                                                                                                                                            45\n                                                            (real code histories)                           (simulated environment histories)\n                                                                                                                                                                     LiberCoder-32B         GLM-4.6\n                                                                                                                                                                                                      Qwen3-Coder-480B\n                                    "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "(a) Deriving agentic tasks by tracing code or environment histories                                                         (b) Pass@1 on Terminal-Bench 1.0 vs model size\n                                         Figure 1. Illustration of the idea behind our CLI-Gym that brings high performance on the Terminal-Bench 1.0. (a): Code-intensive\n                                         tasks, as those in the SWE-bench, can be derived with readily available code histories and context like PRs. For tasks involving intensive\n                                         interaction with the environment like CLI, as those in the Terminal-Bench, we employ agents to simulate and explore environment\n                                         histories guided by execution feedback, realizing scalable derivation of environmen-intensive tasks. (b): With task trajectories obtained\n                              "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Abstract                                                                     of 1,655 environment-intensive tasks are derived,\n                                                                                                                                                                 being the largest collection of its kind. Moreover,\n                                                Agentic coding requires agents to effectively in-                                                                with curated successful trajectories, our fine-tuned\n                                                teract with runtime environments, e.g., command                                                                  model, named LiberCoder, achieves substantial\n                                                line interfaces (CLI), so as to complete tasks like                                        "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "1\n\f                               CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 1. A summary of existing pipelines for deriving agentic coding tasks at scale. Code-intensive tasks can be naturally derived from\nGitHub repositories, benefited from the detailed code histories and the rich context, e.g., commits, PRs, issues. In contrast, environment-\nintensive tasks are constructed with heavy human labor in existing works and at a substantially smaller scale (102 vs 103 ∼ 104 )."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Method                                           Gold Instance    −→        Data Engine        −→     Problem Instance             Collection    # Instances\nCode-Intensive Task\nSWE-Bench (Jimenez et al., 2024)                                               PR-based                                              Auto           2294\nSWE-Gym (Pan et al., 2024)                                                     PR-based             Code-Intensive Issue             Auto           2438\nR2E-Gym (Jain et al., 2025)                 Pre-installed Github Repo   PR-based / LLM-based                 +                       Auto           8135\nSWE-smith (Yang et al., 2025b)                                           PRs / LLM Synthesis   Environment / Failed Unit Tests       Auto          50137\nSWE-Dev (Du et al., 2025)                                                    Test-Driven                       "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "ing dependency issues, repairing problematic configura-                           Due to these problems, currently no pipeline is available for\ntions, and fixing broken environment variables. As such re-                       scalable derivation of environment-intensive tasks, severely\nsearch remains publicly unavailable, on the Terminal-Bench                        hindering the enhancement of agents’ performance.\n(Terminal-Bench Team, 2025), which evaluates agents’ pro-\n                                                                                  To address the above challenge, we design a principled ap-\nficiency in interacting with the command line interfaces\n                                                                                  proach to simulate environment histories and provide the\n(CLI) environment, agents powered by large language mod-\n                             "
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "2\n\f                         CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "With our CLI-Gym, we derive 1,655 environment-intensive              coding, as they provide reliable success signals for both\ntask instances from 29 popular open-source repositories.             training and evaluation. For code-intensive tasks, scalable\nCompared with the dozens of manually labeled tasks in the            training environments have been extensively studied, in-\nTerminal-Bench, our task collection is nearly 20× larger,            cluding SWE-gym (Pan et al., 2024), R2E-gym (Jain et al.,\nas shown in Table 1. Moreover, for our task collection, we           2025), and SWE-smith (Yang et al., 2025b), which con-\ncurate 291 trajectories that successfully complete the cor-          struct executable tasks by crawling pull requests or injecting\nresponding tasks, and perform a pilot study on fine-tuning           synthetic faults. While code-intensive tasks benefit from\nLLMs. Sur"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "Scaling Training Environment for Agentic Coding. Exe-                where Spoor represents an environment state that fails at least\ncutable and verifiable environments are crucial for agentic          one unit test, while Sgold denotes a state in which all unit\n                                                                     tests pass. The agent produces a set of state modifications\n\n3\n\f                                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Github Repo                                      Agentic Environment Inversion\n                                                                                                                                 Task Instance\n                                            Query Generation                      Problem Instance Generation\n                                                                                                                                 Problem Statement\n      Gold Instance                                                                                                         ×𝑵\n                                              Selected Unit Tests\n                                                                                       Build              LLM\n        Environment                                                                                                   "
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Codebase                                                                                                                  Codebase\n\nsrc           train.py                                   Inverse Agentic Coding                                           src            train.py\n                                                Gold\n                                                                                                            Dockerfile\n        tests         setup.py                Instance                       …                                                    tests          setup.py\n\nTask            “pip list”         “pip uninstall torch”\n       Unit Tests                             Prompt                                                                             Unit Tests"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Test_gpt2                        Unit                          …                                  Induce                  Test_gpt2\n              Test_download                    Tests                                                            Failure                 Test_download\n\nFigure 2. Overview of our proposed CLI-Gym pipeline. 1) Starting from a GitHub repository, we construct a gold instance consisting of a\nfunctional environment, codebase, and associated unit tests. 2) We then derive task prompts from the unit tests and execute them with an\nagent to obtain failure-inducing commands. Based on the observed execution commands and failing tests, we automatically generate a\ncorresponding problem statement. 3) Finally, the outputs from the previous steps are assembled into a standardized task instance."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "(∆D, ∆C), corresponding to changes in the Dockerfile and                              As shown in Figure 2, we start from a gold environment\nthe codebase, respectively, in order to repair the instance,                          and its associated set of passing unit tests. From a selected\nsuch as bug fixing or dependency configuration.                                       subset of these tests, we employ an LLM to generate envi-\n                                                                                      ronment inversion prompts that specify how an agent should\n3.2. Instance Construction by Environment Inversion                                   deliberately induce failures. To promote task diversity, we\n                                                                                      maintain a memory pool of previously task descriptions\nAs suggested by Equation 2, scaling"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "4\n\f                           CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 2. Statistics comparing CLI-Gym with the Terminal-Bench 1.0 and 2.0.                                    Other\n  Except for size and cost metrics, we report the average value across instances. † 229                         (110)             Infrastructure\n  instances are composed of some non-evaluation tasks and 1.0 / 2.0 test tasks.                  Source Logic                          (370)\n                                                                                                    (110)"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Category      Metric                Terminal-Bench 1.0 / 2.0         CLI-Gym\n                                                                 †                            File System               CLI-Gym            Concurrency\n                                                                                                                                              (50)\n      Size          # Instances                               229              1655               (378)\n                                                                                                                         (1655)\n                    # Images                                    22               29\n      Issue Text    Length by Words                          140.7            159.1                                                      Dependencies\n                                                           "
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "across different application domains. This broad coverage\n    FROM task-pandas:latest          # Gold environment                    demonstrates the generality of our approach and its applica-\n    RUN mkdir -p /tmp/corrupted\n                                                                           bility to a wide range of real-world software environments.\n    RUN cp /opt/.../lib/libsqlite3.so /tmp/corrupted\n         /                                                                 Notably, compared to Terminal-Bench, the tasks produced\n    RUN cp /opt/.../lib/libz.so /tmp/corrupted/                            by our framework are accompanied by a substantially larger\n    # Corrupt ELF headers to break dynamic linking                         number of unit tests. This richer testing context enables a\n    RUN dd if=/dev/zero of=/tmp/corrupted/libsqlite3                       more reliab"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "5\n\f                         CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 3. Performance on Terminal-bench 1.0 and Terminal-bench 2.0. We report pass@1 scores for LiberCoder-32B and LiberCoder-\n235B-A22B evaluated using the OpenHands agent framework. Results for other models are taken from the official Terminal-Bench\nleaderboards. Best Performance with Any Agent reports the best publicly available results (regardless of the agent framework used).\nModels marked with † are evaluated by us. We highlight the top-2 open-source entries with bold font in each column."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Model                                                         OpenSource      Terminal-bench@1.0        Terminal-bench@2.0\n  Performance with OpenHands\n  Claude Haiku 4.5 (Anthropic, 2025e)                                 ✗                   -                       13.9\n  Gemini 2.5 Pro (Comanici et al., 2025)                              ✗                   -                       16.4\n  Grok 4 (xAI, 2025)                                                  ✗                   -                       27.2\n  Claude Sonnet 4 (Anthropic, 2025a)                                  ✗                 41.3                        -\n  Claude Opus 4.1 (Anthropic, 2025b)                                  ✗                   -                       36.9\n  Claude Sonnet 4.5 (Anthropic, 2025d)                                ✗                 42.7†                     42.6\n  GPT-5 (Singh et al., 2025)       "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "4.1. Experimental Setups                                            Training. We fine-tune Qwen3-32B and Qwen3-235B-\n                                                                    A22B-Instruct using a two-stage training procedure. In the\nAgent Framework. We adopt OpenHands as the general-\n                                                                    first stage, since these models were not optimized for agen-\npurpose agent framework to induce environment corruption\n                                                                    tic coding, we enhance this capability using a collection of\nand subsequently perform task completion. OpenHands\n                                                                    48K open-source software engineering trajectories, derived\nis a widely used open-source code agent framework that\n                                                       "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "6\n\f                            CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 4. Ablation study on the effects of open-source agentic                      Incorrect                                                                                              32\ntrajectories and our generated trajectories across model scales.                      edit\n                                                                                                                                                           19"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "SWE Traj.    Filtered-Success Traj.     Pass@1         Pass@3                  Incorrect                                                            17\n                                                                                localization\n  Qwen3-32B                                                                                                               7\n                                            10.3           19.1                     Context                               7\n  ✓                                     22.1 (+11.8)   28.1 (+9.0)                 exceeded\n                                                                                                                                       12\n                        ✓               32.4 (+22.1)   37.9 (+18.8)\n  ✓                     ✓               38.9 (+28.6)   44.5 (+25.4)                  Struck               1\n  "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "SWE Traj. Raw-Success Traj. Filtered-Success Traj. Pass@1                               70.0\n                                                                                                                                                       Improvement by 291 samples\n                                              ✓               32.4                        60.0                                                         Qwen3-32B\n                       ✓                                      33.8\n                                                                                          50.0\n      ✓                ✓                                      36.4                                                                   30.0                  12.5\n      ✓                                       ✓               38.9         Resolved (%)   40.0"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "23.1\n                                                                                                   29.5                                        12.5\n                                                                                          30.0\n                                                                                                                                                                     28.6\n                                                                                                              33.4\ntasks, 80 in v1.0 and 89 in v2.0, where agents must interact                              20.0"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "with a Linux environment via command-line interfaces to\n                                                                                          10.0\ndiagnose and resolve realistic software and system issues.\n                                                                                           0.0                                                                                  0.0        0.0\nFollowing the standard Terminal-Bench evaluation proto-                                           software\n                                                                                                 engineering\n                                                                                                             security\n                                                                                                                         system\n                                     "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "4.2. Main Results                                                            larger open-weight models, including Qwen3-Coder-480B-\n                                                                             A35B-Instruct (480B parameters) and Kimi-K2-Instruct\nTable 3 reports the performance of our trained models,                       (approximately 1T parameters). This highlights the effec-\nLiberCoder-32B and LiberCoder-235B-A22B, in compar-                          tiveness of targeted agentic supervision over naive model\nison with representative closed-weight and open-weight                       scaling in complex CLI tasks. At a larger scale, LiberCoder-\nbaselines on the Terminal-Bench 1.0 and 2.0 leaderboards.                    235B-A22B further advances the state of the art among\nFor a fair comparison, we consider only entries officially                   open-weight models on "
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "7\n\f                                  CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "35                                                                               40\n               pass@1                                                                           pass@1\n               pass@3                                                                           pass@3                                     37.9\n                                                                   32.4             35                                           36.5\n   30                                                       31.4\n                                                     30.1                                                32.4                              32.4\n                                                                                    30\n                                       27.2                                                                                      28.9\n   25"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "10                                                                                5\n        1                2         4             8            16      32                 0                100                        200     300\n                               Number of repositories                                                       Number of trajectories\n\nFigure 7. Effect of environment diversity under a fixed data bud-                Figure 8. Effect of trajectory scaling on Terminal-bench@1.0\nget. We vary the number of source repositories while keeping                     performance. We fine-tune the Qwen3-32B model using differ-\nthe total number of 100 CLI-Gym trajectories fixed.                              ent proportions of the 291 Filtered-Success trajectories."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "vides a stronger inductive bias for terminal-based interaction.                signals. However, the improvements plateau beyond approx-\nCombining SWE and CLI-Gym data consistently achieves                           imately 200 trajectories, suggesting that data quality and\nthe best performance, suggesting that generic software engi-                   task diversity may be more important than quantity.\nneering priors and specialized environment interaction skills\nare complementary.                                                             4.4. Results and Failure Case Visualization\nEnvironment Diversity via Scaling Repositories. Dif-                           Category-wise Improvement. Figure 6 illustrates the\nferent repositories induce distinct system configurations,                     category-wise performance changes after training with CLI-\nresulting in diverse failure modes and r"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "8\n\f                         CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Impact Statement                                                     Jain, N., Singh, J., Shetty, M., Zheng, L., Sen, K., and\n                                                                        Stoica, I. R2e-gym: Procedural environments and hy-\nThis paper presents work whose goal is to advance the field             brid verifiers for scaling open-weights swe agents. arXiv\nof Machine Learning. There are many potential societal                  preprint arXiv:2504.07164, 2025.\nconsequences of our work, none of which we feel must be\nspecifically highlighted here.                                       Jimenez, C. E., Yang, J., Wettig, A., Yao, S., Pei, K., Press,\n                                                                       O., and Narasimhan, K. R. Swe-bench: Can language\nReferences                                                             models resolve real-world github is"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Du, Y., Cai, Y., Zhou, Y., Wang, C., Qian, Y., Pang, X., Liu,        Singh, A., Fry, A., Perelman, A., Tart, A., Ganesh, A.,\n  Q., Hu, Y., and Chen, S. Swe-dev: Evaluating and training            El-Kishky, A., McLaughlin, A., Low, A., Ostrow, A.,\n  autonomous feature-driven software development. arXiv                Ananthram, A., et al. Openai gpt-5 system card. arXiv\n  preprint arXiv:2505.16975, 2025.                                     preprint arXiv:2601.03267, 2025."
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Google.    Gemini CLI. https://github.com/                           Team, K., Bai, Y., Bao, Y., Chen, G., Chen, J., Chen,\n  google-gemini/gemini-cli, 2025. Accessed:                            N., Chen, R., Chen, Y., Chen, Y., Chen, Y., et al.\n  2026-01-26.                                                          Kimi k2: Open agentic intelligence. arXiv preprint\n                                                                       arXiv:2507.20534, 2025.\nGoogle DeepMind.   A new era of intelligence\n with gemini 3.     https://blog.google/                             Terminal-Bench Team. Terminal-bench: A benchmark for\n  products-and-platforms/products/                                     ai agents in terminal environments, Apr 2025. URL\n  gemini/gemini-3/, November 2025. Accessed:                           https://github.com/laude-institute/\n  2026-01-27.                              "
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "9\n\f                        CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nWang, X., Rosenberg, S., Michelini, J., Smith, C., Tran, H.,\n Nyst, E., Malhotra, R., Zhou, X., Chen, V., Brennan, R.,\n et al. The openhands software agent sdk: A composable\n and extensible foundation for production agents. arXiv\n preprint arXiv:2511.03690, 2025.\nxAI. Grok 4. https://x.ai/news/grok-4, July\n  2025. Accessed: 2026-01-27."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Yang, A., Li, A., Yang, B., Zhang, B., Hui, B., Zheng, B.,\n  Yu, B., Gao, C., Huang, C., Lv, C., et al. Qwen3 technical\n  report. arXiv preprint arXiv:2505.09388, 2025a.\nYang, J., Lieret, K., Jimenez, C. E., Wettig, A., Khand-\n  pur, K., Zhang, Y., Hui, B., Press, O., Schmidt, L., and\n  Yang, D. SWE-smith: Scaling data for software engi-\n  neering agents. In The Thirty-ninth Annual Conference\n  on Neural Information Processing Systems Datasets and\n  Benchmarks Track (NeurIPS), 2025b.\nZ.ai. Glm-4.6. https://z.ai/blog/glm-4.6, 2025.\n  Accessed: 2026-01-28.\n\n10\n\f                         CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "A. Detailed CLI-Gym Pipeline\nThis section presents the full technical details of the CLI-Gym pipeline. We construct gold instances from 29 different\nopen-source GitHub repositories. A gold instance consists of the environment, codebase, and unit tests. Based on these gold\ninstances, we further generate task instances. The repository information, the number of unit tests per repository, and the\nfinal number of task instances produced are summarized in Table 9."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "A.1. Query Generation\nAfter constructing a repository as a gold instance, we first randomly sample 1–3 intervention directions and randomly select\n200 unit tests from the repository, which are injected into a prompt with previous task titles and provided to LLM to obtain\nan initial task prompt. The specific prompt is shown in Figure 10.\nOnce a task prompt in a predefined format is generated, we randomly apply a second-stage prompt refinement to make the\ntask more closely aligned with the selected unit tests, improving both yield and diversity. The refinement prompt used in our\npipeline is shown in Figure 11.\nAfter generating a task prompt specification, we embed it into a task template (Figure 12) and package it as an agent\ntask. Each task consists of: (1) a Docker-compose.yaml file for mapping trajectories, logs, and other artifacts between the\nexecuting container and local path; (2) a "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "A.2. Environment Inversion\nWe execute agentic tasks using a modified Terminal-Bench harness. Specifically, docker-compose.yaml is used to mount\ntrajectory files and logs into the container and to invoke the Dockerfile, which specifies the base image and launches the\nagent. The agent is then prompted with the task prompt that specifies how an agent should deliberately induce failures and\nallow any operation to interact with the environment and finish the task. Each task is executed for approximately 15 minutes\nand is terminated when the agent outputs a final thought. A sample trajectory is shown in Figure 13.\nAfter task execution, the harness automatically runs run-tests.sh inside the container to evaluate the selected unit tests. Based\non the test outcomes, we apply the following rules:"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "• If some unit tests fail, the failed tests are recorded as fail-to-pass tests, while the successful ones are recorded as\n     pass-to-pass tests.\n   • If the test command fails to execute, all selected unit tests are recorded as fail-to-pass tests.\n   • If all unit tests pass, the task is considered unsuccessful and discarded.\n\nIn addition, the harness prompts the agent to summarize a Dockerfile that captures the degraded environment, enabling\ndeterministic reproduction of the failure that the agent built. A complete Dockerfile demo is shown in Figure 20."
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "A.3. Task Generation\nAfter the inverse task is completed, we generate a corresponding problem statement targeting the induced faults. The\nproblem statement is constructed from the original task prompt together with the failed unit tests information. Concretely,\nwe randomly select one of three prompts with different levels of guidance: the prompt shown in Figure 14 asks the LLM to\ngenerate a more explicit and strongly guided issue description, while the prompt shown in Figure 15 encourages a weaker,\nless directive issue formulation, and the prompt shown in Figure 16 balances direction and difficulty.\nRegardless of which prompt is used, the LLM is required to output a hint. This hint can optionally be removed by a\nrule-based filter, allowing us to derive two distinct repair tasks (with or without hints) from the same issue.\nThe generated statement is then inserted into the problem task tem"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "11\n\f                         CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nB. Detailed Experiments\nIn this section, we present the full experimental configurations and execution details."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "B.1. Training Set Construction\nStarting from 29 gold instances, we generated 4,066 task prompts, which resulted in 1,655 problem instances, including\nfaulty images, failed unit tests, and Dockerfile which induces failures. Using strong language models with OpenHands, we\ncollected 417 successful trajectories. We then filtered out 126 trajectories, retaining 291 Filtered-Success trajectories for\ntraining.\nThe filtering criteria are as follows. (1) Trajectories with fewer than 20 steps. We consider the number of interaction steps to\nbe correlated with task difficulty; therefore, trajectories that solved tasks with few steps were removed, as they typically\ncorrespond to trivial or low-difficulty environments. (2) Cheating trajectories. We discarded trajectories that exploited\nhistorical artifacts such as cached Git information, Conda logs, or other unintended shortcuts to solve the task, byp"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "B.2. Training Details\nFor Qwen3-32B: The learning rate is initialized at 2 × 10−5 and follows a cosine decay schedule. To stabilize the early\nstage of training, we employ a linear warmup strategy for the first 5% of the total training steps, during which the learning\nrate increases linearly from a minimum 1 × 10−6 to 2 × 10−5 . We train models for 10, 15, and 20 epochs and report the\ncheckpoint with the best validation performance. The batch size is set to 16. We adopt qwen3-coder as the agent template.\nThe maximum sequence length is 100k tokens, achieved by extending the native 40k context window using YaRN with an\nexpansion factor of 2.5.\nFor Qwen3-235B-A22B-Instruct: The learning rate is initialized at 1 × 10−5 and follows a cosine decay schedule. To\nstabilize the early stage of training, we employ a linear warmup strategy for the first 5% of the total training steps, during\nwhich the"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "B.3. Agent and Inference Details\nWe adopt the OpenHands agent framework (Wang et al., 2025) as the execution interface between language models and\nCLI environments. OpenHands provides a unified Agent–Computer Interface (ACI) that enables models to interact with\ncontainerized systems through structured tool calls, including shell command execution, file editing, and environment\ninspection. At inference time, each model operates as a single autonomous agent that iteratively observes environment\nfeedback and issues actions until the task is solved or a termination condition is reached.\nAction space. The agent is allowed to invoke the tools in Figure 19, All actions are executed inside isolated Docker\ncontainers constructed for each task.\nTermination conditions. An episode terminates when one of the following conditions is met: (1) the agent explicitly calls\nthe finish tool; (2) a global tim"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "B.4. Ablation Studies and Case Visualization\nAgentic Coding Pretraining with SWE Tasks. The open-source SWE-style trajectories used in this paper strictly DO\nNOT contain any Terminal-Bench task, ensuring that there is no risk of benchmark contamination or evaluation leakage.\nThese trajectories are only used to initialize the models’ general agentic coding abilities, such as repository navigation, tool\ninvocation, and multi-step program repair, rather than environment-specific knowledge. In this setting, models are first\ntrained on the SWE-style trajectories for 1 epoch, followed by fine-tuning on the Filtered-Success trajectories for 15 epochs.\nAll other training hyperparameters, including learning rate, batch size, context length, optimizer, and agent interface, are\nkept identical to the main setting."
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "12\n\f                           CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "Environment Diversity via Scaling Repositories. When multiple repositories are involved, trajectories are uniformly\nsampled to ensure balanced coverage across repositories, avoiding dominance by any single codebase or environment\nconfiguration. The training protocol is as follows: each dataset is trained under its respective best-performing epochs with\nthe same other settings.\nFiltering low-quality Trajectories. In this experiment, each dataset is trained using its best-performing configuration (e.g.,\n15 epochs for Filtered-Success trajectories and 10 epochs for Raw-Success trajectories). All other factors are strictly the\nsame. This design avoids confounding effects from underfitting or overfitting and ensures that the observed differences are\nattributable to data quality rather than training instability.\nCategory-wise Improvement. We compare the baseline Qwen3-32B model and our LiberCo"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "B.5. More Experiments\nImpact of Different Agents\nWe sampled some officially validated scoring examples from the leaderboard to demonstrate the impact of different agents,\namong which the OpenHands we used did not perform very well, as shown in Table 6.\n\nTable 6. Performance Comparison on Terminal-Bench@2.0\n                                          Claude Haiku 4.5                     Claude Opus 4.5\n                                         Agent        Score                   Agent        Score\n                                         Terminus 2       28.3                Terminus 2     57.8\n                                         Claude Code      27.5                Claude Code    52.1\n                                         OpenHands        13.9                OpenHands      51.9"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Comparison with other datasets. Table 7 compares representative datasets and benchmarks in terms of the number of task\ninstances, base environments, and storage footprint.\nBy leveraging CLI-Gym, our dataset uses a small set of base images systematically generate a large number of CLI-centric\nproblem instances. This results in a substantially lower storage footprint.\n\nTable 7. Comparison of representative datasets in terms of scale and storage footprint. We report the number of task instances (#Instance),\nthe number of base images/environments (#Images), and the required storage size."
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "DataSet                   #Instances     #Images      Size\n                                       Code-centric\n                                       SWE-gym                      2438         2438        6 TBs\n                                       SWE-smith                   50137          128       295 GBs\n                                       R2E-gym                      4578           –         4 TBs\n                                       CLI-centric\n                                       Terminal Bench@1.0           80            14        192 GBs\n                                       Terminal Bench@2.0           89            11        235 GBs\n                                       Ours                        1655           29        119 GBs"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Gain with Hint. We conducted an ablation study to analyze the effect of introducing hints when generating problem\nstatements in CLI-Gym. Specifically, this variant augments the repair issue with additional hints extracted from the task\nprompt that induces failure, with the goal of facilitating trajectory generation and increasing data yield.\n\n13\n\f                          CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 8. Ablation study on hint-augmented repair issue generation. Adding hints substantially increases the number of valid trajectories\nproduced by CLI-Gym, leading to improved downstream performance. When controlling for data scale, hints alone do not significantly\naffect performance."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Setting                       # Trajectories   Performance\n                                                     w/o hints                           104              23.0\n                                                     w/ hints (subsampled)               104              22.8\n                                                     w/ hints (full)                     291              32.4"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "As shown in Table 8, adding hints significantly increases the number of usable trajectories, enabling us to collect 291\ntrajectories instead of 104, which leads to a substantial performance improvement. When controlling for data scale by\nsubsampling the full dataset to the same size (104 trajectories), the performance remains comparable.\nPerformance Benefits Model Behavior. Figure 9 analyzes the relationship between overall performance and the frequency\nof stuck failures. We observe a strong negative correlation between pass@1 performance and the proportion of trajectories\nin which the agent becomes stuck in repetitive action loops. As the number of Filtered-Success trajectories increases, model\nperformance steadily improves, while the incidence of looped behavior drops sharply from 42.7% to 3.0%. This result\nsuggests that environment-repair supervision not only improves success rates, b"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Performance vs Stuck in loop\n                                                      50\n                                                               42.7\n                                                      40\n                                   % Stuck in loop\n\n30         26.5"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "20\n                                                                                 9.2\n                                                      10\n                                                                                                                 3\n                                                       0\n                                                                      25             30         35                   40\n                                                                              Performance (pass@1)\nFigure 9. Relationship between task performance and the proportion of failure cases stuck in action loops. Each point corresponds to a\nQwen3-32B model fine-tuned with an increasing number of filtered-success trajectories and evaluated on Terminal-Bench@1.0. The\nx-axis reports pass@1 performance, and the y-axis shows the percentage of tasks where the agent become"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "14\n\f                    CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTable 9. Statistics and descriptions of 29 repositories we used (total task instances: 1655)."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Repo              Unit Tests     Task Instances        Description\napispec                 569                 100        Pluggable API specification generator for web frameworks.\nautograd                585                  20        Efficiently computes derivatives of numpy code automatically.\ncantools                372                 120        Tools for CAN bus signal decoding, encoding and editing.\nclick                   499                   2        Composable command line interface toolkit for Python.\ncookiecutter            356                   4        Utility for creating projects from project templates.\ndominate                 65                  40        Python library for creating and manipulating HTML documents.\nenvirons                105                   2        Simplified environment variable parsing for Python apps.\nexceptiongroup           89                  "
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "15\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nDegradation Issue Generation Prompt 1\n\n# Role: Chaos Engineering Lead and QA Expert\n# Background: We are testing the OpenHands agent in a secure Docker container.\n# Objective: Design a one-way or multi-directional environmental disruption task\n    based on the Disruption Direction, and select some unit tests from the List of\n    Candidate UTs to verify whether the disruption was successful.\n\n## Input Data\nList of Candidate UTs:\n{candidate_uts_list}\n\n## Disruption Direction\n{directions}"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "## Constraints (Key)\n1. **Natural Language**: The task description must be a clear, human-readable goal (\n    e.g., \"perform certain actions to achieve a specific objective\"). Some bash\n    commands for reference can be provided to help the agent complete the disruption\n    task.\n2. **Causality**: The chosen disruptions must logically cause the selected UT (unit\n    test) to fail, and no more than 50 UTs should be selected.\n3. **Complexity**: The generated disruption tasks should have a certain level of\n    difficulty to solve. They should also not leave backup files or allow bypassing\n    expected recovery methods.\nIn addition, they should involve recovery challenges such as:\n    - Tampering with system paths/files, causing kernel/system issues, e.g., VFS:\n        unable to mount root filesystem, with the error message \"unknown-block(0, 0)\n        \". Do not simply mimic this issue.\n    "
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "## Output Format\nStrictly follow the following Markdown format:\n---\n**Task Name**: <Short Title>\n**Category**: <Single word, e.g., Data>\n**Selected UTs**:\n- <Path to UT 1>\n- <Path to UT 2>\n**Task Description**: <Detailed natural language instructions provided to the agent.\n     Describe the **goal** and **steps** to create the vulnerability, and let the\n    agent verify the vulnerability.>\n**Expected Result**: <The error that should occur>\n**Recovery Strategy**: <How to fix it>\n---\n\nFigure 10. Degradation Issue Generation Prompt 1\n\n16\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nDegradation Issue Generation Prompt 2\n\n# Role: Chaos Engineering Lead (Refinement)\n# Context: Refine the draft sabotage task to be a high-quality directive for an AI\n    Agent.\n\n## Input Data\n1. **Target UTs (Paths)**:\n{extract_result[’selected_uts’]}"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "2. **Draft Task**:\n{extract_result}\n\n## Refinement Objectives\n1. **Natural Language Refinement**: Ensure ‘Task Description‘ is written in clear,\n    instructional English. It should explain *what* to do (the objective) rather than\n     just listing code.\n    * Bad: \"Run ‘chmod 000 file‘\"\n    * Good: \"Locate the log file and modify its permissions so that it is not\n        writable by the current user.\"\n2. **Verification Step**: Add a sentence at the end of ‘Task Description‘ asking the\n     agent to: \"Run the target Unit Tests to confirm the failure.\"\n3. **Logic Check**: Ensure the task strictly targets the logic of the provided \"\n    Target UTs\".\n\n## Output Format\nRetain the exact Markdown format."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "---\n**Task Name**: <Refined Title>\n**Category**: <Same>\n**Selected UTs**:\n<List the input Target UTs paths here, one per line>\n**Task Description**: <Refined natural language objective + verification request>\n**Expected Result**: <Detailed error>\n**Recovery Strategy**: <Refined recovery>\n---\n\nFigure 11. Degradation Issue Generation Prompt 2\n\n17\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nDegradation Instruction Template\n\ninstruction: |\n  You are in a completely isolated and secure Docker container, where you can do\n      anything to complete the following task:\n    {degradaton_issue}"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "I will run these tests using a conda environment named \"testbed\" with the command\n      \"cd /testbed && source /opt/miniconda3/bin/activate && conda activate testbed\n      && pytest [UTs].\" I will confirm whether you have successfully completed the\n      task by observing whether any tests fail. Therefore, please use the Python\n      environment located in /opt/miniconda3/envs/testbed/bin throughout the entire\n      process.\n  Available UTs:\n    {UTs}"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "After completing the task, please summarize a Dockerfile. I want to append this\n      Dockerfile to the original image’s Dockerfile that you had before executing the\n       task, so that I can reproduce the environment after the task was executed.\n      Based on your memory, write all meaningful operations you performed from start\n      to finish in the form of Dockerfile commands in the /logs/Dockerfile file. You\n      do not need to include any commands you did not execute, nor do you need to\n      construct a fully functional Dockerfile from scratch because I will append it\n      to the original image. Also, there is no need to guess how the original image\n      was built; just write down the commands you actually executed. Since my entire\n      process is automated, no comments or explanations are required. Pay attention\n      to writing multi-line instructions in accordance with Doc"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Do not leave any introductory documents or code comments (e.g., INTRODUCTION.md)!\n      Do not leave backup files (e.g., init.py.bak and file in /tmp). Do not make the\n       environment look like it has been deliberately sabotaged (e.g., by adding a\n      sitecustomize.py); make the sabotage appear more natural. After tampering with\n      the files, do not change their names, as this will alert the forensics experts.\n       Remember to delete files like .git, conda package cache and so on, as they can\n       make solving the problem too easy.\n\nFigure 12. Degradation Instruction Template\n\n18\n\f                CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nAgent Working Demo"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "{\n      \"id\": 69,\n      \"source\": \"agent\",\n      \"message\": \"Command ‘cat > /etc/profile.d/02-set-interval-locale.sh << ’EOF’\n          nexport LC_ALL=en_US.interval nexport LANG=en_US.interval nexport LC_NUMERIC=\n          en_US.interval nexport LC_MONETARY=en_US.interval EOF‘ executed with exit\n          code 0.\",\n      \"action\": \"run\",\n      \"function\": {\n          \"arguments\": \"{\"command\": \"cat > /etc/profile.d/02-set-interval-locale.sh <<\n               ’EOF’ nexport LC_ALL=en_US.interval nexport LANG=en_US.interval nexport\n               LC_NUMERIC=en_US.interval nexport LC_MONETARY=en_US.interval EOF\", \"\n              security_risk\": \"MEDIUM\"}\",\n          \"name\": \"execute_bash\"\n      },\n      ...\n}\n...\n{\n      \"id\": 131,\n      \"source\": \"agent\",\n      \"message\": \"All done! What’s next on the agenda?\",\n      \"action\": \"finish\",\n      \"function\": {\n          \"arguments\": \"{\"message\""
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Figure 13. Agent Working Demo\n\n19\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nRepair Issue Generation Prompt 1\n\n# Role: QA Engineer / Bug Reporter\n# Objective: Report a bug to the AI agent without revealing the solution, forcing\n    the agent to investigate.\n\n## Background (Input Data)\n**Malicious Behavior (Root Cause: The current environment is a test environment that\n     has been affected by the malicious task described as follows):**\n{data[\"task_description\"]}\n**Unit Tests that actually failed (should be mentioned in the bug report):**\n{symptoms_UTs}"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "## Your Task\nWrite a natural language bug report to the agent.\n1. **Describe the Symptoms**: Summarize a recoverable issue. Describe what went\n    wrong. Point out that some unit tests failed.\n2. **Objective**: Ask the agent to **investigate the environment**, identify the\n    root cause, and fix it.\n3. **Constraints**: Do not provide a solution or analyze the problem; just describe\n    what happened.\n\n## Output Rules (Strict)\n- **Output only the instruction text.**\n- Do not use Markdown headings, do not use \"Task Name,\" and do not use code blocks.\n- The output should look like a user asking for help: \"I can’t... Can you figure out\n     the reason and help me fix this bug?\""
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "## Output Format (Strict)\n<Help information, only mentioning the failed unit tests>\nHint:\n<Describe where the problem might be based on the description of the malicious task,\n     but do not provide a solution. Do not specify exactly where or what the problem\n    is!>\n\nFigure 14. Repair Issue Generation Prompt 1\n\n20\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nRepair Issue Generation Prompt 2\n\n# Role: QA Engineer / Bug Reporter\n# Objective: Report issues to the AI agent without revealing the solution, forcing\n    the agent to investigate.\n\n## Background (Input Data)\n**Malicious Behavior (Root Cause: The current environment is a test environment that\n     has been affected by the malicious task described as follows):**\n{data[\"task_description\"]}\n**Unit Tests that actually failed (should be mentioned in the bug report):**\n{symptoms_UTs}"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "## Your Task\nWrite a natural language help message for the agent.\n1. **Direct Request for Help:** State that I have some UTs that are failing and need\n     help to fix them.\n2. **Describe the Symptoms:** Summarize a recoverable problem. Describe what went\n    wrong and what kind of help is needed.\n3. **Constraints:** Do not provide a solution or analyze the problem. Just describe\n    what happened.\n\n## Output Rules (Strict)\n- **Output only the instruction text.**\n- Do not use Markdown headings, do not use \"Task Name,\" and do not use code blocks.\n- I will replace it into a YAML file. Pay attention to indentation and symbol\n    conventions (e.g., do not use \"-\").\n- The output should look like a user asking for help: \"I can’t... Can you help me\n    figure out why and tell me how to fix it?\""
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "## Output Format (Strict)\n<Help message, only referring to the UTs that are failing>\nhint:\n<Describe where the problem might be based on the description of the malicious task,\n     but do not provide a fix. Do not specify exactly where or what the problem is!>\n\nFigure 15. Repair Issue Generation Prompt 3\n\n21\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nRepair Issue Generation Prompt 3\n\n# Role: QA Engineer / Bug Reporter\n# Objective: Report issues to the AI agent without revealing the solution, forcing\n    the agent to investigate.\n\n## Background (Input Data)\n**Malicious Behavior (Root Cause: The current environment is a test environment that\n     has been affected by the malicious task described as follows):**\n{data[\"task_description\"]}\n**Unit Tests that actually failed (should be mentioned in the bug report):**\n{symptoms_UTs}"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "## Your Task\nWrite a natural language help message for the agent.\n1. **Direct Request for Help:** State that I have some UTs that are failing and need\n     help to fix them.\n2. **Describe the Symptoms:** Summarize a recoverable problem. Describe what went\n    wrong and what kind of help is needed.\n3. **Constraints:** Do not provide a solution or analyze the problem. Just describe\n    what happened.\n\n## Output Rules (Strict)\n- **Output only the instruction text.**\n- Do not use Markdown headings, do not use \"Task Name,\" and do not use code blocks.\n- The output should look like a user asking for help: \"I can’t... Can you help me\n    figure out why and tell me how to fix it?\""
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "## Output Format (Strict)\n<Help message, only referring to the UTs that are failing>\nhint:\n<Describe where the problem might be based on the description of the malicious task,\n     but do not provide a fix. Do not specify exactly where or what the problem is!>\n\nFigure 16. Repair Issue Generation Prompt 3\n\nRepair Instruction Template\n\ninstruction: |\n{problem_statement}\n\nFigure 17. Repair Instruction Template\n\n22\n\f                 CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nRun-tests Template\n\nset -uo pipefail -x\n\ncat > tester.py <<EOF\nimport os\nimport subprocess, sys\nsys.path.insert(0, ’/testbed’)"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "def run_and_log(cmd, log_path):\n    with open(log_path, \"w\", buffering=1, encoding=\"utf-8\") as logf:\n        p = subprocess.Popen(\n            cmd,\n            stdout=subprocess.PIPE,\n            stderr=subprocess.STDOUT,\n            text=True,\n            bufsize=1,\n            shell=True,\n            executable=\"/bin/bash\"\n        )\n        for line in p.stdout:\n            line = line.replace(\"\\r\", \"\\n\")\n            sys.stdout.write(line)\n            logf.write(line)\n        return p.wait()\n\nrun_and_log(\n    ’source /opt/miniconda3/bin/activate; conda activate testbed; pytest --disable-\n        warnings --color=no --tb=no --verbose {UTs}’,\n    \"/test.log\"\n)\nEOF\n\nchmod +x tester.py\npython tester.py\n\nFigure 18. Run-tests Template\n\n23\n\f              CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nTools"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "\"function\": {\n    \"name\": \"execute_bash\",\n    \"description\": \"Execute a bash command in the terminal within a persistent shell\n         session.### Command Execution* One command at a time: You can only execute\n        one bash command at a time. If you need to run multiple commands sequentially\n        , use ‘&&‘ or ‘;‘ to chain them together.* Persistent session: Commands\n        execute in a persistent shell session where environment variables, virtual\n        environments, and working directory persist between commands...\",\n},\n\"function\": {\n    \"name\": \"think\",\n    \"description\": \"Use the tool to think about something. It will not obtain new\n        information or make any changes to the repository, but just log the thought.\n        Use it when complex reasoning or brainstorming is needed.Common use cases:1.\n        When exploring a repository and discovering the source of a bug, cal"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "Figure 19. Tools\n\n24\n\f                  CLI-Gym: Scalable CLI Task Generation via Agentic Environment Inversion\n\nDockerfile Demo\n\nFROM task-pandas:latest\n\nRUN mkdir -p /corrupted_libs\nRUN cp /opt/miniconda3/envs/testbed/lib/libsqlite3.so.0.8.6 /corrupted_libs/\n    libsqlite3.so.0\nRUN cp /opt/miniconda3/envs/testbed/lib/libz.so.1.2.13 /corrupted_libs/libz.so.1\nRUN dd if=/dev/zero of=/corrupted_libs/libsqlite3.so.0 bs=1 count=24 seek=8 conv=\n    notrunc\nRUN dd if=/dev/zero of=/corrupted_libs/libz.so.1 bs=1 count=24 seek=8 conv=notrunc\nRUN rm /opt/miniconda3/envs/testbed/lib/libsqlite3.so.0.8.6\nRUN cp /corrupted_libs/libsqlite3.so.0 /opt/miniconda3/envs/testbed/lib/libsqlite3.\n    so.0.8.6\nRUN rm /opt/miniconda3/envs/testbed/lib/libz.so.1.2.13\nRUN cp /corrupted_libs/libz.so.1 /opt/miniconda3/envs/testbed/lib/libz.so.1.2.13\n\nFigure 20. Dockerfile Demo\n\n25"
+    }
+  ]
+}

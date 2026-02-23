@@ -1,0 +1,187 @@
+{
+  "arxivId": "2602.12249",
+  "paperTitle": "&#34;Sorry, I Didn&#39;t Catch That&#34;: How Speech Models Miss What Matters Most",
+  "abstract": "Despite speech recognition systems achieving low word error rates on standard benchmarks, they often fail on short, high-stakes utterances in real-world deployments. Here, we study this failure mode in a high-stakes task: the transcription of U.S. street names as spoken by U.S. participants. We evaluate 15 models from OpenAI, Deepgram, Google, and Microsoft on recordings from linguistically diverse U.S. speakers and find an average transcription error rate of 44%. We quantify the downstream impact of failed transcriptions by geographic locations and show that mis-transcriptions systematically cause errors for all speakers, but that routing distance errors are twice as large for non-English primary speakers compared to English primary speakers. To mitigate this harm, we introduce a synthetic data generation approach that produces diverse pronunciations of named entities using open-source text-to-speech models. Fine-tuning with less than 1,000 synthetic samples improves street name transcription accuracy by nearly 60% (relative to base models) for non-English primary speakers. Our results highlight a critical gap between benchmark performance and real-world reliability in speech systems and demonstrate a simple, scalable path to reducing high-stakes transcription errors.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Despite speech recognition systems achieving low word error rates on standard benchmarks, they often fail on short, high-stakes utterances in real-world deployments. Here, we study this failure mode in a high-stakes task: the transcription of U.S. street names as spoken by U.S. participants. We evaluate 15 models from OpenAI, Deepgram, Google, and Microsoft on recordings from linguistically diverse U.S. speakers and find an average transcription error rate of 44%. We quantify the downstream impact of failed transcriptions by geographic locations and show that mis-transcriptions systematically cause errors for all speakers, but that routing distance errors are twice as large for non-English primary speakers compared to English primary speakers. To mitigate this harm, we introduce a synthetic data generation approach that produces diverse pronunciations of named entities using open-source text-to-speech models. Fine-tuning with less than 1,000 synthetic samples improves street name transcription accuracy by nearly 60% (relative to base models) for non-English primary speakers. Our results highlight a critical gap between benchmark performance and real-world reliability in speech systems and demonstrate a simple, scalable path to reducing high-stakes transcription errors."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "“Sorry, I Didn’t Catch That”:\n                                                                     How Speech Models Miss What Matters Most\n\nKaitlyn Zhou 1 2 Martijn Bartelds 1 3 Federico Bianchi 1 James Zou 1 3\n\nAbstract                                                Address Recognition on SF Street Names\n                                              Despite speech recognition systems achieving low                            STREETS                  SPEAKERS            AUDIO\n                                                                                                                               Van Ness\n                                              word error rates on standard benchmarks, they of-                                                       78\narXiv:2602.12249v2 [cs.AI] 16 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Gear\n                                              ten fail on short, high-stakes utterances in real-\n                                                                                                                                             → participants → 2,262\n                                                                                                                           29\n                                              world deployments. Here, we study this fail-\n                                              ure mode in a high-stakes task: the transcription                          SF STREETS                13 LANGS          UTTERANCES\n                                              of U.S. street names as spoken by U.S. partic-\n                                              ipants. We evaluate 15 models from OpenAI,\n                                              Deepgram, Goo"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1\n\f                         “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "for non–English primary speakers than for English-only                2. Background and Related Work\nprimary speakers. Although taxi usage is uneven across de-\nmographic groups (Jiang, 2019; Sikder, 2019), taxis play a            Recent advances in multi-modal models have made speech\nvital role for elderly, low-income, and disabled populations          recognition systems a routine part of everyday life. One sec-\nby providing an often subsidized means of transportation              tor that has embraced the cost-saving capabilities of speech\n(Kaufman et al., 2016). If speech-to-text systems were used           models is in live agent call centers. Speech models are ubiq-\nin San Francisco for ride-hailing, we estimate that the av-           uitously deployed in lieu of live agents from ride-hailing\nerage passenger pickup would be misrouted by 1.26 miles,              companies and emergen"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "• We show that transcription error rates differ substan-           3. Dataset\n     tially across speakers, with notably lower accuracy for\n                                                                      In our work, we seek to augment existing automatic speech\n     non-English-only primary speakers.\n                                                                      recognition (ASR) and contribute to the emerging area of\n                                                                      named entity recognition in speech models. In particular,\n   • We introduce a practical, open-source approach for gen-          we evaluate the performance of deployed state-of-the-art\n     erating synthetic speech data, achieving nearly 60% im-          speech models on their ability to recognize real U.S. street\n     provement in named entity transcription performance.             names, as "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "SF Streets                                        n    %\n                                                                          Gender                Male                       37    48\n                                                                                                Female                     40    51\n                                                                                                Prefer not to say           1     1\n                                                                          Age                   20–29                      19    24\n                                                                          (M=38.1, SD=11)       30–39                      29    37\n                                                                                                40–49                      17    22\n                                                   "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "3\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\npaid $18 USD an hour. The average accuracy of this dataset\namong Whisper models of all sizes is around 24%. We\nrelease this dataset for public research use."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "US Streets                                         n    %\n   Gender                 Male                       52    54\n                          Female                     45    46\n                          Prefer not to say           0     0\n   Age                    20–29                      32    33\n   (M=37.2, SD=11.3)      30–39                      29    30\n                          40–49                      21    22\n                          50–59                      11    11\n                          60–69                       4     4\n                          70+                         0     0\n   Primary Language       English Only                0     0\n                          Multilingual w/ English    72    74           Figure 3. Overall Transcription Accuracy on SF Streets for Models\n                          Non-English                25    26           That Accept "
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Table 2. Participant demographics for U.S. Streets Dataset (n =\n97). The participants’ primary languages represented 29 unique\nlanguages (Chinese, Farsi, English, Italian, Greek, Romanian, Ko-       also contrast with our prior beliefs about these state-of-the-\nrean, Punjabi, Hakka, Arabic, Faroese, Croatian, Tamil, Urdu,\nIndonesian, German, Malayalam, Gujarati, Hindi, Spanish, Lao-           art systems with very low WER. In our analysis, we find that\ntian, Russian, Japanese, Polish, Thai, French, Other, Portuguese,       models can have low WER but still highly consequential\nVietnamese).                                                            transcription errors (e.g., “Font” being transcribed as “Bont”\n                                                                        is low in edit distance, but potentially high in geographic lo-\n                                             "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "4\n\f                         “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nFigure 4. Transcription Accuracy by Language Groups Across All Model Families. 95% confidence intervals calculated via bootstrap\nresampling of 10,000 samples"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "largely eliminate lack of context as an explanation, leaving         A small analysis of street names from U.S. cities (n =\nrecognition and selection errors (mishearing, phonetic               177, 155) found that 33% of the street names came from\nambiguity, and choosing the wrong candidate) as the                  non-English origins.5\nprimary remaining failure modes. Even in this “perfect\n                                                                     Our findings illustrate that even when the overall word error\ncontext” setting, average accuracy across tested models is\n                                                                     rate (WER) is low, models may still fail disproportionately\n76%, indicating that the bottleneck is not just context, but\n                                                                     on the named entities that carry the most operational imp"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "4.2. Implications for Speech Model Evaluation                        5. Exacerbated Errors for Non-English\n                                                                        Primary Speakers\nOur results and new dataset highlight that street name recog-\nnition remains a distinct and difficult task, and one that           As modern systems are deployed in diverse urban envi-\nshould be evaluated explicitly before deploying speech mod-          ronments, users may vary greatly demographically in age,\nels in mission-critical workflows.                                   gender, and linguistic background. For example, the same\n                                                                     street name can be pronounced in substantially different\nWe see two main hypotheses for why word error rates can\n                                                                     ways, particular"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "5\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "2024), we investigate whether similar disparities arise in the         drop instances where no location could be found even with\ncontext of street name recognition.                                    the Google Maps API (n = 212, 9% of the dataset). We\n                                                                       cap the distance error to 20 miles and discard any instances\n                                                                       beyond this threshold (n = 6); making the assumption that\n                                                                       out-of-city destinations would be corrected for by humans\n                                                                       in the loop.\n                                                                       Despite this added leniency, transcription errors still re-\n                                          "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "6\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nFigure 6. (1) Select a sample of speech from Common Voice, e.g., Spanish (2) Set the XTTS to generate speech in Spanish (supports\n16 languages, excluding English) (3) Clone the voice and generate Spanish but with injected English street names, e.g., “Mi nombre\nes... Washington” (4) Extract street name speech and manually validate. Repeat this with as many samples as needed to create a unique\nfinetuning dataset.6"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "recognition model to increase performance on street name             pertinent for future work.\nrecognition using synthetic data alone.\nAlthough large volumes of speech data are available, it re-          Intuition and Breakthrough The key insight behind our\nmains difficult to obtain datasets that adequately capture the       synthetic data generation approach is to exploit the implicit\nwide range of pronunciation patterns exhibited by speakers           accent style transfer of cloning models. When generat-\nwith diverse language backgrounds. Recent advances in text-          ing speech in a given language, the model tends to im-\nto-speech (TTS) modeling present an opportunity to address           pose a canonical or “default” speaking style associated with\nthis data gap and synthetically produce a broad spectrum             that language. In our qualitative analysis, we observed\nof stre"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "7\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nXTTS supports voice cloning in 16 different languages.\nFor each of these languages, we select a speaker speak-\ning in that language from Common Voice Scripted\nSpeech 24.0 (e.g., select two speakers from the Spanish\ndataset) and clone these voices to synthesize new text that\nwill contain the street name (e.g., Estoy en Washington).\nWe then automatically extract the audio that is associated\nwith the word “Washington” and manually verify each of\nthese files. We finetune Whisper-base (batch size 16,\nlearning rate 1e-5, early stopping loss threshold at 0.01).\nWith less than 1,000 utterances of data from this purely\nsynthetic dataset, we can substantially improve street name\ntranscription."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Limited Risk of Dual Use One potential concern is that\nthis technique could be misused to deliberately generate\nstereotypical or caricatured speech. In practice, however,\nsuch misuse is constrained by the behavior of current voice\ncloning models. The synthesis quality degrades rapidly\nwhen the prompt contains large amounts of English text.\n                                                                       Figure 7. Improvement in accuracy from the finetuned model\nThe model performs best when the prompt is predominantly\n                                                                       across language groups. 95% confidence intervals calculated via\nin the target foreign language with only occasional English            bootstrap resampling of 10,000 samples. This holds true for Whis-\ninsertions. Attempts to generate full English sentences in             per models across all sizes,"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Out-Of-Distribution Languages Additionally, we see\nthat even for languages that were not originally in the syn-\nthetic training data (e.g., languages spoken by participants\nof SF Streets but not supported by XTTS like Vietnamese),\nwe still see gains in a model’s ability to recognize speech\nfrom a Vietnamese speaker — suggesting a generalizability\neffect from learning other ways of speaking, Figure 10.                Figure 8. Training only on synthetic out-of-distribution street\n                                                                       names\nWe additionally train 16 Whisper-base models, each\nwith synthetic data from one language (e.g., training a model\nwith synthetic data from French only) and evaluate how                 Out-Of-Distribution Street Names Our data generation\nwell each of these language-specific models performs on                process relies entirely on synt"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "8\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "generalization problem because street names are often rare             failure modes they present, especially across various de-\nin training data, and their pronunciations can be highly               mographic groups. We introduce a recipe to synthetically\nspecific to individual entities, limiting transferability.             generate named entities with varied pronunciation, leading\n                                                                       to substantial gains on this task. We use public datasets and\nWe finetuned Whisper-base with less than 1,000 syn-\n                                                                       adhere to their terms and agreements, and synthetic voice\nthetic samples and found that overall performance remains\n                                                                       generation is done via a local, open-sourced model. Lastly,\nlargely un"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Our work here aims to advance our understanding of lan-                City and County of San Francisco. San francisco language\nguage technologies in context. We evaluated several pub-                 diversity data. https://www.sf.gov/data--s\nlicly deployed language models and assessed the potential                an-francisco-language-diversity-data,\n                                                                         2026. Accessed: 2026-02-11.\n\n9\n\f                        “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Garg, A., Gupta, A., Gowda, D., Singh, S., and Kim, C.               San Francisco Municipal Transportation Agency. Best\n  Hierarchical multi-stage word-to-grapheme named en-                  practices studies of taxi regulation: Taxi user surveys.\n  tity corrector for automatic speech recognition. In Inter-           Technical report, San Francisco Municipal Transporta-\n  speech, pp. 1793–1797, 2020.                                         tion Agency, 2013. URL https://www.sfmta.co\n                                                                       m/sites/default/files/Draft%20SF%20U\nGarofolo, J. S., Lamel, L. F., Fisher, W. M., Pallett, D. S.,\n                                                                       serSurvey%2055%20WEB%20version040420\n  Dahlgren, N. L., Zue, V., and Fiscus, J. G. Timit acoustic-\n                                                                       "
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Jiang, J. More americans are using ride-hailing apps. ht             Sikder, S. Who uses ride-hailing services in the united\n   tps://www.pewresearch.org/short-reads                               states? Transportation research record, 2673(12):40–54,\n   /2019/01/04/more-americans-are-using                                2019.\n  -ride-hailing-apps/, January 2019. Accessed:\n                                                                     Twilio. The future of mobility: how curb delivers the\n   2026-01-27.\n                                                                       promised ride with help from twilio. https://cu\nKaufman, S. M., Smith, A., O’Connell, J., and Marulli, D.              stomers.twilio.com/en-us/curb, 2025. Ac-\n  Intelligent paratransit. 2016.                                       cessed: 2025-12-08."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Koenecke, A., Nam, A., Lake, E., Nudell, J., Quartey, M.,            Twilio Inc. TwiML Voice: Gather, 2025. URL https:\n  Mengesha, Z., Toups, C., Rickford, J. R., Jurafsky, D.,              //www.twilio.com/docs/voice/twiml/ga\n  and Goel, S. Racial disparities in automated speech recog-           ther.\n  nition. Proceedings of the national academy of sciences,\n 117(14):7684–7689, 2020.                                            U.S. Census Bureau. https://data.census.gov,\n                                                                       2022. Accessed 19 Dec. 2025.\nNing, J., Sun, Y., Xu, B., Yang, Z., Luo, L., and Lin, H.\n  Breaking the boundaries: A unified framework for chi-              Wong, G. and Wyloge, E. SF traffic is second-slowest in US\n  nese named entity recognition across text and speech. In            — and getting worse. San Francisco Examiner, January\n  Findings of "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "10\n\f                           “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "A. Appendix\nA.1. SF Streets Public Dataset                                               Street Name                 Prompt Format\nThe publicly released SF Streets dataset differs slightly from               ALEMANY                     “I’m on ALEMANY”\nthe dataset analyzed in this paper to respect participants                   ARGUELLO                    “I’m on ARGUELLO”\nwho did not want their data released. It contains 47 of                      BAY SHORE                   “I’m on BAY SHORE”\n                                                                             BERNAL HEIGHTS              “I’m on BERNAL HEIGHTS”\nthe original participants’ data and 45 of newly collected                    CERVANTES                   “I’m on CERVANTES”\ndata. The demographic breakdown of the participants in SF                    CESAR CHAVEZ                “I’m on CESAR CHAVEZ”\nStreets public are s"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Street Name                 Accepted Alternative\n                                                                                 BAYSHORE                    BAY SHORE\n                                                                                 HUNTER’S POINT              HUNTERS POINT\n                                                                                 CESAR CHAVEZ                CAESAR CHAVEZ\n                                                                                 MONTEREY                    MONTERREY\n                                                                                 CERVANTES                   SERVANTES\n                                                                                 ALEMANY                     ALMANY\n                                                                                 ALEMANY                     ALAMANY\n               "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "11\n\f“Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nFigure 9. Accuracy between finetuned and baseline models across model sizes\n\nFigure 10. Accuracy between finetuned and baseline models across model sizes\n\n12\n\f                          “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nFigure 11. Accuracy between base-whisper and a finetuned model using synthetic data only from one language, crossed by test data of\nvarious languages.\n\nFigure 12. Accuracy between base-whisper and a finetuned model using synthetic data only from one language crossed by names of streets\n\n13\n\f                       “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "US Street Prefix Paraphrases\nCan you pick me up at [STREET NAME]?\nCan you come get me on [STREET NAME]?\nCan you meet me on [STREET NAME]?\nWould you mind picking me up at [STREET NAME]?\nCould you come get me at [STREET NAME]?\nAre you able to pick me up at [STREET NAME]?\nI’m at [STREET NAME]\nI’m near [STREET NAME]\nI’m close to [STREET NAME]\nI’m right by [STREET NAME]\nI’m in the vicinity of [STREET NAME]\nI’m currently near [STREET NAME]\nI live near [STREET NAME]\nMy place is near [STREET NAME]\nI’m staying near [STREET NAME]\nI’m based near [STREET NAME]\nMy residence is near [STREET NAME]\nMy place is located on [STREET NAME]\n  Table 6. Prefix paraphrases for the US streets dataset.\n\n14\n\f                “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nphrase                                                city      phrase                                            city"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Are you able to pick me up at STEVENSON?              Chicago   Can you pick me up at STRATO?                     Jacksonville\nI’m at THOMAS.                                        Chicago   Are you able to pick me up at FABRAY?             Jacksonville\nI’m currently near WAVELAND.                          Chicago   I’m currently near PLANTS.                        Jacksonville\nI’m at MIDWAY AIRPORT LOWER.                          Chicago   Are you able to pick me up at RUBY?               Jacksonville\nI’m close to FRONTIER.                                Chicago   I’m near KINGS COLONY.                            Jacksonville\nWould you mind picking me up at SOLIDARITY?           Chicago   I’m close to COXWELL.                             Jacksonville\nI’m close to LELAND.                                  Chicago   I’m based near TAMRA.                             Jacksonville\nI’m right b"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Table 7. Dataset for U.S. Streets\n\n15\n\f            “Sorry, I Didn’t Catch That”: How Speech Models Miss What Matters Most\n\nphrase                                               city           phrase                                       city"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Can you meet me on BROWNS?                           Philadelphia   I’m staying near MANOCK.                     San Diego\nMy place is near NICE.                               Philadelphia   Can you pick me up at SANTOLINA?             San Diego\nCan you meet me on NORTHWOOD?                        Philadelphia   I’m at BROOKLYN.                             San Diego\nI’m currently near NICETOWN.                         Philadelphia   I’m in the vicinity of BERYL COVE.           San Diego\nI’m in the vicinity of WORRELL.                      Philadelphia   Can you meet me on WOMBLE?                   San Diego\nI live near COWDEN.                                  Philadelphia   My residence is near CARIB.                  San Diego\nI’m based near FLAGLER.                              Philadelphia   Can you come get me on STEEL?                San Diego\nMy place is located on HAYDEN.         "
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Table 8. Dataset for U.S. Streets\n\n16"
+    }
+  ]
+}

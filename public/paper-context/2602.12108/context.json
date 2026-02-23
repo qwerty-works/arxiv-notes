@@ -1,0 +1,372 @@
+{
+  "arxivId": "2602.12108",
+  "paperTitle": "The Pensieve Paradigm: Stateful Language Models Mastering Their Own Context",
+  "abstract": "In the world of Harry Potter, when Dumbledore&#39;s mind is overburdened, he extracts memories into a Pensieve to be revisited later. In the world of AI, while we possess the Pensieve-mature databases and retrieval systems, our models inexplicably lack the &#34;wand&#34; to operate it. They remain like a Dumbledore without agency, passively accepting a manually engineered context as their entire memory. This work finally places the wand in the model&#39;s hand. We introduce StateLM, a new class of foundation models endowed with an internal reasoning loop to manage their own state. We equip our model with a suite of memory tools, such as context pruning, document indexing, and note-taking, and train it to actively manage these tools. By learning to dynamically engineering its own context, our model breaks free from the architectural prison of a fixed window. Experiments across various model sizes demonstrate StateLM&#39;s effectiveness across diverse scenarios. On long-document QA tasks, StateLMs consistently outperform standard LLMs across all model scales; on the chat memory task, they achieve absolute accuracy improvements of 10% to 20% over standard LLMs. On the deep research task BrowseComp-Plus, the performance gap becomes even more pronounced: StateLM achieves up to 52% accuracy, whereas standard LLM counterparts struggle around 5%. Ultimately, our approach shifts LLMs from passive predictors to state-aware agents where reasoning becomes a stateful and manageable process.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "In the world of Harry Potter, when Dumbledore&#39;s mind is overburdened, he extracts memories into a Pensieve to be revisited later. In the world of AI, while we possess the Pensieve-mature databases and retrieval systems, our models inexplicably lack the &#34;wand&#34; to operate it. They remain like a Dumbledore without agency, passively accepting a manually engineered context as their entire memory. This work finally places the wand in the model&#39;s hand. We introduce StateLM, a new class of foundation models endowed with an internal reasoning loop to manage their own state. We equip our model with a suite of memory tools, such as context pruning, document indexing, and note-taking, and train it to actively manage these tools. By learning to dynamically engineering its own context, our model breaks free from the architectural prison of a fixed window. Experiments across various model sizes demonstrate StateLM&#39;s effectiveness across diverse scenarios. On long-document QA tasks, StateLMs consistently outperform standard LLMs across all model scales; on the chat memory task, they achieve absolute accuracy improvements of 10% to 20% over standard LLMs. On the deep research task BrowseComp-Plus, the performance gap becomes even more pronounced: StateLM achieves up to 52% accuracy, whereas standard LLM counterparts struggle around 5%. Ultimately, our approach shifts LLMs from passive predictors to state-aware agents where reasoning becomes a stateful and manageable process."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "The Pensieve Paradigm: Stateful Language Models\n                                             Mastering Their Own Context\n                                             Xiaoyuan Liu1,2 , Tian Liang1 , Dongyang Ma1 , Deyu Zhou , Haitao Mi1 , Pinjia He2 , Yan Wang1,†\n                                             1\n                                                 Tencent AI Lab\n                                             2\n                                                 The Chinese University of Hong Kong, Shenzhen\n                                             †\n                                                 Project Lead\n\nxyliu.cs@gmail.com, yanwang.branden@gmail.com\n\nIn the world of Harry Potter, when Dumbledore’s mind is overburdened, he extracts memories into a\narXiv:2602.12108v1 [cs.AI] 12 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Pensieve to be revisited later. In the world of AI, while we possess the Pensieve—mature databases\n                                             and retrieval systems, our models inexplicably lack the “wand” to operate it. They remain like\n                                             a Dumbledore without agency, passively accepting a manually engineered context as their entire\n                                             memory. This work finally places the wand in the model’s hand. We introduce StateLM, a new class\n                                             of foundation models endowed with an internal reasoning loop to manage their own state. We equip\n                                             our model with a suite of memory tools, such as context pruning, document indexing, and note-taking,\n                                             and train it to actively manage these tools. B"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": " Code              Models           Data\n                                             Date: February 13, 2026"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1   Introduction\n                                         A fundamental limitation of current LLMs is their\n                                         stateless, autoregressive nature. At their core, they\n                                         are passive predictors, architecturally designed to\n                                         perform sequence completion within an externally-\n                                         provided context. This forces them to operate like\n                                         a mind with no long-term memory of its own, un-\n                                         able to actively manage or alter their own reasoning\n                                         process. This core limitation has pushed the area\n                                         towards brittle, external workflows of “Context En-\n                                                      "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2   Related Work: Human as the Wizard\nThe core challenge of statelessness has not gone unnoticed. The dominant response, however, has been to cast\nthe human developer as the wizard, meticulously orchestrating the model’s limited memory. This paradigm of\nexternal control is defined by Andrej Karpathy as “context engineering”:\n     “...the delicate art and science of filling the context window with just the right information for the\n     next step...” [1]\nThis observation frames the entire landscape of current research. The vast majority of work focuses on\nbuilding a better context-workflow while the model remains a passive component, waiting for the human\nwizard to manage its memory."
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2\n\fRAG The most prevalent form of context engineering is RAG [2, 3]. In the standard RAG paradigm, a pipeline\nis designed around a stateless LLM. The process involves taking a user query, using a dense retriever to search\na vector database (the Pensieve) for relevant text chunks, and “stuffing” this retrieved context into the model’s\nprompt. The model has no agency; it passively accepts the context it is given. Recent advancements like\nALR2 [4] and Search-O1 [5] make this external workflow more sophisticated, but they still operate within a\nworkflow predefined by the human developer."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Agentic Memory A second line of work moves toward more structured memory systems for LLM agents.\nFrameworks like MemGPT [6] and MemOS [7] introduce operating-system-like memory hierarchies to page\ninformation in and out of the context window.\nMost recently, research has shifted toward making these context management behaviors learnable through\nReinforcement Learning (RL). Context-Folding [8] introduces a framework that empowers agents to manage\ntheir context by procedurally branching into sub-trajectories and “folding” them upon completion. This allows\nthe model to collapse intermediate steps while retaining a concise summary. Similarly, ReSum [9] proposes\na paradigm for indefinite exploration by training agents to perform periodic context summarization. By\nconverting interaction histories into compact states, ReSum enables models to bypass context constraints.\nHowever, even these advanc"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "This Study: The Model as its Own Context Engineer. While existing works train models to adapt to human-\npredefined context engineering routines, StateLM trains the model to become its own context engineer.\nInstead of teaching the model to merely execute a rigid routine like folding or summarizing, we place the\nwand in its hand. StateLM is equipped with a general-purpose toolkit of memory operations—such as\ndeleteContext, readChunk, and updateNote—and is trained to use them strategically. The model is no\nlonger a passive observer of a predefined workflow; it learns to architect its own reasoning loop, dynamically\ndeciding which information is vital, which is noise, and how to structure its own internal state."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3     Methodology\nThis section introduces our proposed method, StateLM. We first formalize the problem setup (Section 3.1),\nthen describe the our proposed StateLM framework and the Pensieve paradigm (Section 3.2). Finally, we\noutline the training procedures used to develop the StateLM (Section 3.3)."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "3.1   Problem Setup\nWe consider a generic tool-augmented agentic reasoning process for language models. Given a user query q,\nthe agent interacts with an environment over a sequence of rounds t = 1, . . . , T . At each round t, the agent\nconditions on an interaction state        \u0002                               \u0003\n                                     st = q, a1 , o1 , . . . , at−1 , ot−1 ,\nwhere each (ai , oi ) denotes a past assistant action and its corresponding environment response.\nAlthough the interaction is defined over the abstract state st , the language model operates on a textual\nprompt obtained by applying a chat templating function C, which serializes the state into a token sequence\nand injects additional instructions such as system prompts and tool specifications xt = C(st ). For clarity, we\nomit this serialization step in the subsequent discussion.\nAt round t, the agent sampl"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3\n\f                                                              Environment                                                                        Environment\n                 Self-Engineered Context\n                                                                                      Round 5\n          TOOL SPECS                   EXT. MEMORY KEYS\n                                                                                        This is important … UPDATE_NOTE(key, content, summary)"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "SYSTEM PROMPT                                                                        Update Success\n                                                             Long Context Input                                                                   External Memory\n                                                                                      Round 6\n                          USER QUERY                                                                                                                 Notebook\n                                                                                         Let’s clear the context … DELETE_CONTEXT(msg_id)\n   Round 1                                                                                               Context Deletion Success\n              Let me first check … ANALYZE_TEXT()                                     Round 7\n                        "
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Round 2                                                                                               Context Deletion Success"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "The document is too long … BUILD_INDEX()                             1   Round 8\n                                                                                  2\n                           Total Chunks                                                          To summarize, let me … READ_NOTE(key)                    Note1\n                                                                                  3\n   Round 3                                                                                              Note Content and Summary\n      For user’s question, let’s … SEARCH_ENGINE(keywords)                            Round 9\n                         Relevant Results                                                 Let me check the context usage… CHECK_BUDGET()\n                                                                                                        Available Space and Turns\n "
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Context Limit\n\nStateLM\n\nFigure 2 The self-context engineering workflow of StateLM. Given a query over a long context, StateLM engages in a\nmulti-round, stateful reasoning loop that analyzes the input, builds an index, and iteratively searches, reads, takes\nnotes, and prunes its working context. Messages highlighted in red are replaced with stubs after the deletion operation.\nThe loop terminates once StateLM determines it has gathered sufficient information for the final answer.\n\nA defining characteristic of this formulation is the monotonic growth of the interaction state:\n\nst+1 = st ∥ (at , ot ),"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "where ∥ denotes ordered concatenation. All prior actions and observations are permanently retained and\nexposed to the model at future rounds. While effective for short-horizon reasoning, this monotonic accumulation\nbecomes a critical limitation in long-horizon settings. Earlier reasoning steps and raw tool outputs persist\nin the prompt and continuously consume the model’s fixed context budget, eventually leading to context\nexhaustion and performance degradation."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "3.2     Our Method: StateLM Reasoning with Pensieve\nStateLM extends the generic agentic reasoning loop by allowing the model to explicitly modify its own\ninteraction history. Rather than treating the interaction state as an append-only record, we endow the policy\nwith the ability to actively control which past elements remain visible. This transforms the interaction state\nfrom a passive log into a mutable, stateful object that can be managed over time.\n\nst+1 = st ∥ (at , ot ) −→ st+1 = F(st , at , ot ),"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "where F is a state-update function that may append new interactions or modify the visible context according\nto the context-management actions.\nThe core mechanism enabling this transformation for the agentic loop is the Pensieve paradigm, which we\ndefine as a persistent external memory coupled with explicit context-pruning operations. Conceptually, the\nPensieve comprises two components: (i) an external notebook that stores compact, task-relevant notes across\nthe entire episode, and (ii) a deletion action that can remove the selected past interactions from the context.\nThis design is inspired by the Pensieve metaphor in Harry Potter, where raw experiences are extracted,\ndistilled into durable memories, and revisited on demand.\nConcretely, in addition to standard reasoning and tool-use actions, StateLM may emit context-management"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "4\n\factions of the form\n                                at = note(args),    at = deleteContext(msg),\nwhere msg identifies a previous assistant action ai or environment observation oi . Executing deleteContext()\nremoves the corresponding element from the interaction history exposed to the model in subsequent rounds,\nwhile the recorded note remains persistently accessible. This helps to sustain long-horizon reasoning under\nfixed context budgets.\nStateLM Reasoning Flow. Figure 2 illustrates a typi-    Table 1 The StateLM “Spellbook”: a general-purpose toolkit\ncal reasoning trajectory under the proposed formu-       for stateful context interaction.\nlation, with the available toolkit shown in Table 1.        Tool Name             Description\nGiven a query over a long input, the model first\n                                                            Context Perception (Understanding the enviro"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "date segments using searchEngine and selectively            Memory Management (Distilling signal and pruning noise)\n                                                             note/updateNote Records or updates key facts.\ninspects relevant chunks through readChunk.\n                                                             readNote         Retrieves stored notes to context.\nAfter reading relevant information from a retrieved          deleteContext    Removes messages from context.\nsegment, StateLM summarizes the key facts into           Termination\nthe external notebook using note or updateNote.           finish            Ends reasoning and outputs the answer.\nCrucially, it then invokes deleteContext to re-\nmove both the raw chunk content and the associ-\nated note-construction message from the visible interaction history. This search–read–note–delete cycle repeats\nacross reasoning ro"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "3.3     Training Approach\n3.3.1   Supervised Learning from Expert Trajectories"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "We first initialize StateLM using supervised learning from expert-generated trajectories that demonstrate\neffective context management. To construct such trajectories, we incorporate a teacher model and place it in\nthe StateLM inference environment, equipped with a curated system prompt that specifies high-level process\nguidelines and a few processing examples. We then collect complete interaction trajectories produced by the\nteacher. As illustrated in Figure 3 (left), each expert trajectory consists of a sequence of interleaved thoughts\n(t) and actions (a), together with the corresponding environment observations (o).\nIn practice, trajectories produced by teacher models can fail to meet our requirements due to various reasons.\nTo obtain a high-quality dataset, we apply a post-processing pipeline to filter and construct the training\nsamples."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Outcome-based Reject Sampling. We first retain only trajectories that reach a correct final answer. Correctness\nis determined by comparing the model-provided answer against the golden answer.\n\nProcess-based Reject Sampling. Among the trajectories that pass outcome filtering, we further filter based on\ncontext management behavior. Specifically, we discard trajectories that fail to prune the context in time, and\nthose that skip necessary reading steps when sequential scanning is required.\n\nTraining Sample Construction. Each expert trajectory T = (q, t1 , a1 , o1 , . . . , aT ) consists of a sequence of\ninterleaved thoughts, actions, and environment outcomes generated in response to an input query q. From a"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "5\n\f                                                          Supervised                                                                                               Reinforcement\n                   StateLM Environment                    Fine-tuning                  StateLM Environment                                                          Fine-tuning\n\nTeacher Model                                                             StateLM πsft                                            Gradient Update\n\nInput data                                                         Input data                                                                     Reward Module"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "trajectory T = {q, t1, a1, o1, t2, a2, o2, …, tn, an}                 Rollout      T1 = {q, t1, a1, o1, t2, a2, o2, t3, a3, o3, …, tk, akfinish}                          Reward    n\n                                                                        trajectory\n                            Processing Layer\n                                                                                     S1 = {q, t1, a1, o1, t2, a2, o2, t3, a3del}\n                                                                                                                                                                              .repeat()\n  samples S1 = {q, t1, a1}, S2 = {q, t1, a1, o1, t2, a2}, . . .\n                                                                                                                                             Context Evolve\n                                                         "
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Figure 3 The two training stages of StateLM."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "single trajectory, we construct multiple supervised training samples by progressively evolving the interaction\nhistory within the same environment used in the generation. Specifically, for the i-th step, the input context\nto the model includes the query and the evolved context state st from all preceding interaction turns up to\nstep i − 1, while the prediction target is the teacher’s thought and action at step i.\nDuring training, we apply a token-level mask such that the cross-entropy loss is computed only over the tokens\nof the final assistant turn corresponding to step i. All earlier turns are masked out and do not contribute\nto the loss, as they may be modified or removed during subsequent generation. This masking scheme also\nensures compatibility with chat templates that include generation tag control, such as the <think> tag logic\nused by Qwen3."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Action Balancing. Even after the two-stage rejection sampling, the resulting data distribution can remain\nimbalanced. In particular, frequent and low-complexity actions such as deleteContext and readChunk may\ndominate the dataset, leading to under-representation of other operations. To avoid biasing the policy toward\ncertain operation strategies, we downsample training samples associated with overrepresented actions, yielding\na more balanced distribution over memory and reasoning operations.\n\n3.3.2   Reinforcement Learning for Self-Improvement"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Following behavior initialization through supervised fine-tuning, we employ reinforcement learning fine-tuning\nto further improve StateLMs and promote the emergence of effective problem-solving strategies through\ntrial-and-error interaction. The training algorithm builds on a GRPO-style objective, with adaptations specific\nto StateLM, including trajectory snapshots, controlled batching, and task-aware reward design."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Trajectory Rollout and State Snapshots. As illustrated on the Figure 3 (right), given an input query q, we\nrollout n trajectories T (1) , . . . , T (n) from the current policy πθold . Each trajectory corresponds to a complete\nepisode and terminates either with a finish action or upon reaching a predefined budget limit. During\nrollout generation, the agent interacts with the environment and invokes context management actions. We\ncollect a state snapshot whenever a context-editing action is taken. After the snapshot, the context is evolved\nand masked, and next sample proceeds from the new state. By the end of a trajectory, this process yields a\nsequence of state snapshots together with their loss masks.\nRather than using all snapshots produced within a trajectory, we control the batch size by uniformly sampling\na fixed number of snapshots per trajectory. Each selected snapshot contributes "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Reward Design. After collecting the rollout trajectories, we assign a scalar reward to each trajectory and its\nassociated snapshot trajectories based on the outcome of the final trajectory. Specifically, given a query q, a\ngolden answer a, and the terminal trajectory Tlast , the reward is defined as:\n\n6\n\f                                                 correct, formatted, and finished,\n                                          \n                                          +1,\n                                          \n                         R(q, a, Tlast ) = −0.5, incorrect, formatted, and finished,\n                                          \n                                            −1,  unformatted or unfinished.\n                                          "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Correctness is determined by checking equivalence between the final answer and the golden answer using the\nsame judging procedure as in the SFT stage. Format compliance requires the answer to be returned via the\nfinish tool call and to satisfy task-specific constraints, such as brevity requirements. We additionally impose\npredefined limits on the maximum context window size and the number of interaction turns. Trajectories that\nexceed either limit are aborted and categorized as unfinished. Given this outcome reward, the advantage is\ncomputed using a group-based baseline formed across samples from multiple rollout trajectories.\n\n4     Experiment\nTo verify the effectiveness of the proposed method, we evaluate the proposed method through extensive\nexperiments on three base models of varying parameter scales across multiple benchmarks."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "4.1   Training Setup\nOur training procedure consists of two stages. For Stage 1: Supervised Learning from Expert Trajectories, we\nuse the PublicDomain split of NovelQA [11] and the training split of NarrativeQA [12] to generate expert\ndemonstrations. These datasets are chosen for their long-context characteristics, which naturally require\nexplicit context management. We use Claude Opus 4.1 as the teacher model for its agentic capabilities. While\nthe majority of trajectories are generated with the search tool enabled, we also incorporate a small subset\ngenerated without search to develop scan-based reading behaviors. In total, we collect 3.3K full trajectories,\nwhich are subsequently filtered and decomposed into 35.7K training samples. For Stage 2: Reinforcement\nLearning for Self-Improvement, we adopt LongBench v2 [13] as the training dataset, using 488 problems\nin its training set. We al"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "4.2   Synthetic Memory Retrieval\nWe first assess whether StateLM can succeed on a task that isolates memory retrieval from extensive reasoning.\nTo this end, we follow the Needle-in-a-Haystack setup from prior work [15] and construct a synthetic benchmark\nof 480 problems spanning 8 context lengths. Each problem embeds a single key sentence (the “needle”) into a\nlong passage (the “haystack”), and the model must retrieve the exact value associated with the queried key.\nTo test the model limit, we utilize YaRN [16] to obtain the recommended 128K context window for both\nStateLM and the Qwen3 instruct baselines. For the latter, we follow prior work [11, 17] and truncate the\ninput by retaining only the first 128K tokens of the context.\nTo test StateLM’s memory management ability under increasing context pressure, we deliberately remove\nthe search tool from the available tool set. Otherwise, Sta"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "7\n\fTable 2 Needle-in-a-haystack (NIAH) experimental results comparing model performance across selected context lengths.\nAll values represent accuracy (%) and results are averaged over 3 runs.\n                                                                      Length\n Model\n                                     32K        64K       128K      256K      512K      768K       1M       2M\n Qwen3-4B                          100.00     100.00      88.33     41.67     23.33     16.67     3.33       1.7\n StateLM-4B (w/o search)            95.00      95.56      95.56    88.33     76.67     62.78     53.89     32.22\n Qwen3-8B                          100.00     100.00      88.33     41.67     23.33     16.67     3.33       1.7\n StateLM-8B (w/o search)            99.44      98.33      98.33    99.44     95.55     88.89     88.89     67.22\n Qwen3-14B                         100.00     100.00      88"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "problems within their context limit, and repeated sampling does not affect the outcome. While the instruct\nbaselines rapidly degrade beyond the 128K limit, falling to nearly 0% accuracy at 1M tokens, the StateLM\nvariants remain highly robust up to 2M context."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "4.3   Long-Context Reasoning\nWe next evaluate the effectiveness of StateLM in practical long-context reasoning scenarios. To this end, we\nconsider four benchmarks spanning three domains:\n• Long Document QA: the Copyright split of NovelQA [11] (757 problems) and the En.MC (English Multiple-\n  Choice) split of ∞Bench [18] (229 problems).\n• Chat Memory: LongMemEval-S [19] (500 problems), which evaluates long-term memory retention under\n  multi-turn user-assistant interactions.\n• Deep Research: a randomly downsampled subset of BrowseComp-Plus [20] (150 problems) following [8],\n  which tests agent model’s deep research ability through iterative reasoning over search results.\nOur primary comparisons are against Qwen3 instruct models, which are scaled to 128K context length using\nYaRN. In addition, we include the following methods:\n• Qwen3-235B [14]: the strong agentic model Qwen3-235B-A30B-Ins"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "8\n\fTable 3 Performance comparison of StateLM with baseline models on long-context reasoning benchmarks. The mean\ninput length of each benchmark computed by the Qwen3 tokenizer is reported in parentheses. Results for Qwen3 and\nStateLM variants are measured over 3 runs. *For BrowseComp-Plus, we use the full 128k context for our trained\nStateLMs for better performance.\n                                                                                                                                                                                               LongDoc QA (135K)\n                             Model                                                                               Context                                                                                                                                                                         Chat Memory                      "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Qwen3-4B      StateLM-4B\n                                                        Qwen3-4B      StateLM-4B\n                                                                Qwen3-4B               Qwen3-8B\n                                                                               StateLM-4B            StateLM-8B\n                                                                                              Qwen3-8B      StateLM-8B\n                                                                                                      Qwen3-8B              Qwen3-14B\n                                                                                                                     StateLM-8B           StateLM-14B\n                                                                                                                                   Qwen3-14B     StateLM-14B\n                          "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Accuracy (Avg @ 3)\n\nAccuracy (Avg @ 3)\n\n77.45\n                            Accuracy (Avg @ 3)\n\nAccuracy (Avg @ 3)\n\nAccuracy (Avg @ 3)\n                                                          Accuracy (Avg @ 3)\n\nAccuracy (Avg @ 3)"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Accuracy (Avg @ 3)\n                                 70.00                    70.00                         70.00\n                       70                        70                             70                                                         70               70\n                                                                                                                                                        67.39                   67.3967.86\n                                                                                                                                                                                      70                      67.86\n                                                                                                                                                                                                            67.39                 67."
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "50                        50                             50                                                         50                          50                            50                                                         50                          50                            50   46.54           46.54           46.54\n                                                                                                                                                                                                                      42.77         42.77                            42.77\n                                                                                                 39.62         39.62                            39.62\n                       40                        40                             40                                                         40        "
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "30                    30                    30                         30      30                                                                                 30                         30      30                                                                                30\n                                           0-32K                  32-128K 0-32K\n                                                               0-32K          128-512K32-128K\n                                                                           32-128K                  0-32K\n                                                                                       128-512K 128-512K                                                                                            128-512K32-128K\n                                                                                                                              "
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "EvidenceEvidence\n                            Problem Problem  Position (Token)\n                                             Problem Position    PositionProblem\n                                                       Evidence(Token)           EvidenceEvidence\n                                                                          (Token)Problem  Position Position\n                                                                                          Problem  (Token)  PositionProblem\n                                                                                                   Evidence(Token)   (Token)Problem  Position Position\n                                                                                                                            EvidenceEvidence\n                                                                                                                      "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "In addition, StateLM consistently outperforms other agentic memory methods at the same model scale and\ncontext budget, highlighting the advantage of the self-managed paradigm over predefined workflows.\nFigure 4 further breaks down performance by the position of answer evidence in the context. The results\nshow that, on the Long Document QA task, StateLM consistently outperforms the instruct baseline across all\nevidence ranges, with the most pronounced gains occurring when the relevant evidence appears later in the\ndocument. For example, in the 128–256K range, StateLM exceeds the instruct model by 24 and 25 accuracy\npoints for the 4B and 8B variants, respectively.\nStateLM generalizes effectively to deep research tasks. On the deep research benchmark BrowseComp-Plus, the\nperformance gap becomes even more pronounced: StateLM-14B-RL achieves up to 52% accuracy, whereas\nthe best vanilla counte"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "9\n\f                           Qwen3-14B            RL-MemoryAgent-14B             StateLM-14B                                         Qwen3-14B                    RL-MemAgent-14B\n                                                                                                                                   StateLM-14B\n                           character                                          multi-ses\n                                                                                                                            90                                      88.9               88.8\n                         100                                                   100\n\nsin\n                                                                                                                                                      85.6"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "ate\n              g\n                                                                                                                                                             82.8\n               n          80 90.5                                               80\n\ng\n                                                                   pd\n                                               pl\n                                                                                                                                                                           81.2 80.7\n            ni\n\nle-\n                                                                                                                            80\n\not\n       ea\n\n60                                                    60\n\n.u\n\nses\n      m\n\now"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "Accuracy\n                     87.5 40                   88.9                             40\n                                                                            54.89\n\n-us\n                                                                                          93.81                                                71.3\n\nkn\n                                                                   70.94        20\n\ner\n                          20                                                                                                            69.5\n                                                                                                                            70\n                           0                                                     0\n    settg"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "relat\n                                                                                                                                 60.1\n\ni.\n                                                                                                                            60\n\nass\n                   88.5                         85                    49.62 27.78\n\ntem\n\n-\n                                                                                                     ses\n                                    44.4                                                  95.83\n                             53.8\n\npo\n\nle-\n                                                                                                                            50\n\nral"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "g\n                                                                                                                                 Multi-Hop            Single-Hop             Detail\n\nsin\n                   tim                     n\n                      es               spa                                 single-ses-pref.                                                    Problem Complexity\nFigure 5 Performance breakdown by problem aspect on NovelQA (left) and LongMemEval (middle), and by question\ncomplexity on NovelQA (right)."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "StateLM improves across problem aspects and difficulty levels. By breaking down performance across different\naxes in Figure 5, we observe that StateLM-14B achieves consistent improvements over both the instruct\nbaseline and MemAgent across most aspects. StateLM is relatively weaker on the “span” and “user-preference”\ncategories, which likely stems from the limitations of keyword-search-based reading when handling non-direct\nor implicit queries. In contrast, StateLM-14B exhibits the largest gains over the instruct model on the\n“Multi-Hop” category, showing the advantage and robustness of the proposed iterative reasoning loop for\nintegrating evidence across multiple locations.\n\n5       Further Analysis"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "5.1         Tool Use Pattern\nTo better understand how StateLMs manage\ntheir reasoning states during inference, we ana-                                                                                        Rounds               mem           del           srh\nlyze their tool-use patterns across different bench-                                      NovelQA (119K)                                   18.6                4.3         6.3           1.8\nmarks. Specifically, we track the total rounds, ex-\n                                                                                          ∞Bench (189K)                                    20.7                4.6         6.8           2.9\nternal memory operations (mem, including note,\nupdateNote, and readNote), context pruning op-                                            LongMemEval (115K)                               22.4                4.9  "
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "5.2         Comparison to Qwen3 Agentic\nSince recent open-source models such as Qwen3 already support agentic tool calls, a natural question arises:\nis deliberate training necessary for developing StateLMs? In other words, can instruct models learn to manage"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "10\n\ftheir own context states solely through an agent-style system prompt paired with an appropriate toolkit? To\nvalidate our approach, we construct a detailed system prompt that explicitly specifies the intended context\nmanagement procedure (see Figure 9 in the Appendix) and expose the full tool set of StateLM to Qwen3\ninstruct models, which we refer to as “Agentic” models. We then evaluate these models on the Long Document\nQA tasks from NovelQA and ∞Bench and compare their performance against our fine-tuned StateLMs.\nThe results in Figure 6 present this comparison.            Qwen3-4B-Agentic   Qwen3-8B-Agentic     Qwen3-14B-Agentic\nWhile the largest agentic model, Qwen3-14B, is              StateLM-4B         StateLM-8B           StateLM-14B"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "able to correctly complete and submit answers                90\nfor up to 30% of the questions, its performance\n                                                             75\nremains substantially below that of the trained\nStateLMs. Smaller agentic variants perform even              60"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Accuracy\nworse, further widening the gap. Our error analysis\n                                                             45\nreveals that these models often fail to keep their\ncontext within the budget, causing the overflow              30\nerror. These findings suggest that although such\n                                                             15\nmodels inherently possess instruction-following and\ntool-calling capabilities, mastering the context man-          0\nagement based on Pensieve is not a trivial task and                    NovelQA            InfiniteBench\nrequires deliberate training, particularly for these  Figure 6   StateLM   and Qwen3-agentic      model performance\n                                                      comparison.\nrelatively small-scale models. In other words, our\ntraining stages enable these models to learn and develop effective tool-use patterns that mak"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "5.3   Error Analysis\nTo better understand the failure modes of StateLM, we conduct a qualitative error analysis by manually\ninspecting incorrect trajectories across the evaluation benchmarks, and the major failure modes are summarized\nas follows:\n• Search Constraints. The current BM25-based keyword retrieval often misses evidence for implicit or\n  paraphrased queries due to limited semantic coverage.\n• Formatting Errors. A small fraction of failures arise from malformed tool calls, particularly in long-horizon\n  trajectories and smaller models.\n• Context Window. Deleted content is replaced by lightweight stubs, which can still accumulate over long\n  trajectories and gradually consume context budget. In addition, untimely or overly conservative deletions\n  may cause transient context overflow before pruning takes effect.\nThese failure modes suggest several promising directions for StateLM"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "6     Conclusion\nIn this work, we introduce StateLM, a state-aware agentic system in which models actively manage their own\ncontext through tool-based operations. Across both synthetic memory retrieval and realistic long-context\nreasoning tasks, StateLM consistently outperforms instruct baselines as well as existing agentic methods.\nEmpirically, it achieves 10%–20% gains on the chat memory task and demonstrates over 40% improvements\non the agentic deep research task. These results point to a shift from systems that passively accumulate\ncontext toward models that dynamically refine and control their reasoning states. Despite certain limitations,\nour proposed paradigm offers a scalable and principled approach for future foundation models and agentic\nsystems, where context management becomes an intrinsic and learned capability."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "11\n\fReferences\n [1] Andrej Karpathy. Context engineering is the delicate art and science of filling the context window... https:\n     //x.com/karpathy/status/1937902205765607626?lang=en, June 2025. Accessed: 2025-06-25.\n [2] Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich\n     Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. Retrieval-augmented generation for knowledge-intensive\n     nlp tasks. Advances in Neural Information Processing Systems, 33:9459–9474, 2020.\n [3] Yunfan Gao, Yun Xiong, Xinyu Gao, Kangxiang Jia, Jinliu Pan, Yuxi Bi, Yi Dai, Jiawei Sun, Meng Wang, and\n     Haofen Wang. Retrieval-augmented generation for large language models: A survey, 2024.\n [4] Huayang Li, Pat Verga, Priyanka Sen, Bowen Yang, Vijay Viswanathan, Patrick Lewis, Taro Watanabe, and\n     Yixuan Su. ALR2 : A retrieve-then-reason framework f"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "12\n\f[18] Xinrong Zhang, Yingfa Chen, Shengding Hu, Zihang Xu, Junhao Chen, Moo Khai Hao, Xu Han, Zhen Leng Thai,\n     Shuo Wang, Zhiyuan Liu, et al. inf ty bench: Extending long context evaluation beyond 100k tokens. arXiv\n     preprint arXiv:2402.13718, 2024.\n[19] Di Wu, Hongwei Wang, Wenhao Yu, Yuwei Zhang, Kai-Wei Chang, and Dong Yu. Longmemeval: Benchmarking\n     chat assistants on long-term interactive memory. arXiv preprint arXiv:2410.10813, 2024.\n[20] Zijian Chen, Xueguang Ma, Shengyao Zhuang, Ping Nie, Kai Zou, Andrew Liu, Joshua Green, Kshama Patel, Ruoxi\n     Meng, Mingyi Su, et al. Browsecomp-plus: A more fair and transparent evaluation benchmark of deep-research\n     agent. arXiv preprint arXiv:2508.06600, 2025.\n[21] Kuang-Huei Lee, Xinyun Chen, Hiroki Furuta, John Canny, and Ian Fischer. A human-inspired reading agent\n     with gist memory of very long contexts. In Proceedin"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "13\n\fA     Training Dataset Construction\n\nSource           Questions      Trajs     Outcome Filter      Process Filter      Samples     Action Balancing\n NovelQA                 3096    3291                 2322                  2256      46180\n                                                                                                         35737\n NarrativeQA              100      83                    8                     8        634\n Total                   3196    3374                 2330                  2264      46814              35737\n                                Table 5 SFT Dataset statistics by filtering stages."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Source             Questions                    Type                          Split\n                                            488   Open-Ended (127), MCQ (361)               Train\n                LongBench v2\n                                             15    Open-Ended (1), MCQ (14)            Validation\n                                           Table 6 RL Dataset statistics.\n\nFor LongBench v2 data used in reinforcement learning, we convert a subset of multiple-choice questions into\nopen-ended questions by removing the original option lists, which help to diversify the problem type. The\ntransferability of the question is determined by an LLM-based judge, which we instantiate as gpt-oss-120b,\nbased on whether the correct answer remains unique, verifiable, and unambiguous."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "B     Training Configurations\nFor Supervised Fine-tuning (SFT), each model is trained on two machines, each equipped with 8 H20 GPUs.\nThe training configurations are specified in the table below.\n\nTable 7 SFT Training Configuration\n\nParameter                              Value\n                                Global Batch Size                     128\n                                Learning Rate Scheduler             cosine\n                                Learning Rate                      1 × 10−5\n                                Warm-up Ratio                      3 × 10−2\n                                Max Sequence Length                  28000\n                                Epochs                        3 (14B), 4 (4B, 8B)\n                                Parallelism Strategy          DeepSpeed ZeRO-3"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "For reinforcement learning (RL) training, we use the GRPO algorithm with a rollout batch size of 32 and a\nrollout number of 8. We enable KL loss and set the KL coefficient to 0.001. The number of samples for each\nrollout trajectory is set to 8 for the 8B model and 2 for the 14B model. Models are trained for 32 steps to\nobtain the StateLM-RL variants.\n\nC     Evaluation Configurations\n\nC.1   Generation\nIn our experiments, we use the Qwen3 non-thinking mode for both StateLMs and instruct baselines. We\nexclude the thinking mode because it requires a 32K output space at each step, which is computationally\nexpensive and reduces the available context window.\nFor both StateLM and instruct baselines, we adopt the recommended sampling parameters as documented in\nthe Qwen3 official guide. Detailed configurations are reported in Table 8 below:"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "14\n\f                                         Table 8 Generation Configuration\n\nParameter                 Value      Method\n                                   Temperature                 0.7        Both\n                                   Top_p                       0.8        Both\n                                   Top_k                       20         Both\n                                   Max Output Tokens          8000      Instruct\n                                   Max Context Tokens        120000     Instruct\n                                   Context Budget            32000      StateLM\n                                   Round Budget                150      StateLM\n                                   Max Rounds                  200      StateLM"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "This configuration is used for most evaluations, except for the BrowseComp-Plus subset. For this benchmark,\nwe follow the official configuration to obtain the Qwen3 results, as detailed in the official repository.1 In this\nsetting, Qwen3 instruct models are augmented with a search tool based on the BM25 algorithm, which is the\nsame algorithm used in StateLM’s search tool."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "C.2    Grading\nFor long-document QA tasks with multiple-choice questions, we use a rule-based grading script adapted from\nthe implementation of [18]. Additionally, we observe that MemAgent models often output the option content\nwithout the corresponding option letter in multiple-choice questions; to reflect their best achievable performance,\nwe adapt our grading script to treat such responses as correct. For LongMemEval and BrowseComp-Plus,\nwe follow the official evaluation guidelines and use an LLM-based judge to assess answer correctness, with\nGPT-4o as the judge model.\nFor the reward module in RL training, we adopt a two-layer design: multiple-choice questions are evaluated\nusing a rule-based grading script, and open-ended questions are evaluated with an LLM-based judge. In the\nexperiment, the judge model is set to gpt-oss-120b, and the grading prompt is shown in Figure 8."
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "D     Tool Use Analysis\nIn this section, we report tool-use statistics for StateLM-4B and StateLM-8B, which complement the analysis\npresented in Section 5.1.\n\nTable 9 Tool-use pattern of StateLM-4B across benchmarks. Mean input length of each benchmark is reported.\n\nRounds       mem    del    srh\n                              NovelQA (119K)              19.5        4.4   6.5    2.3\n                              ∞Bench (189K)               21.4        4.6   6.6    3.9\n                              LongMemEval (115K)          24.5        5.3   8.3    3.5\n                              BrowseComp+ (552K)          21.9        3.4   5.4    7.2\n\nE     Prompts\n\n1 https://github.com/texttron/BrowseComp-Plus/blob/main/docs/qwen.md\n\n15\n\fTable 10 Tool-use pattern of StateLM-8B across benchmarks. Mean input length of each benchmark is reported."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Rounds     mem     del   srh\n                          NovelQA (119K)               19.6      4.5    6.6   2.2\n                          ∞Bench (189K)                21.0      4.3    6.3   4.2\n                          LongMemEval (115K)           24.5      5.6    8.9   2.3\n                          BrowseComp+ (552K)           22.5      3.8    5.2   7.9\n\nPrompt\n\nYou are an AI assistant for long-context processing with tools. Produce factually correct answers\n grounded in any attached text while conserving the context window. Describe your processing plan\n first, then proceed with the tools.\n\nFigure 7 System prompt used in training and inference of our StateLMs.\n\nPrompt"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Given a problem, its correct answer, and a student’s answer below, your task is to review the student’s\n answer and determine if it is correct by comparing it to the correct answer. If the student’s answer is\n incomplete or ambiguous, assume it is incorrect.\n\n### Problem\n {problem}\n\n### Answer\n {answer}\n\n### Student Answer\n {mode_ans}\n\nPlease put your final answer (True or False) in \\\\boxed{}. Specifically, if the student’s answer is correct,\n the final answer should be \\\\boxed{True}; otherwise, the final answer should be \\\\boxed{False}.\n\nFigure 8 Prompt template used by LLM Judge for Open-Ended questions.\n\n16\n\fPrompt\n\nYou are an AI assistant specialized in processing long-context tasks with tools. Produce factually\naccurate answers grounded in the provided context while minimizing context consumption."
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Processing Strategy:\n1. Check the size of the attached text:\n   - Long (> 8K tokens): build an index and process in chunks. For extremely long texts, increase the\nchunk size up to 12,000 tokens.\n   - Short (≤ 8K tokens): load the full text and answer directly.\n   - Empty: proceed with reasoning, using note-taking tools.\n2. Analyze user’s query and justify which processing mode is required to answer reliably and state\nthat you plan to use that mode explicitly.\n   (a) Linear scan: Full-passage, sequential chunk-by-chunk reading (no details skipped), or\n   (b) Keyword search: Keyword-based search to retrieve and inspect only the relevant chunks.\n3. While reading, record relevant, accurate, and verifiable notes. Merge related notes as they grow to\nkeep them concise.\n4. Delete unnecessary context messages by their ‘msg_id’ to preserve context space, but do not delete\neverything or overuse the"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "Describe your reasoning and processing plan before invoking any tools.\n\nFigure 9 System prompt for the Qwen3-Agentic models.\n\n17"
+    }
+  ]
+}

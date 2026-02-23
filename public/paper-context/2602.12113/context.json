@@ -1,0 +1,522 @@
+{
+  "arxivId": "2602.12113",
+  "paperTitle": "Stop Unnecessary Reflection: Training LRMs for Efficient Reasoning with Adaptive Reflection and Length Coordinated Penalty",
+  "abstract": "Large Reasoning Models (LRMs) have demonstrated remarkable performance on complex reasoning tasks by employing test-time scaling. However, they often generate over-long chains-of-thought that, driven by substantial reflections such as repetitive self-questioning and circular reasoning, lead to high token consumption, substantial computational overhead, and increased latency without improving accuracy, particularly in smaller models. Our observation reveals that increasing problem complexity induces more excessive and unnecessary reflection, which in turn reduces accuracy and increases token overhead. To address this challenge, we propose Adaptive Reflection and Length Coordinated Penalty (ARLCP), a novel reinforcement learning framework designed to dynamically balance reasoning efficiency and solution accuracy. ARLCP introduces two key innovations: (1) a reflection penalty that adaptively curtails unnecessary reflective steps while preserving essential reasoning, and (2) a length penalty calibrated to the estimated complexity of the problem. By coordinating these penalties, ARLCP encourages the model to generate more concise and effective reasoning paths. We evaluate our method on five mathematical reasoning benchmarks using DeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-Distill-Qwen-7B models. Experimental results show that ARLCP achieves a superior efficiency-accuracy trade-off compared to existing approaches. For the 1.5B model, it reduces the average response length by 53.1% while simultaneously improving accuracy by 5.8%. For the 7B model, it achieves a 35.0% reduction in length with a 2.7% accuracy gain. The code is released at this https URL .",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Large Reasoning Models (LRMs) have demonstrated remarkable performance on complex reasoning tasks by employing test-time scaling. However, they often generate over-long chains-of-thought that, driven by substantial reflections such as repetitive self-questioning and circular reasoning, lead to high token consumption, substantial computational overhead, and increased latency without improving accuracy, particularly in smaller models. Our observation reveals that increasing problem complexity induces more excessive and unnecessary reflection, which in turn reduces accuracy and increases token overhead. To address this challenge, we propose Adaptive Reflection and Length Coordinated Penalty (ARLCP), a novel reinforcement learning framework designed to dynamically balance reasoning efficiency and solution accuracy. ARLCP introduces two key innovations: (1) a reflection penalty that adaptively curtails unnecessary reflective steps while preserving essential reasoning, and (2) a length penalty calibrated to the estimated complexity of the problem. By coordinating these penalties, ARLCP encourages the model to generate more concise and effective reasoning paths. We evaluate our method on five mathematical reasoning benchmarks using DeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-Distill-Qwen-7B models. Experimental results show that ARLCP achieves a superior efficiency-accuracy trade-off compared to existing approaches. For the 1.5B model, it reduces the average response length by 53.1% while simultaneously improving accuracy by 5.8%. For the 7B model, it achieves a 35.0% reduction in length with a 2.7% accuracy gain. The code is released at this https URL ."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 2: Output statistics of two models on the AIME 2024-2025 datasets. The reported metrics"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 3: The framework of ARLCP. It adaptively imposes a reflection penalty according to the"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 1: Performance comparison of different methods on multiple reasoning benchmarks. Metrics"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: The analysis of accuracy, length, and reflection for model responses on five benchmarks"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Comparison of average reflection token count between vanilla models and ARLCP."
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 2: The impact of adaptive penalty components on the performance of LRM. The dynamic"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 3: Performance of different parameter settings."
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 4: The performance of ARLCP on the out-of-distributeion benchmark MMLU. ARLCP"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 5: Performance comparison of ARLCP on multiple reasoning benchmarks with Qwen3-1.7B."
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 6: Performance comparison between different RL methods."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 6: Average reflection token counts statistics of other models."
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Figure 7: For a math problem from MATH-500, DeepSeek-R1-Distill-Qwen-7B costs about 9000"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Adaptive Reflection and Length Coordinated Penalty (ARLCP)\n\nS TOP U NNECESSARY R EFLECTION : T RAINING LRM S\n                                         FOR E FFICIENT R EASONING WITH A DAPTIVE R EFLEC -\n                                         TION AND L ENGTH C OORDINATED P ENALTY"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Zewei Yu1 Lirong Gao1 Yuke Zhu2 Bo Zheng2 Sheng Guo2\n                                          Haobo Wang1,3† Junbo Zhao1†\n                                          1\n                                            State Key Laboratory of Blockchain and Data Security, Zhejiang University\n                                          2\n                                            MYbank, Ant Group 3 Innovation and Management Center,\n                                            School of Software Technology (Ningbo), Zhejiang University\n                                          {yuzeweizju, gaolirong, j.zhao, wanghaobo}@zju.edu.cn\narXiv:2602.12113v1 [cs.AI] 12 Feb 2026\n\nfelix.yk@alibaba-inc.com guangyuan@antgroup.com\n                                          guosheng1001@gmail.com\n                                          †\n                                            Corresponding author."
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "A BSTRACT\n                                                  Large Reasoning Models (LRMs) have demonstrated remarkable performance on\n                                                  complex reasoning tasks by employing test-time scaling. However, they often\n                                                  generate over-long chains-of-thought that, driven by substantial reflections such\n                                                  as repetitive self-questioning and circular reasoning, lead to high token consump-\n                                                  tion, substantial computational overhead, and increased latency without improving\n                                                  accuracy, particularly in smaller models. Our observation reveals that increasing\n                                                  problem complexity induces more excessive and unnecessary ref"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1   I NTRODUCTION\n                                         Large Reasoning Models (LRMs), such as OpenAI o1 (OpenAI, 2024), QwQ (Qwen Team, 2025),\n                                         and DeepSeek-R1 (Guo et al., 2025), have demonstrated exceptional capabilities in complex rea-\n                                         soning tasks. When tackling challenging problems, these models employ long chain-of-thought rea-\n                                         soning with self-reflective mechanisms, systematically exploring multiple solution pathways while\n                                         generating extensive reflective reasoning traces. This iterative reasoning framework enables them\n                                         to perform significantly better than conventional LLMs. Typically, the reasoning process in these\n                                         LRMs is explicitly or"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "is training-free inference-stage optimization, such as Early Exit (Yang et al., 2025b; Qiao et al.,\n2025; Xu et al., 2025) and Model Switch (Liao et al., 2025; Ong et al., 2025; Yang et al., 2025c).\nThese methods do not change the model’s inference capability or distribution, but only optimize\nthe generation process with early stopping or pruning, thus offering limited efficiency gains for\nredundant models or complex tasks. The second direction is training LRMs under length-penalty\nguidance using supervised fine-tuning (Jiang et al., 2025; Xia et al., 2025; Huang et al., 2025) or\nReinforcement Learning (RL) (Arora & Zanette, 2025; Zhang et al., 2025; Aggarwal & Welleck,\n2025). While such methods enhance control over reasoning length, they often sacrifice reasoning\nquality—for example, by suppressing reflection or discarding the entire thinking process—which\nnegatively affects answer accu"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2   R EALATED W ORK\n\nLarge Reasoning Models. Following Open-o1 (OpenAI, 2024), researchers have developed ad-\nvanced reasoning models through detailed rewards and search-based methods (Qwen Team, 2025).\nNotable approaches include mutual learning between models (Qi et al., 2024), example-guided\nsearch (Zhang et al., 2024), and MCTS-integrated self-play for self-correcting reasoning (Zhao et al.,\n2024). The release of DeepSeek-R1 (Guo et al., 2025) further popularized ”R1-style” models that\nachieve multi-step reasoning and self-reflection using only simple rule-based rewards (Team et al.,\n\n2\n\f      Adaptive Reflection and Length Coordinated Penalty (ARLCP)\n\n2025; Yang et al., 2025a). However, overthinking behaviors significantly increase computational\n      costs, driving active research into efficiency reasoning."
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Efficient Reasoning for LRMs. Most existing methods to improve the efficiency of LRM fo-\n      cus on reducing response tokens. Training-free approaches include prompting with token budgets\n      (Muennighoff et al., 2025; Aytes et al., 2025), model switching (Liao et al., 2025; Fan et al., 2025;\n      Yang et al., 2025c), and early exit mechanisms (Yang et al., 2025b; Qiao et al., 2025). Other strate-\n      gies use Supervised Fine-Tuning (SFT) with compressed Chain-of-Thought (CoT) data (Jiang et al.,\n      2025; Yu et al., 2025) or length-selected data from sampling and post-processing (Shen et al., 2025;\n      Rafailov et al., 2023). Furthermore, Reinforcement Learning (RL) techniques often incorporate\n      length-based rewards (Arora & Zanette, 2025; Luo et al., 2025a; Liu et al., 2025a) or adapt other\n      rewards (Zhang et al., 2025; Aggarwal & Welleck, 2025). While different, t"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3                     M OTIVATION AND O BSERVATION\n      This section examines common patterns that regularly appear during models’ reasoning processes.\n      By carefully studying these patterns, we hope to find practical mechanisms to improve the efficiency\n      of the models.\n\nReflection correlates with problem complexity.\n      During inference, we observe that reasoning                                                                                                           140\n                                                                                                                           Average Reflection Token Count"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "models frequently generate specific reasoning-                                                                                                                             1.5B\n                                                                                                                                                            120                  7B\n      supportive tokens such as “wait”, “hmm”, and\n                                                                                                                                                            100\n      “alternatively”, which are intrinsically linked to\n      the model’s internal behavior. To quantitatively                                                                                                      80\n      analyze these patterns, we conduct a study mea-                                                                "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "Average Reflection Count\n\n14,378         2.4x 14,626                                                                                                                                                                       7B\n                      14000 2.4x                                                          140 3.2x 139.86        3.3x 133.75                                                     80\n                      12000                                                               120\n                                                                                                                                                                  Accuracy (%)"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "60\n                      10000                                                               100\n                       8000                                                                80                                                                                    40\n                                                6,185\n                       6000 5,918                                                          60\n                                                                                              43.52              41.00\n                       4000                                                                40                                                                                    20\n                       2000                                                                20\n                          0     1.5B                7B                            "
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "1"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "1-1\n                                                                                                                                                                                      -\n                                                                                                                                                                                    1\n                                                                                                                                                                                    1\n                                                                                                                                                                                    1\n                                                                                                                                                                      "
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Correct          Incorrect                                  Correct Avg            Incorrect Avg                                                              Reflection Token Count Interval\n                                  Avg Tokens       Avg Tokens                                 Reflection Count       Reflection Count\n\nFigure 2: Output statistics of two models on the AIME 2024-2025 datasets. The reported metrics\n      include average response tokens (left), average reflection token count (medium) for both correct and\n      incorrect answers, and accuracy trend with different reflection token count intervals."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Over-reflection leads to incorrect responses and inefficiency. To further investigate the relation-\n      ship between reflection tokens and model performance, we analyze the performance of DeepSeek-\n      R1-Distilled-Qwen-1.5B and 7B in terms of response length and reflection tokens for both correct\n      answers and incorrect answers and the accuracy trend with different reflection token count intervals\n      on AIME 2024-2025 datasets, as shown in Figure 2. The results indicate that correct responses\n\n3\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "exhibit significantly shorter average token lengths and fewer reflection tokens than incorrect ones.\nAnd smaller reasoning models (1.5B) require substantially longer responses while exhibiting lower\naccuracy than larger models (7B). Additionally, as the number of reflection tokens increases, model\naccuracy declines. These results indicate that while some reflection is necessary, unproductive or ex-\ncessive reflection—a phenomenon we term ”over-reflection”—traps models in inefficient and often\nincorrect exploration of the solution space."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Key insights and motivation.         Our observations highlight three key insights:\n• Reflection as complexity indicator: Higher reflective token counts correlate with increased prob-\n  lem complexity, enabling dynamic assessment and adaptive reward design.\n• Over-reflection risks: Incorrect responses often exhibit excessive reflection, trapping models in\n  inefficient solution-space exploration.\n• Balanced intervention needed: Low-complexity tasks still require length penalties for their low-\n  reflection behaviors, while complex tasks require strategies to stop unnecessary reflections.\nMotivated by these observations, we propose ARLCP, a reinforcement learning method that com-\nbines two key components: (1) a dynamic reflection penalty adjusted based on problem complexity\nand (2) a length penalty to ensure an overall penalty. By balancing these two penalties, our ap-\nproach systematical"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "4     M ETHODOLOGY\nIn this section, we introduce Adaptive Reflection and Length Coordinated Penalty (ARLCP) algo-\nrithm, which consists of two essential components: (1) an adaptive reflection penalty based on the\ncomplexity of problems. (2) a length penalty ensures the overall penalty in a low-reflection situation.\n\n4.1   P RELIMINARY"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Given an LRM M , an input prompt x = [x1 , . . . , xn , <think>], where [x1 , . . . , xn ] represents\nthe problem context and <think> serves as the special token initiating the reasoning process,\nM generates a response y = [y1 , . . . , yl , </think>, yl+2 , . . . , ym ]. Here, [y1 , . . . , yl ] represents\nthe thinking phase, constituting an extended chain of exploratory reasoning, reflection, and self-\nvalidation. while </think> explicitly terminates this process. [yl+2 , . . . , ym ] is the subsequent\nsolution segment which contains only the validated steps and final answer to the problem. Since\nthe generation is auto-regressive, meaning that given a prompt x and tokens y ≤k = [y1 , . . . , yk ]\ngenerated so far, next token y k+1 is generated from the conditional probablity distribution M (yk+1 |\nx, y≤k ). The whole auto-regressive steps can be decomposed as:\n                         "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "4.2   A DAPTIVE R EFLECTION AND L ENGTH C OORDINATED P ENALTY (ARLCP)\n\nOur proposed approach ARLCP is a reinforcement learning method that adaptively imposes a re-\nflection penalty according to the complexity of each problem, supplemented by a length penalty,\nallowing the LRM to flexibly reduce unnecessary reflection and thus minimize token consumption.\nAnd the framework is shown in 3. Based on empirical observations in Section 3, we identify three\nkey findings: (1) reflection intensity correlates with problem complexity; (2) incorrect solutions\nexhibit excessive reflection patterns that hinder efficient reasoning; (3) static reflection penalty is\nineffective for low-reflection problems.\n\nThe complexity of each problem λ. Motivated by the above findings, we first estimate the\nmodel-aware complexity of each problem based on the Reflection Token Counts (RTC) of the"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "4\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)\n\nAlgorithm 1 ARLCP (Adaptive Reflection and Length Coordinated Penalty)\nInput: Policy model M ; dataset D; hyperparameters m, α, n1 , n2 , λ1 , λ2 , λ3"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "1: Initialize: Ground truth answers o∗ (Pi ) for all Pi ∈ D\n 2: for training step = 1, . . . , M do\n 3:    Sample a batch Db from D\n 4:    For each Pi ∈ Db , generate m candidate responses oki ∼ M (·|Pi ) using sampling\n 5:    for all oki in batch do\n 6:       Extract LEN(oki ) (response token count), RTC(oki ) (reflection token count via keyword matching),\n          and ANS(oki )\n 7:       Compute correctness C(oki ) ← 1{ANS(oki ) = o∗ (Pi )}\n 8:    end for\n 9:    Collect correct responses Ycorrect = {oki |C(oki ) = 1}\n10:    Compute µR = mean(RTC(Ycorrect )), σR = std(RTC(Ycorrect ))\n11:    Compute µL = mean(LEN(Ycorrect )), σL = std(LEN(Ycorrect ))\n12:    for all oki in batch do\n                                                  RTC(ok                         LEN(ok\n                                                \u0010              \u0011               \u0010             \u0011\n                          "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "response. Specifically, for each prompt pi in the batch, the LRM generates m candidate roll-\nouts oi = [o1i , o2i . . . , om                                                       k\n                              i ] using standard sampling. Each reasoning trajectory oi consists of: (1)\n       k                                                       k\nLEN(oi ), indicating the response length tokens. (2) RTC(oi ), indicating the reflection tokens count,\nbased on reflection-trigger keyword matching, as shown in Appendix A.4. The complexity of the\nproblem λ is categorized into three levels: simple, moderate, and hard through threshold-based\nsegmentation: simple with weight λ1 when RTC(oki ) does not exceed the lowest threshold n1 , mod-\nerate with weight λ2 when RTC(oki ) falls between n1 and the moderate threshold n2 , and hard with\nweight λ3 when RTC(oki ) exceeds the highest threshold n2 ."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Reflection penalty. Then, we propose an adaptive mechanism that dynamically imposes a reflec-\ntion penalty according to the complexity of each problem λ. This mechanism allows the LRM to\nflexibly adjust its reasoning process, discouraging unnecessary reflection on simpler problems while\npermitting more extensive reasoning for complex ones. Formally, we define the reflection penalty\ncoefficient α1 , which is modulated by the estimated problem complexity λ, as follows:\n                                                      k\n                                        λ1 , if RTC(oi ) ≤ n1 ;\n                                        \n                                  α1 = λ2 , if n1 < RTC(oki ) ≤ n2 ;                             (2)\n                                        \n                                                      k\n                                          λ3 , if RTC(oi ) > n2 "
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "For reasoning trajectory oki , its reflection penalty f (RTC(oki )) can be calculated as:\n                                               RTC(oki ) − mean(RTC(oi ))correct\n                          f (RTC(oki )) = σ(                                     ).                     (3)\n                                                      std(RTC(oi ))correct\nHere, mean(RTC(oi ))correct and std(RTC(oi ))correct are the mean and standard deviation of reflection\ntokens whose answers are correct, respectively. σ is the sigmoid function.\n\nLength penalty. While the reflection penalty effectively discourages excessive reflective behav-\niors, it may not fully constrain other forms of unnecessary verbosity that do not directly stem from\nreflection. Therefore, we further introduce a length penalty based on the total token count LEN(oki )\n\n5\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Update\n                                           Alright, so I need to\n                                          figure out ...Therefore                                                                  Accuracy                         r1 = 0\n                                             the answer is 19.                    /                             1/0                 Reward\n                                          Response length = 500                                                                      (ACC)\n                                    Reflection tokens count（RTC） = 80\n                                                                        Correction Evaluation\n                                           Alright, so I need to\n                                          figure out ...Therefore                                                                                     "
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Question                         Response length = 3000\n                                    Reflection tokens count（RTC） = 60\n                                                                                                                                    Length\n                                           Alright, so I need to                                                                  Penalty(LP)\n                                          figure out ...Therefore\n                                              the answer is 9.                                                                                                     r4 = 0.6\n                                                                                                     Adaptive Weight Allocation\n                                         Response length = 6000\n                                    Reflection tokens count（RTC"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Figure 3: The framework of ARLCP. It adaptively imposes a reflection penalty according to the\ncomplexity of each problem, supplemented by a length penalty, allowing the LRM to flexibly reduce\nunnecessary reflection and minimize token consumption."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "of the generated output. This complementary penalty encourages the LRM to generate overall more\nconcise responses, suppressing both redundant reflection and any additional irrelevant or verbose\ncontent. The length penalty is calculated as:\n                                                                              LEN(oki ) − mean(LEN(oi ))correct\n                                       f (LEN(oki )) = σ(                                                       ).                                                                          (4)\n                                                                                     std(LEN(oi ))correct\nThe length penalty coefficient α2 of oki is defined as α2 = α − α1 , where α is the overall penalty\ncoefficient. This coefficient allows the total penalty to be flexibly allocated between reflection and\nlength penalties according to the complexity of"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "5           E XPERIMENTS\n5.1            E XPERIMENTAL S ETUP\n\nLRMs. We conduct all experiments on DeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-\nDistill-Qwen-7B, two popular reasoning models obtained through supervised fine-tuning on large-\nscale high quality distillation.\n\nDatasets. The training dataset we use is DeepScaleR (Luo et al., 2025b) dataset, which is a col-\nlection of 40K unique math problem-answer pairs compiled from: AIME problems (1984-2023),\nAMC (prior to 2023), Omni-MATH (Gao et al., 2025), and Still dataset (Min et al., 2024). The\ntraining dataset does not overlap with our evaluation benchmark dataset. For evaluation, we use\nfive widely recognized math benchmarks with increasing complexity: GSM8K (Cobbe et al., 2021)\n\n6\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Table 1: Performance comparison of different methods on multiple reasoning benchmarks. Metrics\ninclude accuracy (Acc), response tokens (Length), and relative changes (∆Acc, ∆Length). The best\nand second results are bolded and underlined, respectively."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "AMC 2023   AIME 2024 AIME 2025    GSM8K     MATH-500       Overall\n  Method\n                 Acc Length Acc Length Acc Length Acc Length Acc Length ∆Acc ∆Length(%)\n  DeepSeek-R1-Distill-Qwen-1.5B\n  Vanilla       66.72   7742    30.00   12256   21.40   12201   78.46   1009   80.20   4582       -        -\n  NoThinking    49.22   1377    14.38   4266     9.79    3630   69.98    278   69.20    908   -12.84   -81.04%\n  SFTShortest   67.66   7657    26.04   12181   21.46   12258   79.38    928   81.00   4531    -0.25    -2.07%\n  DPOShortest   69.53   7091    29.60   11721   23.13   11879   77.10    989   84.20   4185     1.36    -5.21%\n  O1-Pruner     70.47   7046    27.71   11937   20.83   11855   78.39    913   82.60   4375     0.64    -5.69%\n  TLMRE         72.10   2798    25.80   5386    19.60    4581   84.30   530    82.10   1800     1.42   -58.10%\n  AdaptThink    67.19   3342    30.83   "
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "test set (1319 grade school math problems), MATH500 (Lightman et al., 2024) (500 high-school\ncompetition math problems), AMC2023 (40 more challenging high-school level math competition\nproblems), AIME 2024 and AIME 2025 (30 Olympiad-level math problems).\n\nEvaluation metrics For evaluation metrics, we consider both pass@1 accuracy (Acc) and re-\nsponse length (Length). We also report the average accuracy variation, ∆Acc, and the average length\nvariation rate, ∆Length(%), across all test datasets. Considering the limited size of AMC2023,\nAIME2024, and AIME2025, we repeatedly sample 16 responses for each case and report the aver-\nage results. For all models, we set the evaluation context size to 16K, and set the temperature to 0.6\nas default in DeepSeek’s models."
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Implementation Details. Our implementation integrates the VeRL framework (Sheng et al., 2025)\nwith REINFORCE Leave One Out (RLOO) policy optimization method (Ahmadian et al., 2024).\nWhile GRPO (Shao et al., 2024) has gained popularity as a policy optimization approach, we avoid\nits use due to two critical limitations: (1) GRPO demonstrates sensitivity in non-standard settings\ninvolving length penalties in the objective function, and (2) this sensitivity can trigger abrupt policy\ncollapses, as empirically observed in recent studies (Arora & Zanette, 2025; Dai et al., 2025). These\ninstability risks motivate our choice of RLOO, which maintains robustness under length-penalized\nobjectives. The details of selecting RLOO are shown in Appendix A.2. All experiments are con-\nducted on 8 NVIDIA A100 GPUs with prompts using model-specific templates for problems (see\nAppendix A.6), context length of"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "5.2   BASELINES\n\nWe compare ARLCP with the following representative methods for efficient reasoning:\n\n7\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "AMC 2023                                      AIME 2024                              AIME 2025                               GSM8K                                  MATH-500\n                                    91                                            57                                                                                                                  700                                    3500\n                                                                          5500                                        10000 39                                10500                                         93.0\n                                                                                  56                                                                                                                                                         3250\n                                  "
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "Average Tokens\n                                                                                                                            38\n               Accuracy (%)\n                                    90                                            55                                  9000                                                                                                                   3000\n                                                                                                                            37                                9500                                    650   92.0\n                                                                          4500                                                                                                                                                               2750\n                                     "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "AMC 2023                                      AIME 2024                              AIME 2025                                   GSM8K                                 MATH-500\n                                   40                                                                                      90                                                                                 25\n                                                                                 80                                                                                2.4\n                                   35                                                                                      80\n                                                                                 70                                                                                2.2                                        20\n             "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Figure 4: The analysis of accuracy, length, and reflection for model responses on five benchmarks\n(AMC 2023, AIME 2024, AIME 2025, GSM8K, and MATH 500) across different training steps."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "1. Nothinking (Ma et al., 2025) enables reasoning models to bypass long thinking and directly\n   generate the final solution by prompting with </think>. We use this method to determine the\n   lower bound of the response token for each dataset and do not include it in the comparisons.\n2. SFTShortest constructs training data by sampling multiple responses for each problem and selecting\n   the two shortest correct responses, followed by the standard SFT pipeline for model fine-tuning.\n3. DPOShortest generates preference data by pairing the shortest correct response with the longest\n   responses per problem through multiple sampling, then applies DPO (Rafailov et al., 2023) for\n   fine-tuning.\n4. O1-Pruner (Luo et al., 2025a) employs pre-sampling to estimate reference model performance,\n   followed by off-policy RL-style fine-tuning to optimize shorter reasoning processes while main-\n   tain"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "5.3                                             M AIN RESULTS"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Table 1 summarizes the evaluation results of various methods on five mathematical reasoning bench-\nmarks (AMC 2023, AIME 2024, AIME 2025, GSM8K and MATH500). Compared to the vanilla\nDeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-Distill-Qwen-7B models, ARLCP achieves re-\nmarkable improvements by reducing average response lengths by 53.1% and 35.0%, respectively,\nwhile enhancing average accuracy by 5.8% and 2.7%. On DeepSeek-R1-Distill-Qwen-1.5B,\nARLCP achieves the highest overall accuracy (∆Acc = 5.81) while reducing the average response\nlength by 53.05%. Similarly, for DeepSeek-R1-Distill-Qwen-7B, ARLCP maintains a significant\naccuracy gain (∆Acc = 2.69) and the greatest reduction in response length (-34.96%). The exper-\nimental results of ARLCP across both DeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-Distill-\nQwen-7B demonstrate a clear trade-off between reasoning accuracy and response"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "8\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)\n\n1.5B Model                                                                       7B Model\n                                                  Vanilla                                               119.1               100      Vanilla                                           99.0\n                                   120                                                  111.9\n                                                  ARLCP                                                                              ARLCP                               88.7"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Average Reflection Token Count\n                                   100                                                                                       80\n                                                                                                                                                                                              47%\n                                                                                                                                                                                47%\n                                       80\n                                                                          68.6                                               60\n                                                                                                                                                                                              52.7\n  "
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "Figure 5: Comparison of average reflection token count between vanilla models and ARLCP."
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "Table 2: The impact of adaptive penalty components on the performance of LRM. The dynamic\npenalty yields the best balance between improved accuracy and reduced response length in LRM.\n        Method                                                               Length Penalty α2                          Reflection Penalty α1                    ∆Acc           ∆Length(%)\n        ARLCP                                                                       Adaptive(✓)                                   Adaptive(✓)                      5.8                 -53.1%\n        w/o Length Penalty                                                                   ✗                                        ✓                            5.6                 -29.6%\n        w/o Reflection Penalty                                                             0.05                                        ✗             "
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "strength according to problem difficulty, enabling more effective suppression of unnecessary reflec-\ntions in complex tasks. ARLCP allows efficient reasoning without compromising solution quality,\nachieving the balance between accuracy and efficiency through coordinated penalty design.\nTo evaluate the effectiveness of our approach, we deeply track the changes in response length and\nthe number of reflection-triggering words throughout the training process. As shown in Figure 4,\nboth the average count of reflection words and the output length gradually decrease as training pro-\ngresses, while accuracy correspondingly improves. These results indicate that our proposed adaptive\nreflection penalty successfully encourages the LRM to eliminate unnecessary reflective behaviors\nand produce more concise outputs. Consequently, this not only reduces superfluous token consump-\ntion but also significa"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "5.4                  M ORE ANALYSIS\n\nThe analysis of reflection behavior. To evaluate the efficacy of our approach in mitigating unnec-\nessary reflective behaviors, we conducted comparative analyses between ARLCP and the original\nmodels across multiple math datasets, as presented in Figure 5. The results demonstrate that our\nmodel significantly reduces the average reflection token count, effectively stopping unnecessary re-\nflective behaviors in the model."
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "The impact of two core penalty. To verify the cooperative effect of length penalty and reflection\npenalty in ARLCP, we conducted an ablation study on the 1.5B LRM by separately removing each\ncomponent. When removing the reflection penalty, we fixed the length penalty parameter α2 to\n0.05; when removing the length penalty, we retained the original adaptive parameter α1 . As shown\nin Table 2, removing either component led to performance degradation, confirming their cooperative\nroles in optimizing reasoning efficiency. We further analyze the impact of the adaptive coefficients\non model performance. We fix the adaptive coefficients α1 and α2 at 0.1 and train the base 1.5B\nmodel. The training results indicate that when coefficients are fixed, the model performance de-\ngrades, demonstrating the effectiveness of the adaptive coefficients in our approach."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "9\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Table 3: Performance of different parameter settings.\n                   Complexity Thresholds (n1 , n2 )           ∆acc        ∆Length(%)\n                   20, 40                                      3.36         -20.2%\n                   60, 100                                     2.67         -19.7%\n                   40, 100                                     3.36         -20.0%\n                   40, 80 (ours)                               3.58         -21.7%\n                   Penalty Weights (λ1 , λ2 , λ3 , α)         ∆acc        ∆Length(%)\n                   Different α\n                   0.1                                         3.48          -9.5%\n                   0.3                                         2.26         -30.7%\n                   0.2 (ours)                                  3.58         -21.7%\n                   Different λ\n                   0.025, 0.05, 0"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "The sensitivity analysis. To explore the impact of the complexity thresholds (n1 , n2 ) and penalty\nweights (λ1 , λ2 , λ3 , α) on model performance, we evaluate various parameter configurations of\nARLCP applied to the DeepSeek-R1-Distill-Qwen-1.5B model (trained for 100 steps). The results,\nsummarized in Table 3, demonstrate that:\n• Impact of n1 and n2 : Increasing n1 leads to a slight initial improvement in performance, fol-\n  lowed by a decline; the best performance is achieved at n1 = 40. In contrast, varying n2 have a\n  relatively minor effect on performance, with the optimal setting found at n2 = 80.\n• Impact of α: A smaller α leads to a lower reduction in output length and lower accuracy, whereas\n  a larger α yields greater length compression but at the expense of a more noticeable drop in\n  accuracy. Our chosen α strikes a good balance between the length compression ratio and accu"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Table 4: The performance of ARLCP on the out-of-distributeion benchmark MMLU. ARLCP\nachieves the best balance on MMLU, improving accuracy while significantly reducing response\nlength compared to other baselines.\n                                                              MMLU\n                   Method\n                                       Acc        Length         ∆Acc        ∆Length\n                   DeepSeek-R1-Distill-Qwen-7B\n                   Vanilla             63.4         1257             -          -\n                   Nothinking          51.2          128          -12.2      -89.8%\n                   SFT                 62.8         1321           -0.6      +0.05%\n                   AdaptThink          63.6          856          +0.2       -31.9%\n                   TLMRE               63.9          872          +0.5       -30.6%\n                   ARLCP               64.1  "
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "The generalizability to different domains. To evaluate cross-domain generalization, we assess\nARLCP on MMLU, a challenging benchmark comprising 14k multiple-choice questions spanning\n57 diverse subjects. As shown in Table 4, compared to the vanilla DeepSeek-R1-Distill-Qwen-7B,\nARLCP reduces response length by 40% while achieving a 0.7% improvement in accuracy. These\nresults demonstrate that ARLCP not only effectively transfers beyond mathematical reasoning to\na broad range of open-domain tasks, but also consistently enhances reasoning efficiency across all\nquestion types. Importantly, the ability to maintain or even improve accuracy while significantly\nshortening responses highlights the robustness and generality of the proposed adaptive penalty\n\n10\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "mechanisms. This suggests that ARLCP is well-suited for practical deployment in diverse, real-\nworld settings where both efficiency and accuracy are critical."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "Table 5: Performance comparison of ARLCP on multiple reasoning benchmarks with Qwen3-1.7B.\n                   AMC 2023   AIME 2024 AIME 2025    GSM8K     MATH-500       Overall\n    Method\n                   Acc Length Acc Length Acc Length Acc Length Acc Length ∆Acc ∆Length(%)\n    Qwen3-1.7B\n    Vanilla       75.16   8484     38.75 13138 28.54 13287 90.67         2094   87.00   5096    -        -\n    ARLCP(ours) 79.69     5320     42.92   9466   32.92   9755   89.99   1057   89.60   2568   3.00   -38.19%\n    DeepSeek-R1-Distill-Llama-8B\n    Vanilla       87.34   5849     48.54 10774 29.17 11189 81.58         811    87.60   4062    -        -\n    ARLCP(ours) 88.91     3328     44.58   7436   31.25   7512   90.45   694    89.00   2080   1.99   -34.01%"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "The generalizability to different series models. To evaluate the generalizability of our approach\nacross model families, we extended our experiments to the Qwen3 series and DeepSeek-R1-Distill-\nLLama series—using Qwen3-1.7B and DeepSeek-R1-Distill-LLama-8B as representative exam-\nples—which lie outside the DeepSeek-R1-Distill-Qwen family. As shown in Table 5, ARLCP con-\nsistently improves accuracy while substantially reducing output length across nearly all benchmarks,\ndemonstrating strong transferability beyond the original model family.\n\n6      C ONCLUSION"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "In this work, we first identify the phenomenon of over-reflection in reasoning models significantly\nimpacting model efficiency and analyze its correlation with problem complexity. Based on this in-\nsight, we propose ARLCP, a dynamic reinforcement learning method that teaches LRMs to stop\nunnecessary reflection and enhance thinking efficiency through an adaptive reward strategy condi-\ntioned on problem complexity. Experiments on five mathematical reasoning benchmarks demon-\nstrate that ARLCP reduces average response length while improving accuracy.\n\nR EPRODUCIBILITY S TATEMENT"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "We have provided open-source code to reproduce all experiments described in this study (ARLCP).\nThe datasets are publicly accessible, and all experimental procedures—including full implemen-\ntation of model training, evaluation protocols, and reproducibility benchmarks—can be replicated\nusing the provided resources.\n\nACKNOWLEDGMENT\n\nThis paper is mainly supported by the NSFC under Grants (No. 62402424). This work was sup-\nported by MYbank, Ant Group. Haobo Wang is also supported by the Fundamental Research Funds\nfor the Central Universities (No. 226-2025-00085) and Zhejiang Provincial Universities (No. 226-\n2025-00065).\n\nR EFERENCES\nPranjal Aggarwal and Sean Welleck. L1: Controlling how long a reasoning model thinks with\n  reinforcement learning. In Second Conference on Language Modeling, 2025."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Arash Ahmadian, Chris Cremer, Matthias Gallé, Marzieh Fadaee, Julia Kreutzer, Olivier Pietquin,\n  Ahmet Üstün, and Sara Hooker. Back to basics: Revisiting reinforce-style optimization for learn-\n  ing from human feedback in llms. In Lun-Wei Ku, Andre Martins, and Vivek Srikumar (eds.),\n\n11\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Vol-\n  ume 1: Long Papers), ACL 2024, Bangkok, Thailand, August 11-16, 2024, pp. 12248–12267.\n  Association for Computational Linguistics, 2024.\nDaman Arora and Andrea Zanette. Training language models to reason efficiently.              CoRR,\n  abs/2502.04463, 2025. doi: 10.48550/ARXIV.2502.04463.\nSimon A. Aytes, Jinheon Baek, and Sung Ju Hwang. Sketch-of-thought: Efficient LLM reasoning\n  with adaptive cognitive-inspired sketching. In Proceedings of the 2025 Conference on Empirical\n  Methods in Natural Language Processing, pp. 24296–24320. Association for Computational Lin-\n  guistics, November 2025. ISBN 979-8-89176-332-6. doi: 10.18653/v1/2025.emnlp-main.1236.\nKarl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser,\n  Matthias Plappert, Jerry Tworek, Jacob Hilton, Rei"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "12\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "Xu, Zhongyu Zhang, and Zhen Zhang. Deepseek-r1 incentivizes reasoning in llms through rein-\n  forcement learning. Nature., 645(8081):633–638, 2025. doi: 10.1038/S41586-025-09422-Z.\nJian Hu. REINFORCE++: A simple and efficient approach for aligning large language models.\n   CoRR, abs/2501.03262, 2025. doi: 10.48550/ARXIV.2501.03262.\nChengsong Huang, Langlin Huang, Jixuan Leng, Jiacheng Liu, and Jiaxin Huang. Efficient test-time\n  scaling via self-calibration. In NeurIPS 2025 Workshop on Efficient Reasoning, 2025.\nYuxuan Jiang, Dawei Li, and Frank Ferraro. DRP: distilled reasoning pruning with skill-aware\n  step decomposition for efficient large reasoning models. CoRR, abs/2505.13975, 2025. doi:\n  10.48550/ARXIV.2505.13975.\nBaohao Liao, Yuhui Xu, Hanze Dong, Junnan Li, Christof Monz, Silvio Savarese, Doyen Sahoo,\n  and Caiming Xiong. Reward-guided speculative decoding for efficient LLM rea"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "13\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Ziqing Qiao, Yongheng Deng, Jiali Zeng, Dong Wang, Lai Wei, Fandong Meng, Jie Zhou, Ju Ren,\n  and Yaoxue Zhang. Concise: Confidence-guided compression in step-by-step efficient reasoning.\n  CoRR, abs/2505.04881, 2025. doi: 10.48550/ARXIV.2505.04881.\nXiaoye Qu, Yafu Li, Zhaochen Su, Weigao Sun, Jianhao Yan, Dongrui Liu, Ganqu Cui, Daizong\n  Liu, Shuxian Liang, Junxian He, Peng Li, Wei Wei, Jing Shao, Chaochao Lu, Yue Zhang, Xian-\n  Sheng Hua, Bowen Zhou, and Yu Cheng. A survey of efficient reasoning for large reasoning\n  models: Language, multimodality, and beyond. CoRR, abs/2503.21614, 2025. doi: 10.48550/\n  ARXIV.2503.21614.\nQwen Team.      Qwq-32b-preview.          https://qwenlm.github.io/blog/\n qwq-32b-preview/, 2025. Accessed: 15 March 2025.\nRafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D. Manning, Stefano Ermon, and\n  Chelsea Finn. Direct preference optimization: Your "
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "14\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)\n\nHu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, Jian Yang, Jianhong Tu, Jianwei Zhang,\n    Jian Yang, Jiaxi Yang, Jingren Zhou, Junyang Lin, Kai Dang, Keqin Bao, Kexin Yang, Le Yu,\n    Lianghao Deng, Mei Li, Mingfeng Xue, Mingze Li, Pei Zhang, Peng Wang, Qin Zhu, Rui Men,\n    Ruize Gao, Shixuan Liu, Shuang Luo, Tianhao Li, Tianyi Tang, Wenbiao Yin, Xingzhang Ren,\n    Xinyu Wang, Xinyu Zhang, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yinger Zhang,\n    Yu Wan, Yuqiong Liu, Zekun Wang, Zeyu Cui, Zhenru Zhang, Zhipeng Zhou, and Zihan Qiu.\n    Qwen3 technical report. CoRR, abs/2505.09388, 2025a. doi: 10.48550/ARXIV.2505.09388."
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "Chenxu Yang, Qingyi Si, Yongjie Duan, Zheliang Zhu, Chenyu Zhu, Zheng Lin, Li Cao, and\n  Weiping Wang. Dynamic early exit in reasoning models. CoRR, abs/2504.15895, 2025b. doi:\n  10.48550/ARXIV.2504.15895.\n\nWang Yang, Xiang Yue, Vipin Chaudhary, and Xiaotian Han. Speculative thinking: Enhancing\n small-model reasoning with large model guidance at inference time. CoRR, abs/2504.12329,\n 2025c. doi: 10.48550/ARXIV.2504.12329.\n\nBin Yu, Hang Yuan, Haotian Li, Xueyin Xu, Yuliang Wei, Bailing Wang, Weizhen Qi, and Kai Chen.\n  Long-short chain-of-thought mixture supervised fine-tuning eliciting efficient reasoning in large\n  language models. CoRR, abs/2505.03469, 2025. doi: 10.48550/ARXIV.2505.03469."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Linan Yue, Yichao Du, Yizhi Wang, Weibo Gao, Fangzhou Yao, Li Wang, Ye Liu, Ziyu Xu, Qi Liu,\n  Shimin Di, and Min-Ling Zhang. Don’t overthink it: A survey of efficient r1-style large reasoning\n  models. CoRR, abs/2508.02120, 2025. doi: 10.48550/ARXIV.2508.02120.\n\nDan Zhang, Sining Zhoubian, Ziniu Hu, Yisong Yue, Yuxiao Dong, and Jie Tang. Rest-mcts*: LLM\n  self-training via process reward guided tree search. In Amir Globersons, Lester Mackey, Danielle\n  Belgrave, Angela Fan, Ulrich Paquet, Jakub M. Tomczak, and Cheng Zhang (eds.), Advances in\n  Neural Information Processing Systems 38: Annual Conference on Neural Information Process-\n  ing Systems 2024, NeurIPS 2024, Vancouver, BC, Canada, December 10 - 15, 2024, 2024."
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Jiajie Zhang, Nianyi Lin, Lei Hou, Ling Feng, and Juanzi Li. AdaptThink: Reasoning models can\n   learn when to think. In Proceedings of the 2025 Conference on Empirical Methods in Natu-\n   ral Language Processing, pp. 3716–3730. Association for Computational Linguistics, November\n   2025. ISBN 979-8-89176-332-6. doi: 10.18653/v1/2025.emnlp-main.184.\n\nYu Zhao, Huifeng Yin, Bo Zeng, Hao Wang, Tianqi Shi, Chenyang Lyu, Longyue Wang, Weihua\n  Luo, and Kaifu Zhang. Marco-o1: Towards open reasoning models for open-ended solutions.\n  CoRR, abs/2411.14405, 2024. doi: 10.48550/ARXIV.2411.14405.\n\nA     A PPENDIX\n\nA.1    O PTIMIZING THE ADAPTIVE PENALTY WITH R EINFORCEMENT L EARNING"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "The adaptive penalty in ARLCP (Equation 5) combines accuracy rewards with dynamic reflec-\ntion/length penalties. However, autoregressive sampling during response generation renders this\npenalty non-differentiable. To address this, we employ Proximal Policy Optimization (PPO) (Schul-\nman et al., 2017), a policy gradient method that maximizes the expected reward while constraining\npolicy updates to avoid instability.\n\nPPO Objective with Density Ratio PPO optimizes the policy by maximizing the surrogate ob-\njective:\n                 min fθk (y, x)A(y <k , x), clip1+ϵ\n                     \b                              \u0002 k      \u0003    <k\n                                                1−ϵ fθ (y, x) A(y    , x) ,           (7)\nwhere the density ratio is defined as:"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "πθ (y k |x + y <k )\n                                   fθk (y, x) =                         .                       (8)\n                                                  πold (y k |x + y <k )\n\n15\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "RLOO Advantage Estimator Traditional PPO uses a value network to estimate advantages,\nwhich adds computational overhead for large language models. Instead, we adopt the REINFORCE\nLeave-One-Out (RLOO) estimator (Ahmadian et al., 2024), which computes advantages via Monte\nCarlo sampling. For a prompt P with m generated responses O = [O1 , O2 . . . , Om ], the trajectory\nadvantage is computed as:\n                                                            m\n                                                      1 X\n                         A(Oi , P ) = R(Oi , P ) −        R(Oj , P ),                            (9)\n                                                     m−1\n                                                           j̸=i"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "where R(Oi , P ) denotes the trajectory return. In ARLCP, the trajectory return corresponds directly\nto the reward function r(oki ) from Equation 5, which integrates accuracy, reflection, and length\npenalties.\nWe approximate the token-level advantage by directly using the sequence-level advantage:\n                                     A(y <t , x) = A(Oi , P ).                                 (10)\nThis framework balances computational efficiency and performance by eliminating the value net-\nwork while retaining robust policy updates through RLOO.\n\nA.2   T HE DETAILS OF SELECTING RLOO"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "Although RLOO can produce high-variance gradient estimates, we choose it over the more popular\nGRPO due to a critical limitation of the latter: GRPO is prone to catastrophic collapse when com-\nbined with length-based rewards (Arora & Zanette, 2025; Dai et al., 2025). As shown in Table 6,\nour method also fails when using GRPO. To avoid this failure mode, we adapt RLOO and design\nour reward function accordingly.\nTo mitigate the theoretical variance of RLOO, we use standard strategies: large batch sizes (128)\nand multiple rollouts per prompt (16). Additionally, our penalty function provides regularization\nthat further stabilizes training (see Equation 3). As shown in Figure 4, training remains stable\nthroughout, confirming that RLOO is an effective choice for our setting—successfully avoiding the\ncritical failure modes of GRPO."
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "Table 6: Performance comparison between different RL methods.\n                     Method                         ∆ acc ∆ Length(%)\n                     ARLCP with GRPO                   -2.71       -65.2%\n                     ARLCP with REINFORCE++             4.87       -50.4%\n                     ARLCP with RLOO (ours)             5.81       -53.1%"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "Moreover, RLOO is not essential to our framework. To verify this, we implemented ARLCP\nusing REINFORCE++ (Hu, 2025) as an alternative advantage estimator. As shown in Table 6,\nboth the RLOO and REINFORCE++ variants achieve strong performance on DeepSeek-R1-Distill-\nQwen-1.5B, demonstrating that our adaptive penalty mechanism is compatible with different policy\ngradient algorithms. This flexibility enables ARLCP to effectively balance accuracy and conciseness\nacross various RL advantage estimators, with the RLOO-based implementation yielding the best\noverall results.\n\nA.3   A NALYSIS OF R EFLECTION -T OKEN C OUNTS VERSUS P ROBLEM C OMPLEXITY ACROSS\n      OTHER R EASONING M ODEL FAMILIES"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "To assess whether the correlation between reflection and problem complexity generalizes beyond a\nsingle model family, we examine the reflection behavior of GPT-OSS and Qwen3-Thinking across\nvarying levels of problem complexity. As shown in Figure 6, both models exhibit the same trend ob-\nserved in the DeepSeek-distilled Qwen models: the number of reflection tokens gradually increases\nwith rising problem complexity. This result confirms that the relationship between reflection and\nproblem complexity is not specific to one architecture, but rather holds across diverse reasoning\nmodels.\n\n16\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)\n\n175\n                                                        GPT-OSS-20B"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "Average Reflection Token Count\n                                         150            Qwen3-4B-Thinking\n                                         125\n                                         100\n                                         75\n                                         50\n                                         25\n                                           0Level 1        Level 2         Level 3        Level 4         Level 5\n                                          Figure 6: Average reflection token counts statistics of other models.\n\nA.4   R EFLECTION T RIGGERS"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "We consider the following reflection-trigger keywords to calculate reflection token counts in our\nwork, and their variants are also treated as reflection triggers to ensure comprehensive coverage.\nFor instance, the variants of “wait” include “wait”, “Wait”, “ wait”, “.wait”, and “WAIT”. Similar\nexpansions are applied to other reflection-trigger keywords to account for capitalization, spacing,\nand punctuation variations. These tokens are carefully curated to comprehensively capture reflection\noccurrences in the output, thereby ensuring both computational accuracy and analytical precision.\nThe reflection-trigger keywords include:\n\n“wait”, “alternatively”, “hold on”, “another thought”, “verify”, “think again”, “but”, “how-\n           ever”, “alternative”, “check”, “double-check”, “oh”, “hmm”.\n\nA.5   T HE ANALYSIS OF FIXED R EFLECTION T RIGGERS"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "Although our reflection keyword list is fixed, we emphasize that this approach is highly scalable\nwithin the current LRMs ecosystem. The list is derived through LLM-based reflection token recog-\nnition and statistical analysis of outputs from the DeepSeek-R1-Distill-Qwen models (1.5B and 7B).\nTo validate our claim, we analyzed reflection tokens in other LRM families and domains (such as\nfinance), including Qwen3-4B-Thinking-2507, GPT-OSS-20B, and Fin-R1-7B Liu et al. (2025b).\nThe most frequent reflection keywords for each model are shown as follows:\n\nReflection keywords in Qwen3-4B-Thinking-2507\n\n“wait”, “hold on”, “maybe”, “check”, “think again”, “another thought”, “verify”, “but”,\n           “hmm”, “alternative”.\n\nReflection keywords in GPT-OSS-20B\n\n“maybe”, “wait”, “but”, “alternative”, “check”, “however”, “hmm”, “double-check”, “an-\n           other thought”."
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "All three sets exhibit strong overlap with our predefined triggers. This cross-model consistency\nconfirms that our reflection triggers captures universal reflection behaviors in modern LRMs. Con-\n\n17\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)\n\nReflection keywords in Fin-R1-7B\n\n“wait”, “alternative”, “but”, “check”, “however”, “maybe”, “perhaps”, “hmm”.\n\nsequently, using a fixed set does not hinder the generalizability of our method across different models\nor domains.\n\nA.6   P ROMPT T EMPLATE IN EXPERIMENTS"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Following prior work Zhang et al. (2025), we use the following prompt for all experiments:\nquestion. To ensure consistency across different settings, this base prompt is applied uniformly\nin every evaluation. Specifically, the complete prompt integrated with the models’ templates\n(DeepSeek-R1-Distill-Qwen-1.5B and DeepSeek-R1-Distill-Qwen-7B) is constructed as follows:\n    Prompt Template for Reasoning in Experiments\n\n< |U ser| > {question} < |Assistant| >< think > \\n\n\nA.7   T HE DETAILS OF SELECTING COMPLEXITY THRESHOLDS (n1 , n2 )"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "We determined the complexity thresholds n1 and n2 through a pilot study on five benchmarks:\nGSM8K, MATH-500, AMC2023, AIME2024, and AIME2025. Using both DeepSeek-R1-Distill-\nQwen-1.5B and 7B models, we measured the average number of reflection tokens per problem and\nfound values to lie in the range [0, 120], as shown in Figure 1. Based on this empirical distribution,\nwe defined a three-tier complexity scheme:\n• Easy: 0 ≤ count ≤ 40,\n• Moderate: 40 < count ≤ 80,\n• Hard: count > 80.\nThis scheme is model-agnostic: to adapt it to a new model, one only needs to run inference on\na representative set of problems across complexity levels, estimate its reflection token distribution,\nand align the thresholds accordingly.\n\nA.8   C ASE STUDY"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "We present a case study of ARLCP in Figure 7 to demonstrate its capability in mitigating unnecessary\nreflections. As shown in the figure, when tackling challenging problems, the DeepSeek-R1-Distill-\nQwen-7B model generates significant token costs during reasoning, often accompanied by redundant\nand repetitive reflections. In contrast, our ARLCP-7B model dynamically stops unnecessary reflec-\ntions through adaptive mechanisms, generating concise solutions while maintaining accuracy. This\ncomparative analysis highlights the effectiveness of our approach in optimizing both computational\nefficiency and solution quality.\n\nA.9   LLM USAGE STATEMENT"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "This paper utilized Large Language Models (LLMs) as a general-purpose tool for language polish-\ning and grammar refinement during writing. The role of LLMs is limited to enhancing the clarity\nand readability of the manuscript, including optimizing sentence structure and correcting errors in\nlinguistic expression. No part of the core research methodology, data analysis, or theoretical con-\ntributions was generated or influenced by LLMs. The authors confirm that this disclosure complies\nwith the conference’s guidelines for transparency in LLM usage.\n\n18\n\fAdaptive Reflection and Length Coordinated Penalty (ARLCP)"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "• Question (MATH-500): Define\n                                       ∞                       ∞\n                                       X 1                     X 1\n                                  p=              and   q=                .\n                                             k2                      k3\n                                       k=1                     k=1"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "Find a way to write\n                                          ∞ X\n                                            ∞\n                                          X             1\n                                          j=1 k=1\n                                                    (j + k)3\n  in terms of p and q.\n  * Original Response:\n  <think>Alright, so I have this problem here where I need to express a double sum in terms\n  of two known series, p and q. Let me write down what I know: [omited][...]\n  But I don’t think I need the numerical value here; it’s just another constant.\n  Hmm, okay, so I have to manipulate this double sum somehow to relate it to p and q.\n  [omited][...]\n  Wait, so for each fixed n, j goes from 1 to n-1, and k is n - j. [omited][...]\n  Wait, is that right? [omited][...]\n                                  PBut  wait, 1/n³ isP\n                                                "
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "* ARLCP’s Response (ours):\n  <think>Alright, so I have this problem here where I need to express a double sum in terms\n  of two known sums, p and q. Let me write down what I know. [omitted][...] but maybe I don’t\n  need that exact value right now. Similarly, q is the sum from k=1 to infinity of k13 . That’s known\n  as Apéry’s constant, but again, maybe [omitted][...] Hmm, [omitted][...] Wait, is that right?\n  Let me check. [omitted][...] But since 1/n³ is independent of j, the inner sum is just adding 1/n³\n  (n - 1) times. [omitted][...] Therefore, the answer is p - q. Let me just double-check my steps\n  to make sure I didn’t make any mistakes. [omitted][...] **Final Answer** p − q </think>\n  [omitted][...] Therefore, the final answer is:\n                                                  p−q\n\n(1479 tokens, 8 reflection tokens count)"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Figure 7: For a math problem from MATH-500, DeepSeek-R1-Distill-Qwen-7B costs about 9000\ntokens in thinking, which contains many unnecessary reflections. In contrast, our ARLCP-7B effec-\ntively reduces unnecessary reflections and produces a concise final solution.\n\n19"
+    }
+  ]
+}
