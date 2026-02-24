@@ -1,0 +1,322 @@
+{
+  "arxivId": "2602.20048",
+  "paperTitle": "CodeCompass: Navigating the Navigation Paradox in Agentic Code Intelligence",
+  "abstract": "Modern code intelligence agents operate in contexts exceeding 1 million tokens--far beyond the scale where humans manually locate relevant files. Yet agents consistently fail to discover architecturally critical files when solving real-world coding tasks. We identify the Navigation Paradox: agents perform poorly not due to context limits, but because navigation and retrieval are fundamentally distinct problems. Through 258 automated trials across 30 benchmark tasks on a production FastAPI repository, we demonstrate that graph-based structural navigation via CodeCompass--a Model Context Protocol server exposing dependency graphs--achieves 99.4% task completion on hidden-dependency tasks, a 23.2 percentage-point improvement over vanilla agents (76.2%) and 21.2 points over BM25 retrieval (78.2%).However, we uncover a critical adoption gap: 58% of trials with graph access made zero tool calls, and agents required explicit prompt engineering to adopt the tool consistently. Our findings reveal that the bottleneck is not tool availability but behavioral alignment--agents must be explicitly guided to leverage structural context over lexical heuristics. We contribute: (1) a task taxonomy distinguishing semantic-search, structural, and hidden-dependency scenarios; (2) empirical evidence that graph navigation outperforms retrieval when dependencies lack lexical overlap; and (3) open-source infrastructure for reproducible evaluation of navigation tools.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Modern code intelligence agents operate in contexts exceeding 1 million tokens--far beyond the scale where humans manually locate relevant files. Yet agents consistently fail to discover architecturally critical files when solving real-world coding tasks. We identify the Navigation Paradox: agents perform poorly not due to context limits, but because navigation and retrieval are fundamentally distinct problems. Through 258 automated trials across 30 benchmark tasks on a production FastAPI repository, we demonstrate that graph-based structural navigation via CodeCompass--a Model Context Protocol server exposing dependency graphs--achieves 99.4% task completion on hidden-dependency tasks, a 23.2 percentage-point improvement over vanilla agents (76.2%) and 21.2 points over BM25 retrieval (78.2%).However, we uncover a critical adoption gap: 58% of trials with graph access made zero tool calls, and agents required explicit prompt engineering to adopt the tool consistently. Our findings reveal that the bottleneck is not tool availability but behavioral alignment--agents must be explicitly guided to leverage structural context over lexical heuristics. We contribute: (1) a task taxonomy distinguishing semantic-search, structural, and hidden-dependency scenarios; (2) empirical evidence that graph navigation outperforms retrieval when dependencies lack lexical overlap; and (3) open-source infrastructure for reproducible evaluation of navigation tools."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: 1-hop architectural context returned by CodeCompass for"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: ACS by Condition and Task Group"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 2: ACS by Condition and Group"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 3: MCP Tool Adoption by Task Group"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 4: Impact of MCP Tool Usage on ACS"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 5: First Correct Tool Call (FCTC) Comparison"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 3: MCP Adoption"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 6: Overall Performance Summary"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 7: Graph Navigation Improvement on Hidden Dependencies"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Figure 4: MCP Impact"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 5: FCTC Comparison"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Figure 6: Overall Summary"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Figure 7: G3 Improvement"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "The Navigation Paradox in Large-Context Agentic\n                                                            Coding:\n                                            Graph-Structured Dependency Navigation\narXiv:2602.20048v1 [cs.AI] 23 Feb 2026\n\nOutperforms Retrieval in Architecture-Heavy\n                                                             Tasks∗\n\nTarakanath Paipuru\n                                                                   Independent Researcher\n                                                               Tarakanath.Paipuru@gmail.com\n\nFebruary 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "1     The Navigation Paradox in Large-Context\n                                               Agentic Coding\n                                         1.1     Graph-Structured Dependency Navigation Outper-\n                                                 forms Retrieval in Architecture-Heavy Tasks\n                                         Tarakanath Paipuru Independent Researcher February 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Abstract\n                                                   Agentic coding assistants powered by Large Language Models (LLMs)\n                                               are increasingly deployed on repository-level software tasks. As context\n                                               windows expand toward millions of tokens, a tacit assumption holds that\n                                               retrieval bottlenecks dissolve — the model can simply ingest the whole\n                                               codebase. We challenge this assumption by introducing the Navigation\n                                               Paradox: larger context windows do not eliminate the need for structural\n                                               navigation; they shift the failure mode from retrieval capacity to naviga-\n                                               tional salie"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "ip607/research-codecompass"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\f          We present CodeCompass, an MCP-based graph navigation tool that\n     exposes structural code dependencies (IMPORTS, INHERITS, INSTAN-\n     TIATES edges extracted via static AST analysis) to Claude Code during\n     agentic task execution. To evaluate its impact, we construct a 30-task\n     benchmark on the FastAPI RealWorld example app, partitioned into three\n     groups by dependency discoverability: G1 (semantic — keyword-findable),\n     G2 (structural — reachable via import chains), and G3 (hidden — non-\n     semantic architectural dependencies invisible to both keyword search and\n     vector retrieval). We report results from 258 completed trials (out of\n     270 planned: 30 tasks × 3 conditions × 3 runs; 12 trials failed due to\n     API credit exhaustion) comparing Vanilla Claude Code, BM25-augmented\n     prompting, and CodeCompass graph navigation.\n          Our results"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2    Introduction\nThe dominant narrative around LLM context windows is expansionist: more\ntokens means fewer failures. GPT-4’s 128K window, Claude’s 1M-token context,\nand Gemini’s 2M-token experiments have been met with enthusiasm that “the\nwhole codebase fits.” Under this narrative, the retrieval problem for coding\nagents dissolves — if every file is in context, no relevant file can be missed."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\fWe argue this narrative is incomplete. Fitting a codebase in context does not\nguarantee that an LLM attends to the architecturally critical files for a given\ntask. This is not merely a lost-in-the-middle failure [LIU ET AL. 2023] — it is\na deeper structural problem. Software codebases are graphs of semantic and\nsyntactic dependencies. A change to a base class silently requires updating all\ninstantiation sites. A refactored JWT payload breaks all route handlers that\ndecode it. A renamed configuration key cascades through every module that\nimports the settings object. These dependencies are structurally determined\nbut semantically invisible: no keyword search, no embedding similarity, no\nBM25 ranking will surface app/api/dependencies/database.py as relevant to\na task described as “add a logger parameter to BaseRepository.”\nWe formalize this as the Navigation Paradox: as context windows "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "3\n\f       semantic tasks, validating the taxonomy’s predictive validity.\n    5. The Veto Protocol — an empirical metric quantifying cases where\n       internal search fails but graph traversal succeeds, providing task-level\n       evidence of structural blind spots."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3     Related Work\n3.1     Repository-Level Code Editing\nSWE-bench [JIMENEZ ET AL. 2023] established the canonical benchmark\nfor repository-level software engineering, requiring agents to resolve GitHub\nissues against real Python repositories. The dominant approach to the file\nlocalization problem — identifying which files to edit — has been retrieval-\nbased: BM25 over issue text [AGENTLESS, XIAT ET AL. 2024], embedding\nsimilarity [CODESEARCHNET], or hybrid strategies. Agentless [XIAT ET AL.\n2024] demonstrated that non-agentic, structured localization followed by edit\ngeneration outperformed fully agentic approaches on SWE-bench, suggesting\nthat localization quality is the dominant determinant of success.\nOur work complements SWE-bench by constructing a controlled benchmark\nwhere the type of dependency (semantic vs. structural vs. hidden) is a first-class\nexperimental variable. We do not"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "3.2     Knowledge Graphs for Code\nRepoGraph [OUYANG ET AL. 2024] proposed a graph-based repository struc-\nture for augmenting LLM code completion. CodexGraph [LIU ET AL. 2024]\ninterfaces LLMs with graph databases to support complex multi-step operations.\nKGCompass [ANONYMOUS 2024] constructs repository-aware KGs for software\nrepair, using entity path tracing to narrow the search space. These works share\nour intuition that graph structure improves over flat retrieval, but evaluate on\ndifferent tasks (completion, repair) with different metrics (exact match, patch\nsuccess).\nSeddik et al. [2026] is the closest methodological relative. Their Programming\nKnowledge Graph (PKG) framework constructs AST-derived hierarchical graphs\nfor RAG-augmented code generation on HumanEval and MBPP, demonstrating\n20% pass@1 gains over NoRAG baselines. A key difference: PKG is a retrieval\naugmentation for gene"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "4\n\f3.3     Context Utilization in Long-Context LLMs\nLost-in-the-middle [LIU ET AL. 2023] demonstrated that LLMs systematically\nunderweight information in the middle of long contexts, attending disproportion-\nately to prefix and suffix. Subsequent work [KAMRADT 2023] showed that recall\nperformance degrades as context length grows even when the target information\nis present. These findings are the attention-level analogue of our navigational\nsalience hypothesis: having a file in context does not guarantee that the LLM\nwill use it correctly. Our work operates at a coarser granularity — file discovery\nrather than intra-context attention — but is motivated by the same underlying\nconcern."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "3.4     MCP and Agentic Tool Use\nThe Model Context Protocol (MCP) [ANTHROPIC 2024] provides a standard-\nized interface for exposing tools and data sources to LLMs. Prior deployments\nhave focused on filesystem access, web search, and database querying. To our\nknowledge, CodeCompass is the first published MCP server specifically designed\nto expose static code dependency graphs for agentic navigation evaluation."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "4     Methodology\n4.1     Benchmark Construction\nWe construct a 30-task benchmark on the FastAPI RealWorld example\napp [NSIDNEV 2021], a production-quality Python codebase implementing a\nMedium-like blogging API (~3,500 lines, 40 source files). We choose this codebase\nbecause it is (a) large enough to contain genuine architectural dependencies, (b)\nsmall enough that all conditions complete trials within practical time bounds,\nand (c) uses the repository pattern with dependency injection — a common\nenterprise architecture that generates non-trivial structural dependencies.\nTask format. Each task consists of a natural-language prompt describing a\ncode modification and a gold standard listing the set of files that must be read\nor edited for a correct, complete implementation. Tasks are verified by manual\ninspection to ensure the gold standard is minimal yet complete.\nTask taxonomy. We parti"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "5\n\f      via 2–4 hop import chains. The task description names one or two\n      files; required files are their structural neighbors. Example: “Extract\n      RWAPIKeyHeader to app/api/security.py” — the task description names\n      the security component, but correct implementation requires updating\n      app/api/dependencies/authentication.py, app/api/routes/api.py,\n      and app/main.py — none of which appear in the task text.\n   • G3 — Hidden (tasks 21–30): Required files share no semantic overlap\n     with the task description and are reachable only via structural graph traver-\n     sal. Example: “Add a logger parameter to BaseRepository.__init__” —\n     the description mentions base.py, but a complete implementation requires\n     app/api/dependencies/database.py (which instantiates repositories via\n     get_repository()) — a file with no lexical overlap with “logger”, “pa-\n     rame"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "4.2    Graph Construction and Quality Assumptions\nWe parse the FastAPI repo with Python’s built-in ast module to extract three\nedge types:\n   • IMPORTS: file A imports from file B (via import or from ... import\n     statements)\n   • INHERITS: class in A inherits from class in B\n   • INSTANTIATES: file A constructs an instance of a class defined in B\nWe resolve relative imports to canonical repo-relative paths and store all edges\nin Neo4j 5.15. The resulting graph contains 71 nodes (Python source files)\nand 255 edges (201 IMPORTS, 20 INHERITS, 34 INSTANTIATES). For each\nCondition C task, the agent invokes get_architectural_context(file_path)\nwhich returns the 1-hop neighborhood of the target file in both inbound and\noutbound directions.\nVisualization of 1-hop architectural context. Figure 1 illustrates the\nstructure returned by CodeCompass when querying a single file. The visual-\nization "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "6\n\fFigure 1: 1-hop architectural context returned by CodeCompass for\napp/models/domain/articles.py. The center node (red) is the query file;\ngray nodes are structural neighbors. Edge colors indicate relationship types:\nIMPORTS (blue), INHERITS (green), INSTANTIATES (orange). This visual-\nization demonstrates how a single graph traversal surfaces files across multiple\narchitectural layers without lexical matching."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "7\n\f← [IMPORTS]     app/db/repositories/comments.py\n← [IMPORTS]     app/db/repositories/profiles.py\n← [IMPORTS]     app/db/repositories/tags.py\n← [IMPORTS]     app/db/repositories/users.py\n← [INSTANTIATES] app/api/dependencies/database.py\nTotal: 7 structural connections\nThis single call surfaces database.py — the hidden required file for task 23 —\nwhich no retrieval signal ranks highly.\nGraph quality and human validation. The automated AST pipeline pro-\nduces a structurally complete but semantically unvalidated graph. In production\ndeployments, graph construction is not a purely automated activity: an SME\nfamiliar with the codebase’s architectural intent must review and approve the\nedges, add domain-specific relationships (e.g., “this service is owned by team\nX and must not be modified without consulting team Y”), and maintain the\ngraph as the codebase evolves. The automated graph used in"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "4.3    Experimental Conditions\nWe evaluate three conditions:\n\nCondition                 Description                    MCP           BM25\nA — Vanilla               Unaugmented Claude             ×             ×\n                          Code (claude-sonnet-4-5)\nB — BM25                  BM25 file rankings             ×             ✓\n                          prepended to prompt\nC — Graph                 CodeCompass graph              ✓             ×\n                          navigation via MCP"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Condition A uses the raw task prompt with no augmentation. Claude Code’s\nbuilt-in tools (Glob, Grep, Read, Edit) are available. This establishes the frontier\nmodel baseline.\nCondition B prepends the top-10 BM25-ranked files to the prompt using the\ntask description as the query. BM25 is computed over function/class-level chunks\n(339 chunks total) using rank-bm25 [DOHAN 2021], with scores aggregated to\nfile level by taking the maximum chunk score. This replicates the Agentless-style\nlocalization approach [XIAT ET AL. 2024].\nCondition C registers CodeCompass as an MCP server in the agent’s\nexecution environment. The task prompt instructs the agent to call\n\n8\n\fget_architectural_context on the primary task file first and to read all\nreturned neighbors before making edits. The graph tool and all built-in Claude\nCode tools are available."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "4.4    Metrics\nArchitectural Coverage Score (ACS). For each trial, we extract the set\nof files accessed (read or edited) from the Claude Code JSONL transcript by\nparsing tool calls (Read, Edit, Write, Bash). ACS is:\n\n|files_accessed ∩ required_files|\n                     ACS =\n                                      |required_files|"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "ACS measures navigational completeness — what fraction of architecturally\nrelevant files the agent discovered and engaged with. ACS does not measure\nimplementation correctness; a file that is read but not correctly edited still counts\ntoward ACS.\nFirst Correct Tool Call (FCTC). The number of tool call steps before the\nagent first accesses a required file. Lower is better — it captures how efficiently\nthe agent navigates to relevant code.\nMCP Calls. Count of get_architectural_context and semantic_search\ninvocations per trial. Used to verify that Condition C agents actively use the\ngraph tool.\nVeto Protocol Events. Trials where internal search tools (Grep, Bash) are\ncalled and return zero results matching required files, but the graph tool suc-\ncessfully surfaces at least one. Counts empirical cases of structural blind spots."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "4.5    Execution Harness\nAll trials are run via claude -p (non-interactive print mode) with\n--dangerously-skip-permissions. The FastAPI repository is reset to\na clean git checkout state before each trial. To prevent nesting errors,\nCLAUDECODE=\"\" is unset before each invocation. Transcripts are captured from\n~/.claude/projects/<hash>/*.jsonl. ACS and FCTC are calculated by\nharness/calculate_acs.py which parses tool call traces from the JSONL\nschema.\nThe full harness, benchmark tasks, and MCP server are open source and available\nat: https://github.com/tpaip607/research-codecompass\nReproducibility artifacts: - 30 benchmark tasks with gold standards - AST\nparser and Neo4j graph construction - MCP server implementation (FastMCP +\nNeo4j) - Complete experiment harness with ACS calculator - 258 trial transcripts\nand analysis code - Visualization generation scripts"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "9\n\f5     Results\nAll results are based on 258 completed trials out of the planned 270 (30 tasks\n× 3 conditions × 3 runs). The remaining 12 trials failed due to API credit\nexhaustion during the final experiment run. Current sample sizes: A (89 trials),\nB (81 trials), C (88 trials). Some tasks in Condition C produced duplicate result\ndirectories from concurrent runners; the most recent result was used in all such\ncases.\n\n5.1    Overall ACS by Condition\nSee Figure 2 for visualization of ACS by condition and group."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Condition         G1 ACS         G2 ACS        G3 ACS         Overall (n)\nA — Vanilla       90.0% ±       79.7% ±        76.2% ±       82.0% ± 22.1%\n                  20.3%         20.6%          23.6%         (89)\n                  (n=30)        (n=30)         (n=29)\nB — BM25          100.0% ±      85.1% ±        78.2% ±       87.1% ± 19.4%\n                  0.0%          17.7%          22.9%         (81)\n                  (n=24)        (n=29)         (n=28)\nC — Graph         88.9% ±       76.4% ±        99.4% ±       88.3% ± 18.6%\n                  21.2%         19.7%          3.6%          (88)\n                  (n=27)        (n=30)         (n=31)"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "The task taxonomy shows strong predictive validity (Figure 2). G1 results confirm\nthat BM25 is the optimal strategy for semantic tasks — achieving perfect coverage\nwith zero variance. G3 results confirm the core hypothesis: graph navigation\nprovides a 23.2 percentage-point improvement on hidden-dependency tasks\nwhere retrieval cannot help (99.4% vs 76.2%) (Figure 7). BM25 provides minimal\nimprovement over Vanilla on G3 tasks (78.2% vs 76.2%), confirming that keyword\nretrieval cannot surface semantically-distant architectural dependencies. G2\nresults produce the most surprising finding: Condition C underperforms both\nbaselines on structural tasks (76.4% vs 79.7% Vanilla, vs 85.1% BM25), a\nregression discussed in Section 5."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "5.2    Success Rate and FCTC\nSee Figure 5 for FCTC comparison across conditions and groups. See Figure 6\nfor overall performance summary.\nUsing ACS ≥ 1.0 as the success criterion (complete coverage of required files):\n\n10\n\fCondition      Completion Rate      Mean FCTC (steps to first required file)\nA—             54% (48/89)          1.67\nVanilla\nB — BM25       62% (50/81)          1.36\nC — Graph      66% (58/88)          1.93"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Condition C achieves the highest completion rate (+12pp over Vanilla) but the\nslowest path to the first required file (Figure 5). This paradox is particularly\nevident on G3 tasks: C takes 2.23 steps vs A’s 1.31 steps, yet achieves 99.4% vs\n76.2% final coverage. The interpretation: when C uses the graph tool (which\nhappens mid-task rather than immediately), it discovers comprehensively, even\nif it starts slowly.\nBM25 (Condition B) is consistently fastest to first required file (1.14–1.79\nsteps across groups), validating prepended file rankings as an effective first-step\nheuristic.\n\n5.3    MCP Tool Adoption\nThe most consequential finding in the dataset.\nSee Figure 3 for MCP adoption rates by task group. See Figure 4 for impact of\nMCP usage on ACS."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "MCP calls per trial    Trials         Mean ACS\n                 0 (tool ignored)       51 (58.0%)     80.2%\n                 1+ (tool used)         37 (42.0%)     99.5%\n\nDespite an explicit system prompt instruction to call get_architectural_context\nbefore editing any file, 58.0% of Condition C trials made zero MCP\ncalls. When the tool was used, mean ACS was 99.5% — near-perfect (Figure 4).\nWhen it was skipped, mean ACS dropped to 80.2%, indistinguishable from the\nVanilla baseline.\nThe pattern varies substantially by task group (Figure 3):\n\nGroup              MCP Adoption         Avg Calls   Mean ACS (when used)\n   G1 (Semantic)      22.2% (6/27)         0.22        —\n   G2 (Structural)    0.0% (0/30)          0.00        —\n   G3 (Hidden)        100% (31/31)         1.16        99.5%"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "The G2 result is noteworthy: zero trials out of 30 used the graph tool\non structural tasks, despite structural dependencies being the tool’s primary"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "11\n\fdesign purpose. The model appears to apply a rational heuristic: on tasks where\nglob+read achieves ~80% ACS (G1, G2), the overhead of calling the graph tool\nis not justified.\nImproved prompt experiment: After identifying low adoption rates in initial\nG3 trials (85.7%, 30/35), we developed an improved prompt with a mandatory\nchecklist positioned at the END of the prompt (to avoid Lost in the Middle\nsuppression effects). This checklist-at-END formatting achieved 100% adoption\n(31/31 trials) on G3 tasks, increasing mean G3 ACS from 96.6% to 99.4%.\nThis validates that prompt engineering — specifically, structural formatting that\nmitigates attention bias — can substantially improve tool adoption rates without\nrequiring tool_choice enforcement.\nThis reveals the core problem: tool effectiveness (99.5% when used) vs\ntool discoverability (42% overall adoption rate). The bottleneck is not\nthe "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "5.4    Statistical Validation\nTo confirm that the observed G3 improvement is not attributable to sampling\nvariance, we applied Welch’s t-test comparing Condition C (Graph) against both\nbaselines on hidden-dependency tasks.\n   • Graph vs Vanilla: t=5.23, p<0.001 (nC =31, nA =29)\n   • Graph vs BM25: t=4.83, p<0.001 (nC =31, nB =28)\nBoth comparisons are highly significant at the p<0.001 level. The 23.2 percentage-\npoint improvement over Vanilla (99.4% vs 76.2%) exceeds 1 standard deviation of\nthe baseline distribution (σ A =23.2%), indicating a large and robust effect. Graph\nnavigation achieves near-perfect coverage (99.4% ± 3.5%) with substantially\nreduced variance compared to both baselines."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "5.5    Veto Protocol Events\nTask 23 provides the clearest Veto Protocol event in the dataset: Conditions A\nand B universally call Glob and Read over app/db/repositories/ but never\nsurface database.py. Condition C’s graph call returns database.py as the first\nresult. The file has no shared vocabulary with the task description (“logger”,\n“BaseRepository”, “parameter”) and is connected only via 7 structural edges\n(IMPORTS + INSTANTIATES).\nAcross all G3 trials, the pattern holds: every file missed by Condition A that was\nfound by Condition C is reachable in 1–2 graph hops from the task’s named file,\nbut shares fewer than 2 tokens with the task description after stopword removal."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "12\n\f6     Discussion\n6.1    The Navigation Paradox\nOur results support the Navigation Paradox hypothesis. On G3 tasks, Claude\nCode with access to the full codebase (Condition A) achieves 80% ACS — not\nbecause the relevant file exceeds the context window, but because it never enters\nthe model’s navigational attention. The model’s default strategy — glob for files\nmatching the task’s domain vocabulary, then read those files — is effective when\nrequired files share vocabulary with the task description. It fails systematically\nwhen required files are architecturally connected but semantically distant.\nThe BM25 condition (B) provides no improvement over Vanilla on G3 tasks.\nBM25 rankings are determined by term overlap between the task description and\nfile content. app/api/dependencies/database.py contains terms like “pool”,\n“connection”, “repository” — none of which appear in “logger paramete"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "6.2    Graph Navigation vs. Retrieval\nThe distinction between navigation and retrieval is fundamental to interpreting\nthese results. Retrieval asks: given this query, what documents are similar?\nNavigation asks: given this file, what other files are structurally connected?\nFor tasks where the relevant file set is determined by code structure rather\nthan query-document similarity, retrieval is the wrong tool — not because it is\ninsufficiently powerful, but because it is solving the wrong problem.\nThis distinction aligns with the Seddik et al. [2026] observation that “code and\nnatural-language documentation often co-evolve, implying that text encodes\ncomplementary signals rather than redundant descriptions of code.” In our\nframing, structural edges (IMPORTS, INHERITS, INSTANTIATES) encode\nthe architectural signal that complements the semantic signal of task descrip-\ntions. PKG addresses he"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "6.3    Tool Adoption as a First-Class Research Problem\nThe 61% tool-ignore rate is the most practically significant finding in this study.\nWhen the model uses the graph tool, it achieves 99.4% ACS — substantially\naddressing the navigational problem. The open question is not whether the tool\nworks, but how to ensure consistent adoption.\nOur results suggest the model makes a rational choice: on G1 and G2 tasks,\nwhere the default Glob+Read heuristic achieves ~85% ACS, the overhead of"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "13\n\fcalling the graph tool (one extra step, potentially noisy results) is not worth the\nmarginal gain. On G3 tasks, the model cannot know in advance that it is facing\na hidden dependency — so it applies the same cheap heuristic, fails, and never\ncorrects course within a single trial.\nThis points to a specific design intervention: rather than instructing the model\nto optionally call the graph tool, systems should be designed so that the first\ntool call is structurally mandated — either via tool_choice forcing an initial\nget_architectural_context call, or via a multi-agent pipeline where a dedi-\ncated planning agent always performs dependency mapping before an execution\nagent makes edits. The 38% adoption rate under an explicit instruction sug-\ngests that even strongly-worded prompts are insufficient; structural workflow\nenforcement is required."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "6.4    Graph Quality and the Human-in-the-Loop Assump-\n       tion\nThe graph used in this study is automatically derived from static AST anal-\nysis. This is a deliberate methodological choice: automated construction is\nreproducible, avoids author bias, and establishes a lower bound. However,\nproduction-grade deployment of graph-augmented coding agents carries an im-\nportant assumption: graph quality requires human expert input.\nAn SME familiar with the codebase’s architecture must validate the graph at\nconstruction time (are these edges architecturally meaningful, or artifacts of\nimport style?), augment it with domain knowledge not present in the AST\n(ownership boundaries, change risk, semantic groupings), and maintain it as the\ncodebase evolves — because a stale graph is potentially worse than no graph, by\nconfidently pointing the agent to wrong dependencies. The 20pp G3 improvement\nsho"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "6.5    Limitations\nSingle codebase. All 30 tasks are drawn from one Python web application.\nGeneralizability to other codebases, languages, or architectural patterns is\nuntested.\nACS vs. correctness. ACS measures navigational completeness, not imple-\nmentation correctness. A trial that achieves 100% ACS may still produce a\nbroken implementation; a trial with 80% ACS may produce a working one if the\nmissed file was not strictly required. We chose ACS over pass@1 because our\nresearch question is specifically about navigation and ACS is measurable from\ntranscripts without execution infrastructure.\nPrompt sensitivity. Condition C requires explicit prompt engineering to\nensure graph tool invocation. The measured improvement partially reflects"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "14\n\fprompt design. A cleaner evaluation would structurally enforce the graph call\nrather than relying on instruction.\nModel-specific findings. All trials use claude-sonnet-4-5. Different models\nmay exhibit different navigational heuristics and tool-adoption rates."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "6.6    G2 Regression Analysis\nCondition C underperformed both baselines on G2 structural tasks (76.4% vs\n79.7% Vanilla, vs 85.1% BM25). Analysis reveals this regression is explained by\nzero graph tool adoption combined with prompt overhead.\nZero MCP adoption. As shown in Figure 3, 0% of G2 trials (0/30) invoked\nget_architectural_context, despite structural dependencies being its design\npurpose. The model appears to apply a rational heuristic: on tasks where\nGlob+Read achieves ~80% ACS (G1, G2), the overhead of calling the graph\ntool is not justified. Without using the tool, Condition C suffers from prompt\noverhead—a longer system prompt with tool instructions—but gains none of the\nnavigational benefits.\nTool usage analysis. G2 trials in Condition C used 12.5 mean tool calls vs\n12.1 for Vanilla, with similar file access patterns (4.0 files read) and comparable\nprecision (0.568 vs 0.580 re"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "7     Conclusion\nWe introduced the Navigation Paradox — the observation that expanding LLM\ncontext windows shifts the coding agent failure mode from retrieval capacity\nto navigational salience — and presented CodeCompass, a graph-based MCP\ntool that exposes structural code dependencies to agentic coding systems. Our\n258-trial controlled benchmark on a 30-task partitioned dataset demonstrates\nfour findings:\nFirst, BM25 retrieval is optimal for semantic tasks (G1: 100% ACS with\nzero variance) and provides a free, trivial baseline that graph navigation does\nnot beat on those tasks. Teams may benefit from adopting it."
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "15\n\fSecond, graph navigation provides a 23.2 percentage-point improvement\non hidden-dependency tasks (G3: 99.4% vs 76.2% Vanilla, vs 78.2% BM25).\nThe mechanism is structural: get_architectural_context(\"app/db/repositories/base.py\")\nreturns the hidden required file as the first result in one tool call. Retrieval\nsignals are unlikely to replicate this because the dependency is architectural, not\nsemantic.\nThird, prompt engineering significantly impacts tool adoption rates.\nInitial G3 trials achieved 85.7% MCP adoption; an improved prompt with\nchecklist-at-END formatting (to mitigate Lost in the Middle effects) achieved\n100% adoption (31/31 trials), increasing mean G3 ACS from 96.6% to 99.4%.\nThis demonstrates that careful prompt design can close the adoption gap on\ntasks where the tool is genuinely necessary.\nFourth, and most practically important: the bottleneck is not the graph —\nit is c"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "7.1    Figures\nFigure 2: ACS by Condition and Task Group\nArchitectural Coverage Score (ACS) across three experimental conditions (A:\nVanilla, B: BM25, C: Graph) and three task groups (G1: Semantic, G2: Struc-\ntural, G3: Hidden). Error bars show standard deviation. n=258 trials total.\nBM25 achieves perfect 100% ACS on semantic tasks. Graph navigation provides\n23.2pp improvement on hidden-dependency tasks (G3: 99.4% vs 76.2% Vanilla).\n\n16\n\f                   Figure 2: ACS by Condition and Group\n\nFigure 3: MCP Tool Adoption by Task Group\nMCP tool adoption rates in Condition C across task groups. n=88 trials. G1\nshows 22.2% adoption (tool correctly ignored on semantic tasks), G2 shows\n0% adoption (problematic—tool designed for structural tasks), G3 shows 100%\nadoption with improved prompts (perfect adoption on hidden-dependency tasks)."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Figure 4: Impact of MCP Tool Usage on ACS\nComparison of mean ACS when MCP tool is used versus ignored in Condition\nC. When used: 99.5% ACS (n=37 trials). When not used: 80.2% ACS (n=51\ntrials). The +19.2% improvement demonstrates tool effectiveness when adopted.\nTrials that ignore the tool perform identically to Vanilla baseline.\n\nFigure 5: First Correct Tool Call (FCTC) Comparison\nSteps to first required file across conditions and groups. Lower is better. BM25\n(Condition B) is consistently fastest (1.14-1.79 steps) due to prepended file\nrankings. Condition C takes longer on G3 (2.23 vs 1.31 steps) but achieves\nsuperior final coverage (99.4% vs 76.2% ACS), demonstrating the FCTC paradox:\ngraph navigation prioritizes completeness over speed.\n\n17\n\f                           Figure 3: MCP Adoption"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Figure 6: Overall Performance Summary\nAggregate performance metrics across conditions. Shows overall ACS, completion\nrate (ACS ≥ 1.0), and FCTC (inverted for display). Condition C achieves highest\ncompletion rate (66%) and overall ACS (88.3%), validating graph navigation’s\neffectiveness for repository-level tasks.\n\nFigure 7: Graph Navigation Improvement on Hidden Dependencies\nACS on G3 (hidden-dependency) tasks across conditions. Graph navigation\n(Condition C) achieves 99.4% ACS—a 23.2 percentage-point improvement over\nboth Vanilla (76.2%) and BM25 (78.2%). This demonstrates that retrieval-based\napproaches provide zero benefit when dependencies are architecturally determined\nbut semantically invisible.\n\n7.2    References\n(To be populated with full bibliography)\n   • [AGENTLESS] Xia et al. (2024). Agentless: Demystifying LLM-Based\n     Software Engineering Agents."
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "18\n\fFigure 4: MCP Impact\n\n19\n\fFigure 5: FCTC Comparison\n\nFigure 6: Overall Summary\n\n20\n\f                          Figure 7: G3 Improvement"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "• [SEDDIK 2026] Seddik et al. (2026). Context-Augmented Code Generation\n     Using Programming Knowledge Graphs. arXiv:2601.20810.\n   • [JIMENEZ 2023] Jimenez et al. (2023). SWE-bench: Can Language Models\n     Resolve Real-World GitHub Issues?\n   • [LIU 2023] Liu et al. (2023). Lost in the Middle: How Language Models\n     Use Long Contexts.\n   • [OUYANG 2024] Ouyang et al. (2024). RepoGraph: Enhancing AI Software\n     Engineering with Repository-Level Code Graph.\n   • [LIU 2024] Liu et al. (2024). CodexGraph: Bridging Large Language\n     Models and Code Repositories via Code Graph Databases.\n   • [ANTHROPIC 2024] Anthropic (2024). Model Context Protocol Specifica-\n     tion.\n   • [NSIDNEV 2021] Nsidnev (2021). FastAPI RealWorld Example App.\n     GitHub."
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "7.3    Appendix A: Benchmark Task Descriptions\n(Full table of 30 tasks with required files and taxonomy classification — to be\nattached)\n\n21\n\f7.4    Appendix B: CodeCompass MCP Tool Specifications\n@mcp.tool()\ndef get_architectural_context(file_path: str) -> str:\n    \"\"\"\n    Returns all files structurally connected to the given file via\n    IMPORTS, INHERITS, or INSTANTIATES edges in the code dependency graph.\n    Use this before editing any file to discover non-obvious architectural\n    dependencies.\n    \"\"\"\n\n@mcp.tool()\ndef semantic_search(query: str, top_n: int = 8) -> str:\n    \"\"\"\n    Searches the codebase using BM25 keyword ranking over function/class\n    level chunks. Returns the most relevant files ranked by relevance score.\n    \"\"\""
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "7.5    Appendix C: ACS Calculator — Tool Call Extraction\nThe ACS calculator parses JSONL transcripts from Claude Code sessions,\nextracting file paths from: - Read(file_path=...) — direct file reads -\nEdit(file_path=...) — file edits - Write(file_path=...) — file writes\n- Bash(command=...) — regex extraction of app/ or tests/ paths from shell\ncommands\nPaths are normalized by stripping the absolute repo prefix to obtain repo-relative\npaths for comparison against gold standards.\n\n22"
+    }
+  ]
+}
