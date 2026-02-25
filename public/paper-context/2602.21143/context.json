@@ -1,0 +1,577 @@
+{
+  "arxivId": "2602.21143",
+  "paperTitle": "A Benchmark for Deep Information Synthesis",
+  "abstract": "Large language model (LLM)-based agents are increasingly used to solve complex tasks involving tool use, such as web browsing, code execution, and data analysis. However, current evaluation benchmarks do not adequately assess their ability to solve real-world tasks that require synthesizing information from multiple sources and inferring insights beyond simple fact retrieval. To address this, we introduce DEEPSYNTH, a novel benchmark designed to evaluate agents on realistic, time-consuming problems that combine information gathering, synthesis, and structured reasoning to produce insights. DEEPSYNTH contains 120 tasks collected across 7 domains and data sources covering 67 countries. DEEPSYNTH is constructed using a multi-stage data collection pipeline that requires annotators to collect official data sources, create hypotheses, perform manual analysis, and design tasks with verifiable answers. When evaluated on DEEPSYNTH, 11 state-of-the-art LLMs and deep research agents achieve a maximum F1 score of 8.97 and 17.5 on the LLM-judge metric, underscoring the difficulty of the benchmark. Our analysis reveals that current agents struggle with hallucinations and reasoning over large information spaces, highlighting DEEPSYNTH as a crucial benchmark for guiding future research.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Large language model (LLM)-based agents are increasingly used to solve complex tasks involving tool use, such as web browsing, code execution, and data analysis. However, current evaluation benchmarks do not adequately assess their ability to solve real-world tasks that require synthesizing information from multiple sources and inferring insights beyond simple fact retrieval. To address this, we introduce DEEPSYNTH, a novel benchmark designed to evaluate agents on realistic, time-consuming problems that combine information gathering, synthesis, and structured reasoning to produce insights. DEEPSYNTH contains 120 tasks collected across 7 domains and data sources covering 67 countries. DEEPSYNTH is constructed using a multi-stage data collection pipeline that requires annotators to collect official data sources, create hypotheses, perform manual analysis, and design tasks with verifiable answers. When evaluated on DEEPSYNTH, 11 state-of-the-art LLMs and deep research agents achieve a maximum F1 score of 8.97 and 17.5 on the LLM-judge metric, underscoring the difficulty of the benchmark. Our analysis reveals that current agents struggle with hallucinations and reasoning over large information spaces, highlighting DEEPSYNTH as a crucial benchmark for guiding future research."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: A sample task from D EEP S YNTH, illustrating that synthesizing knowledge requires agents"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: An overview of our data collection process for building the D EEP S YNTH benchmark"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 1: D EEP S YNTH statistics across tasks.      Figure 3: Percentage of tasks per capabilities re-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 2: Performance comparison on the D EEP S YNTH benchmark (Pass@1). F1, Precision, Recall"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 4: Performance comparison on the D EEP S YNTH-Dev benchmark. (a) F1 Score measures"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 3: Ablation Study. Tool Ablation: Comparing the benefits of using different tools on D EEP -"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 5: F1-scores across intermediate steps.         Figure 6: F1-scores across synthesis operations."
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 5: Multi-Regional Analysis: Agent performance across region-specific tasks (F1 score)."
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 4: Error analysis for OWL (GPT-4.1). Navigation and synthesis errors are the most prominent."
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 6: Comparison of datasets on various reasoning and retrieval capabilities."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 7: Average Time per instance to run our benchmark"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 8: Intermediate step accuracy and error propagation. Per-step F1 (%) on 40 D EEP S YNTH"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 9: Model cost and output token ranges."
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 10: Agentic Framework Tool Capabilities Comparison. Note: ✓ indicates capability present;"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Table 11: Key operations in information synthesis, their definitions, and examples of application."
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Table 12: Analysis. Studying the role of planning/intermediate steps."
+    },
+    {
+      "id": "cap-16",
+      "type": "caption",
+      "text": "Table 13: Performance comparison on the D EEP S YNTH-Dev benchmark (Pass@1). F1, Precision,"
+    },
+    {
+      "id": "cap-17",
+      "type": "caption",
+      "text": "Figure 7: Annotation Guidelines"
+    },
+    {
+      "id": "cap-18",
+      "type": "caption",
+      "text": "Figure 8: Annotation Guidelines"
+    },
+    {
+      "id": "cap-19",
+      "type": "caption",
+      "text": "Figure 9: Example run using OWL, illustrating errors when trying to collect and reason about data."
+    },
+    {
+      "id": "cap-20",
+      "type": "caption",
+      "text": "Table 14: Examples of questions."
+    },
+    {
+      "id": "cap-21",
+      "type": "caption",
+      "text": "Figure 10: The prompt for the LLM-as-a-judge from Wolfson et al. (2025)."
+    },
+    {
+      "id": "cap-22",
+      "type": "caption",
+      "text": "Figure 11: System prompt provided to the model, outlining instructions, answer formatting guidelines,"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Published as a conference paper at ICLR 2026\n\nA B ENCHMARK FOR D EEP I NFORMATION S YNTHESIS\n                                             Debjit Paul1 , Daniel Murphy2 , Milan Gritta1 , Ronald Cardenas1 ,\n                                             Victor Prokhorov1 , Jun Wang3 , Gerasimos Lampouras1"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Dataset Contributors:\n                                          Lena Sophia Bolliger4 , Aysim Toker1 , Roy Miles1 , Andreea-Maria Oncescu1 , Jasivan\n                                          Alex Sivakumar5 , Philipp Borchert1 , Ismail Elezi1 , Meiru Zhang6 , Ka Yiu Lee1 , Guchun Zhang1\n                                          1\n                                              Huawei Noah’s Ark Lab, UK 2 Imperial College London 3 UCL Centre for Artificial Intelligence\n                                          4\n                                              University of Zurich 5 University of Sheffield 6 University of Cambridge\narXiv:2602.21143v1 [cs.AI] 24 Feb 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "A BSTRACT\n                                                   Large language model (LLM)-based agents are increasingly used to solve complex\n                                                   tasks involving tool use, such as web browsing, code execution, and data analysis.\n                                                   However, current evaluation benchmarks do not adequately assess their ability to\n                                                   solve real-world tasks that require synthesizing information from multiple sources\n                                                   and inferring insights beyond simple fact retrieval. To address this, we introduce\n                                                   D EEP S YNTH, a novel benchmark designed to evaluate agents on realistic, time-\n                                                   consuming problems that combine information "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1     I NTRODUCTION\n                                         Information synthesis involves collecting information from multiple sources and reasoning over it to\n                                         form coherent insights. While this capability has been central to human decision-making and has\n                                         driven advances in fields ranging from scientific discovery to policy development (Tricco et al., 2011;\n                                         Sambre & Brône, 2002), it has traditionally been laborious and cognitively demanding. For example,\n                                         a travel agency from Singapore might want to know “Which non-ASEAN countries experienced a\n                                         significant post-COVID recovery — reaching at least 95% of their 2019 visitor arrival levels to\n                                         Singa"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\fPublished as a conference paper at ICLR 2026\n\nWhich non-ASEAN countries experienced a signiﬁcant post-COVID recovery — reaching at least\n                              95% of their 2019 visitor arrival levels to Singapore by 2023, and what were the main reasons for\n                              travel (business or tourism)?\n\nAnswer\n                              Searching \"Arrival visitors to Singapore\"                       {\n                                                                                                \"country1\": \"reason1\",\n                                                                                                \"country2\": \"reason2\",\n                                                                                                ...\n                                                                                              }\n            Browsing \"https://...\""
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "format output\n            Browsing \"https://...\"\n\n...                                                                        process data\n\nBrowsing \"https://data.aseanstats.org/visitors\"\n\n...\"origin: any non-ASEAN country\"\n\n...\"destination: Singapore\"\n\n...\"year: 2019\"\n\n...\"year: 2023\"\n\nFigure 1: A sample task from D EEP S YNTH, illustrating that synthesizing knowledge requires agents\nto perform multiple steps, including web browsing, gathering information from multiple sources,\nreasoning over them, and generating the final answer."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "overlook the diversity of regional contexts, languages, and information ecosystems, limiting their\nability to evaluate agent performance in realistic, globally distributed settings.\nTo resolve this gap, we introduce D EEP S YNTH benchmark, a new benchmark comprising 120\nchallenging and diverse tasks, aimed to evaluate the ability of agents to browse the entire web,\ncombine information from unstructured and structured sources (paragraphs and tables) across 67\ncountries, and perform analysis to synthesize new information and insights. D EEP S YNTH tasks\nare annotated with a gold standard, manually annotated reasoning chain, which includes all the\nintermediate steps, answers and all required supporting evidence. Each task requires agents to\nnavigate an average of 4.2 web pages, and read between 1 to 15 documents and/or tables. These\ntasks are designed to reflect real-world analysis and insi"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "1. We release D EEP S YNTH, a new benchmark for agents that contains 120 real-world and\n           time-consuming information synthesis tasks. 1 .\n\n1\n       Our data and code for DeepSythn Bench are publicly available\n\n2\n\fPublished as a conference paper at ICLR 2026\n\n2. We show that D EEP S YNTH poses a significant challenge for state-of-the-art agents, revealing\n         key limitations in their capabilities. The best-performing agent achieves only an F1 score of\n         8.97 points, leaving substantial room for improvement.\n      3. We conduct an in-depth analysis to explain how D EEP S YNTH is challenging and demonstrate\n         why current agents cannot yet be considered reliable systems for information synthesis.\n\n2     T HE D EEP S YNTH B ENCHMARK"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "D EEP S YNTH is a benchmark designed to evaluate agents on realistic, time-consuming tasks that\nrequire planning, information gathering, and synthesis from the web. Specifically, D EEP S YNTH\nevaluates agents on their ability to navigate multiple websites, extract information from both structured\nand unstructured sources, and reason effectively to produce correct solutions. It consists of 120 tasks\nthat are carefully designed and annotated by experts. Each task (see Figure 1) is formulated to yield a\nconcise output in the form of a JSON object or dictionary, with key-value pairs organised in a tabular\nstyle, thereby enabling straightforward and reliable verification. Solving these tasks requires agents\nto formulate plans, decompose problems into sub-steps, select and use appropriate external tools (e.g.,\ndocument processors, code interpreters), and integrate intermediate results into a f"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "2.1   C RITERIA FOR D EEP S YNTH TASKS\n\nMotivated by prior benchmarks (Mialon et al., 2023; Yoran et al., 2024; Wei et al., 2025; Phan\net al., 2025), the design of D EEP S YNTH tasks is driven primarily by criteria that promote the\nfuture development of Agents’ information seeking and synthesis capabilities towards practical and\ngrounded goals. Specifically, our criteria consist of:"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "a) Multi-source Information Synthesis: Tasks should require agents to identify connections\n         across multiple data sources or to combine information from them to produce a coherent\n         solution. More specifically, tasks are designed such that agents must not only fetch relevant\n         information but also perform subsequent operations on it (see Table 1).\n      b) Inspired by the Real World: Experts were instructed to draw inspiration from real-world\n         situations. The tasks are designed so that any resulting insights would conceivably be able\n         to shape the decisions and actions of an individual or a group of people, such as political\n         scientists, policy makers, travel agents, etc.\n      c) Verifiable Answers: A task that has a closed-form answer, which can be automatically\n         verified and is stable over time, making it suitable for reproducible e"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "2.2   DATA C OLLECTION\n\nA common practice in designing deep agentic benchmarks is to start with a fact and then craft a\nquestion from it, making the answer difficult to locate (Wei et al., 2025). Since our goal was to ensure\nanswers are non-retrievable, we adopted a different approach. Building D EEP S YNTH involved four\n\n3\n\f Published as a conference paper at ICLR 2026\n\nFigure 2: An overview of our data collection process for building the D EEP S YNTH benchmark\n\nkey steps: (a) identifying data sources, (b) gathering hypotheses, (c) performing analyses, and (d)\n formulating tasks (see Figure 2)."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Data Source Identification. In this step (see Figure 2, left), we engaged 16 human experts2 to\n propose a diverse set of data sources and topics, drawing on their expertise, demographic backgrounds,\n and interests. Given the complexity of the annotation process and the need for efficient coordination,\n participation was restricted to individuals with whom we maintained direct communication, along\n with the paper’s core authors. We collected 223 data sources across 7 domains (socio-economic,\n finance, environment, science, education, transportation, political/socio-political). We excluded data\n sources that originated from untrustworthy or non-official websites, including those requiring user\n authentication, as well as sources containing information that contradicted other verified references.\n Our objective was to curate tasks that are useful to individuals or groups; therefore, we filt"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Hypothesis Generation. We then asked annotators to formulate one or two hypotheses—plausible\n insights that could be inferred from the selected data sources (see Figure 2 bottom left). The objective\n of this step was to elicit hypotheses that are both insightful and practically valuable, encouraging\n reasoning beyond surface-level fact retrieval (see § 2.1(e)). For example, one such hypothesis was:\n“Is there a linear relationship between air quality and pneumonia-related deaths across regions in the\n UK?”. Data sources that did not meet the criteria of usefulness and insightfulness (see § 2.1(b)) were\n subsequently filtered out.3 After this step, we retained a total of 155 data sources, each paired with\n its corresponding set of hypotheses."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Hypothesis Validation. In this step, annotators were tasked with conducting a detailed analysis\nof each data source to assess the validity of the proposed hypotheses (see Figure 2 top right). The\nobjective was twofold: (i) to verify whether the data supported the hypotheses, and (ii) to derive tasks\nwith verifiable answers (see § 2.1(c)). Hypotheses that failed to meet the verifiability criterion were\n    2\n     Details about the annotators are provided in Appendix A.2.\n    3\n     Please note this step involves a degree of subjectivity, and we relied on the domain knowledge and judgment\n of our annotators to ensure the quality of the retained data sources and hypotheses.\n\n4\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Statistic                     Value\n      Total Tasks                     120\n      Avg. Question tokens           78.49\n      Avg. Intermediate steps         7.54                       Web browsing                                               100%\n\nWeb pages per Task               4.2\n      Avg. Annotation Time       5.5 hours                         Web Search                                               100%\n\nSynthesis Operations             %\n                                                        Diverse filetype reading                45%\n      Trend Detection             20.93%\n      Average                     11.05%\n      Correlation                  6.98%            Code Execution / Sandbox                   43%"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Ranking                     19.77%\n      Anomaly Detection            6.98%                         Multi­Modality    20%\n      Counting and Comparing      33.72%\n                                                                               0         20          40     60       80            100\n      Filtering                    0.58%                                                      Percentage of Questions (%)\n\nTable 1: D EEP S YNTH statistics across tasks.      Figure 3: Percentage of tasks per capabilities re-\n                                                    quired to solve D EEP S YNTH.\n\nrefined or discarded. Following this validation and filtering process, we retained 130 data sources,\neach paired with its corresponding, verified hypothesis."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Task Formulation. Finally, annotators were asked to formulate task questions along with inter-\nmediate steps, supporting evidence and corresponding answers. We note that the intermediate steps\nindicate only one possible reasoning path or planning from question to answer, and that no model or\nagent necessarily needs to imitate that path. Since D EEP S YNTH tasks often rely on multiple pieces\nof supporting evidence and reference various documents or tables, annotators were instructed to\nprovide the URLs where the data sources can be accessed. Additionally, they were asked to include a\nbrief explanation of how the task can be solved, specifying any tools, code snippets, or mathematical\nformulas used in the solution. We provide more examples and additional statistics in §A.3."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Data Validation. All questions went through a second annotation stage, where another annotator\nindependently answered the question. Only tasks where the answers from both annotators were\nidentical were retained in the dataset, leaving finally 120 challenging information synthesis tasks.\n\n2.3    DATA S TATISTICS"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Table 1 summarises the key statistics of our benchmark. Tasks in D EEP S YNTH are highly detailed,\nwith an average length of 78.49 tokens, an average of 7.54 intermediate reasoning steps and requiring\nnavigation through an average of 4.2 web pages to reach a solution. Additionally, on average,\nformulating each task (from data source identification to task formulation) took the annotators\napproximately 5.5 hours. This number highlights the challenge in creating such tasks. Overall, all\nthese numbers underscore the inherent complexity and challenge of the benchmark. Moreover, the\ntasks encompass a diverse range of analytical and reasoning skills, including correlation analysis,\nanomaly detection, and identification of causal or linear relationships — as reflected in Table 1. Table 5\npresents the regions covered by our benchmark, along with the percentage of tasks corresponding\nto each regi"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "3     E VALUATION S ETUP\n\nModels. We use D EEP S YNTH to benchmark five state-of-the-art models: (a) o4-mini (OpenAI,\n2025c), (b) GPT-4.1 (OpenAI, 2024), (c) GPT-5 (OpenAI, 2025b), (d) Gemini-2.5-Pro (Comanici\net al., 2025) and (e) DeepSeek-R1 (Guo et al., 2025). For Gemini-2.5-Pro, we use “dynamic thinking”,\nwhere the model decides how much to think. GPT-5 was evaluated using “high reasoning effort”.\n\n5\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Model                                F1 Score   Precision    Recall   Exact Match   LLM Judge Score\n LLM Baselines\n o4-mini (2025-08) \u0019                      3.05         2.33     4.39           0.0                  0.0\n GPT-4.1 (2025-08) \u0019                      3.46         2.86     4.39           0.0                  0.0\n o3 (2025-08) \u0019                           3.29         2.85     3.90           0.0                  0.0\n GPT-5.1 (2025-08) \u0019                      3.83         2.98     5.37           0.0                  0.0\n Gemini-Pro-2.5 (2025-08) \u0019               6.25         4.71     9.27           0.0                  5.0\n GPT-5.2-Pro (2026-02) \u0019                  8.70         8.45     8.96          6.25                 6.67\n DeepSeek-R1-Chat (2025-08)              3.23         2.75     3.90          1.67                  2.5\n DeepSeek-R1-Reasoner (2026-02)          2.80         2."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Table 2: Performance comparison on the D EEP S YNTH benchmark (Pass@1). F1, Precision, Recall\nand Exact Match measure the quality of model predictions. LLM Judge (%) reports the average\nprecision. Models with \u0019 are models or framework which are closed, while  are open-source."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "We also investigate the performance of three state-of-the-art (deep research) agentic frameworks: (a)\no3-deep-research (OpenAI, 2025a); (b) smolagents (Roucher et al., 2025), which is a minimalist\nframework focused on simplicity and rapid prototyping. It uses a standard ReAct loop (Yao et al.,\n2023) and its primary distinguishing feature is that it expresses all actions, such as tool use, as code,\nwhich is parsed out of the response and executed Wang et al. (2024); (c) OWL (Hu et al., 2025),\nwhich employs a role-playing strategy where a planner and an executor collaboratively solve tasks,\noptionally augmented with smaller, more specialised ’workers’. Both OWL and smolagents have\nbeen open-sourced. The details of their tool capabilities are listed in Table 10. All models were\nprompted using the same instructions, provided in Appendix A.5."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Metrics. All tasks require models to generate outputs in a JSON format (or lists of JSON objects).\nOur strictest metric is exact match, meaning that all keys and values must be correct. For partial\nevaluation, we check how many key-value pairs are correct (out of the total pairs) and report precision,\nrecall and F1-score. As an additional ’soft’ metric, we follow Wolfson et al. (2025) and leverage the\nLLM-as-a-judge (with an identical prompt, see Fig. 10) reporting average precision. This serves\ntwo purposes: 1) for small string differences (with semantic equivalence), this method will reward\nanswers beyond exact match, 2) in case of numerical answers, a small margin (1% to 5.5% difference)\ncan still be considered correct, hence providing more granular and permissible scores.\n\n4     R ESULTS\n\n4.1   M AIN R ESULTS"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Table 2 shows the performance of SOTA models on D EEP S YNTH. We first evaluate the parametric\nknowledge and reasoning capabilities of LLMs. The results show that GPT-5.2-Pro achieves the\nhighest F1 score of 8.70, and both GPT-5.2-Pro and DeepSeek-R1-Reasoner achieve the highest LLM\nJudge score of 6.67, indicating substantial room for improvement. Interestingly, the performance gap\nbetween reasoning models (e.g. Gemini-2.5-Pro, GPT-5.1, DeepSeek-R1) and general-purpose LLMs\n(e.g., GPT-4.1) is relatively small on F1 score. This finding suggests that the key bottleneck lies not\nin reasoning ability alone, but in the availability of the necessary information for reasoning. We\ninvestigate this observation in greater depth in Analysis; see §5. Further, under the strict exact-match\nmetric, we observe that almost all models obtain a score of zero, indicating that none can solve\neven a single ta"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "6\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "2.5                                                       F1 Score (LLM)\n            o4-mini          3.3                                                     LLM-Judge GPT-4.1 (LLM)\n           GPT-4.1                                 7.5                               F1 Score (Agent)\n                          1.8                                                        LLM-Judge GPT-4.1 (Agent)\n                o3                                             10.0                                                                                         GPT-4.1            Smolagents (GPT-4.1)\n                                             6.3\n           GPT-5.1                                                    12.5                                                                                 Sampling (Best@N)                     Majority Voting\n                                           6.2\n    "
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "LLM Judge Scores (%)\n      Gemini-Pro-3                                                            15.0                                                          25\n                                                         8.6\n                                       5.0\n                                                                                                                                                                      22.5\n       GPT-5.2-pro                                                                15.6\n                                                                                                                                            20\n    DeepSeek-Chat         2.1\n                                       5.0                                                                                                                                        17.5\nDeepSeek-Reasoner "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "0            5                      10                 15           20           25                                   0\n                                                                      Score                                                                      Best@1        Best@3              Best@5       Self-Consistency@5\n\n(a) Pass@1 performance on D EEP S YNTH-Dev.                                                                                     (b) Best-of-N performance on D EEP S YNTH-Dev."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Figure 4: Performance comparison on the D EEP S YNTH-Dev benchmark. (a) F1 Score measures\nthe quality of model predictions. LLM-Judge (GPT-4.1) reports the average precision as judged by\nGPT-4.1. Light bars denote LLM baselines; dark bars denote framework-based agents. (b) Best-of-N\nLLM Judge Scores comparing GPT-4.1 standalone vs. Smolagents (GPT-4.1) across N ∈ {1, 3, 5}\nand and Self-Consistency@5 (majority voting)."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "To investigate this further, we evaluated our benchmark using three agentic frameworks that integrate\nexternal tools, including simulated web browsing, web search, and a code interpreter. We find that\no3–deep-research, which incorporates web search and an executable code interpreter, outperforms\nthe base o3 model by 5.68 F1 score and 2.50 EM. Furthermore, smolagents and OWL achieve some\ngains, with improvements of 0.29 and 1.95 F1 points and 2.5 and 1.67 EM points respectively, over\nthe base GPT-4.1. Overall, we observe that all systems perform poorly. These findings emphasise that\neffectively solving tasks in D EEP S YNTH requires enhanced tool-use capabilities. Interestingly, we\nfind that low precision indicates that all models frequently produce incorrect or extraneous answers."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "DEEPSYNTH-Dev Results. Figure 4a presents results on the D EEP S YNTH-Dev subset. Among\nstandalone LLMs, GPT-5.2-Pro achieves the highest F1 score (15.6), while Gemini-Pro-3 leads on the\nLLM-Judge metric (15.0), suggesting it produces semantically reasonable outputs that strict matching\npenalizes. Among agents, o3-deep-research attains the highest LLM-Judge score (20.0), reinforcing\nthat tool augmentation benefits synthesis-heavy tasks. We observe a consistent gap between LLM-\nJudge and F1 scores across all models. Our manual evaluation suggests that this discrepancy primarily\narises from failures to produce numerically precise or structurally exact outputs."
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Best-of-N and Self-Consistency Analysis. Figure 4b examines whether multiple attempts improve\ntask completion on D EEP S YNTH-Dev. Under Best@5, Smolagents (GPT-4.1) reaches 25.0% LLM-\nJudge accuracy compared to 17.5% for GPT-4.1, suggesting that tool-use introduces beneficial\nvariance across runs. However, self-consistency (majority voting at N =5) yields only 5% accuracy\nfor both systems, with low average consistency scores (0.27), indicating that correct answers rarely\nemerge as the majority prediction. The stark contrast between Best@5 and self-consistency (27.5%\nvs. 5% for Smolagents) demonstrates that current agents exhibit high output variance on D EEP S YNTH\ntasks. Occasional runs succeed, but models lack the reliability needed for consistent, correct answers."
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Ablation Study. To assess the role of different capabilities on D EEP S YNTH, we perform an ablation\nstudy. As shown in Table 3 (top), performance shows consistent declines across all metrics when\nany capability is removed, with the largest drop (1.81 F1 points) observed when search is excluded.\nWhile the overall changes are modest due to the low baseline performance, these trends indicate that\ndocument processing, code execution, and search each contribute to task success, highlighting the\nmultifaceted challenges posed by D EEP S YNTH.\n\n7\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Performance Metrics\n              Model\n                                                        F1      Precision   Recall    EM\n              OWL (Full)                               5.41         4.62      6.52   1.67\n              Tool Ablation\n                − Web Browsing Toolkit                 4.80         4.20      5.60   1.67\n                − Search Toolkit                       3.60         2.96      4.61    0.0\n                − Document Processing Toolkit          4.90         4.50       5.4   1.67\n                − Code Execution Toolkit               4.82         4.30      5.50    0.0"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Reasoning Chain Ablation\n              GPT-4.1                               3.46            2.86      4.39    0.0\n                + Intermediate Step                 9.36            8.76     10.05    5.0\n              Smolagent (GPT-4.1)                   3.75            3.27      4.39   2.50\n                + Intermediate Step                10.50            8.96     12.70   10.0\n\nTable 3: Ablation Study. Tool Ablation: Comparing the benefits of using different tools on D EEP -\nS YNTH. Reasoning Chain Ablation: Studying the role of planning given the intermediate steps.\n\nFigure 5: F1-scores across intermediate steps.         Figure 6: F1-scores across synthesis operations.\n\n5   A NALYSIS\n\nIn order to understand the challenges of solving D EEP S YNTH questions, we analyse performance\nacross different data collection strategies, followed by a qualitative analysis of model errors."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "RQ1 : How do models perform as the number of intermediate steps increases? We break\ndown the models’ performance based on the number of intermediate steps entailed by D EEP S YNTH\ntasks. Figure 5 presents the performance breakdown, highlighting that all models struggle as the\nnumber of intermediate steps increases, which can be considered an indicator of the task’s complexity.\nNotably, the agentic frameworks (o3-deep research and smolagents + GPT-5) perform better for\n11-15 intermediate steps, while they are on par with other LLMs for smaller numbers of intermediate\nanswers. Given that tasks in D EEP S YNTH require an average of 7.54 intermediate steps, these results\nprovide insights into why the benchmark is so challenging."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "RQ2 : Does providing agents with intermediate steps improve their performance? We evaluate\nhow agents perform when they are provided with the ground truth intermediate reasoning steps (i.e.\nplanning) without revealing the intermediate answers. As shown in Table 3, model performance\nimproves substantially under this setting, with GPT-4.1 and smolagents + GPT-4.1 showing large\ngains. Both EM and F1 scores increase, indicating that models appear to lack planning capabilities."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "RQ3 : Which synthesis operations are more challenging? To further assess the models’ analytical\ncapabilities, we examine their performance on different synthesis operations when intermediate steps\nare provided alongside the task questions (see Table1, 11). Figure 6 presents the results across various\noperation types, revealing substantial variation in task-specific performance. More specifically, we\nobserve that o3 model achieves the highest F1 score in anomaly detection (26.51%), significantly\n\n8\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Region                % of Tasks       GPT-4.1      o3-deep-research       Gemini-2.5-Pro        smolagents\nAfrica                  8.3%             0.0               0.0                  0.0                  0.0\nNorth America          11.7%            4.65              8.00                12.00                 8.33\nSouth America            5%              0.0             25.00                  0.0                 0.00\nAsia                   29.2%            3.36             12.70                 6.50                11.88\nEurope                 38.3%            3.45             10.83                 4.91                 5.28\nOceanic                10.8%            8.96             14.43                 6.67                24.00\nOthers                 12.5%            3.12              6.45                12.12                  0.0"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Table 5: Multi-Regional Analysis: Agent performance across region-specific tasks (F1 score).\nNOTE: A question may span multiple regions. “Others” contains tasks without regional association."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "outperforming the other agents, while Gemini-2.5-Pro and smolagents + GPT-4.1 exhibit moderate\ngains over GPT-4.1 across most task categories. Trend detection and ranking also demonstrate\nrelatively strong performance for Gemini-2.5-Pro and o3, indicating that these models can effectively\ncapture certain structured patterns. In contrast, none of the models exhibit measurable performance\non filtering tasks, which may partly reflect the limited number of filtering tasks in the benchmark\n(see Table 1). Overall, these findings suggest that, although some agents can successfully identify\nanomalous or structured patterns, significant improvements are required for tasks involving arithmetic,\ncomparative reasoning, or complex multi-step analysis."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Error Cause              No. of instances\n                                   Navigation Error                       15\n                                   No answer                               4\n                                   Technical Issue                         4\n                                   Synthesis Error                        16\n\nTable 4: Error analysis for OWL (GPT-4.1). Navigation and synthesis errors are the most prominent."
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "RQ4 : What types of errors do models commonly make? To better understand the challenges\nin solving D EEP S YNTH, we manually analysed a random subset of 32 tasks4 in which OWL +\nGPT-4.1 made errors5 . We focus on OWL because, as an open-source framework, it enables detailed\nexamination of execution traces and interactions between agents and tools. We categorize errors into\nfour types, with their frequencies summarized in Table 4: (1) Navigation errors – when the agent\nfails to locate or access the correct source of information, such as navigating to the wrong web page,\ndocument, or section; (2) No Answer – when the agent does not respond or fails to generate any\noutput; (3) Technical Issue – errors caused by system limitations, software bugs, or tool malfunctions\nthat prevent task completion, independent of reasoning or navigation; and (4) Synthesis Error – when\nthe agent reaches an inco"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "RQ5 : How do agents perform on tasks from different regions? We observe that o3-deep research\nexhibits the most consistent cross-regional capability, particularly in the high-volume areas such as\nEurope and Asia. Notably, all models fail on Africa-related tasks, achieving an F1 score of 0.0. These\nfindings highlight the presence of strong geographical biases in current models and suggest that their\nperformance is not globally uniform, likely reflecting imbalances in the distribution and coverage\n\n4\n       Subset chosen due to the time and cost of manually analysing all outputs.\n   5\n       Two annotators who were not involved in the original data annotation conducted this analysis.\n\n9\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "Real        Multi      Information      Multi-Part\n     Dataset                                  World      Regional     Synthesis       Answers\n     GAIA (Mialon et al., 2023)               partial       ×            partial            ×\n     AssistantBench (Yoran et al., 2024)        ✓           ×              ×             partial\n     BrowseComp (Wei et al., 2025)              ×           ×              ×               ×\n     HLE (Phan et al., 2025)                  partial     partial        partial           ×\n     D EEP S YNTH                               ✓           ✓              ✓               ✓\n\nTable 6: Comparison of datasets on various reasoning and retrieval capabilities.\n\nof their training data. Since D EEP S YNTH contains a diverse set of tasks from multiple regions, it\nnaturally increases the overall difficulty of the benchmark.\n\n6    R ELATED W ORK"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "As LLM-based agents improve in reasoning, tool usage, and interaction across diverse environments,\nresearchers have sought to evaluate LLMs on questions that require multi-hop reasoning skills (Wu\net al., 2025; Wolfson et al., 2025), code generation (Jimenez et al., 2024; Chan et al., 2024; Ouyang\net al., 2025; Starace et al.), information seeking (Wei et al., 2025; Yoran et al., 2024) and even general\nassistance capabilities (Mialon et al., 2023). Table 6 summarises the key differences among popular\nagentic benchmarks; most of these correspond to the criteria we considered in § 2.1 for D EEP S YNTH\ntasks’ design. A distinctive feature of D EEP S YNTH is its multi-part answers, where each response\ncomprises multiple components—e.g., a JSON object containing event causes (strings), percentages\n(floats), dates or years (integers)—with explicit logical links (e.g., key-value pairs). This st"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "7    C ONCLUSION"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "We presented D EEP S YNTH bench, a new benchmark comprising 120 challenging and diverse tasks\nacross 67 countries. By combining planning, tool use, and multi-step reasoning, D EEP S YNTH\naims to evaluate the ability of agents to move beyond shallow retrieval and engage in goal-directed,\ninformation-rich problem solving. D EEP S YNTH was inspired by real-world problems, and its tasks\nwere designed to be strictly verifiable, geopolitically diverse, and robust against memorisation. Our\nexperiments demonstrated the difficulty of our benchmark, with both state-of-the-art LLMs and\nspecialized deep research agents struggling to solve any significant number of tasks. The best of the\nformer (Gemini-Pro-2.5) achieved an F1 score of only 6.25 with no task reaching a perfect score,\nwhile the best of the latter (o3-deep-research) reached 8.97. These results help establish that there is\nsubstantial ro"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "10\n\fPublished as a conference paper at ICLR 2026\n\nR EFERENCES\nTamer Abuelsaad, Deepak Akkil, Prasenjit Dey, Ashish Jagmohan, Aditya Vempaty, and Ravi Kokku.\n  Agent-e: From autonomous web navigation to foundational design principles in agentic systems.\n  arXiv preprint arXiv:2407.13032, 2024.\n\nJun Shern Chan, Neil Chowdhury, Oliver Jaffe, James Aung, Dane Sherburn, Evan Mays, Giulio\n  Starace, Kevin Liu, Leon Maksin, Tejal Patwardhan, et al. Mle-bench: Evaluating machine learning\n  agents on machine learning engineering. arXiv preprint arXiv:2410.07095, 2024.\n\nGheorghe Comanici, Eric Bieber, Mike Schaekermann, Ice Pasupat, Noveen Sachdeva, Inderjit\n  Dhillon, Marcel Blistein, Ori Ram, Dan Zhang, Evan Rosen, et al. Gemini 2.5: Pushing the frontier\n with advanced reasoning, multimodality, long context, and next generation agentic capabilities.\n  arXiv preprint arXiv:2507.06261, 2025."
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Milan Gritta, Debjit Paul, Xiaoguang Li, Lifeng Shang, Jun Wang, and Gerasimos Lampouras. Process\n evaluation for agentic systems. In Findings of the Association for Computational Linguistics:\n EACL 2026. Association for Computational Linguistics, March 2026.\n\nDaya Guo, Dejian Yang, Haowei Zhang, Junxiao Song, Peiyi Wang, Qihao Zhu, Runxin Xu, Ruoyu\n  Zhang, Shirong Ma, Xiao Bi, et al. DeepSeek-R1 incentivizes reasoning in LLMs through\n  reinforcement learning. Nature, 645(8081):633–638, 2025.\n\nMengkang Hu, Yuhang Zhou, Wendong Fan, Yuzhou Nie, Bowei Xia, Tao Sun, Ziyu Ye, Zhaoxuan\n Jin, Yingru Li, Qiguang Chen, Zeyu Zhang, Yifeng Wang, Qianshuo Ye, Bernard Ghanem, Ping\n Luo, and Guohao Li. OWL: Optimized Workforce Learning for General Multi-Agent Assistance\n in Real-World Task Automation, 2025. URL https://arxiv.org/abs/2505.23885."
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Carlos E Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik R\n  Narasimhan. SWE-bench: Can language models resolve real-world github issues? In The Twelfth\n  International Conference on Learning Representations, 2024. URL https://openreview.\n  net/forum?id=VTF8yNQM66.\n\nJinu Lee and Julia Hockenmaier. Evaluating step-by-step reasoning traces: A survey. In Chris-\n   tos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng (eds.), Find-\n   ings of the Association for Computational Linguistics: EMNLP 2025, pp. 1789–1814, Suzhou,\n   China, November 2025. Association for Computational Linguistics. ISBN 979-8-89176-335-\n   7. doi: 10.18653/v1/2025.findings-emnlp.94. URL https://aclanthology.org/2025.\n   findings-emnlp.94/."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Zimu Lu, Yunqiao Yang, Houxing Ren, Haotian Hou, Han Xiao, Ke Wang, Weikang Shi, Aojun Zhou,\n  Mingjie Zhan, and Hongsheng Li. WebGen-Bench: Evaluating LLMs on Generating Interactive\n  and Functional Websites from Scratch. arXiv preprint arXiv:2505.03733, 2025.\n\nGrégoire Mialon, Clémentine Fourrier, Thomas Wolf, Yann LeCun, and Thomas Scialom. GAIA:\n  A benchmark for General AI Assistants. In The Twelfth International Conference on Learning\n  Representations, 2023.\n\nPhilipp Mondorf and Barbara Plank. Beyond accuracy: evaluating the reasoning behavior of large\n  language models–a survey. arXiv preprint arXiv:2404.01869, 2024.\n\nOpenAI.    GPT-4o System Card,              2024.        URL    https://cdn.openai.com/\n  gpt-4o-system-card.pdf.\n\nOpenAI.  Deep Research System Card, 2025a.               URL https://cdn.openai.com/\n  deep-research-system-card.pdf."
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "OpenAI.    GPT-5 System Card,              2025b.        URL    https://cdn.openai.com/\n  gpt-5-system-card.pdf.\n\nOpenAI. OpenAI o3 and o4-mini System Card, 2025c. URL https://openai.com/index/\n  o3-o4-mini-system-card/.\n\n11\n\fPublished as a conference paper at ICLR 2026\n\nAnne Ouyang, Simon Guo, Simran Arora, Alex L Zhang, William Hu, Christopher Ré, and Azalia\n  Mirhoseini. Kernelbench: Can llms write efficient gpu kernels? arXiv preprint arXiv:2502.10517,\n  2025."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Debjit Paul, Mete Ismayilzada, Maxime Peyrard, Beatriz Borges, Antoine Bosselut, Robert West, and\n  Boi Faltings. REFINER: Reasoning feedback on intermediate representations. In Yvette Graham\n  and Matthew Purver (eds.), Proceedings of the 18th Conference of the European Chapter of the\n  Association for Computational Linguistics (Volume 1: Long Papers), pp. 1100–1126, St. Julian’s,\n  Malta, March 2024a. Association for Computational Linguistics. doi: 10.18653/v1/2024.eacl-long.\n  67. URL https://aclanthology.org/2024.eacl-long.67/."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "Debjit Paul, Robert West, Antoine Bosselut, and Boi Faltings. Making reasoning matter: Measuring\n  and improving faithfulness of chain-of-thought reasoning. In Yaser Al-Onaizan, Mohit Bansal,\n  and Yun-Nung Chen (eds.), Findings of the Association for Computational Linguistics: EMNLP\n  2024, pp. 15012–15032, Miami, Florida, USA, November 2024b. Association for Computational\n  Linguistics. doi: 10.18653/v1/2024.findings-emnlp.882. URL https://aclanthology.\n  org/2024.findings-emnlp.882/.\n\nLong Phan, Alice Gatti, Ziwen Han, Nathaniel Li, Josephina Hu, Hugh Zhang, Chen Bo Calvin\n  Zhang, Mohamed Shaaban, John Ling, Sean Shi, et al. Humanity’s last exam. arXiv preprint\n  arXiv:2501.14249, 2025."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Aymeric Roucher, Albert Villanova del Moral, Thomas Wolf, Leandro von Werra, and Erik Kau-\n  nismäki. ‘smolagents‘: a smol library to build great agentic systems. https://github.com/\n  huggingface/smolagents, 2025.\n\nPaul Sambre and Geert Brône. Gilles fauconnier & mark turner, ” the way we think: conceptual blend-\n  ing and the mind’s hidden complexities”. 2002. URL https://api.semanticscholar.\n  org/CorpusID:152136175.\n\nGiulio Starace, Oliver Jaffe, Dane Sherburn, James Aung, Jun Shern Chan, Leon Maksin, Rachel\n  Dias, Evan Mays, Benjamin Kinsella, Wyatt Thompson, et al. PaperBench: Evaluating AI’s Ability\n  to Replicate AI Research. In Forty-second International Conference on Machine Learning.\n\nAndrea C Tricco, Jennifer Tetzlaff, and David Moher. The art and science of knowledge synthesis.\n Journal of clinical epidemiology, 64(1):11–20, 2011."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Xingyao Wang, Yangyi Chen, Lifan Yuan, Yizhe Zhang, Yunzhu Li, Hao Peng, and Heng Ji.\n  Executable code actions elicit better llm agents. In Forty-first International Conference on Machine\n  Learning, 2024.\n\nJason Wei, Nguyen Karina, Hyung Won Chung, Yunxin Joy Jiao, Spencer Papay, Amelia Glaese,\n  John Schulman, and William Fedus. Measuring short-form factuality in large language models.\n  arXiv preprint arXiv:2411.04368, 2024.\n\nJason Wei, Zhiqing Sun, Spencer Papay, Scott McKinney, Jeffrey Han, Isa Fulford, Hyung Won\n  Chung, Alex Tachard Passos, William Fedus, and Amelia Glaese. Browsecomp: A simple yet\n  challenging benchmark for browsing agents. arXiv preprint arXiv:2504.12516, 2025."
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Tomer Wolfson, Harsh Trivedi, Mor Geva, Yoav Goldberg, Dan Roth, Tushar Khot, Ashish Sabharwal,\n  and Reut Tsarfaty. MoNaCo: More Natural and Complex Questions for Reasoning Across Dozens\n  of Documents. Transactions of the Association for Computational Linguistics, 2025.\n\nJian Wu, Linyi Yang, Dongyuan Li, Yuliang Ji, Manabu Okumura, and Yue Zhang. MMQA:\n   Evaluating LLMs with multi-table multi-hop complex questions. In The Thirteenth International\n   Conference on Learning Representations, 2025. URL https://openreview.net/forum?\n   id=GGlpykXDCa.\n\nShunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao.\n  React: Synergizing reasoning and acting in language models. In International Conference on\n  Learning Representations (ICLR), 2023.\n\n12\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Ori Yoran, Samuel Joseph Amouyal, Chaitanya Malaviya, Ben Bogin, Ofir Press, and Jonathan Berant.\n  AssistantBench: Can web agents solve realistic and time-consuming tasks? In Yaser Al-Onaizan,\n  Mohit Bansal, and Yun-Nung Chen (eds.), Proceedings of the 2024 Conference on Empirical\n  Methods in Natural Language Processing, pp. 8938–8968, Miami, Florida, USA, November\n  2024. Association for Computational Linguistics. doi: 10.18653/v1/2024.emnlp-main.505. URL\n  https://aclanthology.org/2024.emnlp-main.505/.\n\n13\n\fPublished as a conference paper at ICLR 2026\n\nA     A PPENDIX\n\nA.1   M ORE R ESULTS AND A NALYSIS"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "This section collects some additional results and analysis. Specifically:\nTable 7 shows how long was required for state-of-the-art LLMs and specialized deep research agents\nto run D EEP S YNTH bench.\nTable 8 presents the intermediate step accuracy and error propagation on the D EEP S YNTH-Dev tasks.\nTable 9 summarises the cost and output token characteristics of the models evaluated in our experi-\nments. For models that produce structured multi-stage reasoning traces, we report both reasoning-\ntoken ranges and final completion-token ranges. Costs correspond to the total API price per full run\nof a D EEP S YNTH task.\nTable 10 presents a brief comparison across the Agentic Framework tool capabilities of the specialized\ndeep research agents we apply to D EEP S YNTH bench (OpenAI, 2025a; Roucher et al., 2025; Hu\net al., 2025).\nTable 11 provides definitions and examples on the key information"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Model                           Avg. Time (sec.)\n                          o4-mini (2025-08)                           20.8\n                          GPT-4.1 (2025-08)                           7.52\n                          GPT-5 (2025-08)                            83.41\n                          Gemini-Pro-2.5 (2025-08)                   34.10\n                          DeepSeek-R1 (2025-08)                        5.2\n                          o3-deep-research (2025-08)                645.39\n                          Smolagent (GPT-4.1)                        35.84\n                          OWL (GPT-4.1)                             1025.5\n\nTable 7: Average Time per instance to run our benchmark"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "Process Evaluation Recently, several works have shown that LLMs make mistakes in their interme-\ndiate reasoning steps (Paul et al., 2024a; Mondorf & Plank, 2024; Lee & Hockenmaier, 2025) and can\nbe unfaithful to their own reasoning (Paul et al., 2024b). Gritta et al. (2026) argued that outcome-only\nmetrics are insufficient for critical applications and proposed compliance checklists to verify that\nagents follow recommended protocols. Motivated by these findings, we evaluate intermediate step\naccuracy by requiring models to emit structured outputs after each decomposition sub-step. While\nend-to-end F1 scores capture overall performance, they obscure where in the reasoning chain failures\noriginate and whether errors at early stages propagate to corrupt downstream computation. We\nevaluate three models: GPT-4.1, DeepSeek-R1, and GPT-5.2 on 40 D EEP S YNTH tasks, scoring each\nintermediate out"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "14\n\fPublished as a conference paper at ICLR 2026\n\nDeepSeek-R1       GPT-4.1       GPT-5.2     Avg. Prop. (%)\n                  Step 1                   11.2            10.0            4.1            —\n                  Step 2                   12.4             9.8            2.6           97.0\n                  Step 3                    3.9             3.3            0.5           100.0\n                  Step 4                    1.4             2.4            0.0           100.0\n                  Step 5                    0.2             0.0            0.0           100.0\n                  Step 6                    0.0             0.0            0.0           100.0\n                  Final Answer             20.1            18.5            16.7           —"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Table 8: Intermediate step accuracy and error propagation. Per-step F1 (%) on 40 D EEP S YNTH\ntasks. Prop. denotes error propagation rate: the percentage of cases where failure at step k (F1 < 50)\nalso results in failure at step k+1. Steps with n < 3 are omitted. GPT-4.1 and DeepSeek-R1 operate\nwithout web access; GPT-5.2 operates with web search enabled. All models show steep accuracy\ndecay and near-total error propagation."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "rates below 10%. This confirms that the low end-to-end F1 scores reported in Table 2 are driven\nprimarily by early retrieval failures that cascade irrecoverably through the reasoning chain.\nA notable divergence emerges between models. Among instruction-following models, DeepSeek-R1\nachieves the highest intermediate accuracy at early steps (11.2% at step 1 vs. 10.0% for GPT-4.1) and\nthe highest final-answer F1 (20.1%), suggesting that its extended chain-of-thought reasoning provides\na modest advantage in producing more accurate intermediate data. However, GPT-5.2 presents a\nstrikingly different profile: despite having access to web search, it achieves the lowest intermediate\nstep accuracy (4.1% at step 1) while maintaining comparable final F1 (16.7%). Qualitative analysis\nof GPT-5.2’s intermediate outputs reveals the cause of this apparent paradox. Rather than producing\napproximate values"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "Model                   Cost (USD)          Output Tokens (Min / Max)\n         deepseek-R1               $0.041            687.4 (avg)\n         GPT-4                     $0.432            188 (min) / 383 (max)\n         GPT-5                      $5.52            1600–15872 (reasoning), 201–425 (completion)\n         o4-mini                    $1.39            448–5760 (reasoning), 40–392 (completion)\n         o3 deep-research         $184.61            448–5760 (reasoning), 40–392 (completion)\n         Gemini-Pro-2.5            $11.78            12995 (avg)\n\nTable 9: Model cost and output token ranges."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "Framework                    Code Interpreter     Web Search   API Calls     Document Processing   Browser Simulation\no3-deep-research (2025-08)          ✓                 ✓             ×                ×                     ×\nSmolagent (GPT-5)                   ✓                 ✓             ×                ×                     ×\nOWL                                 ×                 ✓             ✓                ✓                     ✓\n\nTable 10: Agentic Framework Tool Capabilities Comparison. Note: ✓ indicates capability present;\n× indicates capability not available. Web Browser functionality is included within Web Search\ncapabilities for applicable frameworks.\n\n15\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Operation                  Description                             Example\n      Trend Detection            Identifying patterns, directions, or    Climate events over the last decade\n                                 changes in data over time or across     to detect a trend of increasing wild-\n                                 contexts.                               fires.\n      Average                    Determining a representative value      Synthesising daily temperatures\n                                 that summarises numerical data col-     from multiple weather stations to re-\n                                 lected from multiple sources.           port the average regional tempera-\n                                                                         ture.\n      Correlation                Measuring relationships or associa-     Synthesising data from health stud-\n             "
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Table 11: Key operations in information synthesis, their definitions, and examples of application.\n\nPerformance Metrics\n                        Model\n                                                     F1     Precision      Recall      EM\n                        o3                         3.29          2.85        3.90       0.0\n                          + Intermediate Step     12.87        11.38        14.81      7.50\n                        Gemini-Pro-2.5             6.25           4.71       9.27       0.0\n                         + Intermediate Step      10.40           8.36      13.76      7.50\n\nTable 12: Analysis. Studying the role of planning/intermediate steps.\n\nA.2      DATACARD AND A NNOTATION G UIDELINES"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "D EEP S YNTH currently spans 67 unique countries, including Afghanistan, Algeria, Australia, Austria,\nBelgium, Bhutan, Brazil, Brunei, Cambodia, Cameroon, Canada, Chile, China, Czech Republic, Den-\nmark, Estonia, Fiji, Finland, France, Germany, Ghana, Greece, Greenland, Hungary, Iceland, India,\nIndonesia, Italy, Japan, Laos, Latvia, Lebanon, Liechtenstein, Lithuania, Luxembourg, Malaysia,\nMaldives, Myanmar, Nepal, Netherlands, New Zealand, Nigeria, Norway, Pakistan, Peru, Philippines,\nPoland, Portugal, Qatar, Singapore, Slovakia, South Africa, South Korea, Spain, Sri Lanka, Sweden,\nSwitzerland, Taiwan, Tajikistan, Thailand, Tunisia, Turkmenistan, United Kingdom, United States,\nUzbekistan, Vietnam, and Zimbabwe."
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "Annotator Demographics. We provide additional information that may be relevant for analysing\nthis dataset. Building D EEP S YNTH required the work of expert annotators, who devised the task\nquestions and their answers, and who independently annotated the questions to assess their non-\nambiguity. We have 81.25% of the annotator PhD holders. Both come from the following population:\n\n1. Age:\n            (a) 18 - 25 : 12%\n            (b) 26 - 35 : 68%\n            (c) 36 - 45 : 18%\n\n16\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "Model                           F1 Score   Precision    Recall   Exact Match   LLM Judge Score (GPT-4.1)\n LLM Baselines\n o4-mini (2025-12) \u0019                 3.26       2.63      4.29            0.0                         2.5\n GPT-4.1 (2025-12) \u0019                 1.81       1.57      2.14            0.0                         7.5\n o3 (2025-12) \u0019                      6.33       5.68      7.14           1.25                        10.0\n GPT-5.1 (2025-12) \u0019                 6.18       6.72      5.71           1.25                        12.5\n Gemini-Pro-2.5 (2025-12) \u0019          5.87       4.98      7.14            0.0                         5.0\n Gemini-Pro-3 (2025-12) \u0019            8.59       7.53      10.0            2.5                        15.0\n GPT-5.2 (2025-12) \u0019                15.64      18.45     13.57            2.5                         5.0\n DeepSeek-Chat (2025-12)            2"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "Table 13: Performance comparison on the D EEP S YNTH-Dev benchmark (Pass@1). F1, Precision,\nRecall and Exact Match measure the quality of model predictions. LLM Judge (%) reports the\naverage precision. Models with \u0019 are models or framework which are closed, while  are open-\nsource.\n\n2. Gender: 25% Female, 75% Male\n      3. Nationality: India, Greece, Luxembourg, Slovakia, UK, China, Peru, Romania, Turkey,\n         Kosovo, Germany\n      4. Academic Background:\n           (a) Bachelor’s Degree: 6.25%\n           (b) Master’s Degree: 12.5 %\n           (c) PhD : 81.25%"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "The guidelines that were given to the annotators are presented in Figures 7 and 8. The goal of this\nbenchmark is to evaluate the capability of state-of-the-art LLM-based agents to perform information\nsynthesis and web-based navigation across diverse real-world sources. Accordingly, our design\nfocuses on capturing variation in web content across regions rather than enforcing a uniformly\nbalanced annotator demographic. While annotators were drawn from 11 countries across three\ncontinents, the tasks themselves cover 42 countries, and the associated webpages span a broad\nrange of regional domains. As the benchmark evaluates an agent’s ability to search, retrieve, and\nsynthesise information from heterogeneous sources, the demographic composition of annotators does\nnot influence the underlying skill being measured.\n\nA.3      E XAMPLES"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "In this section (see Table 14), we present some representative examples from D EEP S YNTH bench.\nWe omit some information, e.g. the reasoning trace and intermediate steps, to prevent task leakage.\n\nA.4      M ORE D ETAILS ABOUT E VALUATION\n\nF1 and LLM-Judge Metrics. F1 in our benchmark is computed using exact string and numeric\nmatching across all fields of the required JSON output. This makes it very strict: even minor deviations\n(a missing key, a slightly different string form, or a small numerical mismatch) reduce the score\nsharply. In contrast, the LLM-judge is a soft metric designed to capture partial semantic correctness.\nIt (a) rewards outputs that are semantically equivalent despite surface-level differences (e.g., “U.S.” vs.\n“United States”), and (b) tolerates small numerical deviations (approximately 1%–5.5%), providing a\nmore graded signal of correctness than F1."
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "17\n\fPublished as a conference paper at ICLR 2026\n\nFigure 7: Annotation Guidelines"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "Why EM and LLM Scores? Exact Match (EM) is well-suited for our benchmark because over\n95% of the answers are numeric and all keys correspond to unambiguous factual fields. In this\nsetting, strict matching provides a reliable signal of correctness: either the model produces the correct\nvalue for each key or it does not. EM is also deterministic and stable, avoiding the variability or\nhallucination-related errors that can arise with LLM-based judges.\nTo complement this strict measure, we additionally use an LLM-based judge that evaluates softer,\nsemantic aspects of the output. This score captures cases where the reasoning is sound and the\nanswers are approximately correct but differ slightly in phrasing or small numerical deviations.\nTogether, EM and the LLM score offer a balanced evaluation: one measures exact factual accuracy,\nwhile the other captures approximate correctness and reasonin"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "Evaluation Example Below we illustrate how EM, F1, and the LLM score behave under different\nmodel outputs.\n\n• Ground truth: {“India”: 4.5, “China”: 7.8, “U.S.”: 10.5}\n\nModel 1 output:\n{“India”: 3.6, “China”: 8.7, “U.S.”: 10.5}\nScores: EM = 0.0; F1 = 33.3; LLM Score = 1.0\n\nModel 2 output:\n{“India”: 3.6, “United States”: 10.5, “China”: 8.7}\nScores: EM = 0.0; F1 = 0.0; LLM Score = 1.0\n\nModel 3 output:\n{“India”: 4.5, “U.S.”: 10.5, “China”: 7.8}\nScores: EM = 1.0; F1 = 100; LLM Score = 1.0\n\n18\n\fPublished as a conference paper at ICLR 2026\n\nFigure 8: Annotation Guidelines"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "According to Eurostat, among the Baltic countries, compare\n                                  bi-annual data on natural gas prices for household consumers\n                                  (excluding taxes and levies).\n                                  Determine, for each country, the initial bi-annual semester\n                                  (e.g., '2020-S1' or '2020-S2') during which natural gas prices\n                                  (in euro per kilowatt-hour) demonstrated a signiﬁcant upward\n                                  shift, speciﬁcally reaching or exceeding a 180% increase from\n                                  their 2019, Semester 2, baseline (pre-Covid).\n\nSearching \"Eurostat natural gas pricess household\n                                  consumers bi-annual data\"\n\nBrowsing {url-1}\n\nFinding the data table to download it\n\nscroll_down()"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "scroll_up()\n                                                               ...\n                                                       Data source not found !\n\nDowload from {url-2}\n\nError 404!\n\nFigure 9: Example run using OWL, illustrating errors when trying to collect and reason about data.\nThe agent finds the right URL but fails to query the right data from the website’s database interface.\nA second attempt tries to download a data file from an incorrect URL, resulting in a not found error.\n\n19\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Questions                                                                  Metadata\n   In the 2021 Canadian federal elections, compare the last opinion           Type: Compare, Rank\n   polling results by Abacus Data, EKOS Research, Mainstreet Research,        Region:North America\n   Forum Research, Research Co. and Nanos Research before the elec-           Domain: Sociopolitics\n   tions. How accurate is each of these polls as a predictor for the actual\n   number of votes for each party (rounded to two decimals), you should\n   include the 6 largest parties, and ’others’. Rank each polling company\n   by mean-squared error. Your answer should be a JSON object with\n   the keys being the polling company names. The values should be the\n   MSE (rounded to one decimal). The companies should be sorted in\n   increasing value of MSE.\n   As a Swiss Federal Statistics Officer, I am studying goods tra"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "Table 14: Examples of questions.\n\nModel 4 output:\n{“India”: 100.7, “U.S.”: 100.6, “China”: 7.8}\nScores: EM = 0.0; F1 = 33.3; LLM Score = 0.0\n\nA.5   P ROMPTS\n\nIn this section, we provide the instructions and prompts used across all models; see Figures 10 and\n11.\n\n20\n\fPublished as a conference paper at ICLR 2026\n\nJudge whether the following [response] to [question] is correct\nor not based on the precise and unambiguous [correct_answer] below.\n\n[question]: {question}\n[response]: {response}\n\nYour judgment must be in the format and criteria specified below:\n\nextracted_final_answer: The final exact answer extracted from the\n[response]. Put the extracted answer as ‘None’ if there is no exact\nfinal answer to extract from the response.\n\n[correct_answer]: {correct_answer}"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "final answer length: Provide the overall number of unique answers\nthat appear in [response], not just the correct ones. Be sure to\nprovide a number, not an estimate!\n\nreasoning: Explain why the extracted_final_answer is correct or\nincorrect based on [correct_answer], focusing only on if there\nare meaningful differences between [correct_answer] and the\nextracted_final_answer. Do not comment on any background to the\nproblem, do not attempt to solve the problem, do not argue for\nany answer different than [correct_answer], focus only on whether\nthe answers match.\n\ncorrect: Answer ‘yes’ if extracted_final_answer matches the\n[correct_answer] given above, or is within a small margin of error\nfor numerical problems, a margin of 1 to 5.5 percentage points is\nacceptable. Answer ‘no’ otherwise, i.e. if there is any inconsistency,\nambiguity, non-equivalency, or if the extracted answer is incorrect."
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "precision: Answer ‘1’ if extracted_final_answer matches the\n[correct_answer] given above. Answer ‘0’ otherwise, i.e. if there is\nany inconsistency, ambiguity, non-equivalency, or if the extracted\nanswer is incorrect. In the case where [correct_answer] is a number\nor percentage, then answer with the following formula to compute\nthe normalized similarity score:\n[1 - (abs([correct_answer] - extracted_final_answer) /\nmax(abs([correct_answer]), abs(extracted_final_answer)))]\n\nfinal precision: Extract the precision score from above, just the\nfinal score (number)."
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "overlapping answers: List all of the answers in [response] that also\nappear in [correct_answer]. You can consider an answer from [response]\nto match with an answer in [correct_answer] if it is equivalent or is\nwithin a small margin of error for numerical problems, a margin of 1\nto 5.5 percentage points is acceptable. List all of the [response]\nanswer appearing in [correct_answer] with each answer delimited by\n‘###’. If the number of overlapping answers is zero, output ‘NULL’.\n\nFigure 10: The prompt for the LLM-as-a-judge from Wolfson et al. (2025).\n\n21\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "INSTRUCTIONS:\n- You are a professional researcher preparing a structured,\ndata-driven answer.\n- Your task is to analyze and answer.\n- Answers are not report. Often time answers are numeric\nand need JSON outputs.\n- You will be given a research task by a user. Your task is\nto generate an accurate answer.\n- Focus on data-rich insights."
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "GUIDELINES:\n1. **Answer Format**\n- Be analytical, avoid generalities, and ensure that each\nsection supports data-backed.\n- Prioritize reliable, up-to-date official sources such as\nWikipedia, government websites, etc.\n- Every question will already contain the format of the output.\nPlease follow that.\n- Exact match is the metric.\n- To help extract the answer, before writing down the final\nanswer, please using a split token <Answer>:\n- It is of utmost importance that you follow the answer format\nmentioned in the question.\n- If the question says that the model needs to output the\nanswer JSON. Please follow that.\n- If the question says that the model needs to output a list of\nJSON. Please follow that.\n\n2. **Incomplete answers**\n- Do NOT give incomplete answers.\n- There is always an answer, and the answer often needs some\ndeep reasoning.\n\n3. **Language**\n- Please only answer in English"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Figure 11: System prompt provided to the model, outlining instructions, answer formatting guidelines,\nand language requirements to ensure structured, data-driven responses.\n\n22"
+    }
+  ]
+}
