@@ -1,0 +1,187 @@
+{
+  "arxivId": "2602.21814",
+  "paperTitle": "Prompt Architecture Determines Reasoning Quality: A Variable Isolation Study on the Car Wash Problem",
+  "abstract": "Large language models consistently fail the &#34;car wash problem,&#34; a viral reasoning benchmark requiring implicit physical constraint inference. We present a variable isolation study (n=20 per condition, 6 conditions, 120 total trials) examining which prompt architecture layers in a production system enable correct reasoning. Using Claude 3.5 Sonnet with controlled hyperparameters (temperature 0.7, top_p 1.0), we find that the STAR (Situation-Task-Action-Result) reasoning framework alone raises accuracy from 0% to 85% (p=0.001, Fisher&#39;s exact test, odds ratio 13.22). Adding user profile context via vector database retrieval provides a further 10 percentage point gain, while RAG context contributes an additional 5 percentage points, achieving 100% accuracy in the full-stack condition. These results suggest that structured reasoning scaffolds -- specifically, forced goal articulation before inference -- matter substantially more than context injection for implicit constraint reasoning tasks.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Large language models consistently fail the &#34;car wash problem,&#34; a viral reasoning benchmark requiring implicit physical constraint inference. We present a variable isolation study (n=20 per condition, 6 conditions, 120 total trials) examining which prompt architecture layers in a production system enable correct reasoning. Using Claude 3.5 Sonnet with controlled hyperparameters (temperature 0.7, top_p 1.0), we find that the STAR (Situation-Task-Action-Result) reasoning framework alone raises accuracy from 0% to 85% (p=0.001, Fisher&#39;s exact test, odds ratio 13.22). Adding user profile context via vector database retrieval provides a further 10 percentage point gain, while RAG context contributes an additional 5 percentage points, achieving 100% accuracy in the full-stack condition. These results suggest that structured reasoning scaffolds -- specifically, forced goal articulation before inference -- matter substantially more than context injection for implicit constraint reasoning tasks."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Table 1: Pass rates across six experimental conditions. Pass means the first response recommends"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Table 2: Median response latencies. E_full_stack is faster than D and F despite having more"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 3: Per-layer marginal contributions to pass rate."
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 4: Complete layer progression from baseline to perfect reliability."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Prompt Architecture Determines Reasoning Quality:\n                                                    A Variable Isolation Study on the Car Wash Problem\n                                                                                        Heejin Jo\n                                                                                  Independent Researcher\n                                                                                 info@birth2death.com\n                                                                                https://www.heejinjo.me\narXiv:2602.21814v1 [cs.AI] 25 Feb 2026\n\nFebruary 25, 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract\n                                                     The car wash problem asks a simple question: “I want to wash my car. The car wash is 100\n                                                 meters away. Should I walk or drive?” Every major LLM tested—Claude, GPT-4, Gemini—\n                                                 recommended walking. The correct answer is to drive, because the car itself must be at the car\n                                                 wash.\n                                                     We ran a variable isolation study to determine which prompt architectural layer resolves\n                                                 this failure. Six conditions were tested, 20 trials each, on Claude Sonnet 4.5. A bare prompt\n                                                 with no system instructions scored 0%. Adding a role definition alone also scored 0"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1       Introduction\n                                         The question originated on Mastodon, posted by Kevin (@knowmadd)1 : “I want to wash my car.\n                                         The car wash is 50 meters away. Should I walk or drive?” He tested Perplexity, ChatGPT, Claude,\n                                         and Mistral. All four said walk. The correct answer is drive—you cannot wash a car that is not\n                                         there.\n                                             The post reached Hacker News and accumulated 1,499 points and 943 comments.2 Discussion\n                                         centered on three themes: that LLMs cannot infer implicit prerequisites humans take for granted; the\n                                         classical frame problem [McCarthy and Hayes, 1969], where models fail to identify which unstated\n            "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\f    We encountered this problem through InterviewMate, a real-time interview coaching system.\nDuring a routine test session, the system answered “drive” while every standalone LLM we tested\nsaid “walk.” We did not expect this. InterviewMate’s system prompt has multiple layers—role\ndefinition, a STAR reasoning framework, user profile data, and RAG context retrieval—and we had\nno way to tell which layer produced the correct answer. The result was interesting, but we could\nnot explain it, and a result you cannot explain is not one you can build on.\n    So we designed a variable isolation experiment. Instead of asking why LLMs fail at this\nproblem—a question the Hacker News thread had already covered extensively—we asked which\nspecific prompt layer fixes it within a single model.\n    This question has practical weight. InterviewMate operates during live interviews. The system\nmust interpr"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Role definition → STAR reasoning framework → User profile (vector DB) → RAG context\n                                          retrieval\n\nWe needed to know where the reasoning quality actually comes from in this stack. The car wash\nproblem gave us a clean instrument for testing it: one correct answer, implicit constraint reasoning\nrequired, and simple enough to isolate variables without confounds."
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2    Related Work\nThe Car Wash Benchmark. Ryan Allen published a formal evaluation repository (ryan-allen/car-\nwash-evals) that measures car wash problem failure rates across models. His work established a\nbaseline: most frontier LLMs fail on first pass. Our study starts from this baseline but asks a\ndifferent question—not which models fail, but which prompt layers fix the failure within a single\nmodel.\n    The Frame Problem. McCarthy and Hayes [1969] described the frame problem in classical\nAI: a system must determine which facts remain unchanged when an action occurs, but has no\nprincipled method for knowing which unstated facts are relevant. The car wash problem is a clean\nmodern example. The car’s location is never mentioned in the question. A human infers immediately\nthat the car is at home. The model does not.\n    Chain-of-Thought Prompting. Wei et al. [2022] showed that prompting "
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\fbut the Tree of Thoughts result supports a broader point: the structure imposed on a model’s\nreasoning process has measurable effects on accuracy, independent of the information available.\n    Where STAR Fits. STAR (Situation, Task, Action, Result) is not a research contribution\nof this paper. It is a standard interview preparation framework that we repurposed as a prompt\nstructure. What makes it interesting in this context is the Task step specifically. Chain-of-thought\nasks the model to reason step by step. STAR forces the model to name what it is trying to accomplish\nbefore it begins reasoning about how. The distinction is between general sequential reasoning and\nexplicit goal articulation. Section 5.1 examines this mechanism in detail."
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "3     Methodology\nThis is a pilot study. The sample size (n = 20 per condition, 120 total API calls) is sufficient to\nidentify behavioral patterns and directional differences between conditions. We report pass rates,\nobserved patterns, and statistical significance testing where applicable."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3.1     Experimental Setup\nAll trials used claude-sonnet-4-5-20250929 via the Anthropic Python SDK. This version was\nchosen for consistency with the ryan-allen/car-wash-evals baseline. Hyperparameters were fixed:\nmax_tokens at 512, temperature at 0.7. We chose 0.7 rather than 0 because deterministic decoding\nwould collapse results toward binary outcomes, making per-layer contributions impossible to dis-\ntinguish. The variance introduced by temperature 0.7 across 20 runs lets us measure probabilistic\npass rates.\n    The prompt was modified from the original Mastodon question (50 meters) to 100 meters: “I\nwant to wash my car. The car wash is 100 meters away. Should I walk or drive?” This follows the\nryan-allen/car-wash-evals benchmark. The increased distance makes the surface-level heuristic (“it’s\nclose, just walk”) more tempting, which means correct answers require stronger implicit reas"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "3.2     Variable Isolation Design\nSix conditions were tested. Each ran 20 independent trials.\n\n• Condition A (Bare): No system prompt. Pure baseline to measure the model’s default\n      behavior.\n\n• Condition B (Role Only): An expert advisor persona was injected as the system prompt.\n\n• Condition C (Role + STAR): The STAR reasoning framework was added on top of the\n      role, requiring the model to articulate Situation, Task, Action, and Result in sequence.\n\n• Condition D (Role + Profile): Instead of STAR, physical user context was injected—name,\n      location, vehicle model, current situation. Conditions C and D branch from B in parallel. They\n      are not cumulative.\n\n• Condition E (Full Stack): All layers combined—Role, STAR, Profile, and simulated RAG\n      context."
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3\n\f    • Condition F (Role + STAR + Profile): STAR and profile combined, without RAG\n      context. Added to resolve the E_full_stack confound identified during initial analysis, isolating\n      per-layer contributions between profile and RAG.\n\nThe design isolates STAR (C vs B), profile injection (D vs B), profile’s marginal contribution\non top of STAR (F vs C), RAG’s marginal contribution (E vs F), and the full interaction (E vs C,\nD, and F)."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "3.3     Scoring Methodology\nThe first evaluation run used bare word matching, checking for “walk” or “drive” in the response. This\nfailed. Every response that discussed both options was classified as ambiguous, which produced 0%\npass rates across all conditions regardless of actual recommendation. The scorer was not measuring\nintent.\n    Run 2 replaced word matching with intent-based pattern matching: 14 pass patterns detecting\ndrive recommendations (e.g., \\bshould\\s+drive\\b) and 9 fail patterns detecting walk recommen-\ndations (e.g., \\brecommend\\s+walking\\b).\n    One implementation detail: markdown bold markup had to be stripped before matching. Claude\nfrequently writes “should walk” and the asterisks break whitespace-based regex patterns. When\nboth pass and fail patterns matched in a single response, a dominance ratio determined the result.\nA 2:1 threshold was required for a definitive"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "4     Results\n4.1     Primary Pass Rates\n\nCondition                Components                   Pass Rate      Recovery     Med. Latency\n A_bare                   No system prompt               0% (0/20)       95%            4,649ms\n B_role_only              Role only                     0% (0/20)       100%            7,550ms\n C_role_star              Role + STAR                  85% (17/20)       67%            7,851ms\n D_role_profile           Role + Profile                30% (6/20)      100%            8,837ms\n F_role_star_profile      Role + STAR + Profile        95% (19/20)     0% (0/1)         9,056ms\n E_full_stack             All combined                 100% (20/20)      n/a            8,347ms\n\nTable 1: Pass rates across six experimental conditions. Pass means the first response recommends\ndriving. Recovery means the model self-corrects after the challenge prompt."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "4.2     Key Findings\nFinding 1: Reasoning structure outperforms context injection by 2.83×. C_role_star\nreached 85%. D_role_profile reached 30%. Both branch from the same baseline (B, 0%). The STAR\nframework forces the model to name the task before generating a conclusion. Profile injection gives\nthe model physical facts—car model, location, parking status—but does not force it to process\nthose facts in any particular order. The model can receive all the right information and still take a\nshortcut past it. The difference between C (85%) and D (30%) was statistically significant (Fisher’s"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "4\n\fexact test, two-tailed, p = 0.001, odds ratio = 13.22), confirming that the observed 2.83× advantage\nof structured reasoning over context injection is unlikely to be attributable to chance even at this\nsample size.\n    Finding 2: Per-layer contributions are now isolated. The addition of condition F re-\nsolves the confound in the original five-condition design. The progression from C to E can now be\ndecomposed:\n\n• STAR alone: +85pp (0% to 85%)\n\n• Profile on top of STAR: +10pp (85% to 95%)\n\n• RAG on top of STAR + Profile: +5pp (95% to 100%)"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Profile’s marginal contribution (+10pp) is twice that of RAG (+5pp). Both are necessary for\nperfect reliability, but STAR accounts for the overwhelming majority of the improvement.\n    Finding 3: The recovery paradox. C_role_star had the highest first-pass accuracy but the\nlowest recovery rate (67%). Conditions A, B, and D all recovered at 95–100%. F_role_star_profile\nshowed an even more extreme version of this pattern: its single failure (1/20) did not recover at all\n(0% recovery rate). Section 5.3 discusses the mechanism.\n    Finding 4: Role definition alone does nothing. B_role_only scored 0%, identical to\nA_bare. The expert advisor persona made the model write longer responses (median latency\n7,550ms vs 4,649ms) but did not change the answer."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "4.3   Failure Mode Taxonomy\nThree failure patterns appeared across all failed primary trials:\n    Type 1—Distance Heuristic (∼70% of failures). The model treats the question as a distance\noptimization problem. “100 meters is a 1–2 minute walk.” It never considers what needs to be at\nthe destination.\n    Type 2—Environmental Rationalization (∼20%). The model builds secondary justifica-\ntions around the wrong answer. “Walking saves fuel and is better for the environment.”\n    Type 3—Ironic Self-Awareness (∼10%). The model acknowledges that the car needs to be\nat the car wash, then still recommends walking. One B_role_only response said: “You can drive\nyour car through the wash bay when you arrive”—as if the car would get there on its own.\n\n4.4   Latency Analysis"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Condition               Median Latency        vs Baseline\n                    A_bare                       4,649ms              —\n                    B_role_only                  7,550ms             +62%\n                    C_role_star                  7,851ms             +69%\n                    D_role_profile               8,837ms             +90%\n                    F_role_star_profile          9,056ms             +95%\n                    E_full_stack                 8,347ms             +80%\n\nTable 2: Median response latencies. E_full_stack is faster than D and F despite having more\ncontext, suggesting that model confidence reduces deliberation time."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "5\n\f5     Discussion\n5.1   Why STAR Works: The Task Step\nThe mechanism is in the Task step. Without STAR, the model goes straight from “100 meters” to\nthe distance heuristic to “walk.” The purpose of the trip—washing the car—is in the input, but the\nmodel has no obligation to process it before reaching a conclusion.\n    STAR changes the generation sequence. The model must fill in:\n\nSituation: I want to wash my car. The car wash is 100 meters away.\n      Task: ___"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "This creates a fork. If the model writes “Task: Get your car to the car wash,” the car becomes\nthe subject of the goal statement. Drive follows naturally. If the model writes “Task: Get yourself\nand your car to the car wash efficiently,” the person re-enters as the subject, and walk becomes\nplausible again.\n    The per-trial data confirms this. All 17 passing trials in C_role_star had Task statements where\nthe car was the primary subject. All 3 failures framed the task around the person.\n    Once the model generates “Task: Get your car to the car wash,” every token that follows is\nconditioned on that text. The implicit constraint—the car must physically be there—is now explicit\nin the context window. STAR does not give the model new information. It makes the model write\ndown what it already has before moving on."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "5.2   Why Profile Injection Alone Falls Short\nD_role_profile gave the model everything it needed: Sarah drives a 2022 Honda Civic, it is parked\nin the driveway, she is at home. This is enough to answer correctly. The pass rate was 30%.\n    The problem is not about missing information. The model has the facts. But having facts\nin the context window does not mean the model will use them at the right moment. Without a\nreasoning structure, the model still takes the shortest path from input to output. “100 meters”\ntriggers the distance heuristic and the conclusion lands before the car’s location ever gets pulled\ninto the reasoning chain."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "5.3   The Recovery Paradox\nC_role_star scored 85% on first pass but only 67% on recovery. A_bare and B_role_only scored\n0% on first pass but recovered at 95–100%. F_role_star_profile showed an even more extreme\nversion: 95% first-pass accuracy but 0% recovery on its single failure.\n     When conditions A and B fail, they fail with loose, unstructured responses. A challenge prompt\ncan redirect easily because there is nothing anchoring the wrong answer. When C or F fails, it\nfails with a full STAR-structured argument. The model has already walked through Situation,\nTask, Action, and Result, and produced a coherent case for walking. Correcting course means\ncontradicting a structured argument the model just made.\n     The mechanism is token-level, not psychological. Prior generated text constrains subsequent\ngeneration. This has a practical consequence: if an initial response used structured"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "6\n\f5.4   The Profile-RAG Decomposition\nThe addition of condition F resolves a confound present in the original five-condition design. Pre-\nviously, the jump from 85% (C) to 100% (E) could not be attributed to any single layer because E\nadded both profile and RAG simultaneously.\n   With F at 95%, the decomposition is now clear:\n\nLayer Added        Increment      Cumulative\n                           STAR (C vs B)         +85pp            85%\n                           Profile (F vs C)      +10pp            95%\n                           RAG (E vs F)          +5pp            100%\n\nTable 3: Per-layer marginal contributions to pass rate."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Profile contributes twice as much as RAG in the final stretch. The mechanism is likely that\nprofile grounds the STAR framework in concrete physical details (a specific car, a specific location),\nwhich reduces the probability of the Task step being formulated abstractly. RAG adds situational\ncontext (the car needs washing after a road trip) that eliminates the remaining edge case."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "5.5   Open Questions\nThis study measures behavior at the prompt layer. We can see that STAR produces 85% and profile\ninjection produces 30%. We do not know what happens inside the model to produce this difference.\n    Which attention heads activate differently when the Task step is present? Does forcing goal\narticulation change the activation pattern in a way that is consistent across prompts, or is it specific\nto this question? Would the same STAR structure produce the same lift on GPT-4 or Gemini, or\nis the effect tied to Claude’s training?\n    These are mechanistic interpretability questions. What we have is a behavioral result that any\ninterpretability study could use as a starting point: the same model, the same question, two prompt\nconditions, a 55 percentage point gap."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "6     Limitations\nSingle model. Every trial used claude-sonnet-4-5-20250929. Whether these patterns hold\nacross GPT-4o, Gemini, or Mistral is unknown.\n    Single task. One question, one correct answer. The car wash problem tests implicit physical\nconstraint reasoning specifically. Whether STAR produces similar gains on temporal constraints,\nsocial context inference, or causal chain reasoning has not been tested.\n    Sample size. 20 runs per condition. The Fisher’s exact test confirms that the C vs D difference\nis statistically significant (p = 0.001), but confidence intervals around individual pass rates remain\nwide.\n    Temperature. 0.7 was chosen as a reasonable default for introducing variance. We did not\nsweep across temperature values.\n    Distance modification. The original Mastodon question used 50 meters. We used 100, fol-\nlowing the benchmark. The longer distance might make the "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "7\n\f    Latency overhead. STAR-structured prompts increased median response time by about 69%\nover baseline (7,851ms vs 4,649ms).\n    Challenge prompt bias. The challenge prompt (“How will I get my car washed if I am\nwalking?”) is leading. A neutral challenge like “Are you sure?” would better isolate self-correction\nability.\n    F condition timing. Condition F was added after the initial five-condition experiment, ap-\nproximately six days later. While the same model version, hyperparameters, and scoring method-\nology were used, we cannot rule out that API-level changes may have introduced minor behavioral\ndifferences.\n\n7    Conclusion\nWe started this study because we had a result we could not explain. Our system answered a question\ncorrectly when other LLMs did not, and we did not know which part of the system was responsible.\n    The experiment gave us a clear answer:"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Layer                           Pass Rate         Marginal Contribution\n         Baseline (A, B)                     0%                      —\n         STAR (C)                           85%                    +85pp\n         Profile alone (D)                  30%            +30pp (without STAR)\n         STAR + Profile (F)                 95%           +10pp (on top of STAR)\n         STAR + Profile + RAG (E)           100%       +5pp (on top of STAR + Profile)\n\nTable 4: Complete layer progression from baseline to perfect reliability."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "STAR reasoning accounts for the overwhelming majority of the improvement. Profile and RAG\nare necessary for perfect reliability but insufficient on their own. The mechanism appears to be\ngoal articulation: when the model is forced to write down what it is trying to accomplish before\nit starts reasoning about how, implicit constraints surface as explicit text. Once they are explicit,\nautoregressive generation conditions on them.\n    There is a broader point here. A common pattern in applied AI is to solve reasoning failures by\nadding more context—more facts, more profile data, more retrieved documents. Our results suggest\nthis is the wrong first move. How the model processes information matters more than how much\ninformation it receives. Profile injection with all the right facts scored 30%. Structured reasoning\nwith no additional facts scored 85%. The difference was statistically signifi"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "References\nMcCarthy, J. and Hayes, P.J. (1969). Some Philosophical Problems from the Standpoint of Artificial\n Intelligence. Machine Intelligence 4, Edinburgh University Press, pp. 463–502.\n\nWang, X., Wei, J., Schuurmans, D., Le, Q., Chi, E., Narang, S., Chowdhery, A., and Zhou, D.\n (2023). Self-Consistency Improves Chain of Thought Reasoning in Language Models. Proceedings\n of ICLR 2023.\n\n8\n\fWei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E., Le, Q., and Zhou, D.\n (2022). Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. Advances in\n Neural Information Processing Systems 35 (NeurIPS 2022).\n\nYao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., and Cao, Y. (2023a). ReAct:\n  Synergizing Reasoning and Acting in Language Models. Proceedings of ICLR 2023."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Yao, S., Yu, D., Zhao, J., Shafran, I., Griffiths, T.L., Cao, Y., and Narasimhan, K. (2023b). Tree\n  of Thoughts: Deliberate Problem Solving with Large Language Models. Advances in Neural\n  Information Processing Systems 36 (NeurIPS 2023).\n\nAllen, R. (2026). car-wash-evals. GitHub. https://github.com/ryan-allen/car-wash-evals\n\n9"
+    }
+  ]
+}
