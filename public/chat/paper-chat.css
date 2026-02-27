@@ -23,7 +23,7 @@
 }
 
 .paperChat__row{display:flex; gap:10px; align-items:center}
-.paperChat__btn{border:1px solid rgba(127,127,127,.25); background:transparent; color:inherit; padding:10px 12px; border-radius:999px; cursor:pointer; font-size:13px}
+.paperChat__btn{border:1px solid rgba(127,127,127,.25); background:transparent; color:inherit; padding:8px 10px; border-radius:999px; cursor:pointer; font-size:12px}
 .paperChat__btnPrimary{border-color: rgba(52,211,153,.55); background: rgba(52,211,153,.10)}
 .paperChat__muted{font-size:12px; opacity:.75}
 

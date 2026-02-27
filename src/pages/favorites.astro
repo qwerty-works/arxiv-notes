@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="My favorites" description="Saved locally in your browser.">
+  <main class="paper article">
+    <h1 style="margin-top:0">My favorites</h1>
+    <p style="color:var(--muted)">
+      Everything here is saved <strong>locally in your browser</strong> (IndexedDB). Nothing is synced to any server.
+    </p>
+
+    <div id="favoritesList" class="paper list" style="margin-top:14px">
+      <div style="color:var(--muted)">Loading…</div>
+    </div>
+
+    <p style="margin-top:14px; color:var(--muted); font-size:12px">
+      Tip: clearing your browser site data will remove favorites and saved chat history.
+    </p>
+
+    <script type="module" src="/favorites.js"></script>
+  </main>
+</BaseLayout>

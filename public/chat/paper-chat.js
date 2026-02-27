@@ -35,6 +35,8 @@ const modalTitle = $('paperChatModalTitle');
 const modalBody = $('paperChatModalBody');
 const modalClose = $('paperChatModalClose');
 
+const clearBtn = $('paperChatClear');
+
 const LS_KEY = 'paperChat.encKey.v1';
 
 let lastChunksSent = [];
@@ -45,16 +47,40 @@ let sessionPass = null;
 const turnMemory = []; // [{q, a}]
 const MAX_TURNS = 3;
 
+// Local persistence (IndexedDB)
+let store = null;
+async function getStore(){
+  if (store) return store;
+  store = await import('/local-store.js');
+  return store;
+}
+
 // Client-side cooldown to avoid accidental spam
 let nextAllowedAt = 0;
 const COOLDOWN_MS = 1500;
 
 function nowMs(){ return Date.now(); }
 
-function open(){
+async function open(){
   elRoot.dataset.state = 'open';
   drawer.style.display = 'block';
   renderGate();
+
+  // Load persisted chat history (if available)
+  const arxivId = currentArxivId();
+  if (arxivId){
+    try{
+      const s = await getStore();
+      const history = await s.getMessages(arxivId, 50);
+      if (history && history.length){
+        msgs.innerHTML = '';
+        for (const m of history){
+          addMsg(m.role, m.text);
+        }
+      }
+    }catch{ /* ignore */ }
+  }
+
   setTimeout(() => {
     const focusEl = drawer.querySelector('input,textarea,button');
     focusEl?.focus?.();
@@ -88,6 +114,21 @@ function renderGate(){
 fab?.addEventListener('click', () => {
   if (elRoot.dataset.state === 'open') close();
   else open();
+});
+
+clearBtn?.addEventListener('click', async () => {
+  const arxivId = currentArxivId();
+  if (!arxivId) return;
+  if (!confirm('Clear saved chat history for this paper? (local only)')) return;
+  try{
+    const s = await getStore();
+    await s.clearThread(arxivId);
+    msgs.innerHTML = '';
+    receiptsWrap.hidden = true;
+    receiptsBody.innerHTML = '';
+  }catch{
+    alert('Could not clear history.');
+  }
 });
 closeBtn?.addEventListener('click', close);
 
@@ -317,6 +358,15 @@ function addMsg(role, text){
   return d;
 }
 
+async function persistMsg(role, text){
+  const arxivId = currentArxivId();
+  if (!arxivId) return;
+  try{
+    const s = await getStore();
+    await s.addMessage({ arxivId, role, text, ts: Date.now() });
+  }catch{ /* ignore */ }
+}
+
 function openModal(chunkId){
   const c = (lastChunksSent || []).find((x)=>x.id===chunkId);
   if (!c) return;
@@ -485,6 +535,7 @@ sendBtn?.addEventListener('click', async () => {
   if (!arxivId) return alert('Open a paper page first');
 
   addMsg('user', question);
+  persistMsg('user', question);
   q.value='';
   sendBtn.disabled = true;
 
@@ -507,6 +558,7 @@ sendBtn?.addEventListener('click', async () => {
     });
 
     assistantEl.textContent = answer;
+    persistMsg('assistant', answer);
 
     const ids = parseReceiptIds(answer);
     renderReceipts(chunks, ids);
