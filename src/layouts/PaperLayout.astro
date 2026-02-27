@@ -34,7 +34,50 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       Source: <a href={fm.sourceUrl} target="_blank" rel="noopener noreferrer">arXiv</a>
       <span style="color:var(--muted)">·</span>
       <span style="color:var(--muted)">{fm.paperTitle}</span>
+      <span style="color:var(--muted)">·</span>
+      <button id="favBtn" type="button" style="border:1px solid var(--border); background:transparent; color:var(--muted); padding:2px 8px; border-radius:999px; cursor:pointer" aria-label="Toggle favorite">☆</button>
+      <span id="favHint" style="color:var(--muted); font-size:12px">Saved locally</span>
     </div>
+
+    <script type="module">
+      import { isFavorite, setFavorite, removeFavorite } from '/local-store.js';
+
+      const arxivId = ${JSON.stringify(fm.arxivId)};
+      const title = ${JSON.stringify(fm.catchyTitle)};
+      const slug = ${JSON.stringify(entry.slug.split('/').slice(1).join('/'))};
+
+      const btn = document.getElementById('favBtn');
+      if (btn){
+        const setUi = (on) => {
+          btn.textContent = on ? '★' : '☆';
+          btn.style.color = on ? 'var(--text)' : 'var(--muted)';
+        };
+
+        const init = async () => {
+          try{
+            const on = await isFavorite(arxivId);
+            setUi(on);
+          }catch{}
+        };
+
+        btn.addEventListener('click', async () => {
+          try{
+            const on = await isFavorite(arxivId);
+            if (on){
+              await removeFavorite(arxivId);
+              setUi(false);
+            } else {
+              await setFavorite({ arxivId, slug, title, savedAt: Date.now() });
+              setUi(true);
+            }
+          }catch(e){
+            alert('Could not save favorite (browser storage blocked?)');
+          }
+        });
+
+        init();
+      }
+    </script>
 
     <section class="paper tldr" style="margin-top:14px; padding:14px 14px 12px">
       <h2 style="margin:0 0 8px; font-size:14px; letter-spacing:0.02em; text-transform:uppercase; color:var(--muted)">TL;DR</h2>
