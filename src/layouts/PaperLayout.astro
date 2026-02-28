@@ -35,12 +35,12 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       <span style="color:var(--muted)">·</span>
       <span style="color:var(--muted)">{fm.paperTitle}</span>
       <span style="color:var(--muted)">·</span>
-      <button id="favBtn" type="button" style="border:1px solid var(--border); background:transparent; color:var(--muted); padding:2px 8px; border-radius:999px; cursor:pointer" aria-label="Toggle favorite">☆</button>
+      <button id="favBtn" type="button" style="border:1px solid var(--border); background:transparent; color:var(--muted); padding:2px 8px; border-radius:999px; cursor:pointer" aria-label="Toggle favorite" title="Favorite (saved locally)">☆</button>
       <span id="favHint" style="color:var(--muted); font-size:12px">Saved locally</span>
     </div>
 
     <script type="module">
-      import { isFavorite, setFavorite, removeFavorite } from '/local-store.js';
+      import { isFavorite, setFavorite, removeFavorite } from `${BASE}local-store.js`;
 
       const arxivId = ${JSON.stringify(fm.arxivId)};
       const title = ${JSON.stringify(fm.catchyTitle)};
@@ -50,7 +50,7 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       if (btn){
         const setUi = (on) => {
           btn.textContent = on ? '★' : '☆';
-          btn.style.color = on ? 'var(--text)' : 'var(--muted)';
+          btn.style.color = on ? 'var(--accent)' : 'var(--muted)';
         };
 
         const init = async () => {
