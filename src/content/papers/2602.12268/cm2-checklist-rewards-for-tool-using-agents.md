@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.12268"
+feed: "cs.AI"
 catchyTitle: "RL for agents without ‘verifiable’ rewards"
 funnySubtitle: "Stop asking your judge model for vibes. Ask it YES/NO questions."
 blurb: "CM2 shows a practical trick for training tool-using agents with RL when the objective is open-ended. Replace outcome rewards with per-turn checklists: binary, evidence-grounded criteria with dependencies + weights. Then keep rewards sparse in assignment (more stable), while keeping criteria dense (still informative)."

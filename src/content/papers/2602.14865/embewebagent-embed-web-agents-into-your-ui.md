@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.14865"
+feed: "cs.AI"
 catchyTitle: "Stop Driving Your App Through Screenshots"
 funnySubtitle: "Give the agent the app’s *real* controls (but keep it on a leash)"
 blurb: "If you control the UI, don’t make your agent guess via pixels/DOM dumps. Expose a curated ARIA snapshot + URL as observations, and a page-scoped function registry as the only action surface. EmbeWebAgent reports a tiny retrofit cost (~150 LOC shim + ~200 LOC registry) while making actions more reliable via page-filtered tools, explicit navigation URLs, and mixed-granularity ‘primitives + composites’."

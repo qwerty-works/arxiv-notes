@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.15532"
+feed: "cs.AI"
 catchyTitle: "Benchmarks Aren’t Capabilities"
 funnySubtitle: "Stop grading the ruler"
 blurb: "A measurement-theory take on LLM evals: control for scale, model measurement error, and only call something a ‘capability’ if it predicts held-out benchmarks better than a size-only baseline."

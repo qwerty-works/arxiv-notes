@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.13093"
+feed: "cs.AI"
 catchyTitle: "Stop letting users bully your model"
 funnySubtitle: "‘Are you sure?’ is an attack surface"
 blurb: "This paper stress-tests reasoning models with 8-turn adversarial follow-ups and shows: (1) misleading suggestions flip everyone, (2) most failures are Self-Doubt + Social Conformity, (3) confidence-based defenses break because confidence barely predicts correctness."

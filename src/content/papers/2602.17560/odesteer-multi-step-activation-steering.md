@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17560"
+feed: "cs.AI"
 catchyTitle: "Steer the model like a control system"
 funnySubtitle: "Stop yeeting activations. Walk them there."
 blurb: "Activation steering usually means one big hidden-state shove. ODESteer reframes that shove as an ODE: define a scalar barrier h(a) that scores ‘good vs bad’ activations, then take many small, normalized gradient steps so steering is adaptive and numerically stable. Use this to tune inference-time edits with a real sweep plan (T, steps, speed) instead of vibes."

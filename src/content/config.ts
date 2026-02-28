@@ -1,9 +1,15 @@
 import { defineCollection, z } from 'astro:content';
 
+// Which arXiv listing feed this post came from.
+// Examples: "cs.AI", "physics.data-an"
+const feedSchema = z.string().min(1);
+
 const papers = defineCollection({
   type: 'content',
   schema: z.object({
     arxivId: z.string(),
+    feed: feedSchema.default('cs.AI'),
+
     catchyTitle: z.string(),
     funnySubtitle: z.string(),
     blurb: z.string(),
@@ -23,3 +29,4 @@ const papers = defineCollection({
 });
 
 export const collections = { papers };
+

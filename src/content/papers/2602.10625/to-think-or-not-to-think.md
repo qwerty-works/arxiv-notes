@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.10625"
+feed: "cs.AI"
 catchyTitle: "Overthinking Is Not Understanding"
 funnySubtitle: "Longer chain-of-thought, shorter lifespan"
 blurb: "A ToM study finds reasoning models don’t reliably beat non-reasoning ones. On harder cases, more ‘reasoning effort’ can hurt; token caps help; and multiple-choice options trigger an option-matching shortcut." 

@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.12249"
+feed: "cs.AI"
 catchyTitle: "Street Names Are the Boss Fight"
 funnySubtitle: "Low WER, high-stakes faceplant"
 blurb: "15 production-grade ASR models miss ~44% of spoken U.S. street names; the downstream map/routing error is ~2× worse for non‑English primary speakers. A simple fix: fine-tune with <1k synthetic named-entity pronunciations generated via multilingual TTS style-transfer." 

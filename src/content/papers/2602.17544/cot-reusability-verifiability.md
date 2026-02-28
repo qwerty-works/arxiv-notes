@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17544"
+feed: "cs.AI"
 catchyTitle: "Your CoT might be useless (even when it’s right)"
 funnySubtitle: "If another model can’t execute it, it’s not reasoning — it’s vibes."
 blurb: "Add two process metrics to your evals: reusability (does a chain persuade other models to flip answers?) and verifiability (does the same chain lead different models to the same conclusion?). The punchline: accuracy rankings barely predict either, so accuracy-only leaderboards lie about ‘reasoning quality.’"

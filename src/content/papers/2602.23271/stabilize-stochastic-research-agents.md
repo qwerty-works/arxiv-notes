@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.23271"
+feed: "cs.AI"
 catchyTitle: "Make your research agent repeatable"
 funnySubtitle: "Stop shipping a slot machine with citations."
 blurb: "If the same ‘deep research’ query gives different conclusions across runs, treat it as a reliability bug. This paper shows how to measure variance over answers/findings/citations and how to reduce it: stabilize early queries and constrain inference with structured outputs. Combined mitigations cut average stochasticity by ~22% while improving accuracy in DeepSearchQA."

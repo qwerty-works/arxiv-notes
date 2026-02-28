@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.16246"
+feed: "cs.AI"
 catchyTitle: "Ship agent evals without a fake perfect database"
 funnySubtitle: "Grade the state you wanted, not the tool path you got."
 blurb: "Proxy State-Based Evaluation replaces expensive deterministic backends with an LLM-inferred proxy state + judges, so you can run outcome-based evals, diagnose hallucinations, and generate training data for tool-calling agents."

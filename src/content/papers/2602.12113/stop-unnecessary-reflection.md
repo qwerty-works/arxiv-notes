@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.12113"
+feed: "cs.AI"
 catchyTitle: "Make your reasoning model stop doom-spiraling"
 funnySubtitle: "‘Wait… wait…’ is not a strategy"
 blurb: "ARLCP is a simple idea with sharp edges: treat hesitation-y ‘reflection’ tokens (wait/hmm/double-check/alternatively) as a measurable spiral signal, then train (or select) for efficiency with a *separate* reflection penalty and length penalty that adapts to problem difficulty. Reported results: big token cuts with accuracy gains."

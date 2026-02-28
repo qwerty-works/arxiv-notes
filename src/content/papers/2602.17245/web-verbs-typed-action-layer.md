@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17245"
+feed: "cs.AI"
 catchyTitle: "Stop letting agents click the internet"
 funnySubtitle: "If it needs 40 clicks, it needs a function"
 blurb: "Package the web’s messy workflows as typed ‘verbs’ with contracts (pre/postconditions + logs), then force your agent to write short code over those verbs instead of driving the GUI. Use Prompt #1 to spec verbs, Prompt #2 to compile tasks into runnable workflows, and Prompt #3 to harden locators and failure detectors."

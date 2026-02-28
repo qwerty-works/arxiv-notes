@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17990"
+feed: "cs.AI"
 catchyTitle: "Stop shipping workflows on uncalibrated metric scores"
 funnySubtitle: "If 0.90→0.84 doesn’t tell you ‘missing step’ vs ‘paraphrase,’ your CI gate is vibes."
 blurb: "WorkflowPerturb is a stress-test benchmark for workflow-evaluation metrics: take golden workflows, apply realistic damage (missing steps, compressed steps, paraphrases) at known severities, then measure how your metrics respond. Use the resulting score trajectories to set CI thresholds that block functional regressions but tolerate harmless rewrites."

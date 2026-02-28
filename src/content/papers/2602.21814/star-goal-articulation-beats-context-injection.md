@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.21814"
+feed: "cs.AI"
 catchyTitle: "Force the goal first"
 funnySubtitle: "Stop adding context. Start ordering thoughts."
 blurb: "If your agent keeps missing an implicit prerequisite, don’t reach for more retrieved context first. Make the model write an explicit goal (Task) before it recommends an action. In a small variable-isolation study on the ‘car wash’ trick question, a STAR scaffold (Situation→Task→Action→Result) moved first-pass accuracy from 0% to 85%, while profile-style physical context alone only reached 30%."
