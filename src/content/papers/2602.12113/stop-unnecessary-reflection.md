@@ -79,7 +79,7 @@ Steal this as an ops metric:
 - Plot accuracy (or pass@k) vs reflection-trigger count bins.
 - If accuracy drops as triggers rise, treat high trigger counts as a **spiral alert** (a signal to stop, branch, or resample).
 
-Receipt: Figure 2 reports that accuracy declines as reflection token count increases, and incorrect responses have more reflection tokens and longer outputs than correct ones.
+**Receipt:** Figure 2 reports that accuracy declines as reflection token count increases, and incorrect responses have more reflection tokens and longer outputs than correct ones.
 
 ## Move 2: Split the penalty in two: reflection vs length
 
@@ -93,7 +93,7 @@ This is useful even if you’re not training:
 - When you sample multiple candidates, rank by correctness first, then **low reflection**, then **reasonable length** (use prompt #2).
 - If you’re building an agent policy, use reflection as a specific stop/summary trigger (use prompt #1).
 
-Receipt: ARLCP’s reward uses separate penalties for reflection-token count and total length (Methodology, Eq. 5 / Algorithm 1).
+**Receipt:** ARLCP’s reward uses separate penalties for reflection-token count and total length (Methodology, Eq. 5 / Algorithm 1).
 
 ## Move 3: Make penalties *adaptive* to difficulty (easy ≠ hard)
 
@@ -109,7 +109,7 @@ This avoids two common mistakes:
 - Over-penalizing hard problems (you crush necessary exploration).
 - Under-penalizing easy problems (you let verbosity leak everywhere).
 
-Receipt: ARLCP thresholds reflection-token count with n1=40 and n2=80 to set reflection-penalty weight α1, then sets α2=α−α1 for length (Methodology, Eq. 2).
+**Receipt:** ARLCP thresholds reflection-token count with n1=40 and n2=80 to set reflection-penalty weight α1, then sets α2=α−α1 for length (Methodology, Eq. 2).
 
 ## Move 4: Demand Pareto improvements (shorter *and* better), then prove it with ablations
 
@@ -119,7 +119,7 @@ When you evaluate “efficient reasoning”, insist on the trade-off curve, not 
 - Prefer methods that improve the frontier (shorter without losing accuracy).
 - Run ablations so you know which knob actually mattered.
 
-Receipt: Table 1 reports ARLCP’s main results (e.g., −53.05% length with +5.81 ΔAcc on 1.5B; −34.96% length with +2.69 ΔAcc on 7B). Table 2 shows removing either penalty degrades the trade-off.
+**Receipt:** Table 1 reports ARLCP’s main results (e.g., −53.05% length with +5.81 ΔAcc on 1.5B; −34.96% length with +2.69 ΔAcc on 7B). Table 2 shows removing either penalty degrades the trade-off.
 
 ## Move 5: Force a domain-transfer spot check
 
@@ -129,7 +129,7 @@ Do at least one out-of-domain check where verbosity is common:
 
 - If your intervention only shortens answers by making them worse, it’ll show up.
 
-Receipt: Table 4 reports on MMLU: about −41% length with a +0.7 accuracy improvement over vanilla (7B).
+**Receipt:** Table 4 reports on MMLU: about −41% length with a +0.7 accuracy improvement over vanilla (7B).
 
 ## Do this now (tight checklist)
 
