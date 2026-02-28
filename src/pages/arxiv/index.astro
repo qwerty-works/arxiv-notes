@@ -10,7 +10,7 @@ import { SECTIONS } from '../../lib/sections';
 
     <div class="paper list" style="margin-top:14px">
       {SECTIONS.map((s) => (
-        <a class="cardLink" href={`/arxiv/${encodeURIComponent(s.feed)}/`}>
+        <a class="cardLink" href={`${import.meta.env.BASE_URL}arxiv/${encodeURIComponent(s.feed)}/`}>
           <div class="cardTitle">{s.label}</div>
           <div class="cardSub">Feed: {s.feed}</div>
         </a>
