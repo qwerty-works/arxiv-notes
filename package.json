@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "lint:security": "python3 scripts/security_lint.py",
     "test": "vitest run",
+    "test:paths": "npm run build && node scripts/ui_path_smoke.cjs",
     "astro": "astro"
   },
   "devDependencies": {

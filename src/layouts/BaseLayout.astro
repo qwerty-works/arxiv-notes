@@ -39,6 +39,7 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.openai.com" />
 
     <meta name="theme-color" content="#0b0d10" />
+    <meta name="arxiv-notes-base" content={BASE} />
     <link rel="stylesheet" href={`${BASE}chat/paper-chat.css`} />
   </head>
   <body>
@@ -69,7 +70,7 @@ const BASE = import.meta.env.BASE_URL.endsWith('/')
           <header class="paperChat__header">
             <div>
               <div class="paperChat__title">Chat with this paper</div>
-              <div class="paperChat__muted" style="font-size:11px; margin-top:2px">Saved locally in your browser · Paper text (arXiv PDF extract)</div>
+              <div class="paperChat__muted" style="font-size:11px; margin-top:2px">Paper text (arXiv PDF extract) · History saved locally</div>
             </div>
             <div style="display:flex; gap:8px; align-items:center">
               <button id="paperChatClear" class="paperChat__btn" type="button" aria-label="Clear chat history">Clear</button>
