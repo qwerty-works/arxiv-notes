@@ -60,27 +60,27 @@ If your assistant keeps giving “reasonable” answers that ignore a hidden pre
 - Add a guardrail: the Task must name the object that must be present (e.g., *the car*, *the file*, *the credential*), not just the user.
 - Metric: run 20 stochastic repeats; track **% of runs where the Task names the right object** and **% correct final answers**. If those don’t move together, your scaffold isn’t binding.
 
-Receipt: Table 1 shows Role+STAR reaching **85% (17/20)** first-pass accuracy versus **0%** baseline.
+**Receipt:** Table 1 shows Role+STAR reaching **85% (17/20)** first-pass accuracy versus **0%** baseline.
 
 ### Move 2: Treat “add more context” as a *second* move; first ask whether you’ve made the model *use* what it already has.
 
 When you see a failure mode that looks like a shortcut (“100 meters → walk”), don’t immediately add RAG or a giant profile blob.
 
 - Decision rule: if the model’s answer is dominated by a single salient cue (distance, price, politeness), try a **Goal → Constraints → Action** scaffold before retrieval.
-- Operator move: if you do add context, attach it to the goal step (e.g., “Given: the car is parked in the driveway”) so it’s hard to skip.
+- **Operator move:** if you do add context, attach it to the goal step (e.g., “Given: the car is parked in the driveway”) so it’s hard to skip.
 - Metric: do a quick ablation table (baseline vs scaffold vs profile vs scaffold+profile) and keep only layers with measurable lift.
 
-Receipt: Table 1 reports profile-style physical context alone at **30% (6/20)**, below STAR’s **85%**.
+**Receipt:** Table 1 reports profile-style physical context alone at **30% (6/20)**, below STAR’s **85%**.
 
 ### Move 3: Add a “rewrite ONLY the Task” correction path, because structured wrong answers can get sticky.
 
 Structured reasoning can increase accuracy *and* make failures harder to unwind: the model has already committed to a coherent story.
 
-- Operator move: when a user challenges an answer, don’t ask for “reconsider”; ask the model to **rewrite only the Task**, then recompute.
+- **Operator move:** when a user challenges an answer, don’t ask for “reconsider”; ask the model to **rewrite only the Task**, then recompute.
 - Pitfall + guardrail: if you request a full rewrite, the model may defend the earlier structure; step-targeted correction forces a new anchor.
 - Metric: log **recovery rate** separately from first-pass (among failures, % that flip after a challenge).
 
-Receipt: Table 1’s “Recovery” column + Section 5.3 describe a “recovery paradox” where structured conditions had lower recovery on failures.
+**Receipt:** Table 1’s “Recovery” column + Section 5.3 describe a “recovery paradox” where structured conditions had lower recovery on failures.
 
 ### Move 4: Run prompt-layer ablations like you’d debug a production system: one change at a time, with repeats.
 
@@ -92,13 +92,13 @@ If you have a multi-layer stack (role + scaffold + profile + RAG), you can’t g
   - Track **median latency** as a cost metric.
 - Decision rule: only keep a layer if it improves pass rate *or* reduces variance *at acceptable latency*.
 
-Receipt: Table 3 attributes marginal lift to layers (STAR +85pp; profile +10pp on top of STAR; RAG +5pp on top).
+**Receipt:** Table 3 attributes marginal lift to layers (STAR +85pp; profile +10pp on top of STAR; RAG +5pp on top).
 
 ### Move 5: Build a small “implicit prerequisite” regression suite so you don’t overfit to the meme.
 
 Don’t ship a scaffold because it fixes one viral question; prove it generalizes in your domain.
 
-- Operator move: write 10–30 items where the correct answer requires an unspoken prerequisite (object must be present; access must be granted; artifact must exist).
+- **Operator move:** write 10–30 items where the correct answer requires an unspoken prerequisite (object must be present; access must be granted; artifact must exist).
 - Pitfall + guardrail: if you can’t auto-score, you’ll fool yourself—start with items you can score with regex/unit tests/tool checks.
 - Metric: track average pass rate + confidence intervals across the suite; require improvement before rollout.
 

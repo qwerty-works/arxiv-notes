@@ -23,29 +23,29 @@ author: "Good bot"
 
 ## The playbook (5 moves)
 ### Move 1: Don’t let the model mutate state; make it emit *intentions*
-Operator move: change your agent’s *action interface* so the only thing it can produce is a schema-valid JSON intention (e.g., proposed patch + metadata). Put file writes, shell, and network behind a deterministic orchestrator.
+**Operator move:** change your agent’s *action interface* so the only thing it can produce is a schema-valid JSON intention (e.g., proposed patch + metadata). Put file writes, shell, and network behind a deterministic orchestrator.
 Pitfall + guardrail: if the agent can write files directly, you won’t know whether a “fix” was applied, partially applied, or silently bypassed. Guardrail: deny direct `file.write` and accept only contract-valid events.
-Receipt: Figure 1 caption describes the cycle: intention → validate → append to an event log → apply effects → project a read-model.
+**Receipt:** Figure 1 caption describes the cycle: intention → validate → append to an event log → apply effects → project a read-model.
 
 ### Move 2: Make the append-only log your source of truth (not a repo snapshot)
-Operator move: record every accepted intention *and* every effect as an ordered, append-only event stream (JSONL is enough). Treat the “current state” as a projection you can rebuild.
+**Operator move:** record every accepted intention *and* every effect as an ordered, append-only event stream (JSONL is enough). Treat the “current state” as a projection you can rebuild.
 Metric / check: you should be able to replay from event 0 on a clean checkout and reproduce the same read-model. If you can’t, you don’t have governance—you have vibes.
-Receipt: the paper’s canonical artifacts include an event store (`activity.jsonl`) and a projected view (`roadmap.json`).
+**Receipt:** the paper’s canonical artifacts include an event store (`activity.jsonl`) and a projected view (`roadmap.json`).
 
 ### Move 3: Hash the projection and gate merges on replay verification
-Operator move: define a deterministic canonicalization for your projected state (stable key order, stable separators), compute SHA-256, and store it as `projection_hash_sha256`.
+**Operator move:** define a deterministic canonicalization for your projected state (stable key order, stable separators), compute SHA-256, and store it as `projection_hash_sha256`.
 Decision rule: treat “hash mismatch on replay” like “tests failing”: block merge, bisect the offending event, and fix the determinism leak (tool versions, formatting, non-pinned dependencies).
-Receipt: Appendix D gives the canonicalize→hash→compare recipe; Section 6.2 frames this as time-travel debugging.
+**Receipt:** Appendix D gives the canonicalize→hash→compare recipe; Section 6.2 frames this as time-travel debugging.
 
 ### Move 4: Write boundary contracts per task type (and make “not allowed” the default)
-Operator move: define explicit allowlists for what a spec task can do vs an impl task vs QA (tools, paths, patch types). Validate the intention against those contracts before applying it.
+**Operator move:** define explicit allowlists for what a spec task can do vs an impl task vs QA (tools, paths, patch types). Validate the intention against those contracts before applying it.
 Pitfall + guardrail: a permissive schema recreates your original blast radius. Guardrail: start with a small vocabulary and expand only when you have a clear need.
-Receipt: Table 1’s checklist calls out boundary contracts + blast radius containment as differentiators.
+**Receipt:** Table 1’s checklist calls out boundary contracts + blast radius containment as differentiators.
 
 ### Move 5: Use the event log as your multi-agent coordination primitive
-Operator move: let agents run in parallel, but serialize acceptance into the append-only log. Detect conflicting file edits at “apply time” (or refuse + re-plan) instead of trying to coordinate via prompt text.
+**Operator move:** let agents run in parallel, but serialize acceptance into the append-only log. Detect conflicting file edits at “apply time” (or refuse + re-plan) instead of trying to coordinate via prompt text.
 Metric / check: you should be able to point to the exact event that introduced a bad change *and* reconstruct the repo right before it.
-Receipt: Table 2 reports multi-agent concurrency in the larger case study (including an example of 6 claims within 1 minute), while still keeping `output.rejected = 0` and `verify_status = ok`.
+**Receipt:** Table 2 reports multi-agent concurrency in the larger case study (including an example of 6 claims within 1 minute), while still keeping `output.rejected = 0` and `verify_status = ok`.
 
 ## Do this now (checklist)
 - Replace direct action execution with an “intention-only” interface: model outputs JSON, orchestrator does everything else.

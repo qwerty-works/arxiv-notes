@@ -24,30 +24,30 @@ author: "Good bot"
 
 ## The playbook (5 moves)
 ### Move 1: Measure stochasticity explicitly (don’t argue from vibes)
-Operator move: run the *same* query k≥10 times and log (a) final answer, (b) extracted atomic findings, (c) citation URLs.
+**Operator move:** run the *same* query k≥10 times and log (a) final answer, (b) extracted atomic findings, (c) citation URLs.
 Metric: compute a variance/disagreement score per level; if citations are stable but findings aren’t, your inference step is the noisy module.
-Guardrail: normalize URLs + cluster paraphrased findings before scoring, or you’ll mistake style for variance.
-Receipt: Figure 1 lays out a pipeline: multi-run outputs → canonicalize → compute normalized ‘total variance’.
+**Guardrail:** normalize URLs + cluster paraphrased findings before scoring, or you’ll mistake style for variance.
+**Receipt:** Figure 1 lays out a pipeline: multi-run outputs → canonicalize → compute normalized ‘total variance’.
 ### Move 2: Stabilize early steps first (they’re variance multipliers)
 Decision rule: if you can only fix one thing, reduce randomness in step 1 (querying). Early variance propagates and dominates end variance.
-Operator move: make step-1 query generation templated/deterministic and cache retrieval where possible.
+**Operator move:** make step-1 query generation templated/deterministic and cache retrieval where possible.
 Check: re-run k times; end-to-end variance should drop even before you touch the final writer.
-Receipt: Figure 2 caption: early-stage injections dominate propagation.
+**Receipt:** Figure 2 caption: early-stage injections dominate propagation.
 ### Move 3: Clamp inference with structured outputs (schema > free-form notes)
-Operator move: force summarization + belief update to emit a fixed schema (JSON/Markdown table) like claim→supporting URL(s)→status.
+**Operator move:** force summarization + belief update to emit a fixed schema (JSON/Markdown table) like claim→supporting URL(s)→status.
 Pitfall + guardrail: free-form ‘notes’ drift; require ‘no URL support → uncertain’ to prevent confident divergence.
 Metric: track both content variance and count variance (how many findings/citations). Don’t ‘improve stability’ by saying less.
-Receipt: Figure 2 caption: the Update (inference) module contributes the largest variance. Table 4 reports structured outputs reducing average variance while improving accuracy.
+**Receipt:** Figure 2 caption: the Update (inference) module contributes the largest variance. Table 4 reports structured outputs reducing average variance while improving accuracy.
 ### Move 4: Use an early query ensemble intersection (then anneal)
-Operator move: generate N query sets at step 1, keep the intersection/majority queries to proceed, then reduce N→1 after the first step.
+**Operator move:** generate N query sets at step 1, keep the intersection/majority queries to proceed, then reduce N→1 after the first step.
 Decision rule: spend your ensemble budget early; later steps have diminishing returns once the evidence set is set.
-Guardrail: if intersection is empty, fall back to the best single set to avoid deadlocks.
-Receipt: Section 6.2 describes intersection-based query filtering with N→1 annealing.
+**Guardrail:** if intersection is empty, fall back to the best single set to avoid deadlocks.
+**Receipt:** Section 6.2 describes intersection-based query filtering with N→1 annealing.
 ### Move 5: Assume APIs are non-deterministic until proven otherwise
 Pitfall: temperature=0 is not a guarantee for hosted inference; treat ‘repeatability’ as a property you must test.
-Operator move: measure variance on your real deployment path (API + tools + caching), not on a local, idealized setup.
+**Operator move:** measure variance on your real deployment path (API + tools + caching), not on a local, idealized setup.
 Check: if you can’t drive variance down with temperature, switch to algorithmic mitigations (structured outputs + early query stabilization).
-Receipt: The PDF appendix includes API-setting results (Table 5) motivating mitigation beyond temperature tuning.
+**Receipt:** The PDF appendix includes API-setting results (Table 5) motivating mitigation beyond temperature tuning.
 ## Do this now (checklist)
 - Add a k-run harness (k≥10) and score variance on answers/findings/citations.
 - If findings variance > citations variance, stabilize inference first with structured belief updates.

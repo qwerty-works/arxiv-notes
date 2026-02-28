@@ -74,7 +74,7 @@ If your “web agent” is mostly **click/scroll/type**, you’re operating at t
 
 ### Move 1: Promote repeated UI flows into *typed verbs* (stop paying the click tax)
 
-Operator move: pick your top 5 brittle workflows (anything that takes ≥10 GUI steps or crosses sites) and package each as a function with **typed parameters + a structured return object**. Then change your agent policy so the LLM can call *only* verbs (no raw browser control) for production tasks.
+**Operator move:** pick your top 5 brittle workflows (anything that takes ≥10 GUI steps or crosses sites) and package each as a function with **typed parameters + a structured return object**. Then change your agent policy so the LLM can call *only* verbs (no raw browser control) for production tasks.
 
 Decision rule: if a task is “one intent but many steps” (search + filter + pick + extract), it’s a verb.
 
@@ -84,7 +84,7 @@ Pitfall + guardrail: don’t ship “verbs” that are just scripts with magic s
 
 ### Move 2: Put contracts on the boundary (preconditions/postconditions + logging)
 
-Operator move: for every verb, write **preconditions** (auth/session/permissions) and at least one **postcondition** you can check immediately (non-empty results, item appears in cart, route distance exists). Log inputs/outputs/timing so you can replay failures.
+**Operator move:** for every verb, write **preconditions** (auth/session/permissions) and at least one **postcondition** you can check immediately (non-empty results, item appears in cart, route distance exists). Log inputs/outputs/timing so you can replay failures.
 
 Decision rule: if the verb can spend money, submit forms, or mutate account state, it must be “fail-closed”: if postconditions don’t hold, stop and surface the debug report.
 
@@ -92,7 +92,7 @@ Pitfall + guardrail: the common failure isn’t a crash — it’s **silent part
 
 ### Move 3: Force explicit computation as code (loops/conditionals, not vibes)
 
-Operator move: when the user asks for ranking, budgeting, or optimization, require the model to output runnable code that composes verbs and computes the result (nested loops, combination search, filters). Don’t accept a narrated plan.
+**Operator move:** when the user asks for ranking, budgeting, or optimization, require the model to output runnable code that composes verbs and computes the result (nested loops, combination search, filters). Don’t accept a narrated plan.
 
 Decision rule: if the task includes words like *rank*, *maximize*, *under budget*, *aggregate*, *compare*, demand a program.
 
@@ -102,7 +102,7 @@ Pitfall + guardrail: models “shortcut” (greedy picks, waypoint hacks, skippi
 
 ### Move 4: Benchmark like an operator (success rate + wall-clock)
 
-Operator move: build a 10-task smoke suite and track two metrics: **pass/fail** and **runtime**. Promote verbs to “stable” only after repeated passes; prioritize new verbs where your baseline fails or is slow.
+**Operator move:** build a 10-task smoke suite and track two metrics: **pass/fail** and **runtime**. Promote verbs to “stable” only after repeated passes; prioritize new verbs where your baseline fails or is slow.
 
 Decision rule: if your GUI-agent baseline is >2× slower or fails tasks that include real decision logic, stop prompt-tuning and add verbs.
 
@@ -110,7 +110,7 @@ Pitfall + guardrail: don’t cherry-pick lookups. Guardrail: include at least on
 
 ### Move 5: If you must automate UIs, build verbs like a product (record → generate → harden)
 
-Operator move: record the workflow once, generate Playwright (or equivalent), then refactor: parameterize the variable inputs, structure the outputs, and add stability tests.
+**Operator move:** record the workflow once, generate Playwright (or equivalent), then refactor: parameterize the variable inputs, structure the outputs, and add stability tests.
 
 Decision rule: if no API exists for the capability, wrap the client flow as a verb instead of handing the LLM raw click control.
 

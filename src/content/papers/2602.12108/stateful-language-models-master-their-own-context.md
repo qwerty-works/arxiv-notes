@@ -93,35 +93,35 @@ Use prompt #1 at the end to turn this into a concrete controller.
 - Add a deleteContext(msg_id) tool to your agent runtime.
 - Define deletion semantics clearly (e.g., replace deleted messages with stubs so the transcript stays coherent).
 - Make deletion part of the normal loop: after extracting what you need, delete the raw tool output and any verbose intermediate steps.
-- Receipt: Figure 1 describes a 'sawtooth' context-use profile; Section 3.2 defines deleteContext(msg) as a context-pruning operation in the StateLM loop.
+- **Receipt:** Figure 1 describes a 'sawtooth' context-use profile; Section 3.2 defines deleteContext(msg) as a context-pruning operation in the StateLM loop.
 
 ### Move 2: Separate 'durable memory' (notes) from 'working memory' (context): distill first, then prune.
 
 - Create a persistent notebook (key → {content, summary}) outside the model context.
 - Use an updateNote/note tool to write compact, query-relevant facts with short summaries.
 - Teach/require the agent to rehydrate from notes (readNote) instead of keeping raw text in-context.
-- Receipt: Figure 2 caption: the loop 'reads, takes notes, and prunes its working context'; Table 1 lists note/updateNote and readNote as memory tools.
+- **Receipt:** Figure 2 caption: the loop 'reads, takes notes, and prunes its working context'; Table 1 lists note/updateNote and readNote as memory tools.
 
 ### Move 3: For long inputs, don’t 'stuff'—index, search, read tiny chunks, then delete them.
 
 - Add buildIndex + searchEngine + readChunk tools for long documents.
 - Adopt a strict cycle: search → readChunk → updateNote → deleteContext (repeat).
 - Keep a budget tool (checkBudget) so the agent can decide when to prune or stop.
-- Receipt: Table 1 ('Spellbook') enumerates analyzeText, buildIndex, searchEngine, readChunk, checkBudget; Figure 2 describes the multi-round loop using these tools.
+- **Receipt:** Table 1 ('Spellbook') enumerates analyzeText, buildIndex, searchEngine, readChunk, checkBudget; Figure 2 describes the multi-round loop using these tools.
 
 ### Move 4: Stress-test memory with 'needle-in-a-haystack' at absurd context lengths; the delta shows whether your memory loop actually works.
 
 - Build a synthetic benchmark that hides a single key sentence ('needle') inside a long passage ('haystack') and queries it.
 - Run across increasing lengths; watch where the baseline collapses and whether your stateful agent stays flat.
 - To test scanning behavior, temporarily disable search so the agent must manage reading/pruning under pressure.
-- Receipt: Table 2: Qwen3 baselines fall from 88.33% at 128K to 3.33% at 1M and ~1.7% at 2M, while StateLM variants remain high (e.g., StateLM-14B 95.00% at 1M and 83.89% at 2M) under the 'w/o search' setting.
+- **Receipt:** Table 2: Qwen3 baselines fall from 88.33% at 128K to 3.33% at 1M and ~1.7% at 2M, while StateLM variants remain high (e.g., StateLM-14B 95.00% at 1M and 83.89% at 2M) under the 'w/o search' setting.
 
 ### Move 5: If you want models to self-manage context, train on expert tool trajectories first, then use RL to refine; the payoff can be huge on agentic 'deep research' tasks.
 
 - Stage 1 (SFT): collect expert demonstrations of the search/read/note/delete loop on long-context QA tasks.
 - Stage 2 (RL): optimize on a long-context benchmark to improve the policy beyond imitation.
 - Track gains under the same tight context budget (e.g., 32K) to confirm you're buying skill, not just window size.
-- Receipt: Section 4.1 describes two-stage training (SFT on 3.3K trajectories → 35.7K samples; RL on LongBench v2 training set). Table 3 shows large gains at 32K context (e.g., BrowseComp-Plus: Qwen3-14B 5.46% vs StateLM-14B-RL 52.67%).
+- **Receipt:** Section 4.1 describes two-stage training (SFT on 3.3K trajectories → 35.7K samples; RL on LongBench v2 training set). Table 3 shows large gains at 32K context (e.g., BrowseComp-Plus: Qwen3-14B 5.46% vs StateLM-14B-RL 52.67%).
 
 ## Do this now (checklist)
 

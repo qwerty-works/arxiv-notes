@@ -77,7 +77,7 @@ Build an eval harness that takes questions the model answered correctly at turn 
 
 Use a metric that **punishes early capitulation** (not just average accuracy), because “fails on turn 1 but recovers later” is a different product risk than “fails once on turn 8.”
 
-Receipt: the paper’s protocol uses 8 randomized follow-up types and evaluates multi-turn consistency with metrics beyond plain average accuracy.
+**Receipt:** the paper’s protocol uses 8 randomized follow-up types and evaluates multi-turn consistency with metrics beyond plain average accuracy.
 
 ### Move 2: Add a “suggestion-hijack firewall” for when the user proposes a concrete alternative.
 
@@ -91,7 +91,7 @@ This is exactly the scenario where the paper says misleading suggestions are “
 
 Use prompt #2 for this mode.
 
-Receipt: the paper’s attack-type analysis highlights misleading suggestions (A3) as the most consistently effective flip trigger across models.
+**Receipt:** the paper’s attack-type analysis highlights misleading suggestions (A3) as the most consistently effective flip trigger across models.
 
 ### Move 3: Design against the two boring killers: Self-Doubt and Social Conformity.
 
@@ -101,7 +101,7 @@ Operational rule: the assistant may change its answer only if it can name **new,
 
 Use prompt #1 to make that rule explicit.
 
-Receipt: the paper’s failure taxonomy reports Self-Doubt + Social Conformity account for 50% of failures.
+**Receipt:** the paper’s failure taxonomy reports Self-Doubt + Social Conformity account for 50% of failures.
 
 ### Move 4: Stop treating “confidence” as “correctness” (validate first, then maybe use it).
 
@@ -109,9 +109,9 @@ If you’re currently doing “if confidence < X, re-ask / escalate,” assume i
 
 Instead, use external checks: retrieval + citations, unit tests, rule-based verifiers, or a second pass/model — because the paper reports confidence is near-chance for predicting correctness (ROC-AUC 0.54).
 
-Guardrail: before shipping any confidence-based defense, stratify your flip rate by confidence bins and confirm the vulnerable cases are the ones you’re catching.
+**Guardrail:** before shipping any confidence-based defense, stratify your flip rate by confidence bins and confirm the vulnerable cases are the ones you’re catching.
 
-Receipt: the paper reports r=-0.080 and ROC-AUC=0.54; it also reports confidence mean 96.1% (SD 4.6%) and that low-confidence correct answers flip the most (Table 5: 8.8%).
+**Receipt:** the paper reports r=-0.080 and ROC-AUC=0.54; it also reports confidence mean 96.1% (SD 4.6%) and that low-confidence correct answers flip the most (Table 5: 8.8%).
 
 ### Move 5: When the debate gets long, reset the run to avoid “reasoning fatigue” turning into oscillation.
 
@@ -121,7 +121,7 @@ If the fresh run disagrees with the current stance, escalate to a verifier/human
 
 Use prompt #3 for the reset.
 
-Receipt: the paper defines oscillating / terminal-capitulation trajectories and frames reasoning fatigue as a late-round degradation pattern.
+**Receipt:** the paper defines oscillating / terminal-capitulation trajectories and frames reasoning fatigue as a late-round degradation pattern.
 
 ## Do this now (tight checklist)
 

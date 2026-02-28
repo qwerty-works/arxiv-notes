@@ -80,7 +80,7 @@ Decision rule: if you’re not using step-by-step reasoning and your failures lo
 
 Pitfall + guardrail: repetition can waste context window; cap it to tasks with short prompts or large windows.
 
-Receipt: the paper reports consistent accuracy gains “when not using reasoning,” across Gemini/GPT/Claude/DeepSeek, without longer generations.
+**Receipt:** the paper reports consistent accuracy gains “when not using reasoning,” across Gemini/GPT/Claude/DeepSeek, without longer generations.
 
 ### Move 2: Use repetition when **latency matters**, because it mostly hits prefill—not generation.
 
@@ -90,7 +90,7 @@ Decision rule: if your bottleneck is generation length, repetition is less scary
 
 Pitfall + guardrail: some providers meter/price prefill differently; verify cost, not just wall-clock.
 
-Receipt: the conclusion explicitly notes latency isn’t impacted because repetition affects the parallelizable prefill stage.
+**Receipt:** the conclusion explicitly notes latency isn’t impacted because repetition affects the parallelizable prefill stage.
 
 ### Move 3: Don’t confuse “repeat the prompt” with “make the prompt longer.”
 
@@ -100,7 +100,7 @@ Decision rule: if you’re tempted to add “extra explanation” to fix a bug, 
 
 Pitfall + guardrail: if repetition helps but padding doesn’t, don’t “optimize” by replacing repetition with filler.
 
-Receipt: Appendix ablations include a padding control (periods) that does not improve performance.
+**Receipt:** Appendix ablations include a padding control (periods) that does not improve performance.
 
 ### Move 4: Don’t expect miracles in explicit chain-of-thought mode.
 
@@ -110,7 +110,7 @@ Decision rule: if you see long internal restatements (“Let’s restate the pro
 
 Pitfall + guardrail: if you need reasoning, spend your effort on better intermediate checks and stopping rules, not repetition.
 
-Receipt: Appendix A.2 reports mostly ties when “think step by step” is used.
+**Receipt:** Appendix A.2 reports mostly ties when “think step by step” is used.
 
 ### Move 5: Turn this into a **default policy** with an eval gate.
 
@@ -120,7 +120,7 @@ Decision rule: promote repetition to default only after it wins on *your* distri
 
 Pitfall + guardrail: if it helps only one benchmark-y task, keep it scoped—don’t apply it everywhere.
 
-Receipt: the experiments span multiple-choice and other tasks (ARC/OpenBookQA/MMLU-Pro plus custom benchmarks), and they report format/length/latency comparisons.
+**Receipt:** the experiments span multiple-choice and other tasks (ARC/OpenBookQA/MMLU-Pro plus custom benchmarks), and they report format/length/latency comparisons.
 
 ## Do this now (tight checklist)
 

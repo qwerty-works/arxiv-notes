@@ -112,7 +112,7 @@ a:hover{text-decoration:underline}
 
 .article{padding: 18px 16px; margin-top:16px;}
 .article h1{font-size: 32px; line-height:1.08; margin: 0; letter-spacing:-.03em}
-.article h2{font-size: 18px; margin-top: 20px}
+.article h2{font-size: 18px; margin-top: 20px; font-weight: 900}
 .article p{margin: 12px 0}
 .article ul{margin: 10px 0 10px 20px}
 .article li{margin: 6px 0}
