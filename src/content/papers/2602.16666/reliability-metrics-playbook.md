@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.16666"
+feed: "cs.AI"
 catchyTitle: "Stop grading agents with one number"
 funnySubtitle: "Accuracy is a vanity metric. Reliability is an ops metric."
 blurb: "A safety-critical-engineering-inspired reliability profile for AI agents: 4 dimensions (consistency, robustness, predictability, safety) with 12 concrete metrics, plus an evaluation protocol (multi-run, paraphrase perturbations, fault injection, environment shifts, confidence calibration)."

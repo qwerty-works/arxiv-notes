@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.11136"
+feed: "cs.AI"
 catchyTitle: "Proof Beats Vibes"
 funnySubtitle: "LLM judges are persuasive. Z3 is petty and refuses to be charmed."
 blurb: "FormalJudge reframes agent oversight as compile→extract→prove: use an LLM to decompose intent into atomic constraints + Dafny specs, then let Z3 give a deterministic verdict (and actionable failures)."

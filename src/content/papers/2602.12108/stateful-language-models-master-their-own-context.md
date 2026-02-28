@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.12108"
+feed: "cs.AI"
 catchyTitle: "Give the model the wand"
 funnySubtitle: "Working memory should be small on purpose"
 blurb: "StateLM gives an agent a real working-memory policy: read small chunks, write durable notes, delete the raw text. Reported results show big wins under small context budgets and robustness at extreme context lengths."

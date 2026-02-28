@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2512.14982"
+feed: "cs.AI"
 catchyTitle: "Repeat the prompt. Yes, really."
 funnySubtitle: "A stupid-simple accuracy bump (when you’re not ‘reasoning’)"
 blurb: "Prompt repetition is a cheap lever: repeat the exact same input prompt before the answer, and many popular LLMs get more accurate—without longer outputs or higher latency. It’s a useful default when you’re running fast, non-reasoning generations and you care about reliability."

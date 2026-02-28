@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.23193"
+feed: "cs.AI"
 catchyTitle: "Make your coding agent auditable by construction"
 funnySubtitle: "If it can free-type, it can free-break."
 blurb: "If your agent edits files directly, you don’t have an ‘autonomous developer’—you have an unbounded blast radius plus a debugging nightmare. This paper proposes ESAA: treat the LLM as an intention emitter (validated JSON only), route every state change through a deterministic orchestrator, and store an append-only event log you can replay and hash-verify. Two case studies report 0 out-of-contract outputs and successful replay verification, while supporting multi-agent concurrency."

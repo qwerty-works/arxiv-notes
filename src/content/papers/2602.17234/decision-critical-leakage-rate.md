@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17234"
+feed: "cs.AI"
 catchyTitle: "Your backtest is lying to you"
 funnySubtitle: "If the model ‘remembers’ the future, accuracy is fake."
 blurb: "A practical leakage audit for LLM backtesting: extract atomic claims from rationales, label them with a temporal taxonomy, and compute Shapley-DCLR (decision-critical leakage) so you can tell when high performance is just hindsight." 

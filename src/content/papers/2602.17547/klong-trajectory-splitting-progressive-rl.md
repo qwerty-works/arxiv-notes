@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.17547"
+feed: "cs.AI"
 catchyTitle: "Stop training agents like the job ends in 200 turns"
 funnySubtitle: "If it overflows context and runs for hours, you’re in a different sport."
 blurb: "KLong is an open-source LLM agent trained for *extremely* long-horizon tasks (context overflow + multi-hour runs) using three operator-relevant ideas: a data factory with rubrics + blacklists, trajectory-splitting SFT (pin the early spec, overlap windows, truncate the tail), and progressive RL with staged timeouts."

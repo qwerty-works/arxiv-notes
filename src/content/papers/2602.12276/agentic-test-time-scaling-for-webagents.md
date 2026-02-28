@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.12276"
+feed: "cs.AI"
 catchyTitle: "Stop Re-Rolling Every Step"
 funnySubtitle: "Spend tokens where the agent is actually confused"
 blurb: "Uniform ‘sample N and vote’ saturates fast in long-horizon web agents. This paper shows a simple rule: measure per-step disagreement (entropy or top-1 vs top-2 margin) and only escalate to an ‘arbiter’ model call when the step is contentious—improving success while using fewer tokens."

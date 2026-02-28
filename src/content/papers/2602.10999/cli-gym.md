@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.10999"
+feed: "cs.AI"
 catchyTitle: "Break Your Container (On Purpose)"
 funnySubtitle: "If your agent can’t fix a CLI, it’s not an agent. It’s autocomplete with delusions."
 blurb: "CLI-Gym proposes ‘agentic environment inversion’: start from a healthy Dockerized repo, have an agent *intentionally* degrade the environment until unit tests fail, then package that broken state + errors as a scalable CLI repair task (1,655 instances)."

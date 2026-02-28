@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.14643"
+feed: "cs.AI"
 catchyTitle: "Stop Stuffing Your Workflow Into the Prompt"
 funnySubtitle: "Make the model choose from 2 edges, not 980"
 blurb: "If your agent must follow a strict decision tree, don’t paste the whole tree into the prompt. Convert it to an edge list, retrieve only the current node’s outgoing edges, and split the agent into a low-temp router + a separate message writer. On a 449-node triage workflow, this architecture improved turn accuracy by +29.42 points while cutting cost 14.4× and reducing latency 57.1% vs a single-prompt baseline."

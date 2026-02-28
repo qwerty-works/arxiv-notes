@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.20048"
+feed: "cs.AI"
 catchyTitle: "Stop telling your code agent to ‘search’—make it navigate"
 funnySubtitle: "A 1M-token context still won’t find the file it never thinks to open."
 blurb: "CodeCompass shows a simple rule for repo-scale agents: retrieval (BM25/grep) wins when the task text overlaps the code, but dependency-graph navigation wins when the needed files are architecturally connected and semantically distant. The operational lesson: add graph hops *and* enforce tool adoption, or you get baseline performance."

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SECTIONS } from '../../lib/sections';
+---
+
+<BaseLayout title="Sections" description="Browse by arXiv feed section.">
+  <main class="paper article">
+    <h1 style="margin-top:0">Sections</h1>
+    <p style="color:var(--muted)">These are the arXiv feeds we publish from. More coming.</p>
+
+    <div class="paper list" style="margin-top:14px">
+      {SECTIONS.map((s) => (
+        <a class="cardLink" href={`/arxiv/${encodeURIComponent(s.feed)}/`}>
+          <div class="cardTitle">{s.label}</div>
+          <div class="cardSub">Feed: {s.feed}</div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

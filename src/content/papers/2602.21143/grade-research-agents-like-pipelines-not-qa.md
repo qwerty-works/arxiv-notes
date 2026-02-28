@@ -1,5 +1,7 @@
 ---
+
 arxivId: "2602.21143"
+feed: "cs.AI"
 catchyTitle: "Grade research agents like pipelines, not QA bots"
 funnySubtitle: "If Exact Match is zero, your agent might be ‘almost right’—and still unusable."
 blurb: "DeepSynth is a 120-task benchmark for web-scale synthesis (avg 4.2 pages/task, 7.54 steps). The operator takeaway isn’t ‘models are bad’—it’s *how to evaluate them*: split navigation vs synthesis, run an oracle-planning baseline, and enforce JSON/number correctness. Even top systems hit single-digit F1 (best agent 8.97), and Africa-slice performance is 0—so your internal eval needs stage metrics + regional diversity or you’ll ship a fragile demo."
