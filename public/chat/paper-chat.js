@@ -49,9 +49,15 @@ const MAX_TURNS = 3;
 
 // Local persistence (IndexedDB)
 let store = null;
+function siteBase(){
+  const meta = document.querySelector('meta[name="arxiv-notes-base"]');
+  const base = (meta && meta.content) ? meta.content : '/';
+  return base.endsWith('/') ? base : (base + '/');
+}
+
 async function getStore(){
   if (store) return store;
-  store = await import('/local-store.js');
+  store = await import(`${siteBase()}local-store.js`);
   return store;
 }
 

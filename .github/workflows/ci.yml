@@ -51,3 +51,6 @@ jobs:
 
       - name: UI tests (favorites/local-store)
         run: npm test
+
+      - name: UI path smoke (GitHub Pages base)
+        run: npm run test:paths
