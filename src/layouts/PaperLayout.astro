@@ -35,17 +35,29 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
       <span style="color:var(--muted)">·</span>
       <span style="color:var(--muted)">{fm.paperTitle}</span>
       <span style="color:var(--muted)">·</span>
-      <button id="favBtn" type="button" style="border:1px solid var(--border); background:transparent; color:var(--muted); padding:2px 8px; border-radius:999px; cursor:pointer" aria-label="Toggle favorite" title="Favorite">☆</button>
+      <button
+        id="favBtn"
+        type="button"
+        style="border:1px solid var(--border); background:transparent; color:var(--muted); padding:2px 8px; border-radius:999px; cursor:pointer"
+        aria-label="Toggle favorite"
+        title="Favorite"
+        data-local-store-url={href('local-store.js')}
+        data-arxiv-id={fm.arxivId}
+        data-title={fm.catchyTitle}
+        data-slug={entry.slug.split('/').slice(1).join('/')}
+      >
+        ☆
+      </button>
     </div>
 
     <script type="module">
-      const LOCAL_STORE_URL = ${JSON.stringify(href('local-store.js'))};
-      const arxivId = ${JSON.stringify(fm.arxivId)};
-      const title = ${JSON.stringify(fm.catchyTitle)};
-      const slug = ${JSON.stringify(entry.slug.split('/').slice(1).join('/'))};
-
       const btn = document.getElementById('favBtn');
       if (btn){
+        const LOCAL_STORE_URL = btn.dataset.localStoreUrl;
+        const arxivId = btn.dataset.arxivId || '';
+        const title = btn.dataset.title || '';
+        const slug = btn.dataset.slug || '';
+
         const setUi = (on) => {
           btn.textContent = on ? '★' : '☆';
           btn.style.color = on ? 'var(--accent)' : 'var(--muted)';
