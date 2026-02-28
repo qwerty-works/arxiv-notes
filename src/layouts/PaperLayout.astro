@@ -40,8 +40,7 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
     </div>
 
     <script type="module">
-      import { isFavorite, setFavorite, removeFavorite } from `${BASE}local-store.js`;
-
+      const LOCAL_STORE_URL = ${JSON.stringify(href('local-store.js'))};
       const arxivId = ${JSON.stringify(fm.arxivId)};
       const title = ${JSON.stringify(fm.catchyTitle)};
       const slug = ${JSON.stringify(entry.slug.split('/').slice(1).join('/'))};
@@ -53,29 +52,38 @@ const canonical = `${fm.arxivId}/${entry.slug.split('/').slice(1).join('/')}/`;
           btn.style.color = on ? 'var(--accent)' : 'var(--muted)';
         };
 
-        const init = async () => {
-          try{
-            const on = await isFavorite(arxivId);
-            setUi(on);
-          }catch{}
-        };
+        (async () => {
+          try {
+            const { isFavorite, setFavorite, removeFavorite } = await import(LOCAL_STORE_URL);
 
-        btn.addEventListener('click', async () => {
-          try{
-            const on = await isFavorite(arxivId);
-            if (on){
-              await removeFavorite(arxivId);
-              setUi(false);
-            } else {
-              await setFavorite({ arxivId, slug, title, savedAt: Date.now() });
-              setUi(true);
-            }
-          }catch(e){
-            alert('Could not save favorite (browser storage blocked?)');
+            const init = async () => {
+              try{
+                const on = await isFavorite(arxivId);
+                setUi(on);
+              }catch{}
+            };
+
+            btn.addEventListener('click', async () => {
+              try{
+                const on = await isFavorite(arxivId);
+                if (on){
+                  await removeFavorite(arxivId);
+                  setUi(false);
+                } else {
+                  await setFavorite({ arxivId, slug, title, savedAt: Date.now() });
+                  setUi(true);
+                }
+              }catch{
+                alert('Could not save favorite (browser storage blocked?)');
+              }
+            });
+
+            init();
+          } catch {
+            // local-store failed to load (bad base path?)
+            btn.title = 'Favorites unavailable (failed to load local storage helper)';
           }
-        });
-
-        init();
+        })();
       }
     </script>
 
