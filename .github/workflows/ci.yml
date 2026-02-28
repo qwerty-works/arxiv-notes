@@ -48,3 +48,6 @@ jobs:
           else
             echo "No context.json files found; skipping"
           fi
+
+      - name: UI tests (favorites/local-store)
+        run: npm test
