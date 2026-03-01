@@ -87,16 +87,7 @@ def host_ok(url: str) -> bool:
     return host in ALLOW_HOSTS
 
 
-def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        print("Usage: python3 scripts/security_lint.py path/to/post.md", file=sys.stderr)
-        return 2
-
-    path = Path(argv[1])
-    if not path.exists():
-        print(f"ERROR: file not found: {path}", file=sys.stderr)
-        return 2
-
+def lint_one(path: Path) -> list[str]:
     md = path.read_text(encoding="utf-8")
     errors: list[str] = []
 
@@ -140,10 +131,50 @@ def main(argv: list[str]) -> int:
         if not host_ok(url):
             errors.append(f"Disallowed outbound link host: {url}")
 
-    if errors:
+    return errors
+
+
+def main(argv: list[str]) -> int:
+    # Modes:
+    #  - single file: python3 scripts/security_lint.py path/to/post.md
+    #  - all posts (default): python3 scripts/security_lint.py
+    targets: list[Path] = []
+
+    if len(argv) == 1:
+        root = Path("src/content/papers")
+        targets = []
+        for p in root.glob("*/**/*.md"):
+            # Only lint actual paper posts: src/content/papers/<arxivId>/*.md
+            # (Skip _meta, templates, notes, etc.)
+            if p.parts[-3] != "papers":
+                continue
+            arxiv_dir = p.parts[-2]
+            if re.fullmatch(r"\d{4}\.\d{5}", arxiv_dir):
+                targets.append(p)
+        targets = sorted(targets)
+        if not targets:
+            print("ERROR: no posts found under src/content/papers", file=sys.stderr)
+            return 2
+    elif len(argv) == 2:
+        targets = [Path(argv[1])]
+    else:
+        print("Usage: python3 scripts/security_lint.py [path/to/post.md]", file=sys.stderr)
+        return 2
+
+    all_errors: list[str] = []
+    for path in targets:
+        if not path.exists():
+            all_errors.append(f"ERROR: file not found: {path}")
+            continue
+        errs = lint_one(path)
+        if errs:
+            all_errors.append(str(path))
+            all_errors.extend([f"  - {e}" for e in errs])
+
+    if all_errors:
         print("SECURITY_LINT_FAILED", file=sys.stderr)
-        for e in errors:
-            print(f"- {e}", file=sys.stderr)
+        for e in all_errors:
+            print(e, file=sys.stderr)
         return 2
 
     print("SECURITY_LINT_OK")

@@ -1,0 +1,167 @@
+{
+  "arxivId": "2602.23330",
+  "paperTitle": "Toward Expert Investment Teams:A Multi-Agent LLM System with Fine-Grained Trading Tasks",
+  "abstract": "The advancement of large language models (LLMs) has accelerated the development of autonomous financial trading systems. While mainstream approaches deploy multi-agent systems mimicking analyst and manager roles, they often rely on abstract instructions that overlook the intricacies of real-world workflows, which can lead to degraded inference performance and less transparent decision-making. Therefore, we propose a multi-agent LLM trading framework that explicitly decomposes investment analysis into fine-grained tasks, rather than providing coarse-grained instructions. We evaluate the proposed framework using Japanese stock data, including prices, financial statements, news, and macro information, under a leakage-controlled backtesting setting. Experimental results show that fine-grained task decomposition significantly improves risk-adjusted returns compared to conventional coarse-grained designs. Crucially, further analysis of intermediate agent outputs suggests that alignment between analytical outputs and downstream decision preferences is a critical driver of system performance. Moreover, we conduct standard portfolio optimization, exploiting low correlation with the stock index and the variance of each system&#39;s output. This approach achieves superior performance. These findings contribute to the design of agent structure and task configuration when applying LLM agents to trading systems in practical settings.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "The advancement of large language models (LLMs) has accelerated the development of autonomous financial trading systems. While mainstream approaches deploy multi-agent systems mimicking analyst and manager roles, they often rely on abstract instructions that overlook the intricacies of real-world workflows, which can lead to degraded inference performance and less transparent decision-making. Therefore, we propose a multi-agent LLM trading framework that explicitly decomposes investment analysis into fine-grained tasks, rather than providing coarse-grained instructions. We evaluate the proposed framework using Japanese stock data, including prices, financial statements, news, and macro information, under a leakage-controlled backtesting setting. Experimental results show that fine-grained task decomposition significantly improves risk-adjusted returns compared to conventional coarse-grained designs. Crucially, further analysis of intermediate agent outputs suggests that alignment between analytical outputs and downstream decision preferences is a critical driver of system performance. Moreover, we conduct standard portfolio optimization, exploiting low correlation with the stock index and the variance of each system&#39;s output. This approach achieves superior performance. These findings contribute to the design of agent structure and task configuration when applying LLM agents to trading systems in practical settings."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Overview of our multi-agent LLM trading system (see main text for details)."
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Table 1: Sharpe Ratio Differences Between Fine-grained and                                      In the fine-grained setting (Table 2a), however, the “w/o Techni-"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 2: Trading performance under Ablation Settings                                       First, we compare the textual outputs generated under fine-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 3: Semantic Similarity with Sector Agent                           index returns and the agent composite returns is low (≈ 0.4), creat-"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 3: Sharpe ratio as a function of allocation between                     yet fully clear whether the performance gains are fundamentally at-"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 5: Top 10 representative words by Log-Odds Ratio with Dirichlet Prior"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Toward Expert Investment Teams:\n                                             A Multi-Agent LLM System with Fine-Grained Trading Tasks\n                                                                  Kunihiro Miyazaki                                                       Takanobu Kawahara\n                                                                Japan Digital Design, Inc.                                              Japan Digital Design, Inc.\n                                                                      Tokyo, Japan                                                            Tokyo, Japan\n                                                                  kunihirom@acm.org                                                takanobu.kawahara@japan-d2.com"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Stephen Roberts                                                            Stefan Zohren\n                                                         Department of Engineering Science                                         Department of Engineering Science\n                                                                University of Oxford                                                      University of Oxford\narXiv:2602.23330v1 [cs.AI] 26 Feb 2026\n\nUnited Kingdom                                                            United Kingdom\n                                                               sjrob@robots.ox.ac.uk                                                  stefan.zohren@eng.ox.ac.uk"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Abstract                                                                       with expectations to generate profits in both investment and trad-\n                                         The advancement of large language models (LLMs) has accelerated                ing contexts through the utilization of agent-based autonomy and\n                                         the development of autonomous financial trading systems. While                 intelligence [34, 62]. One of the most common configurations is\n                                         mainstream approaches deploy multi-agent systems mimicking                     a multi-agent trading system, in which multiple LLM agents are\n                                         analyst and manager roles, they often rely on abstract instruc-                assigned specific roles such as fundamental analysis, news parsing,\n              "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "improvements. The evaluation uses Japanese equity market data,                  systems for LLM-based trading is nascent; research has primarily\nincluding stock prices, financial statements, news articles, and                focused on achieving end-to-end trading completion, with little\nmacroeconomic information. To prevent data leakage and account                  light shed on the granular details of task execution. In contrast, we\nfor the LLM model’s knowledge cutoff, we set the backtesting pe-                aim to formulate role prompts in a more fine-grained and realistic\nriod from September 2023 to November 2025. Beyond portfolio-                    manner that deliberately imitates the division of labor in real invest-\nlevel performance, we also evaluate intermediate textual outputs                ment organizations, to improve controllability and interpretability\nto analyze how"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Portfolio Construction: To eliminate market-wide volatility risk               and Technical—analyze each stock in the investment universe.\nand isolate stock selection capability, we adopt a market-neutral              The Quantitative and Technical Agents assign attractive scores\nstrategy. Specifically, the portfolio holds an equal number of stocks          𝑆 ∈ [0, 100] and generate a textual rationale supporting their evalu-\nfor both long (buy) and short (sell) positions with equal weighting.           ation based on their specific domain expertise. The Qualitative and\nRebalancing Frequency: We conduct portfolio rebalancing at the                 News Agents generate the supplemental information (scores and\nopening of the first business day of each month.                               texts). The output scores and reports are integrated and submitted\nTest Period: The evaluation covers "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Level 1.                              Level 2.                                Level 3.\n               Input data            Information Aggregation and Scoring   Sector- and Macro-Level Adjustment      Portfolio Construction"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Stock prices                Technical Agent\n                                                                  Score&\n                                                                  Report\n                                        Fundamental Agent\n                                                                                     Sector Agent\n                                          (Quantitative)          Score&                                Adjusted\n               Financial                                                                                                                      Final score\n                                                                  Report          Compare stocks        Score&          PM Agent\n              statements                                                                                                                    for each stock\n   "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "News texts                   News Agent\n                                                                  Score&\n                                                                  Report\n                                                                                                        Score&\n            Macroeconomics                                                                              Report\n                                                                                     Macro Agent\n                 data\n\nFigure 1: Overview of our multi-agent LLM trading system (see main text for details)."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "(US VIX, Nikkei VI). For all indicators, we utilize the latest available             Oscillator: Moving Average Convergence Divergence (MACD):\nclosing values and their month-over-month rates of change.                           This metric measures trend momentum as the difference between\n                                                                                     short-term (12-day) and long-term (26-day) exponential moving\n5     Methodology                                                                    averages (EMA) of price, with a 9-day EMA of the MACD line as\n                                                                                     the “signal line,” and their difference as the “histogram.” We show\nThis section details the fine-grained tasks we provide to agents in\n                                                                                     the detail"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Ratio, EV/EBITDA Multiple, Dividend Yield; Efficiency: Total As-            6     Experimental Results\nset Turnover, Inventory Turnover Period; and Growth: Revenue                In this section, we present the empirical backtesting results of the\nGrowth Rate (CAGR), EPS Growth Rate.                                        proposed multi-agent trading system using the Japanese TOPIX\n   For coarse-grained tasks for the Quantitative Agent, instead of          100 universe from September 2023 to November 2025.\nproviding aggregated financial metrics, we provide the agent with\nraw data points that we can get from financial statements, such             6.1     Fine-Grained vs Coarse-Grained Tasks\nas: Income Statement: Sales, Operating Profit, Net Income, Cost\n                                                                            To evaluate the effectiveness of fine-grained task decomposit"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "no news is available, we use NaN as input. The agent searches for                                                          *            ****\nheadlines containing company names (and their abbreviations) and\nextracts the headline and content when found. The agent outputs\n                                                                                                 1.0\nrisk and return outlook scores (5-point scale) and reasoning texts                               0.5\nas input to the Sector Agent.\n                                                                                                 0.0\n5. Sector Agent (Sector-Level Adjustment). This agent synthesizes the\n                                                                                                       10        20        30    40     50\noutputs from the four analyst agents and compares the quantitative\nfigures of each stock"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "corresponds to the all-agent configuration, consistent with the re-                          signals. This highlights the importance of carefully designing agent\nsults shown in Figure 2. Across leave-one-out settings, we find                              roles and interactions, rather than simply increasing the number\n                                                                                             of specialized components.\nTable 1: Sharpe Ratio Differences Between Fine-grained and                                      In the fine-grained setting (Table 2a), however, the “w/o Techni-\nCoarse-grained Settings                                                                      cal” condition shows predominantly negative differences, especially\n                                                                                             for larger portfolio sizes. This implies tha"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "their respective prompt instruction, which is consistent with our                the Technical Agents perform well, and their impact is critically\nexpectations. The fine-grained setting tends to produce more nu-                 high, especially in a fine-grained setting.\nanced analytical terms such as “momentum,” “volatility,” and “con-                  Note that, across trials, the similarity values exhibit very small\ndition” for Technical, and “margins,” “growth-rate,” and “profitabil-            variance, with below 0.002 standard deviation for all cases. Because\nity” for Quant. In contrast, the coarse-grained setting favors more              of this small deviation, the difference between the two settings\nsurface-level market descriptors, such as “price,” “trend,” “rise,”              (Diff.) is statistically significant in all cases.\nand “increase” for Technical, and “EPS,” “earning"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "69, 76] rely on natural language communication, while alternative\n                     2.00\n      Sharpe ratio\n                                                                               approaches propose machine-oriented languages that are mutually\n                     1.75\n                                                                               intelligible among AI agents to improve efficiency and accuracy [63,\n                     1.50                                                      73]. Nevertheless, from a practical perspective [18], natural lan-\n                     1.25                                                      guage interfaces appear advantageous, as they enable interpretabil-\n                                 Gross\n                     1.00        Net (10bps)                                   ity and downstream analyses such as those conducted in our st"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "[10] Felix Drinkall, Eghbal Rahimikia, Janet Pierrehumbert, and Stefan Zohren. 2024.             [37] Burt L Monroe, Michael P Colaresi, and Kevin M Quinn. 2008. Fightin’words:\n     Time machine GPT. In Findings of the Association for Computational Linguistics:                  Lexical feature selection and evaluation for identifying the content of political\n     NAACL 2024. 3281–3292.                                                                           conflict. Political Analysis 16, 4 (2008), 372–403.\n[11] EDINET. [n. d.]. EDINET. https://disclosure2dl.edinet-fsa.go.jp/guide/static/               [38] Sina Montazeri, Haseebullah Jumakhan, and Amir Mirzaeinia. 2025. Finding\n     disclosure/WEEK0060.html [Online; accessed 2026-02-05].                                          Optimal Trading History in Reinforcement Learning for Stock Market Trading.\n[12] FRED. [n. d.]. St. Louis Fe"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "[60] Jiaxin Wen, Ruiqi Zhong, Akbir Khan, Ethan Perez, Jacob Steinhardt, Minlie               A.2     RSI\n     Huang, Samuel R Bowman, He He, and Shi Feng. 2024. Language models learn\n     to mislead humans via RLHF. arXiv preprint arXiv:2409.12822 (2024).                      The RSI is defined as\n[61] Zeyu Xia, Mingde Shi, and Changle Lin. 2023. Stock trading strategy developing                                                         100\n     based on reinforcement learning. In Proceedings of the 2nd International Academic                                𝑅𝑆𝐼𝑡 = 100 −                ,\n     Conference on Blockchain, Information Technology and Smart Finance (ICBIS 2023).                                                     1 + 𝑅𝑆𝑡\n     Atlantis Press, 156–164.                                                                 where\n[62] Yijia Xiao, Edward Sun, Di Luo, and Wei Wang. 2024. Tradi"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "B.1.2   User Prompt (Fine-Grained).\n                                                                                               Instruction: The following are technical indicators for a particular\n                                                                                               stock at the end of a given month. Based on these, please rate the\n                                                                                               attractiveness of long or short positions in this stock on a scale\nA Formulas for Technical Indicators                                                            of 0 to 100 points.\nA.1 MACD                                                                                       Technical indicators used (summary of definitions/reference):\n                                                                                                - Moment"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "· MACD: (12-day EMA - 26-day EMA) / Close price. Normalized by          Rules & Definitions:\n          dividing by Close.                                                     - Metrics: Profitability, Value (PER), Cash Flow, Financial Health,\n        · RSI: Ranges from 0 to 100. (100 × Upward Avg) / (Upward Avg +            Growth (Sales/EPS).\n          Downward Avg).                                                         - Trend Analysis: Consider both \"Absolute Value\" and \"Diff\" (change\n        · Stochastic Oscillator: Uses K, D, J indicators.                          from prev. month).\n Evaluation Rules:                                                               - Freshness: If \"Information Update Month\" is \"Yes\", latest results\n  - Comprehensively assess the risk-reward ratio for the next month                are reflected.\n    based on the combination of indicators.              "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "11\n\f,,                                                                                                                                       Miyazaki et al."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Guidelines:                                                                   Synthesis Logic & Perspective:\n  - Inputs: Excerpts from Securities Reports (Business Overview,                - The \"Bridge\": Connect raw multi-angle analysis to PM execution.\n    Risks, MD&A, Governance).                                                   - Metaphor: Tech/Quant act as the \"Engine\" (price/value);\n  - Outputs: Three specific scores (1-5) and a strategic summary                  Qualitative acts as the \"Steering\" (hazards).\n    (\"Insight\").                                                                - Dynamic Weighting: Adjust weights based on consistency and sector\n  - Format: Return ONLY a JSON object. The \"insight\" must be written              environment (e.g., high volatility → prioritize risk).\n    in Japanese.\n                                                                             "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Instruction: Evaluate the current macroeconomic environment to                         · 0: Strong Underweight/Avoid (High risk).\n impact the 1-month forward return of Japanese stocks, based on                     2. Final Rationale (Japanese):\n \"Levels\" and \"RoC\" (Rate of Change).                                                   · Explain macro influence on this specific stock.\n Evaluation Items & Scoring Rules (0-100): Score 100: Strong Buy\n                                                                                        · Summarize key reasons & risk-reward balance (30 days).\n (Bullish), 50: Neutral, 0: Strong Sell (Bearish).                                  Output Format (JSON only):\n  - Market Trend: Stock indices momentum. (High: Upward trend).                     {\n  - Risk Environment: VIX & Safe assets. (High Score: Low VIX/Stable                  \"final_score\": <integer "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "B.7     PM Agent                                                                   D    Representative Words in Outputs of Agents\n                                                                                   Regarding the log-odds analysis, we first aggregate all text out-\nB.7.1   System Prompt.\n                                                                                   puts and perform morphological analysis on them. We use the\n System Prompt (Role Definition):\n Role: You are the Chief Portfolio Manager (PM). Your task is to                   Japanese morphological analyzer MeCab [23] and the dictionary\n determine the definitive investment score by integrating Top-Down                 NEologd [56]. From the texts, we extracted only nouns without ba-\n Macro analysis with Bottom-Up Sector/Stock analysis.\n                                                                         "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "B.7.2   User Prompt.\n Instruction: As the Portfolio Manager, review the Macro and\n Sector-level inputs to provide your final investment decision for\n the next 1 month.\n Input Reports (Integration):\n    [1. Macro Environment Report]\n    <Macro Analyst Output (JSON)>\n    [2. Sector Specialist Report]\n    <Sector Specialist Output (JSON)>\n Final Decision Tasks:\n 1. Final Investment Score (0-100):\n     · 100: Maximum Overweight (High conviction, perfect alignment).\n     · 50: Neutral/Hold (Market-weight, no clear edge).\n\n13\n\f,,                                                                                                                                 Miyazaki et al.\n\nTable 5: Top 10 representative words by Log-Odds Ratio with Dirichlet Prior"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Agent                              Fine-grained                                                  Coarse-grained\n     Technical   Momentum, Neutral, Short-term, Favorable, Implication,         Price, Trend, Rise, Upward-trend, Fall, Stock-price, Recent,\n     (Level 1)   Suggestion, Long-term, Condition, Decline, Volatility          Recommend, Continuation, Expectation\n     Quant.      Soundness, Margins, Growth, Profitability, Growth-rate, Fa-    EPS, Stability, Improvement, Profit, Earnings, Trend, Stagna-\n     (Level 1)   vorable, Deterioration, Financials, Issues, Unstable           tion, Increase, Attractive, Stability\n     Sector      Momentum, Soundness, Financials, Margins, Profitability,       Overall, Trend, EPS, Improvement, Operating-profit, Stagna-\n     (Level 2)   Growth-rate, Indicators, ROE, Efficiency, Undervalued          tion, Net-income, Stock-price, Trend, Decrease\n   "
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "14"
+    }
+  ]
+}
