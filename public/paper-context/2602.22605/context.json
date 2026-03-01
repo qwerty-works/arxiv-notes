@@ -1,0 +1,387 @@
+{
+  "arxivId": "2602.22605",
+  "paperTitle": "A Thermodynamic Structure of Asymptotic Inference",
+  "abstract": "A thermodynamic framework for asymptotic inference is developed in which sample size and parameter variance define a state space. Within this description, Shannon information plays the role of entropy, and an integrating factor organizes its variation into a first-law-type balance equation. The framework supports a cyclic inequality analogous to a reversed second law, derived for the estimation of the mean. A non-trivial third-law-type result emerges as a lower bound on entropy set by representation noise. Optimal inference paths, global bounds on information gain, and a natural Carnot-like information efficiency follow from this structure, with efficiency fundamentally limited by a noise floor. Finally, de Bruijn&#39;s identity and the I-MMSE relation in the Gaussian-limit case appear as coordinate projections of the same underlying thermodynamic structure. This framework suggests that ensemble physics and inferential physics constitute shadow processes evolving in opposite directions within a unified thermodynamic description.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "A thermodynamic framework for asymptotic inference is developed in which sample size and parameter variance define a state space. Within this description, Shannon information plays the role of entropy, and an integrating factor organizes its variation into a first-law-type balance equation. The framework supports a cyclic inequality analogous to a reversed second law, derived for the estimation of the mean. A non-trivial third-law-type result emerges as a lower bound on entropy set by representation noise. Optimal inference paths, global bounds on information gain, and a natural Carnot-like information efficiency follow from this structure, with efficiency fundamentally limited by a noise floor. Finally, de Bruijn&#39;s identity and the I-MMSE relation in the Gaussian-limit case appear as coordinate projections of the same underlying thermodynamic structure. This framework suggests that ensemble physics and inferential physics constitute shadow processes evolving in opposite directions within a unified thermodynamic description."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Figure reproduced from [22]. Steady-state activity plotted versus peak activity for"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "A Thermodynamic Structure of Asymptotic Inference\n\nWilly Wong∗\narXiv:2602.22605v1 [cs.IT] 26 Feb 2026\n\nFebruary 27, 2026\n\nAbstract\n\nA thermodynamic framework for asymptotic inference is developed in which sample\n\nsize and parameter variance define a state space. Within this description, Shannon in-\n\nformation plays the role of entropy, and an integrating factor organizes its variation into\n\na first-law–type balance equation. The framework supports a cyclic inequality analo-\n\ngous to a reversed second law, derived for the estimation of the mean. A non-trivial\n\nthird-law–type result emerges as a lower bound on entropy set by representation noise.\n\nOptimal inference paths, global bounds on information gain, and a natural Carnot-like\n\ninformation efficiency follow from this structure, with efficiency fundamentally lim-"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "ited by a noise floor. Finally, de Bruijn’s identity and the I–MMSE relation in the\n\nGaussian-limit case appear as coordinate projections of the same underlying thermo-\n\ndynamic structure. This framework suggests that ensemble physics and inferential\n\nphysics constitute shadow processes evolving in opposite directions within a unified\n\nthermodynamic description.\n\n∗ Dept. of Informatics, Faculty of Information Science and Electrical Engineering, Kyushu Uni-\n\nversity willy@inf.kyushu-u.ac.jp\n\f1     Introduction"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Statistical inference is the process by which sampled data are used to infer properties of\nan underlying probability distribution. As the number of samples m becomes large, a fa-\nmiliar asymptotic structure emerges: (i) efficient estimators have variances that scale as\n1/m; (ii) Fisher information is additive; and (iii) sampling distributions become Gaussian.\nTaken together, these properties can be shown to admit a thermodynamic-like mathematical\nstructure. Although statistical inference itself does not describe thermal interactions, the\nresulting structure nonetheless exhibits an a balance law, a natural third law–type constraint\nand, under appropriate conditions, a cyclic inequality that closely parallel the fundamental\nlaws of thermodynamics.\n    These ideas originated from considerations in sensory neuroscience. A sensory receptor\ndoes not observe a stimulus parameter directly; inste"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\ffrom sensory neuroscience, it is not specific to that domain: since the sensory problem is\nfundamentally that of parameter estimation, the same structure applies—with appropriate\nqualifications—to metrology, i.e. inference in measurement science.\n   The inference problem considered here departs from the study of static systems and in-\nstead addresses systems that can evolve over time. We assume that inference is conducted\nindependently over non-overlapping epochs, each treated as locally stationary so that asymp-\ntotic estimation theory applies within each epoch. The sample size denotes the number of\nobservations allocated to a single epoch and may vary between epochs to reflect changes in\noperating conditions. The variance may likewise change, reflecting evolution of the underly-\ning system. In this way, non-stationarity is accommodated through shifts in thermodynamic\ncoordinates bet"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\ffactor that yields a first-law–type balance relation; (3) optimal information-gain paths and\nefficiency bounds; and (4) a unification of familiar entropy–information identities, including\nthe Gaussian-limit form of the de Bruijn and I–MMSE results, as coordinate projections of\na single underlying structure.\n    With this perspective in place, we begin by contrasting inference with the conventional\nensemble-based viewpoint of thermal physics.\n\n2     Ensemble vs. inferential physics"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "In thermal physics, the macroscopic description is specified by constraints on variables such\nas energy or temperature, and physical observables are obtained by averaging over the com-\npatible microscopic configurations. Entropy then quantifies the residual uncertainty about\nthe microstate given the macrostate, and the second law characterizes the typical direction of\nmacroscopic evolution under many independent microscopic interactions. Inference reverses\nthis logic. Consider a tiny probe that has access only to microscopic events, but no direct\nknowledge of the macroscopic parameters that generate them. Here the macrostate is not\nprescribed in advance; it is the quantity to be inferred from data. In this sense, statistical\ninference constitutes the inverse problem to the usual ensemble construction of equilibrium\nphysics.\n    This reversal is not merely conceptual. The same Gaussian li"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "3\n\f    The contrast between the two processes can be summarized succinctly: thermal physics\ndescribes the loss of information that emerges from many independent microscopic interac-\ntions, whereas inference describes the acquisition of information under repeated sampling.\nThe technical question addressed in this paper is how far this parallel between ensemble\nphysics and inference can be carried. Specifically, we will show that inference in the large\nsample limit can be endowed with a thermodynamic structure, including state variables,\na balance relation and, with additional conditions, a second-law like inequality in (m, σ 2 )\nspace.\n    Next, we examine scenarios where the inferential viewpoint is grounded conceptually,\nnamely in sensory transduction and metrology.\n\n3     Inference in sensory transduction and metrology"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Sensory transduction provides a concrete and experimentally accessible realization of infer-\nential physics. Sensory receptors interact with stimuli at the periphery through stochastic\nmicroscopic events and must estimate macroscopic stimulus parameters from those events.\nThe outcome of this inferential process is accessible experimentally through the neural re-\nsponse. Estimation by the sensory system is achieved through repeated sampling in time.\nMicroscopic events are integrated over successive, approximately independent epochs, and\nthe resulting samples are averaged to form an estimate of stimulus magnitude at each mo-\nment. Repetition reduces noise through averaging, and the residual uncertainty of the es-\ntimate can be quantified statistically. It is this process of repeated sampling that frames\nsensory transduction naturally within the realm of statistical inference.\n    In the la"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "4\n\fstimulus-independent with variance σR2 . The total uncertainty in the estimate is therefore\ngiven by the convolution of these two Gaussian contributions. As a result, the differential\nentropy of the estimate takes a closed-form expression depending only on the sample size and\nthe variance [9, 10]. Note that the calculation of the differential entropy is of the asymptotic\nestimator distribution, rather than the entropy of the sample vector or the likelihood itself.\n   Three additional empirical assumptions are required to complete the description. First,\nthe variance of stimulus fluctuations σ 2 (µ) is assumed to be a continuous, non-decreasing\nfunction of the mean stimulus intensity µ (c.f. fluctuation scaling [4]). Second, the sample\nsize evolves dynamically, relaxing monotonically toward a unique equilibrium or optimal\nvalue meq . Third, since the variance increases monotonically wi"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "ṁ = g(m, meq ) ,                                             (1)\n                                        \u0012 2        \u0013\n                                   1     σ       2\n                              H = log         + σR + constant,                              (2)\n                                   2     m\n\nwhere g can be nonlinear and satisfies the conditions that (i) g(m, meq ) = 0 if and only\nif m = meq , with m tracking meq monotonically; (ii) σR2 is constant; and (iii) both σ 2 (µ)\nand meq (µ) are continuous, non-decreasing functions of µ. This formulation is deliberately\nabstract: it does not commit to a specific sensory modality or sampling mechanism, but\nisolates the generic nature of repeated measurement and averaging [23].\n   The final step is to relate the uncertainty H to an observable quantity. A direct propor-"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "5\n\ftionality between firing rate and uncertainty is assumed where\n\nF = kH,                                            (3)"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "with constant k [9, 10]. This identification is not derived from a deeper microscopic theory;\nits justification lies entirely in its empirical consequences. Because firing rate is directly\nmeasurable, this assumption renders the framework testable. From this, the resulting ideal\nsensory unit is already sufficient to derive a reversed second-law–type inequality for mean\ninference (Appendix 2). Additionally, with specific choices of σ 2 (µ) and meq (µ), the model\nyields quantitative predictions for firing-rate responses, including a prediction concerning\nthe firing rate that has been found to be obeyed nearly universally in sensory adaptation.\nThe relevant experimental background and evidence are reviewed in Appendix 1.\n   Sensory systems are not unique in exhibiting this statistical structure. A similar de-\nscription arises whenever an unknown parameter is inferred from repeated, independ"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "6\n\finference and examining the role of the second law.\n\n4     Foundations for a thermodynamic framework"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "The thermodynamic construction rests on two steps: (i) identifying an entropy balance\nequation, and (ii) ensuring that the entropy is a state function. For metrology, H is a\nstate function if it is a single-valued function of the chosen macroscopic state variables. In\nthe sensory domain, establishing H as a state function is more subtle because the system\nis driven and adaptive. At equilibrium, however, the sample size relaxes to a unique value\nmeq (µ), yielding Heq (µ) = 12 log[σR2 + σ 2 (µ)/meq (µ)] which depends only on the state variable\nµ; therefore, H is a state function. Moreover, there is experimental evidence demonstrating\nthat the firing rate F is path independent (see discussion in [23]).\n    From here, the differential of the entropy of the asymptotic estimator distribution can\nbe decomposed as"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "∂H      ∂H\n                                    dH =      dµ +    dm                                      (4)\n                                           ∂µ      ∂m\n                                        = δHflux + δHrelax ,                                  (5)\n\nwhere δHflux is the reversible entropy change due to externally driven changes of the stimulus\nor the system, and δHrelax is the internal response associated with sampling. Defining\n\ndI = − δHrelax ,                                      (6)\n\nwe refer to this quantity simply as information. Under the conditions discussed in Ap-\npendix 2, the theorem there gives the cyclic inequality\n\n˛\n                                               dI ≥ 0.                                        (7)"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "7\n\fThis is the second-law–type constraint for inference, with sign reversed relative to thermal\nphysics. In this formulation, a cyclic change in the stimulus (or more generally the mean\nparameter) implies nonnegative net information gain over a cycle.\n\n5     Identifying an integrating factor and a first law\n\nThe balance equation (4) does not uniquely determine the choice of macroscopic coordinates;\nmoreover, the two coordinates play different roles. Reparameterizing the sampling variable m\nmerely relabels the relaxation coordinate and leaves the inequality unchanged. By contrast,\nexpressing the entropy flux in terms of the stimulus mean µ requires specifying a constitutive\nrelation between µ and the variance σ 2 . For this reason, it is more natural to take σ 2 as the\nstate variable and the entropy balance equation is rewritten as"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "∂H 2 ∂H\n                            dH =       dσ +      dm                                          (8)\n                                  ∂σ 2       ∂m\n                                        dσ 2        σ 2 dm\n                                =               −                                            (9)\n                                  2(σ 2 + mσR2 ) 2m(σ 2 + mσR2 )\n\nOnce again, σ 2 (µ) denotes the variance of a single sensory observation, while σ 2 (θ) = I(θ)−1\ndenotes the inverse Fisher information associated with a single observation of θ.\n    The term ∂H/∂m represents relaxation and corresponds to “irreversible” entropy pro-\nduction, whereas ∂H/∂σ 2 represents entropy flux and defines the “reversible” contribution:\n\ndσ 2\n                                    dHrev =                  .                             (10)\n                                              2(σ 2 + mσR2 )"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Next, we introduce the new state variable\n\nΘ = 2(σ 2 + mσR2 ),                                  (11)"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "8\n\fso that the entropy change takes the Clausius-like form of dHrev = Θ−1 dσ 2 . Here the\nstate variable Θ plays a role analogous to temperature in thermal physics: it acts as an\nintegrating factor for the reversible entropy flux. As will be discussed later, at fixed large m,\nΘ is proportional to the inverse minimum mean square error (MMSE) for an averaged signal\ncorrupted by additive Gaussian noise. An increase in variance produces a larger change\nin entropy when m is small than when m is large. For this reason, we refer to Θ as the\nuncertainty susceptibility.\n   It is important to emphasize that the two coordinates m and σ 2 are treated independently\nand interpreted operationally. The quantity m denotes the number of observations assigned\nto a single inference interval, with intervals taken to be statistically independent and non-\noverlapping. σ 2 can change across different epochs ref"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "σ2\n                                    dσ 2 = Θ dH +         dm.                                (12)\n                                                       m\n\nThis is the first law for inferential systems with efficient asymptotic estimators. Since m is\nproperly an integer, dm should be seen as the continuum approximation to a small increment\n∆m in the large-m regime (with ∆m ≪ m). Since σ 2 is a state function, a cyclic process\n         ¸\nsatisfies dσ 2 = 0, and therefore\n\n˛              ˛\n                                                       σ2\n                                        Θ dH = −          dm.                                (13)\n                                                       m\n\nThe first law admits a clear interpretation in terms of the Cramér–Rao lower bound and"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "9\n\fthe additivity of Fisher information. Given sampled data X1 , X2 , . . . , Xm , the variance of an\nestimator of θ satisfies\n                                                      \u0001\n                                    b 1 , . . . , Xm ) ≥     1\n                                Var θ(X                           ,                          (14)\n                                                           Jm (θ)\n\nwhere Jm (θ) is the Fisher information based on m independent observations. For an efficient\nestimator, equality is achieved. Since Fisher information is additive,\n\nm\n                                             X\n                                  Jm (θ) =         J(θ) = mJ(θ),                             (15)\n                                             i=1"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "with J(θ) the information from a single sample. For a Gaussian distributed signal with\n                                             −1\nvariance σ 2 , J(θ) = 1/σ 2 yielding σ 2 = mJm  . Differentiating gives\n\n−1      −1\n                                   dσ 2 = m d(Jm  ) + Jm  dm                                 (16)\n                                             \u0012 2\u0013\n                                               σ       σ2\n                                        =md          + dm                                    (17)\n                                               m       m"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Reintroducing dH = mΘ−1 d(σ 2 /m) recovers (12). The first law therefore reflects efficient\nestimation and the additivity of Fisher information. When variance is introduced into the\nsystem, it either contributes to increased uncertainty through the term Θ dH, or is reduced\nthrough sampling via (σ 2 /m) dm. This mirrors the thermodynamic interpretation in which\ninjected energy either increases entropy or is converted into work.\n   The correspondence with classical thermodynamics can be made explicit by comparing\nwith\n                                      dU = T dS − P dV.                                      (18)\n\nIn thermodynamics, intensive and extensive variables are paired up so that the left hand size\ndU ends up being extensive (i.e. Euler homogenous of order 1). In (12), m is taken to be\nextensive as sampling is a resource and additional samples can be thought of as requiring"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "10\n\feffort. Variance is also additive and therefore extensive as well. Finally, from the definition\nof the variables, Θ is extensive and H is intensive. Mapping the first law with (18), we can\nidentify (−m) as a quasi-volume and σ 2 /m as a quasi-pressure.\n   Specific cases further clarify the analogy with thermal physics. For a quasi-isochoric\nprocess (dm = 0), the quasi-heat equals dσ 2 . In the limit of vanishing representation noise,\nΘ ≈ 2σ 2 , and the quasi-heat can therefore be written as dΘ/2. For a one-dimensional ideal\ngas, the corresponding expression is kB dT /2 when normalized to be intensive. Since the\nvariance of the Maxwell–Boltzmann velocity distribution equals kB T , this makes the two\nsides structurally similar. A gas-law-like relation follows from Θ = 2(σ 2 + mσR2 ), yielding\nσ 2 /m = Θ/(2m) − σR2 . In the limit of zero representation noise, this reduces to (σ 2 /m)m ≈"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "11\n\f1/m with a decreasing rate of return when sample size is increased. When ma = mb , the\nsampling work equals zero. In general, the integral is path dependent in (m, σ 2 ) state space\nas (σ 2 /m) dm is not an exact differential, and its value is non-zero when evaluated over a\ncycle. Consider a system with σa2 sampled with sample size ma . At t = 0, the system is\nperturbed such that the variance increases to σb2 ≥ σa2 with the sample size increased to mb .\nAt a later time, the variance is returned to σa2 and the sample size is returned to ma . The\nsampling work over this cycle is\n\n˛             ˆ mb              ˆ ma\n                                σ2               σb2               σa2\n                                   dm =              dm +              dm                  (19)\n                                m          ma    m           mb    m"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "= (σb2 − σa2 ) log(mb /ma ),                         (20)\n\nwhich can be interpreted geometrically as a weighted area enclosed in (m, σ 2 ) space.\n\n6    Other thermodynamic relationships, and a third law\n\nOther thermodynamic potentials can be written down formally, but they do not have the\nsame operational role as in thermal physics. The reason is that the variance susceptibility\nΘ = 2(σ 2 + mσR2 ) is a derived state function which is fixed jointly by both m and σ 2 . So the\nusual Legendre formalism of fixing one variable and extremizing over the conjugate variable\ndoes not have a direct analogue. For example, one may define a quasi–Helmholtz free energy\n\nA = σ 2 − ΘH.                                    (21)"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "This is a legitimate state function but because Θ is not an independently controllable vari-\nable, A does not generate a distinct thermodynamic potential with an associated extremum\nprinciple. Moreover, the corresponding Gibbs-like potential reduces to G = −ΘH. Finally,\n\n12\n\fan enthalpy-like construction collapses to zero because constant σ 2 /m implies dH = 0. In\nthis case, all of the variance must be accounted for by the sampling work.\n    Several partial derivative relations can be derived. These relations follow directly from\nthe entropy function H and Θ:"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "σ2\n                           \u0012     \u0013              \u0012    \u0013\n                            ∂H      1            ∂H\n                               2\n                                   = ,                 =−    ,\n                            ∂σ      Θ            ∂m σ2    Θm\n                           \u0012 2 \u0013m                                                         (22)\n                                    σ2\n                                                \u0012    \u0013\n                            ∂σ                    ∂Θ    Θ\n                                   = ,                 = .\n                            ∂m H    m             ∂m H  m"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "From the equation of state Θ = 2(σ 2 + mσR2 ) one also obtains the quasi-specific heat Cm =\n1/2, reminiscent of an equipartition-like result.\n    Finally, a natural third law also emerges from the thermodynamic structure. The entropy\nH = 21 log(σ 2 /m + σR2 ) + const attains its minimum value as m → ∞, where (up to a\nconstant) it approaches the value log(σR ). In sensory applications one often chooses the\nconstant so that H = 0 as m → ∞, allowing H to be interpreted as mutual information. As\nin thermodynamics, this limit is unattainable: not only is m a resource, in the sensory model\nm assumed to be finite and saturates at meq . As such, this illustrates the unattainability of\nzero entropy.\n\n7     Information gain and efficiency"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "An important concept in thermodynamics is the efficiency by which energy supplied to a\nsystem can be converted into useful work. The analogous question in inference concerns the\nefficiency with which information can be acquired through sampling. In classical estimation\ntheory, this efficiency is constrained by the Cramér–Rao bound together with the additivity of\nFisher information, which implies that estimator variance decreases marginally as the sample\nsize m grows. Fisher’s information, however, is not a measure of uncertainty in the literal"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "13\n\fsense; it characterizes the curvature of the log-likelihood. By contrast, Shannon entropy\nprovides an axiomatic measure of uncertainty, but is typically defined for fixed probability\ndistributions and does not by itself encode how uncertainty changes with sampling. In (2), H\ncouples Fisher with Shannon information through an equation of uncertainty that is explicitly\nparameterized by sample size, allowing uncertainty reduction and inferential efficiency to be\ntreated within a single state-space framework. Next we explore how this function shapes\ninformation gain and efficiency.\n\n7.1    Information gain\n\nWe begin by considering the information gained given a fixed sampling budget. This problem\ncan be formulated by examining the sampling-driven terms from the first and second laws.\nConsider the extremization of the information gained through the variation of"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "ˆ mb \u0012                    ˆ mb\n                                                                     1 σ2\n                                                   \u0013\n                                              ∂H\n                        ∆I = −                         dm =               dm,           (23)\n                                        ma    ∂m                ma   Θm\n\nwhich we maximize subject to a fixed sampling “cost” measured by the sampling work\n\nˆ mb\n                                                  σ2\n                                                     dm = W .                           (24)\n                                             ma   m\n\nThe resulting Euler-Lagrange equation is given by"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "σ2          λσ 2\n                                    \u0012                                \u0013\n                              ∂\n                                                         −               =0             (25)\n                             ∂σ 2       2m (σ 2 + mσR2 )    m\n\nwhere λ is the Lagrange multiplier. The condition of optimality can be written in the compact\n        √\nform Θ/ m = const illustrating a trade-off between the state variable Θ and resource m at\na fixed sampling work budget.\n\n14\n\f   Solving for the optimal variance trajectory we obtain\n\n2               W + σR2 (mb − ma ) √ 2\n                        σoptimal (m) =     √        √ \u0001 m − mσR                         (26)\n                                          2 mb − ma"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "This solution can be shown to yield a maximum for the information gained by considering\nthe second variation. The optimal trajectory has an inverted u-shape due to the tradeoff\n                          √\nbetween a sub-linear term m and linear term m. Trajectories are nevertheless restricted\nby the non-negativity of variance.\n   From (26), the optimal information gained can be evaluated to be\n\n√     √ \u00012\n                                  1    mb   2σR2   mb − ma\n                       ∆Ioptimal = log    −                                             (27)\n                                  2    ma    W + (mb − ma )σR2"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Any other path will yield lower information gain for the same budget W . The optimal\nvalue of ∆I is non-decreasing in both mb /ma and W . From here, an upper bound can be\nestablished:\n                                               1     mb\n                                     ∆Imax =     log    .                               (28)\n                                               2     ma"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Regardless of how sampling takes place, or how the variance evolves, the difference in uncer-\ntainty going from ma to mb cannot exceed this upper bound. Moreover, since the derivation\nis carried out in the asymptotic limit, the bound is independent of the underlying distribu-\ntion, provided that variance exists in the asymptotic regime. While this result may appear\nstraightforward when variance is held constant, it is no longer immediate when variance is\nallowed to vary. Thus, (28) defines the maximum information gain for asymptotic inference\nacross all admissible paths in (m, σ 2 ) space — a channel-capacity–like upper bound.\n\n15\n\f7.2    Information efficiency\n\nThe local production of uncertainty is described by the equation"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "\u0012          \u0013\n                                          ∂H              1\n                                                      =     ,                           (29)\n                                          ∂σ 2    m       Θ"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "which specifies how entropy responds to infinitesimal changes in variance. For fixed m,\nthe quantity Θ is bounded from below. Its conditional minimum occurs at σ 2 = 0, where\nΘC = 2mσR2 . The representation noise σR2 therefore imposes a fundamental lower bound\non Θ (and thus an upper bound on information production) analogous to a third-law–type\nconstraint. Finally, the dependence on m reflects the diminishing returns associated with\nincreased sampling.\n   The estimator variance is σ 2 /m, and so increasing the sample size reduces the effec-\ntive variance. In this sampling-driven setting, (29) corresponds to the Gaussian form of\nde Bruijn’s identity [3], with m playing the role of a time or noise parameter through the\nratio σ 2 /m. Alternatively, if variance is treated as the independent control variable, Θ is\nrelated to the minimum mean-square error (MMSE) of a Gaussian channel. For an "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "2σ 2 σR2\n                                     MMSE =                    .                        (30)\n                                                        Θ\n\nIn this representation, (29) reduces to the I–MMSE relation [6]. The appearance of both\nde Bruijn’s identity and the I–MMSE relation reflects the Gaussian structure underlying the\nentropy function. More importantly, both arise as distinct coordinate projections of a single\nunderlying thermodynamic structure. This unification is encoded by the state function Θ =\n2(σ 2 + mσR2 ), which governs joint sampling- and variance-driven information transduction.\n   In communication theory, SNR measures channel quality. In inference, SNR instead\n\n16\n\fquantifies residual uncertainty relative to inferential effort. Although the same ratio appears,\nits interpretation differs. With this distinction in mind, we rewrite the MMSE as"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "MMSE     ΘC\n                                     η≜          =    ,                                    (31)\n                                          σ 2 /m   Θ"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "where normalization by the input signal variance σ 2 /m defines a dimensionless quantity η\ncharacterizing local information efficiency. The efficiency obeys 0 ≤ η ≤ 1, with η = 1\nattained at the noise floor. The existence of a temperature-like variable Θ together with a\nbounded efficiency permits Carnot-type reasoning at the level of inference. Here ΘC plays\nthe formal role of a cold-reservoir temperature, limited by the representation noise. Unlike\nthermal engines, where efficiency measures work extraction and therefore involves a one\nminus structure, the efficiency here measures the fraction of attainable certainty achieved.\n   While the preceding discussion assumes estimators attaining the Cramér-Rao lower bound,\nthe definition of information efficiency extends naturally to suboptimal estimators. Assum-\ning that the general estimator achieves asymptotic normality, the lower bound imp"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "1\n                                         dΣ =     dσ 2 ,                                   (32)\n                                                Θ\n\nwhere dΣ denotes the path dependent entropy production associated with an incremental\ndisplacement in (m, σ 2 ) space. For a fixed dσ 2 , we seek the condition that renders dΣ\n\n17\n\fstationary, i.e.\n                                          δ(dΣ) = 0,                                      (33)"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "for which δ(dΣ) = δ(Θ−1 ) dσ 2 . If m is varied alone, no stationary point exists because\n∂(Θ−1 )/∂m ̸= 0 for finite m. Stationarity therefore requires simultaneous variation of both\ncoordinates such that dΘ = 0, i.e. Θ remains constant along the stationary path. The second\nvariation is positive, so this condition corresponds to a minimum. Thus, small changes in\nvariance produce the least possible entropy production when Θ is constant.\n   The requirement that Θ = 2(σ 2 + mσR2 ) remain constant can appear counterintuitive,\nas an increase in variance must be accompanied by a decrease in sample size. This reflects\nthe fact that information efficiency decreases with both increasing variance and increasing\nsample size. When Θ is held fixed, the marginal cost of reducing uncertainty remains uniform.\nThus the principle of local minimal information production is therefore not a statement about\ni"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "that I /W = ⟨Θ−1 ⟩ ≤ Θ−1                               2\n                      inf . However, since Θinf ≥ 2m∗ σR , where m∗ is the minimum\n\nvalue of m attained in the cycle, therefore I /W ≤ ΘC (m∗ )−1 . That is, the global efficiency\nis bounded by the local efficiency evaluated at the point where m reaches its minimum\nvalue along the cycle. In short, the representation noise sets the irreducible floor, while the\nsample size determines where the floor is evaluated. No choice of cycling through variance\ncan overcome the constraint imposed by minimal sampling. Thus the global bound on\n\n18\n\finformation efficiency is encoded entirely by the local efficiency and by access to the smallest\nattainable sample size. This is analogous to Carnot’s result, which shows that efficiency\ndepends only on the availability of extreme temperatures.\n\n8     Discussion"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "This paper introduces a thermodynamic framework to asymptotic inference by adopting\nsample size m and variance σ 2 as macroscopic state variables. Within this description, the\ndifferential entropy of the asymptotic estimator distribution is calculated in (2), and rela-\ntionships formally analogous to the laws of thermodynamics can be derived. These include\na reversed second-law–type inequality for mean inference (7), the existence of temperature-\nlike state function Θ = 2(σ 2 + mσR2 ) leading to a first-law–type balance relation (12), and\na lower bound on uncertainty set by representation noise that plays a role analogous to a\nthird law. Taken together, these elements define a coherent state-space structure governing\ninformation acquisition in the asymptotic regime permitting the derivation of fundamental\nresults in information gain and efficiency.\n    The correspondence developed here i"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "19\n\fthermodynamic structure therefore does not encode a particular physical mechanism, but\ninstead constrains both the forward ensemble approach and its inverse inferential process as\ntwo realizations of a common formal framework.\n   When extending this approach to metrology, one would expect the same picture and\nmathematics to apply, but with several important caveats. First, the theory is asymptotic:\nit assumes large sample size m, asymptotic normality of estimators, and sufficient smooth-\nness to treat m as a continuous variable. These assumptions are not always satisfied in\npractical settings of measurement. Second, the derivation of a second-law–type inequality\nrelies on some minimum admissibility constrains on sampling, as well as a fluctuation-scaling\nasymmetry. In sensory systems fluctuation-scaling is well supported empirically, as larger\nstimulus magnitudes are typically accomp"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "20\n\fthey can be represented as additional stochastic variability and do not disrupt the asymptotic\nproperties—will not alter the geometric structure of the (m, σ 2 ) state space, but instead shift\nthe operating point of the system to that of a lower efficiency.\n    Several directions for future work follow naturally from this framework. While the present\ntheory focuses on a thermodynamic description of inference, the identification of variance as\nan energy-like variable also suggests a similar statistical physics viewpoint. If the individual\nsamples are denoted by x1 , . . . , xm , a microstate may be identified with the vector x ∈ Rm .\nFixing the sample mean x̄ and sample variance σ̂ 2 = m1 i (xi − x̄)2 restricts the microstates\n                                                           P"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "to a sphere of fixed radius, analogous to a kinetic energy shell, and thereby defining a\nmicrocanonical ensemble. Alternatively, maximizing entropy subject to a constraint on ⟨σ 2 ⟩\nyields a canonical distribution P (x) ∝ exp(−β i (xi − x̄)2 ), with β = Θ−1 . Moreover, if\n                                              P\n\nthe sample entropy Ĥ is constructed from the sample variance σ̂ 2 , this formulation allows\nfor considerations of fluctuations in inference. In particular, large-deviation results such\nas Sanov’s theorem suggest a route towards the construction of fluctuation theorems for\ninference [3]. Finally, although the present work is formulated in the large-m limit, systematic\ncorrections can be explored for specific sampling distributions, such as exponential-family,\nusing the Edgeworth or related asymptotic expansions.\n\nA      Appendix 1: Sensory background and adaptation"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "results\n\nThis appendix summarizes the empirical and theoretical background of the sensory work\nthat motivated the present paper. The goal is not to re-derive the full sensory theory, but to\nshow how the ideal sensory unit (cf Section 3) reproduces results and predictions reported\npreviously. Full details of the theory can be found elsewhere, e.g. [23].\n\n21\n\fA.1       Linearization of sampling dynamics\n\nA standard way to solve the nonlinear state-space model (1)-(2) is to linearize it around a\nfixed point. Here the fixed point is the steady-state sample size meq . For constant stimulus,\nexpand ṁ = g(m, meq ) to first order about m = meq and use g(meq , meq ) = 0 to obtain\n\ndm\n                                       = −a (m − meq ),                                   (34)\n                                    dt\n\nwhere a = −(∂g/∂m)|m=meq > 0 is the relaxation rate."
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "A.2       A Tweedie scaling ansatz and an expression for entropy\n\nTo obtain closed-form expressions for the response of the sensory neuron (i.e. the firing\nrate), one can adopt a fluctuation-scaling-type model for the input statistics. The canonical\nexample arises in vision, where photon statistics at the level of the photoreceptor are well\napproximated by a Poisson distribution. In particular, if the input distribution lies in the\nTweedie family, then over a wide range of natural signals one can write σ 2 ∝ µp , and\ncorrespondingly meq ∝ µp/2 .\n   Choosing the additive constant in (2) to be 12 log(σR2 ) renders H to be a mutual informa-\ntion. Writing the mean input as µ = I + δI, with stimulus intensity I and additive noise δI,\nwe have"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "β(I + δI)p\n                                      \u0012               \u0013\n                                  1\n                               H = log 1 +              ,                                 (35)\n                                  2            m\n                                     meq = (I + δI)p/2 ,                                  (36)\n\nwhere the parameters k, β, p, δI and a are taken to be positive. In practice, these parameters\nare estimated by fitting to response data, although overfitting is often a challenge. These\nexact equations have been developed across a series of publications beginning in the 1970’s\n\n22\n\f[9, 10, 11, 19, 20]. Given a stimulus profile I(t), one can compute the time-dependent firing\nrate via F = kH in (3).\n\nA.3        Sensory adaptation"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Adaptation refers to the neural response to stimulation whereby firing rate rises from a\nspontaneous level, reaches a peak shortly after stimulus onset, and then decays monotonically\nto a steady-state value. For a constant stimulus t ≥ 0, meq is constant and (34) has the\nsolution\n                             m(t) = m(0)e−at + meq (1 − e−at ).                         (37)\n\nBy continuity we take m(0) to be the equilibrium sample size at I = 0, i.e. m(0) = δI p/2\n[20]. Substituting (37) into (35) and using F = kH we obtain the time-dependent response\n\nβ(I + δI)p\n                                \u0012                                  \u0013\n                            k\n                  F (I, t) = log 1 + p/2 −at                         .                  (38)\n                            2       δI e + (I + δI)p/2 (1 − e−at )"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "This expression has three natural fixed points typically observed in adaptation responses:\nthe spontaneous rate SR = F (0, ∞), the peak rate PR = F (I, 0), and the steady-state rate\nSS = F (I, ∞),"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "k\n                                       log 1 + βδI p/2 ,\n                                                       \u0001\n                                 SR =                                                   (39)\n                                     2 \u0012\n                                             β(I + δI)p\n                                                         \u0013\n                                  k\n                              PR = log 1 +                 ,                            (40)\n                                  2             δI p/2\n                                  k\n                              SS = log 1 + β(I + δI)p/2 .\n                                                         \u0001\n                                                                                        (41)\n                                  2\n\n23\n\fA.4     A universal inequality for sensory adaptation"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "The three points, together with the curvature of the logarithm, can be used to derive an\ninequality governing the steady-state activity:\n\n√                    PR + SR\n                                   PR × SR ≤ SS ≤           .                             (42)\n                                                       2"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "That is, the steady-state response must lie between the geometric and arithmetic means of\nthe spontaneous and peak activities [22]. The simplicity of (42) belies its reach: a constraint\nthat is obeyed almost universally across different sensory modalities despite differences in\nmechanisms and stimulation paradigms.\n   The inequality was evaluated across two comprehensive analyses encompassing 40 sep-\narate studies and more than 400 individual recordings of adaptation from different sensory\nmodalities, animal species, and laboratories. The first analysis examined auditory adapta-\ntion data from the 1970’s to the present. Hearing is particularly well suited for repeated\nadaptation experiments because auditory stimuli can be precisely controlled and single-unit\nresponses readily isolated. Across datasets, SS was plotted against PR and compared with\nthe predicted bounds in (42). No parameter"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "24\n\fdo not share identical mechanisms, yet the same quantitative relation holds across modalities,\nspecies, and measurement paradigms. For example, data recorded nearly a century ago by\nAdrian and Zottermann [1] show the same adherence as modern recordings, underscoring\nrobustness across time and methodology.\n\nB      Appendix 2: Proof of the information inequality\n\nWe summarize the proof of the information inequality in (7). Recall that the information\ndifferential is defined by\n                                                       \u0012        \u0013\n                                                           ∂H\n                                  dI = − δHrelax = −                dm,                  (43)\n                                                           ∂m\n\nwhere H(µ, m) is the entropy state function in (2)."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Theorem (Information inequality). Let µ(t) be a cyclic stimulus that generates a closed\nstimulus–response trajectory in (µ, m) via the state space model described in Section 3. The\nchange in information over a cycle obeys the second-law–type inequality\n\n˛\n                                                 dI ≥ 0.                                 (44)\n\nProof. Let C denote the closed curve traced in (µ, m) space over one stimulus cycle. For any\npiecewise-smooth simple loop C that is positively oriented (counter-clockwise) and bounds\na region A, Green’s theorem gives\n\n˛           ˛                 ¨\n                                        ∂H                     ∂ 2H\n                               dI = −      dm = −                   dA.                  (45)\n                             C        C ∂m                  A ∂m ∂µ"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "For the sensory uncertainty state function (2), we evaluate the mixed derivative to yield\n\n∂ 2H            σR2         dσ 2\n                                       =−                   2      .                     (46)\n                                 ∂m ∂µ    2m2 (σR2 + σ 2 /m) dµ"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "25\n\fUnder monotonicity of σ 2 and µ, dσ 2 /dµ ≥ 0, the mixed derivative is non-positive throughout\n                                                                 ¸\nA. Therefore the area integral in (45) is non-negative, implying C dI ≥ 0 for any positively\noriented loop.\n   To justify the orientation for realizable cycles, the sampling dynamics always relaxes\ntoward meq (µ): m tracks the equilibrium meq (µ) with no overshoot such that increases in\nµ drive up m, while decreases in µ drive down m. Consequently, dm/dµ ≥ 0 along the\nincreasing phase of the stimulus and dm/dµ ≤ 0 along the decreasing phase, enforcing a\ncounterclockwise traversal of the loop in (µ, m) space. Hence, physically realizable sensory\ncycles are positively oriented, and the inequality follows."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "The second-law inequality, in a more restricted form, has already been tested extensively\nin neurophysiological recordings. A cyclic presentation of a stimulus, in which a sensory\nneuron is initially at rest, then stimulated with a constant input (i.e. adaptation) until a\nsteady state is reached, and finally returned to rest, constitutes a cyclic process compatible\nwith the second law. The sum of differences in the firing rates over the cycle can be calculated\n       ¸\nfrom − (∂H/∂m) dm and F = kH, yielding (PR − SS) + (TR − SR), where PR, SS, TR,\nand SR denote the peak, steady-state, trough, and spontaneous firing rates respectively.\nSince sensory neurons are observed to obey the inequality (42), as well as the associated\n                   √\ninverted inequality TR × SS ≤ SR ≤ (TR + SS)/2, a straightforward calculation shows\nthat (PR − SS) + (TR − SR) ≥ 0 as is required for the second-l"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "26\n\fegy do not occur instantaneously, but relax toward an optimal operating point over finite\ntime. Under these weak and generic conditions, closed cycles are constrained to be posi-\ntively oriented in (µ, m) space with a non-negative mixed derivative, similar to the sensory\ncase. Consequently, the cyclic inequality continues to hold, extending the second-law–type\nconstraint to metrological inference in estimating the mean.\n\nReferences\n\n[1] Edgar D Adrian and Yngve Zotterman. The impulses produced by sensory nerve-\n    endings: Part 2. The response of a single end-organ. Journal of Physiology, 61(2):151–\n    171, 1926.\n\n[2] Shun-ichi Amari and Hiroshi Nagaoka. Methods of Information Geometry, volume 191.\n    American Mathematical Soceity, 2000.\n\n[3] Thomas M Cover. Elements of Information Theory. John Wiley & Sons, 1999."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "[4] Zoltán Eisler, Imre Bartos, and János Kertész. Fluctuation scaling in complex systems:\n    Taylor’s law and beyond. Advances in Physics, 57(1):89–142, 2008.\n\n[5] Richard R Fay. Coding of information in single auditory-nerve fibers of the goldfish.\n    Journal of the Acoustical Society of America, 63(1):136–146, 1978.\n\n[6] Dongning Guo, Shlomo Shamai, and Sergio Verdú. Mutual information and minimum\n    mean-square error in Gaussian channels. IEEE Transactions on Information Theory,\n    51(4):1261–1282, 2005.\n\n[7] Edwin T Jaynes.     Information theory and statistical mechanics.      Physical Review,\n    106(4):620, 1957.\n\n27\n\f [8] Marcus Müller and Donald Robertson. Relationship between tone burst discharge pat-\n    tern and spontaneous firing rate of auditory nerve fibres in the guinea pig. Hearing\n    Research, 57(1):63–70, 1991."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "[9] Kenneth H Norwich. On the information received by sensory receptors. Bulletin of\n    Mathematical Biology, 39(4):453–461, 1977.\n\n[10] Kenneth H Norwich. Information, Sensation, and Perception. Academic Press, 1993.\n\n[11] Kenneth H Norwich and Willy Wong. A universal model of single-unit sensory receptor\n    action. Mathematical Biosciences, 125(1):83–108, 1995.\n\n[12] Adam J Peterson and Peter Heil. A simplified physiological model of rate-level functions\n    of auditory-nerve fibers. Hearing Research, 406:108258, 2021.\n\n[13] Udo Seifert. Entropy production along a stochastic trajectory and an integral fluctuation\n    theorem. Physical Review Letters, 95(4):040602, 2005.\n\n[14] Ken Sekimoto. Langevin equation and thermodynamics. Progress of Theoretical Physics\n    Supplement, 130:17–27, 1998."
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "[15] Ori Shental and Ido Kanter. Shannon meets Carnot: Generalized second thermodynamic\n    law. Europhysics Letters, 85(1):10006, 2009.\n\n[16] Robert Lee Smith and JJ Zwislocki. Short-term adaptation and incremental responses\n    of single auditory-nerve fibers. Biological Cybernetics, 17(3):169–182, 1975.\n\n[17] Christian J Sumner and Alan R Palmer. Auditory nerve fibre responses in the ferret.\n    European Journal of Neuroscience, 36(4):2428–2439, 2012.\n\n[18] Larry A Westerman and Robert L Smith. Rapid and short-term adaptation in auditory\n    nerve responses. Hearing Research, 15(3):249–260, 1984.\n\n28\n\f[19] Willy Wong. On the Physics of Perception. PhD thesis, University of Toronto, 1997.\n\n[20] Willy Wong. On the rate coding response of peripheral sensory neurons. Biological\n    Cybernetics, 114(6):609–619, 2020."
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "[21] Willy Wong. Consilience in the peripheral sensory adaptation response. Frontiers in\n    Human Neuroscience, 2021.\n\n[22] Willy Wong. A fundamental inequality governing the rate coding response of sensory\n    neurons. Biological Cybernetics, 117(4):285–295, 2023.\n\n[23] Willy Wong.     A universal theorem of sensory information.            arXiv preprint\n    arXiv:2511.11463, 2025.\n\n[24] Graeme K Yates, Donald Robertson, and Brian M Johnstone. Very rapid adaptation\n    in the guinea pig auditory nerve. Hearing Research, 17(1):1–12, 1985."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "29\n\f                                      300   (a)                   (b)                    (c)                 (d)\n                                      200\n                                      100           single unit           single unit          single unit           single unit\n                                                    guinea pig            guinea pig           guinea pig            guinea pig\n                                       0            GP-33-10              GP-17-14             GP-17-4               GP-33-9"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "300   (e)                   (f)                    (g)                 (h)\n                                      200\n                                      100           averaged              single unit          single unit           single unit\n                                                    guinea pig            guinea pig           guinea pig            goldfish\n                                        0                                 GP-6-1               GP-6-2\n\n300   (i)     single unit\n                                                                  (j)                    (k)   single unit\n                                                                                                             (l)\n                                                    gerbil                                     gerbil\n      Steady-state activity SS (Hz)"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "E8F2                                       E11F1\n                                      200\n                                      100                                 single unit                                single unit\n                                                                          gerbil                                     gerbil\n                                        0                                 E8F4                                       E13F4"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "300   (m)     single unit\n                                                                  (n)                    (o)   single unit\n                                                                                                             (p)\n                                                    gerbil                                     guinea pig\n                                                    E11F4                                      GL31/13\n                                      200\n                                      100                                 single unit                                single unit\n                                                                          guinea pig                                 guinea pig\n                                        0                                 GL31/08                                    GP27/18"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "300   (q)     single unit\n                                                                  (r)                    (s)                 (t)\n                                                    guinea pig\n                                                    GP27/04\n                                      200\n                                      100                                 single unit          single unit           averaged\n                                                                          guinea pig           guinea pig            ferret\n                                        0"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "300   (u)     single unit\n                                                                  (v)                    (w)   single unit\n                                                                                                             (x)\n                                                    cat                                        cat\n                                                    A6-U27-R4                                  A7-U19-R4\n                                      200\n                                      100                                 single unit                                single unit\n                                                                          cat                                        cat\n                                        0                                 A7-U29-R2                                  A6-U46-R1"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "0     400      800    0     400     800       0    400 800       0     400       800\n                                                                              Peak activity PR (Hz)"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "Figure 1: Figure reproduced from [22]. Steady-state activity plotted versus peak activity for\na number of auditory studies. In all panels, the dashed lines show the theoretical upper and\nlower bounds of (42). No fitted parameters were required to plot these bounds. SS vs PR\nfrom (a-g) single or averaged guinea pig fibre recordings (figs. 11a-d, 12, 17a and 4a from\n[16]); (h) saccular nerve fibres of goldfish (fig. 3 from [5]); (i-m) single fibre gerbil recordings\n(figs. 4 and 5 from [18]); (n-q) single guinea30pig fibre recordings (figs. 1 and 2 from [24]);\n(r-s) single guinea pig fibre recordings (figs 3a and 3b from [8]); (t) averaged ferret data\n(fig. 6 from [17]); (u-x) single cat fibre recordings (figs. 12e-h from [12]). The spontaneous\nactivity of each unit is indicated by an arrow pointing towards the x-axis."
+    }
+  ]
+}
