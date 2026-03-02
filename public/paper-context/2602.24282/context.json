@@ -1,0 +1,667 @@
+{
+  "arxivId": "2602.24282",
+  "paperTitle": "Unfolding without Iterations, Adversaries, or Surrogates",
+  "abstract": "Correcting measurements for detector effects and constructing appropriate public data representations is a pressing problem in LHC physics. Current methods solve this inverse problem by relying on iterations, minimax optimization, or a surrogate forward mapping. We introduce Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE), which dispenses with these mechanisms while remaining asymptotically correct. AUSSIE replaces the second OmniFold step with a new loss function that directly yields solutions with minimal dependence on the reference simulation. We showcase AUSSIE on various unfolding tasks, including full-phase-space jet substructure.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Correcting measurements for detector effects and constructing appropriate public data representations is a pressing problem in LHC physics. Current methods solve this inverse problem by relying on iterations, minimax optimization, or a surrogate forward mapping. We introduce Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE), which dispenses with these mechanisms while remaining asymptotically correct. AUSSIE replaces the second OmniFold step with a new loss function that directly yields solutions with minimal dependence on the reference simulation. We showcase AUSSIE on various unfolding tasks, including full-phase-space jet substructure."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Gaussian toy example: Observable feature x (left) and unfolded feature z (right),"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Regression losses tracked over training: (Top) The LMLC loss, whose optimum"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: Reco-level jet substructure, comparing AUSSIE and various iterations of OmniFold."
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: Reco-level classifier score over jet substructure observables, comparing AUSSIE"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Unfolded part-level jet substructure, comparing AUSSIE and various iterations of"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 6: Reco-level jet substructure (using constituents), comparing AUSSIE and various"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 7: Reco-level classifier score over constituent-level jets, comparing AUSSIE and"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 8: Unfolded part-level jet substructure (using constituents), comparing AUSSIE and"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 9: Reco-level observables in t H j events, comparing AUSSIE and various iterations"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Figure 10: Unfolded parton-level features in t H j events, comparing AUSSIE and various"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 1: Network and optimization hyperparameters for AUSSIE and OmniFold on the Gaus-"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 2: Network and optimization hyperparameters for AUSSIE and OmniFold on the"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 3: Network and optimization hyperparameters for AUSSIE and OmniFold on the"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 4: Network and optimization hyperparameters for AUSSIE and OmniFold on the t H j"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Figure 11: Reco-level jet substructure, comparing AUSSIE and various iterations of OmniFold."
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Figure 12: Unfolded part-level jet substructure, comparing AUSSIE and various iterations of"
+    },
+    {
+      "id": "cap-16",
+      "type": "caption",
+      "text": "Figure 13: Reco-level jet substructure (using constituents), comparing AUSSIE and various"
+    },
+    {
+      "id": "cap-17",
+      "type": "caption",
+      "text": "Figure 14: Unfolded part-level jet substructure (using constituents), comparing AUSSIE and"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "SciPost Physics                                                            Submission\n\nUnfolding without Iterations, Adversaries, or Surrogates\n\nAyodele Ore1 and Tilman Plehn1,2\n\n1 Institut für Theoretische Physik, Universität Heidelberg, Germany\n                                          2 Interdisciplinary Center for Scientific Computing (IWR), Universität Heidelberg, Germany\n\nMarch 2, 2026\n\nAbstract\narXiv:2602.24282v1 [hep-ph] 27 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Correcting measurements for detector effects and constructing appropriate public data\n                                          representations is a pressing problem in LHC physics. Current methods solve this in-\n                                          verse problem by relying on iterations, minimax optimization, or a surrogate forward\n                                          mapping. We introduce Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE),\n                                          which dispenses with these mechanisms while remaining asymptotically correct. AUSSIE\n                                          replaces the second OmniFold step with a new loss function that directly yields solutions\n                                          with minimal dependence on the reference simulation. We showcase AUSSIE on various\n                                          unfoldi"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Contents\n                                          1 Introduction                                                                           2\n\n2 Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE)                          3\n\n3 Results                                                                                7\n                                            3.1 Toy example                                                                        7\n                                            3.2 Jet substructure observables                                                       8\n                                            3.3 Jet constituents                                                                  11\n                                            3.4 Parton-level events                                                               13"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "4 Outlook                                                                               15\n\nA Training details and hyperparameters                                                  16\n\nB Numerical details                                                                     19\n\nC Additional jet substructure plots                                                     19\n\nReferences                                                                              22\n\n1\n\f SciPost Physics                                                                  Submission\n\n1    Introduction"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Percent-level measurements at the LHC have changed the way we think about hadron collider\nphysics. A central pillar of this precision program is high-fidelity simulation, connecting La-\ngriangians with parton-level theory predictions and observables [1]. However, the expense\nand inaccessibility of these simulations is rapidly becoming a critical bottleneck — it limits the\nnumber of hypotheses that can be tested with simulation-based inference and precludes the\nanalysis of data outside each experimental collaboration.\n    Unfolding provides an alternative strategy by defining appropriate data representations for\nanalyses. It enables efficient comparison to a wide range of models across experiments and\nshifts the computational cost from repeated detector simulation to a one-time inference [2].\nTraditional unfolding methods, however, rely on binning and do not scale to high-dimensional\nphas"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2\n\f SciPost Physics                                                                   Submission\n\n2    Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE)"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Unfolding as an inverse problem deconvolves observations x that arise from distortions of\nsome underlying truth z, for instance, through hadronization or detector interactions. For a\nstochastic distortion, it involves the following probability densities:\n                                         unfolding inference\n                              psim (z)   ←−−−−−−−−−→              punfold (z)\n                                                                     x\n                                                                     \n                           psim (x|z)\n                                     y\n                                                                      unfold\n                                                                      \n                                            forward inference\n                             psim (x)    ←−−−−−−−−−−→             pdata "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "The latent variable z may be at particle level or parton level, and we use the term part level to\ncover both cases. The conditional probability psim (x|z) is the transfer function characterizing\nforward simulation applied to z. On the simulation side this implies a forward folding,\n                                          Z\n                                psim (x) =      dz psim (x|z) psim (z) .                       (2)\n\nIn simulation, we have complete access to z and can sample pairs that implicitly encode the\nforward conditional distribution,\n\n(z, x) ∼ psim (x, z) = psim (x|z) psim (z) .                      (3)"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "On the data side we just have access to samples from pdata (x). The goal is to find a distribution\npunfold (z) that maps forward to pdata (x) under Eq. (2),\n                                          Z\n                              pdata (x) =      dz psim (x|z) punfold (z) .                     (4)"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Assuming that the transfer function is an accurate model of the real detector, a solution\npunfold (z) can be interpreted as an estimate for the part-level phase space distribution in data.\nHowever, it should be understood that the forward process of the detector acts on the full\npart-level phase space. As such, the assumption may be violated even for perfect detector\nsimulation if effects that influence the forward process are not included in z [29, 33, 34]. In\na similar vein, the definition of punfold (z) is influenced by nuisance parameters of the detector\nsimulation [9, 11, 35, 36]. If the simulator is differentiable, then punfold (z) can be obtained by\nmaximizing the likelihood of observed data with Eq. (4) by gradient descent.\n\nDensity ratio unfolding"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "We propose Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE). Similar to Om-\nniFold, AUSSIE phrases unfolding in terms of density ratios. At reco level x we define\n                                                    pdata (x)\n                                         R(x) =               ,                                (5)\n                                                    psim (x)\nand the unfolding target condition in Eq. (4) becomes\n\n1\n                                          Z\n                          R(x) =             dz psim (x|z) punfold (z)\n                                 psim (x)\n                                                           punfold (z)\n                                          Z\n                                        = dz psim (z|x)                .                       (6)\n                                                            psim (z)"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "3\n\f SciPost Physics                                                                   Submission\n\nIf we define the corresponding part-level ratio as\n                                                punfold (z)\n                                       R(z) ≡               ,                                  (7)\n                                                 psim (z)\nthe above target relation in terms of density ratios reads\n                                         Z\n                                  R(x) =     dz psim (z|x) R(z) .                              (8)\n\nIn this relation the conditional probability from the forward folding in Eq. (2) is inverted.\nWhen unfolding with density ratios, we use the estimate of R(z) to construct the unfolded\ndistribution through reweighting\n\npunfold (z) = R(z)psim (z) .                               (9)\n\nClosure"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Because of the non-injective nature of the simulation and a potential loss of information in the\nforward direction, Eqs. (4) and (8) admit multiple solutions. Consequently, judging punfold (z)\nin terms of agreement with the part-level distribution in a pseudodata sample can be mis-\nleading. Moreover, such a test cannot be performed in real data. The part-level problem of\nensuring complete coverage of the solution space is an ongoing research question and beyond\nthe scope of our study.\n    Instead, we first assess the unfolding at reco-level, where a two-sample test between\npdata (x) and the forward folding of punfold (z) can establish the validity of a solution. In terms\nof density ratios, we realize this forward folding with the joint probability of part/reco pairs,\n                       Z\n                                            Eq. (8)\n                          dz psim (x, z) R(z)"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Training\n\nAs a first step, AUSSIE approximates the reco-level density ratio by training a classifier between\nsamples from pdata (x) and psim (x), for example using the binary cross entropy (BCE) loss,\n\nRθ (x) ≈ R(x) .                                      (11)\n\nIn the second step, AUSSIE trains a part-level network Rϕ (z) such that it forward maps to\nRθ (x) as prescribed by Eq. (8). To achieve this, we exploit a maximum likelihood classifier\n(MLC)-like loss functional,\n                                Z\n               LMLC [Rθ , Rϕ ] = d x dz psim (x, z) Rθ (x) − Rϕ (z) log Rθ (x) ,      (12)\n                                                   \u0002                          \u0003\n\nwhich uses paired reco/part events (x, z) from simulation. If we freeze Rϕ (z), this is essentially\na regression loss for Rθ (x), as we can see from the functional derivative"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "δLMLC [Rθ , Rϕ ]                  1\n                                                  \u0014           Z                     \u0015\n           Gθ ,ϕ (x) ≡                  = psim (x) 1 −          dz psim (z|x) Rϕ (z) .        (13)\n                           δRθ (x)                     Rθ (x)\nIt vanishes everywhere exactly when the learned version of Eq. (8) holds,\n                                      Z\n                                 Rθ (x) =    dz psim (z|x) Rϕ (z) .                           (14)\n\n4\n\f SciPost Physics                                                                                           Submission"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "If Rθ (x) simultaneously satisfies Eqs. (14) and (11), then Rϕ (z) solves the unfolding problem.\n    Directly optimizing LMLC with respect to Rϕ (z) does not yield the above unfolding relations,\nso we need another way to use this result to train the unfolder. The key idea in AUSSIE is to\ntrain Rϕ (z) such that the pretrained classifier Rθ (x) lies at the stationary point of LMLC . To\nachieve this, we minimize a norm of Gθ ,ϕ , now freezing θ and varying ϕ. For a function-space\nobject, the natural choice of norm is the Reproducing Kernel Hilbert Space (RKHS) norm\n                                    Z\n                            ∥Gθ ,ϕ ∥2H ≡        d x d x ′ Gθ ,ϕ (x)K(x, x ′ )Gθ ,ϕ (x ′ ) ,                           (15)"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "with K a positive semi-definite kernel. K should not be confused with a detector response\nkernel, as it couples pairs of reco-level events.\n    The RKHS norm is minimized at zero when Gθ ,ϕ (x) lies in the null space of K. For a\nstrictly positive-definite kernel this occurs only when Gθ ,ϕ (x) is pointwise zero, implying that\nthe unfolding condition is satisfied. Repeating the above analysis with an appropriate BCE or\nMean Squared Error (MSE) loss recovers the same result.\n    AUSSIE performs unfolding by minimizing the RKHS norm, inverting the integral rela-\ntion from Eq. (8). We consider the following two options for implementing Eq. (15) as a loss\nfunction:\n\nAnalytic kernel We can use a closed-form and positive-definite kernel, for example a Gaussian"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "−|x − x ′ |2\n                                               K(x, x ′ ) = exp                  ,                                    (16)\n                                                                       2Λ2\n      where Λ is a scale hyperparameter. The RKHS-norm in Eq. (15) can then be directly\n      evaluated by rearranging Eq. (13) as a double expectation over paired part/reco samples\n\nRϕ (z)                Rϕ (z ′ )\n                              ®                                   ¸\n                                                    ′\n               LGauss [Rϕ ] =    1−           K(x, x ) 1 −                               (17)\n                                     Rθ (x)                Rθ (x ′ )             ′ ′         psim (x,z)psim (x ,z )\n\nwhich follows by pulling out the integral and probability densities from Gθ ,ϕ (x)."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "AutoDiff Interestingly, taking the parameter gradient norm\n                                        2\n                                           X                       \u00012\n                                ∇θ LMLC =       ∇θi LMLC [Rθ , Rϕ ] ,                                                 (18)\n                                                          θi"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "is equivalent to Eq. (15) with K chosen as the Neural Tangent Kernel (NTK) [37, 38],\n                                                                                2\n                                            δLMLC [Rθ , Rϕ ]\n                             \n                    2\n                            X Z\n          ∇θ LMLC       =              dx                          ∇θi Rθ (x)\n                            θi\n                                                 δRθ (x)\n                            X \u0012Z                                     \u00132\n                        =              d x Gθ ,ϕ (x) ∇θi Rθ (x)\n                            θi\n                            Z                                      X\n                        =        d x d x ′ Gθ ,ϕ (x)Gθ ,ϕ (x ′ )         ∇θi Rθ (x)∇θi Rθ (x ′ ) .\n                                                                    θi\n              "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "The NTK is strictly positive definite in the infinite-width limit but positive semi-definite\n      for finite θ . Therefore minimizing Eq. (18) only guarantees that Gθ ,ϕ is pointwise zero\n\n5\n\f SciPost Physics                                                                                Submission\n\nif it is in the tangent space of Rθ (x), i.e. if the classifier is sufficiently expressive. We\n      expect this to be satisfied since Gθ ,ϕ is a simple function of Rθ (x) and we match the\n      architecture with Rϕ (x).\n      Numerically, we find that using the L1 gradient norm\n                                                 X\n                               LAutoDiff [Rϕ ] =   ∇θi LMLC [Rθ , Rϕ ]                                  (20)\n                                                      θi"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "gives better results, so we will use this loss function for our following studies. It shares\n      the same optimal asymptotic limit as Eq. (18) despite not having a kernel interpretation.\n      To evaluate LAutoDiff , we apply the autograd engine in PyTorch to the Monte Carlo\n      estimate of LMLC . Further numerical details are provided in Appendix B.\n\nThese two options are complementary. The fixed analytic kernel is computationally efficient,\nbut introduces a hyperparameter and does not translate easily to non-trivial representations\nof x, such as point clouds. The AutoDiff loss is more expensive to compute, but has no hy-\nperparameters and exploits all symmetries encoded in the architecture of Rθ (x). Given these\nconsiderations, we prefer LGauss for low-dimensional x and LAutoDiff for high-dimensional x.\n\nOmniFold comparison"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "It is instructive to briefly compare AUSSIE to OmniFold. OmniFold also trains a classifier\nω(x) ≡ Rθ (x) to learn the reco-level density ratio as in Eq. (11). In a second step, it trains\nν(z) ≡ Rϕ (z) to regress ω(x), originally using a BCE loss. For consistency, we write the equiv-\nalent MLC loss\n                                    Z\n                  LOmniFold [ω, ν] = d x dz psim (x, z) ν(z) − ω(x) log ν(z) .             (21)\n                                                       \u0002                     \u0003\n\nThis leads to the following solution for OmniFold\n                                         Z\n                                  ν(z) =        d x psim (x|z) ω(x) .                                   (22)"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "This condition is an ‘inversion’ of the unfolding target relation in Eq. (8). As a result, the\nforward folding of this part-level ratio does not in general produce the correct reco-level ratio,\n                                             Z\n                                            ?\n                                     ω(x) =       dz psim (z|x)ν(z)\n                                                Z              Z\n                                            =       dz psim (z|x)      d x ′ psim (x ′ |z) ω(x ′ )\n                                                Z\n                                            =       d x ′ dz psim (x ′ |z) psim (z|x) ω(x ′ )\n                     Z\n             ⇔           dz p(x ′ |z) p(z|x) = δ(x ′ − x) .                                             (23)"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "The unfolding only closes for a completely invertible detector. For stochastic detectors, the\nOmniFold weight from Eq. (22) is in a sense double-smeared, and cannot completely map\npsim (z) onto punfold (z). To account for this, OmniFold iterates the reweighting and regression\nto converge on a solution. By viewing these iterations as expectation-maximization steps, the\nauthors of OmniFold showed that it is guaranteed to converge to a solution of Eq. (8).\n\n6\n\f SciPost Physics                                                                                                      Submission\n\n3         Results"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "We benchmark the performance of AUSSIE on a set of increasingly complex unfolding prob-\nlems. We start with a Gaussian toy example in Section 3.1 before unfolding detector effects on\njets via substructure observables in Section 3.2 and via the full constituent-level phase space\nin Section 3.3. Finally, we show parton-level unfolding for a t H j process in Section 3.4.\n\n3.1            Toy example\n\nWe begin with a simple Gaussian example where the forward map imparts a large smearing,\n\npsim (z) = N (z ; 0, 1)\n                                                                       and                 p(x|z) = N (x ; z, 2) .             (24)\n                              pdata (z) = N (z ; 0.2, 0.9)"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "For this one-dimensional problem, we train AUSSIE using small MLP networks for Rθ and Rϕ\nand the Gaussian kernel loss from Eq. (17). We make no attempt to optimize the hyperpa-\nrameter Λ and simply set it to one. For comparison, we also train OmniFold using the same\nnetwork configurations for up to 20 iterations.\n    In Figure 1 we show the results of the unfolding for reco level (left) and part level (right).\nAUSSIE achieves perfect closure on reco level and near perfect closure on part level. The\nsolutions on part level are somewhat degenerate due to the finite statistics of the training\nsample. Comparing this result to a single iteration of OmniFold, the misspecified objective\nin Eq. (22) manifests as a poor reweighting on the part and reco levels. OmniFold improves\nwith iterations, but the large smearing means that 20 iterations are not quite sufficient for\nconvergence.\n   To highlig"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "×10−2                                                           ×10−2\n\n4                                                               4\n        Density\n\nDensity"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Data                                                          Data\n                                        OmniFold (1)                                                  OmniFold (1)\n                  2                                                               2\n                                        OmniFold (5)                                                  OmniFold (5)\n                                        OmniFold (20)                                                 OmniFold (20)\n                                        AUSSIE                                                        AUSSIE\n                                                                                  0\n               1.1                                                            1.1\n    AUSSIE\n\nAUSSIE\n     Data\n\nData"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "1.0                                                            1.0\n               0.9                                                            0.9\n               1.1                                                            1.1\n    OmniFold\n\nOmniFold\n     Data\n\nData\n\n1.0                                                            1.0\n               0.9                                                            0.9\n                  −5.0        −2.5      0.0        2.5       5.0                      −2      −1       0         1         2\n                                         x                                                              z\n\nFigure 1: Gaussian toy example: Observable feature x (left) and unfolded feature z (right),\ncomparing AUSSIE and various iterations of OmniFold."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "7\n\f  SciPost Physics                                                                                Submission\n\n0.004\n\n0.002\nLMLC\n\n0.000                                                                                  OmniFold (1)\n                                                                                                   OmniFold (5)\n      −0.002                                                                                       OmniFold (10)\n            0.015                                                                                  OmniFold (15)\n                                                                                                   OmniFold (20)\nLOmniFold"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "0.010                                                                                  AUSSIE\n                                                                                                   R(z)\n            0.005\n\n0.000\n                    0          1000          2000           3000        4000           5000\n                                                Training step\n\nFigure 2: Regression losses tracked over training: (Top) The LMLC loss, whose optimum\nenforces the unfolding condition. (Bottom) The LOmniFold loss, which is an inversion of LMLC .\nThe black dashed line shows the value of each loss for the optimal solution R(z). Note that\nLOmniFold is only the direct objective for the first OmniFold iteration."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "convergence is significantly faster for AUSSIE. The bottom panel reveals the cause; R(z) is not\na minimizer of LOmniFold and thus each regression step of OmniFold spends unnecessary com-\nputation. We refrain from explicit timing measurements in this study because a fair assessment\nwould require extensive optimization of the hyperparameters related to iteration.\n\n3.2          Jet substructure observables"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "As our first physics example, we unfold detector effects on jet substructure observables in Z j\nevents. The standard dataset [8] consists of R=0.4 anti-k T jets with p T > 150 GeV that are\ngenerated with different parton showers but passed through the same DELPHES v3.4.2 [39]\nsimulation of the CMS detector. The reco-level jets are defined with the same clustering algo-\nrithm. For the reference simulation psim , we take the ATLAS A14 PYTHIA v8.243 central tune\nsample, which contains 1.6M jets. An equal-sized sample showered with HERWIG v7.1.5 is also\nprovided. The aim is to unfold the following six jet substructure observables"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Jet mass m N-subjettiness ratio τ21 Groomed momentum fraction z g\n          \u001a                                                                         \u001b\n   x, z =                                                                             . (25)\n            Jet width w        Jet multiplicity N              Groomed mass log ρ"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Unfolding high-level observables induces a dependence on the reference distribution in the\nresults [33, 34]. This is because the assumption that the forward mapping in simulations\nmatches the one in data is violated — transfer functions between high-level observables involve\nan integral over the part-level phase space of the given distribution. In a real measurement,\nthis ‘hidden-variables’ effect should be treated as a systematic uncertainty [33], or avoided by\nunfolding the full particle-level phase space [30]. We sidestep this issue for now and define\nthe pseudodata as a reweighting of the PYTHIA reference, where the weights are obtained from\na classifier trained between PYTHIA and HERWIG on the part-level substructure observables,"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "pHERWIG (z)\n                        pdata (x, z) ≡ D(z) pPYTHIA (x, z)       with   D(z) ≈               .              (26)\n                                                                                 pPYTHIA (z)\n\nWe train AUSSIE in this setting, again using simple MLPs and the Gaussian Kernel loss in\nEq. (17) with Λ = 1. We also perform ten iterations of OmniFold for reference.\n\n8\n\f  SciPost Physics                                                                                          Submission"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "×10−2                                                         ×10−2\n              7.5                                                                                        Data\n                                                                                                         OmniFold (1)\n                                                                                                         OmniFold (5)\n              5.0\n    Density"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Density\n                                          Data                                                           OmniFold (10)\n                                          OmniFold (1)\n                                                                               5\n                                                                                                         AUSSIE\n              2.5                         OmniFold (5)\n                                          OmniFold (10)\n                                          AUSSIE\n              0.0                                                              0\n              1.1                                                           1.1\n   AUSSIE\n\nAUSSIE\n    Data"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Data\n              1.0                                                           1.0\n              0.9                                                           0.9\n              1.1                                                           1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n              1.0                                                           1.0\n              0.9                                                           0.9\n                      0.2      0.4     0.6     0.8    1.0                          0.1    0.2   0.3    0.4       0.5\n                             N-subjettiness ratio τ21                                Groomed momentum fraction z g\n\n×10−2\n                −1\n           10                                                               7.5\n Density\n\nDensity"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Data                                         5.0                       Data\n                −2             OmniFold (1)                                                           OmniFold (1)\n           10\n                               OmniFold (5)                                 2.5                       OmniFold (5)\n                               OmniFold (10)                                                          OmniFold (10)\n                               AUSSIE                                                                 AUSSIE\n                                                                            0.0\n              1.1                                                           1.1\n   AUSSIE\n\nAUSSIE\n    Data\n\nData"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "1.0                                                           1.0\n              0.9                                                           0.9\n              1.1                                                           1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n\n1.0                                                           1.0\n              0.9                                                           0.9\n                                20          40              60                      −12.5 −10.0 −7.5 −5.0             −2.5\n                                  Jet mass m                                             Groomed mass log ρ\n\nFigure 3: Reco-level jet substructure, comparing AUSSIE and various iterations of OmniFold."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "We show the reco-level results for the substructure observables in Figure 3. AUSSIE matches\nthe data at the order of one percent in each observable, whereas OmniFold exhibits a non-\nclosure in its first iteration. After ten iterations, OmniFold converges to closure but does not\nmatch the precision of AUSSIE for τ21 or z g .\n     In Figure 4 we summarize the reco-level performance using the score of the first-step clas-\nsifier Rθ (x), which approximates the optimal observable. AUSSIE maps the lower tail precisely\nwhile the upper tail shows a small deviation. OmniFold also reaches relatively high precision\nafter ten iterations, but remains slightly biased toward the simulation as evidenced by the\nexcess in the lower tail.\n    Finally, in Figure 5 we see that the non-convergence of OmniFold is most evident on part\nlevel. It now also shows significant deviations from truth in the jet mass, i"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "9\n\f SciPost Physics                                                                                                 Submission\n\n10−2"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Density\n                                                                         Data\n                                                                         OmniFold (1)\n                                                                         OmniFold (5)\n                                                    10−4                 OmniFold (10)\n                                                                         AUSSIE\n                                          AUSSIE     1.25\n                                           Data\n                                                     1.00\n                                                     0.75\n                                                     1.25\n                                          OmniFold\n                                           Data"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "1.00\n                                                     0.75\n                                                              −0.5      0.0      0.5              1.0\n                                                                      log Rθ (x)\nFigure 4: Reco-level classifier score over jet substructure observables, comparing AUSSIE\nand various iterations of OmniFold.\n\n×10−2\n                                                                                0.10                           Data\n                    6                                                                                          OmniFold (1)\n                                                                                                               OmniFold (5)\n          Density\n\nDensity"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "4                         Data                                                             OmniFold (10)\n                                              OmniFold (1)                      0.05                           AUSSIE\n                                              OmniFold (5)\n                    2\n                                              OmniFold (10)\n                                              AUSSIE\n                    0                                                           0.00\n              1.1                                                                  1.1\n  AUSSIE\n\nAUSSIE\n   Data\n\nData\n\n1.0                                                                  1.0\n              0.9                                                                  0.9\n              1.1                                                                  1.1\n  OmniFold\n\nOmniFold\n   Data"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "Data\n\n1.0                                                                  1.0\n              0.9                                                                  0.9\n                         0.2      0.4     0.6     0.8    1.0                             0.1    0.2   0.3    0.4       0.5\n                                N-subjettiness ratio τ21                                   Groomed momentum fraction z g\n\n×10−2\n          10−1                                                                     7.5\n\n5.0\nDensity\n\nDensity"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "10−2                      Data                                                                    Data\n                                    OmniFold (1)                                                            OmniFold (1)\n                                    OmniFold (5)                                   2.5                      OmniFold (5)\n          10−3                      OmniFold (10)                                                           OmniFold (10)\n                                    AUSSIE                                                                  AUSSIE\n                                                                                   0.0\n              1.1                                                                  1.1\n  AUSSIE\n\nAUSSIE\n   Data\n\nData"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "1.0                                                                  1.0\n              0.9                                                                  0.9\n              1.1                                                                  1.1\n  OmniFold\n\nOmniFold\n   Data\n\nData\n\n1.0                                                                  1.0\n              0.9                                                                  0.9\n                                   20          40                60                       −12.5 −10.0 −7.5 −5.0             −2.5\n                                     Jet mass m                                                Groomed mass log ρ\nFigure 5: Unfolded part-level jet substructure, comparing AUSSIE and various iterations of\nOmniFold"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "10\n\f  SciPost Physics                                                                                           Submission\n\n3.3           Jet constituents"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "A straightforward solution to the hidden-variables problem, and the proper unfolding task for\npublic data, is to unfold all jet constituents. Since the forward detector simulation naturally\nacts on this phase space, the unfolding assumption of a universal transfer function is valid,\nat least up to nuisance parameters. We study AUSSIE in this setting and, accordingly, take\nthe HERWIG sample from the jet dataset as the pseudodata, in contrast to Eq. (26). The vastly\nincreased dimensionality of this unfolding problem poses a significant challenge.\n   We represent the part-level and reco-level jets as sets of constituent four momenta and\nnow use LGATr networks [40, 41] for Rθ (x) and Rϕ (z) to exploit the Lorentz and permutation\nsymmetries. For the same reason, and to handle events with varying length, we also switch\nfrom the Gaussian kernel loss to the AutoDiff loss from Eq. (20).\n    Start"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Data                           0.10                            Data\n           0.10                            OmniFold (1)                                                   OmniFold (1)\n                                           OmniFold (5)                                                   OmniFold (5)\n Density\n\nDensity\n\nOmniFold (10)                                                  OmniFold (10)\n                                           AUSSIE                         0.05                            AUSSIE\n           0.05\n\n0.00                                                           0.00\n              1.1                                                            1.1\n   AUSSIE\n\nAUSSIE\n    Data\n\nData"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "1.0                                                            1.0\n              0.9                                                            0.9\n              1.1                                                            1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n\n1.0                                                            1.0\n              0.9                                                            0.9\n                              20          40               60                      0        20           40           60\n                                Jet mass m                                                 Jet multiplicity N"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "×10−2                                                          ×10−2\n                        Data                                                                              Data\n              7.5       OmniFold (1)                                         7.5                          OmniFold (1)\n                        OmniFold (5)                                                                      OmniFold (5)\n    Density\n\nDensity\n\n5.0       OmniFold (10)                                        5.0                          OmniFold (10)\n                        AUSSIE                                                                            AUSSIE\n\n2.5                                                            2.5\n\n0.0                                                            0.0\n              1.1                                                            1.1\n   AUSSIE"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "AUSSIE\n    Data\n\nData\n\n1.0                                                            1.0\n              0.9                                                            0.9\n              1.1                                                            1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n\n1.0                                                            1.0\n              0.9                                                            0.9\n                       0.2      0.4       0.6      0.8                             0.1    0.2   0.3    0.4       0.5\n                          N-subjettiness ratio τ21                                   Groomed momentum fraction z g\n\nFigure 6: Reco-level jet substructure (using constituents), comparing AUSSIE and various\niterations of OmniFold."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "11\n\f SciPost Physics                                                                                                                     Submission\n\n10−1\n\n10−2\n\nDensity\n                                                                                  Data\n                                                       −3                         OmniFold (1)\n                                                  10\n                                                                                  OmniFold (5)\n                                                                                  OmniFold (10)\n                                                  10−4                            AUSSIE"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "1.5\n                                            AUSSIE\n                                             Data\n                                                       1.0\n                                                       0.5\n                                                       1.5\n                                            OmniFold\n                                             Data"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "1.0\n                                                       0.5\n                                                             −2      −1          0       1                    2\n                                                                              log Rθ (x)\nFigure 7: Reco-level classifier score over constituent-level jets, comparing AUSSIE and\nvarious iterations of OmniFold.\n                                                                                                      ×10−2\n                                                             Data\n                                                                                                7.5\n                                                             OmniFold (1)\n             0.10\n                                                             OmniFold (5)\n   Density\n\nDensity"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "OmniFold (10)                      5.0\n                                                                                                                     Data\n                                                             AUSSIE\n             0.05                                                                                                    OmniFold (1)\n                                                                                                2.5                  OmniFold (5)\n                                                                                                                     OmniFold (10)\n                                                                                                                     AUSSIE\n             0.00                                                                               0.0\n                1.1                                     "
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "AUSSIE\n      Data\n\nData\n\n1.0                                                                             1.0\n                0.9                                                                             0.9\n                1.1                                                                             1.1\n     OmniFold\n\nOmniFold\n      Data\n\nData\n\n1.0                                                                             1.0\n                0.9                                                                             0.9\n                                   20          40                            60                       0            20           40                   60\n                                     Jet mass m                                                                   Jet multiplicity N"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "×10−2\n                                                                                            0.10\n                            Data                                                                                                     Data\n               7.5          OmniFold (1)                                                                                             OmniFold (1)\n                            OmniFold (5)                                                                                             OmniFold (5)\n     Density\n\nDensity"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "OmniFold (10)                                                                                            OmniFold (10)\n               5.0                                                                          0.05\n                            AUSSIE                                                                                                   AUSSIE\n\n2.5\n\n0.0                                                                          0.00\n               1.1                                                                              1.1\n    AUSSIE\n\nAUSSIE\n     Data\n\nData\n\n1.0                                                                              1.0\n               0.9                                                                              0.9\n               1.1                                                                              1.1\n    OmniFold\n\nOmniFold\n     Data"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "Data\n\n1.0                                                                              1.0\n               0.9                                                                              0.9\n                      0.2        0.4        0.6        0.8                                            0.1    0.2   0.3    0.4       0.5\n                              N-subjettiness ratio τ21                                                  Groomed momentum fraction z g\nFigure 8: Unfolded part-level jet substructure (using constituents), comparing AUSSIE and\nvarious iterations of OmniFold.\n\n12\n\f SciPost Physics                                                                    Submission"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "smearing. As a result OmniFold now shows better closure in its first iteration. AUSSIE still im-\nproves on iteration ten of OmniFold in τ21 and z g , but varies slightly more in the jet mass and\nmultiplicity. However, the classifier score in Figure 7 shows that these marginals obscure infor-\nmation in other constituent-level correlations. While neither AUSSIE nor OmniFold completely\nreweights the classifier score to match data, AUSSIE does correct the lower tail indicating a\nbetter closure in the full phase space. Unlike the previous result using the high-level jet sub-\nstructure observables, there is no significant improvement for OmniFold between iterations 5\nand 10.\n    On part-level, in Figure 8, we find that neither approach closes exactly onto the HERWIG\ntruth. The jet mass and multiplicity show deviations on the order of ten percent for both\nmethods. Still, τ21 and z g are recover"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "3.4     Parton-level events\n\nAs a final example, we showcase AUSSIE for unfolding to parton level, which is relevant for\nparameter inference with the ML-Matrix Element Method [45, 46]. Reweighting-based un-\nfolding is well suited to this scenario since it automatically preserves strict correlations such as\nmomentum conservation and on-shell conditions. However, as we will shortly demonstrate,\nthe high degree of information loss in this setting poses a challenge to iterative methods such\nas OmniFold.\n      We consider associated single-top and Higgs production [45, 46]\n\npp → t H j → (b j j) (γγ) j + ISR ,                            (27)"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "where the top quark decays hadronically and the Higgs decays to photons. ISR introduces\nadditional jets at reco level, effectively causing a combinatorial smearing that prevents clean\nreconstruction of the top. This process provides sensitivity to the CP phase in the top-Yukawa\ncoupling and is a prime use case for machine learning due to its small cross section in the\nStandard Model.\n    We use the dataset from Ref. [47], which considers a varying CP angle α ∈ (−π, π], defined\nthrough the Yukawa\n\nyt            2i\n                                                                 \n                          L t t̄ H = − p cos α t t̄ + sin α tγ5 t̄ H .                    (28)\n                                        2            3\n\nThe reference simulation samples α uniformly while the pseudodata fixes the angle,"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "1 dσ(α)                                        1 dσ(α)\n                      ­              ·\n            psim (z) =                             ,    pdata (z) =                 .          (29)\n                       σ(α) dz        α∼U [−π,π]                      σ(α) dz α=π/4\n\nThe parton-level events are generated by MADGRAPH5 v3.1.0 with LO-NNPDF, showered with\nPYTHIA, and passed to DELPHES for detector simulation and reconstruction of R = 0.4 anti-k T\njets. We keep at most four ISR jets in the reco events, for a maximum of ten total objects. The\ndataset contains 6.8M reference simulation events and 440k pseudodata events. For more\nspecifics on the process we refer the reader to Ref. [47].\n    Just as in the constituent unfolding above, here we apply LGATr networks and the AutoDiff\nloss to the full part-level and reco-level phase spaces. The reco-level results with AUSSIE and"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "13\n\f SciPost Physics                                                                                       Submission\n\n×10−2\n               6\n                                                                    10−1\n     Density"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Density\n               4                  Data                              10−2         Data\n                                  OmniFold (1)\n                                                                                 OmniFold (1)\n                                  OmniFold (5)\n               2                                                    10−3\n                                                                                 OmniFold (5)\n                                  OmniFold (10)\n                                                                                 OmniFold (10)\n                                  AUSSIE\n                                                                                 AUSSIE\n            1.1                                                        1.1\n AUSSIE\n\nAUSSIE\n  Data"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Data\n            1.0                                                        1.0\n            0.9                                                        0.9\n            1.1                                                        1.1\n OmniFold\n\nOmniFold\n  Data\n\nData\n            1.0                                                        1.0\n            0.9                                                        0.9\n                   −4       −2      0             2   4                         200     400      600       800\n                                  ∆ηγ2 , jb                                               E jb\n\n×10−2\n                                                                    10−1\n               6\n                                                                    10−2\n     Density\n\nDensity"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "4                                                                                   Data\n                                 Data\n                                                                                                   OmniFold (1)\n                                 OmniFold (1)                            −3\n                                                                    10                             OmniFold (5)\n               2                 OmniFold (5)\n                                                                                                   OmniFold (10)\n                                 OmniFold (10)\n                                                                                                   AUSSIE\n                                 AUSSIE                             10−4\n               0\n            1.1                                                      1."
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "AUSSIE\n  Data\n\nData\n\n1.0                                                      1.00\n            0.9                                                      0.75\n            1.1                                                      1.25\n OmniFold\n\nOmniFold\n  Data\n\nData\n\n1.0                                                      1.00\n            0.9                                                      0.75\n                        1    2        3           4   5                  −1.5   −1.0     −0.5      0.0      0.5\n                                   ∆R j1 , j2                                           log Rθ (x)\n\nFigure 9: Reco-level observables in t H j events, comparing AUSSIE and various iterations\nof OmniFold. The lower-right panel is the first-step classifier score."
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "OmniFold are shown in Figure 9. In addition to three kinematic variables that are sensitive to\nthe CP angle, we also include the first-step classifier approximation of the optimal reco-level\nobservable. AUSSIE produces perfect closure in all of these variables, including the classifier\nscore. Even after iterating, OmniFold retains deviations in the tails of the kinematic variables\nthat become apparent in the classifier score. As in the previous section, OmniFold does not\nnoticeably improve from iteration five and ten. We have also checked that no intermediate\niteration matches AUSSIE.\n    We show a selection of part-level distributions in Figure 10. As we have seen before, the\nadvantage of AUSSIE is magnified for part level, compared to reco level. Specifically, angular\ncorrelations are reproduced to within statistical fluctuations by AUSSIE, even in regions where\nOmniFold fails to conve"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "14\n\f SciPost Physics                                                                               Submission\n\n×10−2\n                                Data                          10−1\n               4.5              OmniFold (1)\n                                OmniFold (5)\n    Density\n\nDensity\n                                OmniFold (10)\n                                                                            Data\n               4.0              AUSSIE                        10−2          OmniFold (1)\n                                                                            OmniFold (5)\n                                                                            OmniFold (10)\n                                                                            AUSSIE\n               3.5\n               1.1                                               1.1\n    AUSSIE\n\nAUSSIE\n     Data"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "Data\n               1.0                                               1.0\n               0.9                                               0.9\n               1.1                                               1.1\n    OmniFold\n\nOmniFold\n     Data\n\nData\n               1.0                                               1.0\n               0.9                                               0.9\n                         −2    0                2                      −5             0               5\n                              ∆φ t, j                                                 ηj"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "×10−2\n                                                                 0.2                         Data\n               7.5\n                                                                                             OmniFold (1)\n                                                                                             OmniFold (5)\n    Density\n\nDensity\n\n5.0            Data                                                           OmniFold (10)\n                              OmniFold (1)                       0.1                         AUSSIE\n                              OmniFold (5)\n               2.5\n                              OmniFold (10)\n                              AUSSIE\n               0.0                                               0.0\n               1.1                                               1.1\n    AUSSIE\n\nAUSSIE\n     Data\n\nData"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "1.0                                               1.0\n               0.9                                               0.9\n               1.1                                               1.1\n    OmniFold\n\nOmniFold\n     Data\n\nData\n\n1.0                                               1.0\n               0.9                                               0.9\n                        −5     0                5                           2         4         6\n                              ∆ηh, j                                                ∆R t,h\nFigure 10: Unfolded parton-level features in t H j events, comparing AUSSIE and various\niterations of OmniFold.\n\n4             Outlook"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "We introduced Adversary-free Unfolding SanS Iteration or Emulation (AUSSIE), a novel method\nfor unbinned unfolding of multidimensional collider observables. AUSSIE is a two-step algo-\nrithm based on reweighting a simulated dataset that numerically inverts the integral equation\nrelating latent and observable phase spaces. Importantly, it is non-iterative and does not suf-\nfer from explicit dependence on the simulated dataset. To our knowledge, AUSSIE is the only\nunfolding method that achieves this without relying on surrogates or adversarial training.\n    We demonstrated the performance of AUSSIE on three physics scenarios: unfolding de-\ntector effects on jets at the level of substructure observables and at the level of constituents,\nas well as complete event unfolding to parton level. AUSSIE consistently yields more accu-\nrate unfolded distributions than ten iterations of OmniFold, showi"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "15\n\f SciPost Physics                                                                   Submission\n\nefficient simulation-based inference which we expect to apply more broadly.\n\nAcknowledgments\n\nWe acknowledge support by the Deutsche Forschungsgemeinschaft (DFG, German Research\nFoundation) under grant 396021762 – TRR 257: Particle Physics Phenomenology after the\nHiggs Discovery, and through Germany’s Excellence Strategy EXC 2181/1 – 390900948 (the\nHeidelberg STRUCTURES Excellence Cluster). We acknowledge support by the state of Baden-\nWürttemberg through bwHPC and the German Research Foundation (DFG) through grant INST\n35/1597-1 FUGG. This project started at the Kavli Institute for Theoretical Physics (KITP)\nsupported by grant NSF PHY-2309135.\n\nCode availability\n\nThe code for AUSSIE can be found at https://github.com/heidelberg-hepml/aussie.\n\nA    Training details and hyperparameters"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "Toy example\n\nFor the Gaussian toy example from Section 3.1, we do not use any preprocessing. The full set\nof network and optimization hyperparameters are listed in Table 1.\n\nJet substructure\n\nAs preprocessing for the substructure observables in the jet dataset from Section 3.2, we first\napply a logarithmic scaling at both part and reco level:\n\nm → log m,     τ21 → log τ21 ,    N → log N ,   w → log w .                (30)\n\nAll features are then standardized to zero mean and unit variance, using separate transforma-\ntions for x and z calculated with the training split of the reference simulation. The full set of\nnetwork and optimization hyperparameters are listed in Table 2. The network used to train\nD(z) as defined in Eq. (26) shares the same MLP architecture as the classifier and unfolder.\n\nConstituent-level jets"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "For the jet constituent example in Section 3.3, we apply preprocessing compatible with the\nequivariance constraints of the LGATr architecture. All four momenta are represented in carte-\nsian coordinates (E, p x , p y , pz ) and preprocessed by boosting into the center-of-mass frame of\nthe jet. Particle identities are one-hot encoded and enter the network as scalar channels. To\nallow for symmetry breaking, reference vectors indicating the time and beam-transverse di-\nrections,\n\n(1, 0, 0, 0), (1, 0, 0, 1), (1, 0, 0, −1) ,                (31)\n                                  \b\n\nare appended to the collection of particles before preprocessing with a unique scalar identifier.\nThe full set of network and optimization hyperparameters are listed in Table 3.\n\n16\n\f SciPost Physics                                                                     Submission"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Classifier Rθ          Unfolder Rϕ\n                MLP hidden channels              2                      2\n                MLP hidden layers               32                     32\n                MLP activation                 SiLU                   SiLU\n                Ndata                         10M                  -\n                Nsim                          10M                10M\n                Train/Val/Test              60/5/35            60/5/35\n                Optimizer             ScheduleFree AdamW ScheduleFree AdamW\n                Learning rate               5 × 10−3           5 × 10−3\n                Batch size                    8192               8192\n                Epochs                          1                  1\n                Weight decay                    0                  0\n                Warmup steps                   200                200"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "Table 1: Network and optimization hyperparameters for AUSSIE and OmniFold on the Gaus-\nsian toy example from Section 3.1."
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "Classifier Rθ          Unfolder Rϕ\n                   Architecture              MLP                    MLP\n                   Hidden channels           128                    128\n                   Hidden layers               4                      4\n                   Activation                SiLU                   SiLU\n                   Ndata                     1.6M                 -\n                   Nsim                      1.6M              1.6M\n                   Train/Val/Test          60/5/35            60/5/35\n                   Optimizer         ScheduleFree AdamW ScheduleFree AdamW\n                   Learning rate           5 × 10−4             10−3\n                   Batch size                1024              8192\n                   Epochs                     200               500\n                   Patience                    50                50\n                   Wei"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "Table 2: Network and optimization hyperparameters for AUSSIE and OmniFold on the\nsubstructure-level jet dataset from Section 3.2.\n\nParton-level events\n\nFor the t H j example in Section 3.4, we also use Lorentz-equivariant preprocessing. However,\ninstead of boosting events we globally scale the four-momenta by 1/450 GeV and 1/140 GeV at\nthe part and reco levels respectively. All reco light jets share the same scalar particle identifier,\nand we add the same symmetry-breaking reference vectors from Eq. (31). The full set of\nnetwork and optimization hyperparameters are listed in Table 4.\n\n17\n\f SciPost Physics                                                          Submission"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "Classifier Rθ      Unfolder Rϕ\n                   Architecture      LGATr Slim         LGATr Slim\n                   Blocks                4                  4\n                   Heads                 4                  4\n                   Scalar channels      64                 64\n                   Vector channels      32                 16\n                   MLP ratio             4                  4\n                   Activation          GELU               GELU\n                   Dropout             0.01               0.01\n                   Ndata                 1.6M                  -\n                   Nsim                  1.6M                1.6M\n                   Train/Val/Test       60/5/35            60/5/35\n                   Optimizer      ScheduleFree AdamW ScheduleFree AdamW\n                   Learning rate          10−3             5 × 10−3\n                   Batch siz"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "Table 3: Network and optimization hyperparameters for AUSSIE and OmniFold on the\nconstituent-level jet dataset from Section 3.2."
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "Classifier Rθ      Unfolder Rϕ\n                   Architecture      LGATr Slim         LGATr Slim\n                   Blocks                4                  4\n                   Heads                 4                  4\n                   Scalar channels      32                 32\n                   Vector channels       8                  8\n                   MLP ratio             2                  2\n                   Activation          GELU               GELU\n                   Ndata                  440k                 -\n                   Nsim                  6.8M                6.8M\n                   Train/Val/Test       60/5/35            60/5/35\n                   Optimizer      ScheduleFree AdamW ScheduleFree AdamW\n                   Learning rate          10−3             5 × 10−3\n                   Batch size             512                8192\n                   Epochs"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Table 4: Network and optimization hyperparameters for AUSSIE and OmniFold on the t H j\ndataset from Section 3.4.\n\n18\n\f SciPost Physics                                                                        Submission\n\nB    Numerical details\n\nHere we give details on the numerical estimation of the two losses described in the main text.\n    Kernel loss: The loss from Eq. (17) can be estimated by coupling paired batch elements\nvia a kernel matrix,\n                                M\n                                          Rϕ (zi )                                 Rϕ (z j )\n                                                                                         \n                       1      X\n         LGauss ≈                      1−             K(x i , x j )(1 − δi j ) 1 −              . (32)\n                   M (M − 1) i, j=1       Rθ (x i )                                Rθ (x j )"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "By zeroing the diagonal of the matrix, this ‘U-statistic’ estimator is unbiased. The resulting\nsquared norm can occasionally take small negative values due to numerical precision, so we\nclamp it to stabilize optimization.\n    AutoDiff loss: The squared L2 norm from Eq. (18) can be directly computed over a batch\nby evaluating\n\nM                 2\n                2  1    X\n      |∇θ LMLC | ≈   ∇θ     ℓ(x i , zi )       with    ℓ(x, z) ≡ Rθ (x) − Rϕ (z) log Rθ (x) .    (33)\n                   M    i=1"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "While this estimator is straightforward to implement with automatic differentiation, it is biased\nat finite batch size: the square induces a strictly positive contribution from gradient noise\nproportional to its variance. This additive variance term vanishes in the limit of large batches.\nThis also explains why we find better performance with the L1 alternative from Eq. (20), since\nits linear scaling suppresses this bias compared to the quadratic of the L2 .\n    An unbiased estimator for the squared L2 norm can be constructed by partitioning the\nbatch into two (or more) disjoint subsets and forming the inner product of their parameter\ngradients.\n                                    P              \u0015T \u0014          M\n                              1                          1\n                                \u0014                                                 \u0015\n                            2\n      "
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "This two-sample estimator is consistent and removes the additive bias from gradient variance.\nHowever, it can fluctuate below zero, making stable optimization difficult. As in the kernel\ncase, larger batch sizes significantly reduce this effect. The optimization can be stabilized by\nclamping the norm at the cost of some bias. For our studies, we found the L1 norm from\nEq. (20) more favorable, though this may differ depending on the application.\n\nC    Additional jet substructure plots\n\nFor completeness, we provide the reco-level and part-level distributions for the substructure\nobservables that were omitted from the main text. Figures 11 and 12 respectively show the\nreco-level and part-level results for the jet multiplicity and width using the high-level dataset.\nFigures 13 and 14 the results for the jet multiplicity and groomed mass."
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "19\n\f  SciPost Physics                                                                                       Submission\n\n0.10                                Data                       10−1\n                                               OmniFold (1)\n                                               OmniFold (5)\n Density"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "Density\n                                               OmniFold (10)              10−2       Data\n           0.05                                AUSSIE                                OmniFold (1)\n                                                                                     OmniFold (5)\n                                                                          10−3       OmniFold (10)\n                                                                                     AUSSIE\n           0.00\n              1.1                                                            1.1\n   AUSSIE\n\nAUSSIE\n    Data\n\nData\n              1.0                                                            1.0\n              0.9                                                            0.9\n              1.1                                                            1.1\n   OmniFold\n\nOmniFold\n    Data"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "Data\n              1.0                                                            1.0\n              0.9                                                            0.9\n                    0        20           40               60                  0.0    0.2         0.4         0.6\n                            Jet multiplicity N                                          Jet width w\nFigure 11: Reco-level jet substructure, comparing AUSSIE and various iterations of OmniFold.\nSupplements Figure 3.\n\n×10−2\n              7.5                                                         10−1\n    Density\n\nDensity"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "5.0                                                         10−2         Data\n                               Data\n                                                                                       OmniFold (1)\n                               OmniFold (1)\n                                                                                       OmniFold (5)\n              2.5              OmniFold (5)                               10−3         OmniFold (10)\n                               OmniFold (10)\n                                                                                       AUSSIE\n              0.0              AUSSIE\n              1.1                                                            1.1\n   AUSSIE\n\nAUSSIE\n    Data\n\nData"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "1.0                                                            1.0\n              0.9                                                            0.9\n              1.1                                                            1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n\n1.0                                                            1.0\n              0.9                                                            0.9\n                    0        20           40               60                  0.0    0.2         0.4         0.6\n                            Jet multiplicity N                                          Jet width w\nFigure 12: Unfolded part-level jet substructure, comparing AUSSIE and various iterations of\nOmniFold. Supplements Figure 5.\n\n20\n\f  SciPost Physics                                                                               Submission"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "×10−2\n                                   Data                          7.5       Data\n                                   OmniFold (1)                            OmniFold (1)\n           0.10                    OmniFold (5)                            OmniFold (5)\n Density\n\nDensity\n                                   OmniFold (10)                 5.0       OmniFold (10)\n                                   AUSSIE                                  AUSSIE\n           0.05\n                                                                 2.5\n\n0.00                                                  0.0\n              1.1                                                1.1\n   AUSSIE\n\nAUSSIE\n    Data"
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Data\n              1.0                                                1.0\n              0.9                                                0.9\n              1.1                                                1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n              1.0                                                1.0\n              0.9                                                0.9\n                0.0   0.2         0.4          0.6                      −12.5 −10.0 −7.5 −5.0              −2.5\n                        Jet width w                                          Groomed mass log ρ\nFigure 13: Reco-level jet substructure (using constituents), comparing AUSSIE and various\niterations of OmniFold. Supplements Figure 6."
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "×10−2\n                                                                 7.5\n                                   Data\n           0.15\n                                   OmniFold (1)\n                                   OmniFold (5)                  5.0\n Density\n\nDensity\n\n0.10                    OmniFold (10)                                           Data\n                                   AUSSIE                                                  OmniFold (1)\n\n0.05                                                  2.5                       OmniFold (5)\n                                                                                           OmniFold (10)\n                                                                                           AUSSIE\n           0.00                                                  0.0\n              1.1                                                1.1\n   AUSSIE"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "AUSSIE\n    Data\n\nData\n\n1.0                                                1.0\n              0.9                                                0.9\n              1.1                                                1.1\n   OmniFold\n\nOmniFold\n    Data\n\nData\n\n1.0                                                1.0\n              0.9                                                0.9\n                0.0   0.2         0.4          0.6                      −12.5 −10.0 −7.5 −5.0              −2.5\n                        Jet width w                                          Groomed mass log ρ\nFigure 14: Unfolded part-level jet substructure (using constituents), comparing AUSSIE and\nvarious iterations of OmniFold. Supplements Figure 8.\n\n21\n\f SciPost Physics                                                                   Submission\n\nReferences"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "[1] J. M. Campbell et al., Event generators for high-energy physics experiments, SciPost Phys.\n     16 (2024) 5, 130, arXiv:2203.11110 [hep-ph].\n\n[2] G. Cowan, A survey of unfolding methods for particle physics, Conf. Proc. C 0203181\n     (2002) 248.\n\n[3] G. D’Agostini, Improved iterative Bayesian unfolding, in Alliance Workshop on Unfolding\n     and Data Correction. 10, 2010. arXiv:1010.0632 [physics.data-an].\n\n[4] S. Schmitt, TUnfold: an algorithm for correcting migration effects in high energy physics,\n     JINST 7 (2012) T10003, arXiv:1205.6201 [physics.data-an].\n\n[5] T. Plehn, A. Butter, B. Dillon, T. Heimel, C. Krause, and R. Winterhalder, Modern\n     Machine Learning for LHC Physicists, arXiv:2211.01421 [hep-ph].\n\n[6] N. Huetsch et al., The landscape of unfolding with machine learning, SciPost Phys. 18\n     (2025) 2, 070, arXiv:2404.18807 [hep-ph]."
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "[7] F. Canelli et al., A practical guide to unbinned unfolding, Eur. Phys. J. C 86 (2026) 2,\n     106, arXiv:2507.09582 [hep-ph].\n\n[8] A. Andreassen, P. T. Komiske, E. M. Metodiev, B. Nachman, and J. Thaler, OmniFold: A\n     Method to Simultaneously Unfold All Observables, Phys. Rev. Lett. 124 (2020) 18,\n     182001.\n\n[9] J. Chan and B. Nachman, Unbinned profiled unfolding, Phys. Rev. D 108 (2023) 1,\n     016002, arXiv:2302.05390 [hep-ph].\n\n[10] K. Desai, B. Nachman, and J. Thaler, Moment extraction using an unfolding protocol\n     without binning, Phys. Rev. D 110 (2024) 11, 116013, arXiv:2407.11284 [hep-ph].\n\n[11] H. Zhu, K. Desai, M. Kuusela, V. Mikuni, B. Nachman, and L. Wasserman,\n     Multidimensional Deconvolution with Profiling, arXiv:2409.10421 [hep-ph].\n\n[12] A. Falcão and A. Takacs, High-Dimensional Unfolding in Large Backgrounds,\n     arXiv:2507.06291 [hep-ph]."
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "[13] LHCb, R. Aaij et al., Multidifferential study of identified charged hadron distributions in\n                                                  p\n     Z-tagged jets in proton-proton collisions at s =13 TeV, Phys. Rev. D 108 (2023)\n     L031103, arXiv:2208.11691 [hep-ex].\n\n[14] H1, V. Andreev et al., Unbinned deep learning jet substructure measurement in high Q2ep\n     collisions at HERA, Phys. Lett. B 844 (2023) 138101, arXiv:2303.13620 [hep-ex].\n\n[15] ATLAS, G. Aad et al., Precision calibration of calorimeter signals in the ATLAS experiment\n     using an uncertainty-aware neural network, SciPost Phys. 19 (2025) 6, 155,\n     arXiv:2412.04370 [hep-ex].\n\n[16] ATLAS, G. Aad et al., Measurement of jet track functions in pp collisions at s=13 TeV with\n     the ATLAS detector, Phys. Lett. B 868 (2025) 139680, arXiv:2502.02062 [hep-ex]."
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "[17] CMS, V. Chekhovsky et al., Measurement of event shapes in minimum-bias events from\n                                p\n     proton-proton collisions at s = 13 TeV, arXiv:2505.17850 [hep-ex].\n\n22\n\f SciPost Physics                                                                 Submission\n\n[18] Electron-Positron Alliance, A. Badea et al., Unbinned measurement of thrust in e+ e−\n                  p\n     collisions at s = 91.2 GeV with ALEPH archived data, arXiv:2510.22038 [hep-ex].\n\n[19] M. Bellagente, A. Butter, G. Kasieczka, T. Plehn, and R. Winterhalder, How to GAN away\n     Detector Effects, SciPost Phys. 8 (2020) 4, 070, arXiv:1912.00477 [hep-ph].\n\n[20] M. Bellagente, A. Butter, G. Kasieczka, T. Plehn, A. Rousselot, R. Winterhalder,\n     L. Ardizzone, and U. Köthe, Invertible Networks or Partons to Detector and Back Again,\n     SciPost Phys. 9 (2020) 074, arXiv:2006.06685 [hep-ph]."
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "[21] M. Vandegar, M. Kagan, A. Wehenkel, and G. Louppe, Neural Empirical Bayes: Source\n     Distribution Estimation and its Applications to Simulation-Based Inference,\n     arXiv:2011.05836 [stat.ML].\n\n[22] J. N. Howard, S. Mandt, D. Whiteson, and Y. Yang, Learning to simulate high energy\n     particle collisions from unlabeled data, Sci. Rep. 12 (2022) 7567, arXiv:2101.08944\n     [hep-ph].\n\n[23] A. Shmakov, K. Greif, M. Fenton, A. Ghosh, P. Baldi, and D. Whiteson, End-To-End Latent\n     Variational Diffusion Models for Inverse Problems in High Energy Physics,\n     arXiv:2305.10399 [hep-ex].\n\n[24] S. Diefenbacher, G.-H. Liu, V. Mikuni, B. Nachman, and W. Nie, Improving generative\n     model-based unfolding with Schrödinger bridges, Phys. Rev. D 109 (2024) 7, 076011,\n     arXiv:2308.12351 [hep-ph]."
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "[25] A. Shmakov, K. Greif, M. J. Fenton, A. Ghosh, P. Baldi, and D. Whiteson, Full Event\n     Particle-Level Unfolding with Variable-Length Latent Variational Diffusion,\n     arXiv:2404.14332 [hep-ex].\n\n[26] C. Pazos, S. Aeron, P.-H. Beauchemin, V. Croft, Z. Huan, M. Klassen, and T. Wongjirad,\n     Towards Universal Unfolding of Detector Effects in High-Energy Physics using Denoising\n     Diffusion Probabilistic Models, arXiv:2406.01507 [physics.data-an].\n\n[27] A. Butter, S. Diefenbacher, N. Huetsch, V. Mikuni, B. Nachman, S. Palacios Schweitzer,\n     and T. Plehn, Generative unfolding with distribution mapping, SciPost Phys. 18 (2025) 6,\n     200, arXiv:2411.02495 [hep-ph].\n\n[28] L. Favaro, R. Kogler, A. Paasch, S. Palacios Schweitzer, T. Plehn, and D. Schwarz, How to\n     unfold top decays, SciPost Phys. Core 8 (2025) 053, arXiv:2501.12363 [hep-ph]."
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "[29] A. Butter, T. Heimel, N. Huetsch, M. Kagan, and T. Plehn, Simulation-Prior Independent\n     Neural Unfolding Procedure, arXiv:2507.15084 [hep-ph].\n\n[30] A. Petitjean, A. Butter, K. Greif, S. Palacios Schweitzer, T. Plehn, J. Spinner, and\n     D. Whiteson, Generative Unfolding of Jets and Their Substructure, arXiv:2510.19906\n     [hep-ph].\n\n[31] M. Backes, A. Butter, M. Dunford, and B. Malaescu, An unfolding method based on\n     conditional invertible neural networks (cINN) using iterative training, SciPost Phys. Core\n     7 (2024) 1, 007, arXiv:2212.08674 [hep-ph].\n\n[32] K. Datta, D. Kar, and D. Roy, Unfolding with Generative Adversarial Networks,\n     arXiv:1806.00433 [physics.data-an].\n\n23\n\f SciPost Physics                                                                  Submission"
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "[33] ATLAS, G. Aad et al., Simultaneous Unbinned Differential Cross-Section Measurement of\n     Twenty-Four Z+jets Kinematic Observables with the ATLAS Detector, Phys. Rev. Lett. 133\n     (2024) 26, 261803, arXiv:2405.20041 [hep-ex].\n\n[34] A. Butter, N. Huetsch, V. Mikuni, B. Nachman, and S. Palacios Schweitzer, Analysis-ready\n     Generative Unfolding, arXiv:2509.02708 [hep-ph].\n\n[35] H. Zhu, K. Desai, M. Kuusela, V. Mikuni, B. Nachman, and L. Wasserman, Machine\n     Learning-based Unfolding for Cross Section Measurements in the Presence of Nuisance\n     Parameters, arXiv:2512.07074 [stat.AP].\n\n[36] D. Valsecchi, M. Donegà, and R. Wallny, Profiling systematic uncertainties in\n     Simulation-Based Inference with Factorizable Normalizing Flows, arXiv:2602.13184\n     [hep-ph]."
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "[37] A. Jacot, F. Gabriel, and C. Hongler, Neural tangent kernel: Convergence and\n     generalization in neural networks, in Advances in Neural Information Processing Systems.\n     2018. arXiv:1806.07572 [cs.LG].\n\n[38] A. Chiefa, L. Del Debbio, and R. Kenway, Quantitative Understanding of PDF Fits and\n     their Uncertainties, arXiv:2512.24116 [hep-ph].\n\n[39] DELPHES 3, J. de Favereau, C. Delaere, P. Demin, A. Giammanco, V. Lemaître,\n     A. Mertens, and M. Selvaggi, DELPHES 3, A modular framework for fast simulation of a\n     generic collider experiment, JHEP 02 (2014) 057, arXiv:1307.6346 [hep-ex].\n\n[40] J. Brehmer, V. Bresó, P. de Haan, T. Plehn, H. Qu, J. Spinner, and J. Thaler, A\n     Lorentz-equivariant transformer for all of the LHC, SciPost Phys. 19 (2025) 4, 108,\n     arXiv:2411.00446 [hep-ph]."
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "[41] A. Petitjean, T. Plehn, J. Spinner, and U. Köthe, Economical Jet Taggers – Equivariant,\n     Slim, and Quantized, arXiv:2512.17011 [hep-ph].\n\n[42] W. Bhimji, C. Harris, V. Mikuni, and B. Nachman, OmniLearned: A Foundation Model\n     Framework for All Tasks Involving Jet Physics, arXiv:2510.24066 [hep-ph].\n\n[43] V. Mikuni and B. Nachman, Method to simultaneously facilitate all jet physics tasks, Phys.\n     Rev. D 111 (2025) 5, 054015, arXiv:2502.14652 [hep-ph].\n\n[44] V. Mikuni and B. Nachman, Solving key challenges in collider physics with foundation\n     models, Phys. Rev. D 111 (2025) 5, L051504, arXiv:2404.16091 [hep-ph].\n\n[45] A. Butter, T. Heimel, T. Martini, S. Peitzsch, and T. Plehn, Two invertible networks for the\n     matrix element method, SciPost Phys. 15 (2023) 3, 094, arXiv:2210.00019 [hep-ph]."
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "[46] T. Heimel, N. Huetsch, R. Winterhalder, T. Plehn, and A. Butter, Precision-machine\n     learning for the matrix element method, SciPost Phys. 17 (2024) 5, 129,\n     arXiv:2310.07752 [hep-ph].\n\n[47] A. Butter, S. Diefenbacher, G. Kasieczka, B. Nachman, T. Plehn, D. Shih, and\n     R. Winterhalder, Ephemeral Learning - Augmenting Triggers with Online-Trained\n     Normalizing Flows, SciPost Phys. 13 (2022) 4, 087, arXiv:2202.09375 [hep-ph].\n\n24"
+    }
+  ]
+}
