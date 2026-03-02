@@ -1,0 +1,642 @@
+{
+  "arxivId": "2602.24288",
+  "paperTitle": "DARE-bench: Evaluating Modeling and Instruction Fidelity of LLMs in Data Science",
+  "abstract": "The fast-growing demands in using Large Language Models (LLMs) to tackle complex multi-step data science tasks create an emergent need for accurate benchmarking. There are two major gaps in existing benchmarks: (i) the lack of standardized, process-aware evaluation that captures instruction adherence and process fidelity, and (ii) the scarcity of accurately labeled training data. To bridge these gaps, we introduce DARE-bench, a benchmark designed for machine learning modeling and data science instruction following. Unlike many existing benchmarks that rely on human- or model-based judges, all tasks in DARE-bench have verifiable ground truth, ensuring objective and reproducible evaluation. To cover a broad range of tasks and support agentic tools, DARE-bench consists of 6,300 Kaggle-derived tasks and provides both large-scale training data and evaluation sets. Extensive evaluations show that even highly capable models such as gpt-o4-mini struggle to achieve good performance, especially in machine learning modeling tasks. Using DARE-bench training tasks for fine-tuning can substantially improve model performance. For example, supervised fine-tuning boosts Qwen3-32B&#39;s accuracy by 1.83x and reinforcement learning boosts Qwen3-4B&#39;s accuracy by more than 8x. These significant improvements verify the importance of DARE-bench both as an accurate evaluation benchmark and critical training data.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "The fast-growing demands in using Large Language Models (LLMs) to tackle complex multi-step data science tasks create an emergent need for accurate benchmarking. There are two major gaps in existing benchmarks: (i) the lack of standardized, process-aware evaluation that captures instruction adherence and process fidelity, and (ii) the scarcity of accurately labeled training data. To bridge these gaps, we introduce DARE-bench, a benchmark designed for machine learning modeling and data science instruction following. Unlike many existing benchmarks that rely on human- or model-based judges, all tasks in DARE-bench have verifiable ground truth, ensuring objective and reproducible evaluation. To cover a broad range of tasks and support agentic tools, DARE-bench consists of 6,300 Kaggle-derived tasks and provides both large-scale training data and evaluation sets. Extensive evaluations show that even highly capable models such as gpt-o4-mini struggle to achieve good performance, especially in machine learning modeling tasks. Using DARE-bench training tasks for fine-tuning can substantially improve model performance. For example, supervised fine-tuning boosts Qwen3-32B&#39;s accuracy by 1.83x and reinforcement learning boosts Qwen3-4B&#39;s accuracy by more than 8x. These significant improvements verify the importance of DARE-bench both as an accurate evaluation benchmark and critical training data."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: DARE-bench defines each task by providing a natural-language question and structured"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Table 1: Comparison between DARE-bench and existing benchmarks."
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 2: Overview of DARE-bench benchmark composition and the primary capabilities evaluated"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 2: Automated pipeline of DARE-bench. The construction process consists of four stages:"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Table 3: Distribution of task domains across the DARE-bench train and test sets."
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 4: Hyperparameter sensitivity analysis for o4-mini across different turns and sandbox maxi-"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 5: Main evaluation results on our benchmark (test tasks) under the configuration where turns"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 3: Example of an instruction-following task where the agent fails to respect explicit con-"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 6: Fine-tuning and RL improve performance over baselines. Superscripts denote absolute"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 7: Ablation study on the impact of Instruction Following (IF) and ML Modeling (MM) data"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 8: External validation on DSBench (Jing et al., 2024) after converting tasks into our format."
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 9: Failure mode analysis across different models."
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 10: Comparison between Native Function Call4 and DataWiseAgent on DARE-bench and"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 11: Performance on the Strictly Open-Sourceable Subset"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Table 12: Average number of tokens and tool calls for completions of different models and prompts."
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Table 13: Hyper-parameters used for reinforcement learning experiments."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Published as a conference paper at ICLR 2026\n\nDARE- BENCH : E VALUATING M ODELING AND\n                                         I NSTRUCTION F IDELITY OF LLM S IN DATA S CIENCE\n                                          Fan Shu1,∗       Yite Wang2,∗†     Ruofan Wu1       Boyi Liu2\n                                                       2                 2              1\n                                          Zhewei Yao          Yuxiong He       Feng Yan\n                                          1                           2\n                                            University of Houston       Snowflake AI Research\n\nA BSTRACT\narXiv:2602.24288v1 [cs.AI] 27 Feb 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "The fast-growing demands in using Large Language Models (LLMs) to tackle\n                                                      complex multi-step data science tasks create an emergent need for accurate bench-\n                                                      marking. There are two major gaps in existing benchmarks: (i) the lack of\n                                                      standardized, process-aware evaluation that captures instruction adherence and\n                                                      process fidelity, and (ii) the scarcity of accurately labeled training data. To\n                                                      bridge these gaps, we introduce DARE-bench, a benchmark designed for ma-\n                                                      chine learning modeling and data science instruction following. Unlike many\n                                       "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1       I NTRODUCTION\n                                         Large language models (LLMs) (Anthropic, 2025a;b; OpenAI, 2025a;c; Yang et al., 2025) are in-\n                                         creasingly employed as data-science (DS) agents to perform data reading, transformation, and mod-\n                                         eling through tool-augmented code execution. Such a rapid adoption demands rigorous benchmarks\n                                         to evaluate and enhance the effectiveness and reliability in performing these complex, multi-step\n                                         workflows. However, due to the cost and complexity of evaluation, existing benchmarks can only\n                                         evaluate final-answer accuracy, and leaving other valuable metrics such as process fidelity and re-\n                                         producibili"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Figure 1: DARE-bench defines each task by providing a natural-language question and structured\n                                         files (metadata and train/test splits). An LLM agent executes code within a sandbox to generate\n                                         predictions, which are compared against ground truth for automatic and reproducible evaluation.\n                                             ∗\n                                                 Equal contribution. † Project lead. Work done during Fan Shu’s internship at Snowflake AI Research.\n\n1\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Table 1: Comparison between DARE-bench and existing benchmarks.\n                                                            Data    Inst-   Time                  Train\n     Benchmark                           Domain                                      Verifiable           Tasks\n                                                            File   follow   Series                Tasks\n     MLAgentBench (Huang et al., 2023) Deep Learning         ✓       -        -        ✓           ✗        13\n     MLE-bench (Chan et al., 2024)     Deep Learning         ✓       -        -        ✓           ✗        75\n     SWE-bench (Jimenez et al., 2024)  Software Eng.         ✓       -        -        ✓           ✓      21,294\n     DS-1000 (Lai et al., 2023)          Data Science        ✗       ✗        ✗        ✗           ✗      1,000\n     Arcade (Yin et al., 2022)           Data Science        ✗       "
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "We complement these works by taking a benchmark approach to train LLM agents with high fidelity\ndata and sophisticated yet reproducible evaluation to better acquire domain-specific skills in DS\nworkflows.\nCreating benchmarks that capture process fidelity for both training and evaluation is significantly\nchallenging. The main challenge comes from two-fold. First, the sources for crafting training data\n(e.g., expert-level, executable DS process traces) are scarce and prohibitively expensive to acquire.\nExisting benchmarks largely rely on human-processed data and often center on Kaggle competi-\ntions, creating a major data bottleneck. Second, evaluating “process fidelity” is highly non-trivial\nas randomness and environmental effects confound behavior, and verifying that an agent follows\npermissible DS practices requires a controlled, instrumented harness. These challenges limit the\ndata qua"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Table 2: Overview of DARE-bench benchmark composition and the primary capabilities evaluated\nby each task type. Variants are denoted as IF = Instruction Following, MM = ML Modeling, XF =\neXogenous Features, CF = Canonical Forecasting.\n              Task Type            Train Tasks    Test Tasks        Capability Assessed\n              Classification-IF       1160             74           Instruction following\n              Classification-MM       1160             74               ML Modeling\n              Regression-IF            899             45           Instruction following\n              Regression-MM            899             45               ML Modeling\n              Time-series-XF           915             57        Predictive ML, forecasting\n              Time-series-CF           915             57        Predictive ML, forecasting"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "achieves a total score of 23.25, while the smaller Qwen3-4B baseline performs even worse which\nscores 4.39. By contrast, DARE-bench bridges this gap by providing a training-focused benchmark\nwith verifiable large-scale training data and useful and sophisticated reproducible evaluation. Su-\npervised fine-tuning yields absolute gains of nearly 20 points, while reinforcement learning boosts\nQwen3-4B from 4.39 to 37.40. Overall, DARE-bench significantly improve success rates, process\nadherence, predictive performance, and robustness across a variety of practical data science tasks."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "2   R ELATED W ORK\nLLM Agents. Research into Agentic LLMs focuses on their ability as independent agents through\nplanning, tool calling, and memory capabilities. The integration of reasoning with actions or APIs\noccurs through ReAct (Yao et al., 2023) and Toolformer (Schick et al., 2023) frameworks as re-\nsearchers work on multi-agent collaboration and autonomous tool-augmented systems. Applying\nthese to real-world data science remains difficult because current benchmarks lack adequate training\nresources and often omit critical domains such as time-series forecasting or the distinction between\nopen-ended problem solving and strict instruction-following.\nLLMs for Coding and Data Science Benchmarks. The advancement of coding benchmarks de-\npends on the use of testable pass/fail signals. The HumanEval (Chen et al., 2021) and MBPP\n(Austin et al., 2021) provided short self-contained functions"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "3     DARE- BENCH\nDARE-bench consists of three data science task-families - classification, regression and time-series\nforecasting, each with two variants that probe distinct agent capabilities. For clarity, we denote\nthese variants using intuitive abbreviations: IF (Instruction Following) and MM (ML Modeling) for\nclassification and regression; XF (eXogenous Features) and CF (Canonical Forecasting) for time-\nseries forecasting. In classification and regression, the IF variant emphasizes instruction-following\nby requiring LLM to faithfully reproduce reference workflows, whereas the MM variant targets ML\nmodeling with outcome-based evaluation. These variants capture complementary real-world needs.\nIF simulates a workflow where an agent must strictly execute a senior scientist’s detailed design.\nConversely, MM reflects an outcome-driven scenario where customers only care about the final\nacc"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "3.1   DATASET C URATION\n\nData Scourcing        Task Design         Post-Process          Finalization\n\nFigure 2: Automated pipeline of DARE-bench. The construction process consists of four stages:\n(1) Dataset Sourcing, where Kaggle datasets are filtered by tags, license, size, and metadata; (2)\nTask Design, where schema summaries, targets, features, and feasibility are analyzed with the help\nof LLM; (3) Post-Process, including splitting, noise injection for IF tasks or resampling or entity\nchecks for time-series-CF tasks; and (4) Finalization, which validates solvability in a sandbox for\nIF tasks and produces standardized benchmark artifacts."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "To construct DARE-bench, we design an automated data curation pipeline that systematically trans-\nforms raw Kaggle datasets into standardized machine learning tasks. Unlike prior benchmarks which\nrely mainly on manual curation, our approach integrates web crawling, LLM-based task formulation,\ncontrolled data transformations, and sandbox verification to ensure both quality and scale. Shown\nin Figure 2, the pipeline consists of four stages. Detailed prompts are shown in Appendix I.\nDataset Sourcing with Augmented Metadata. We selected Kaggle as the primary data source due\nto its breadth of real-world, user-contributed datasets. The official API of Kaggle retrieves candidate\ndatasets that meet specific criteria including tabular format and valid open license. Additionally,\nwe develop a lightweight web crawler to extract additional data from webpage descriptions that\nwere present in the data"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "4\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "issues through numerical values that exceed valid ranges and unexpected categorical entries, and the\ntesting set serves as the clean reference data. The chronological split method is used for time-series\nforecasting to preserve the natural order of time in the data. LLM then detects entity identifiers to\nstop data leakage between groups and it performs automatic resampling of irregular time series data\nto uniform intervals through an aggregation method suggested by the model.\nFinalization. After the post-process step, for instruction-following tasks, the validation process for\neach task runs independently in a sandbox environment by executing the reference solution code\nsequence including data loading, preprocessing, training, and prediction generation. Since these\ntasks rely on reference outputs rather than fixed ground truth values, the sandbox ensures that the\ninstructions can be fait"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "3.2   TASK F ORMULATION"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Input and output. Suppose we have the task description Q, an accompanying dataset description\nM , a training set Dtrain = {(xi , yi )}ni=1\n                                          train\n                                                , a testing set without target values Dtest = {xi }ni=1\n                                                                                                     test\n                                                                                                          , and\naccess to a code execution tool T . The tool T enforces a maximum wall-clock runtime Tmax , while\nthe agent G is subject to an interaction budget of K turns. Given these inputs and constraints, G\nproduces executable code C, which is run within T on Dtrain to fit a model and subsequently on Dtest\nto generate predictions ŷ, i.e., ŷ = G(Q, Dtrain , Dtest , M, T (Tmax , K)).\nEvaluation metr"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "3.3   F EATURES OF DARE- BENCH"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "DARE-bench introduces several key features that distinguish it from prior benchmarks in data sci-\nence and machine learning:\nML Modeling and Instruction Following. DARE-bench differs from other existing benchmarks\nbecause it assesses two fundamental data science capabilities which are essential for real-world ap-\nplications: ML modeling and task instruction following for data processing and model development.\nVerifiable Ground Truth. The evaluation process of DARE-bench depends on actual labels and\nsimulated reference solution outputs to produce results that can be replicated. The system design\nremoves all dependencies on human judgment and model-based assessments that enables evaluation\nmetrics to directly assess task performance. This design is similar to coding benchmarks such as\nSWE-bench (Jimenez et al., 2024) and math benchmarks like AIME (Balunović et al., 2025), making\nit extrem"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "5\n\fPublished as a conference paper at ICLR 2026\n\nTable 3: Distribution of task domains across the DARE-bench train and test sets.\n      Dataset        Finance         Health       Business    Technology Automotive    Education    Environment     Others\n      Train          16.9%           10.2%          7.3%         4.0%         4.5%       2.8%          6.8%         47.5%\n      Test           17.1%            8.4%          8.2%         5.6%         3.3%       3.1%          2.4%         51.9%"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Table 4: Hyperparameter sensitivity analysis for o4-mini across different turns and sandbox maxi-\nmum execution time limit configurations.\n               turns           time           class-IF     class-MM       reg-IF     reg-MM        time-XF    time-CF\n                 3             300             37.16         55.44        29.71       51.69         37.99          6.67\n                 5             200             67.56         57.89        53.62       57.60         42.29          9.67\n                 6             180             73.42         61.07        63.76       60.92         41.59          9.79\n                 8             120             73.87         61.42        65.21       61.05         42.11          8.82\n                10             100             75.22         63.36        62.31       62.07         42.03         10.97\n                15             100         "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "world challenges such as class imbalance, missing values, and noise. As illustrated in Table 3,\nquantitative analysis confirms this broad coverage, showing that DARE-bench spans a wide spec-\ntrum of real-world verticals across both training and test sets. Details in categorization can be found\nin Appendix M. In addition, enforced constraints—such as a 10-minute execution limit and bounded\ntool invocation turns—reflect realistic user expectations for efficient, accurate solutions. See more\ndetails on Appendix H.\n\n4     E VALUATION\nIn this section, we present the experimental results and analysis of several LLMs evaluated using\nDARE-bench.\n\n4.1   E XPERIMENT S ETTINGS"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "We experiment with state-of-the-art LLMs from open-source ones such as Qwen3-32B and Qwen3-\n4B (Yang et al., 2025), to proprietary models such as gpt-o4-mini (OpenAI, 2025d), gpt-4o, gpt-\n4.1 (OpenAI, 2025a), gpt-5 (OpenAI, 2025b), Claude-Sonnet-3.7 (Anthropic, 2025a), and Claude-\nSonnet-4 (Anthropic, 2025b).\nFor all the experiments, we employ a greedy decoding strategy whenever applicable, along with\nsandbox (ByteDance-Seed Foundation Code Team, 2024) for code execution. To reduce random-\nness, each task is repeated three times and we report the average score. We evaluate all tasks using\neither accuracy or the macro-F1/clipped R2 score. The ‘classification-IF’ and ‘regression-IF’ met-\nrics are measured using a strict, binary (0/1) accuracy. ‘classification-MM’ is measured using a\ngraded (0.0-1.0) macro-F1 score. The remaining metrics, ‘regression-MM’, ‘time-series-XF’, and\n‘time-series-"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "4.2   H YPERPARAMETER S ENSITIVITY A NALYSIS\n\nThe results, shown in Table 4, clearly indicate a clear trend emerges: performance generally im-\nproves with a higher number of interactive turns. We observe a dramatic leap in performance when\nmoving from 3-turn configurations to 5-turn configurations. For example, the classification-IF score\njumps from 37.16 (at 3 turns, 300 s) to 67.56 (at 5 turns, 200 s). This suggests that allowing the\nagent more opportunities to iterate and refine its approach is crucial.\n\n6\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Table 5: Main evaluation results on our benchmark (test tasks) under the configuration where turns\nset as 5 and sandbox maximum execution time set as 200 s. The best score in each column is\nbolded.2\n        Model               class-IF   class-MM       reg-IF     reg-MM       time-XF     time-CF\n        gpt-4o               32.88       40.45        20.28       40.60        35.54       4.77\n        gpt-4.1              55.82       57.83        52.17       58.62        40.78       6.60\n        gpt-5                69.81       43.40        57.24       56.29        36.83       10.13\n        gpt-o4-mini          67.56       57.89        53.62       57.60        42.29       9.67\n        Claude-Sonnet-3.7    61.48       61.03        46.37       63.20        49.88       13.70\n        Claude-Sonnet-4      16.21       18.27        15.21       11.33         4.80        0.01\n        Qwen3-32B       "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "The highest performance on classification-IF (76.80) was achieved at the (15 turns, 100 s) setting.\nHowever, for our main model comparison, we sought a balance between performance and computa-\ntional efficiency (i.e., cost and latency). We selected the (5 turns, 200 s) configuration as our standard\nsetting. This configuration (5 turns, 200 s) serves as a robust and practical baseline; it significantly\noutperforms 3-turn setups and achieves strong, representative scores across all metrics (e.g., 67.56\non classification-IF, 53.62 on regression-IF, and 42.29 on time-series-XF) within a practical time\nconstraint, i.e., approximately 1000 s user wait time in total.\n\n4.3    M ODEL C OMPARISON"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Based on our sensitivity analysis, we adopt the (5 turns, 200 s) configuration for a comprehensive\ncomparison of all models. The main results are presented in Table 5. Statistics on the average token\nusage and the number of tool invocations are listed in Appendix K.\nIn this standardized setting, Claude-Sonnet-3.7 emerges as the top-performing model. It achieves the\nhighest scores on four of the six evaluation metrics: ‘classification-IF’ (69.81), ‘classification-MM’\n(61.03), ‘regression-MM’ (63.20), ‘time-series-XF’ (49.88) and ‘time-series-CF’ (13.70), demon-\nstrating its strong overall capabilities for this benchmark. gpt-5 leads the two IF columns, achieving\nthe highest ‘classification-IF’ (69.81) and ‘regression-IF’ (57.24).\nThe results also reveal marked disparities between model generations. Claude-Sonnet-4 under-\nperforms significantly compared to its predecessor Claude-Sonnet-3.7"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "7\n\fPublished as a conference paper at ICLR 2026\n\nTask                                    Python Code\n\nEvaluation          Personality      Personality\n\nExtrovert        Extrovert       Fail\n                                                                                Introvert        Extrovert\n                                                                                Introvert        Introvert\n\nFigure 3: Example of an instruction-following task where the agent fails to respect explicit con-\nstraints. Despite being asked to fix the random seed, the model omitted the required argument,\nleading to incorrect predictions and an evaluation failure."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Table 6: Fine-tuning and RL improve performance over baselines. Superscripts denote absolute\ngains compared to the baseline of the same model.\n                                                                                                                                       Model-\n    Model       Setting     class-IF     class-MM        reg-IF        reg-MM          time-XF       time-CF              Total\n                                                                                                                                        Perf\n    Qwen3-32B   Baseline     17.11         30.71         15.21          35.86       26.96              0.00               23.25         65.03\n    Qwen3-32B   SFT-FV     40.54+23.43   44.71+13.99   42.75+27.54    49.21+13.35 39.95+12.99        0.07+0.07          42.42+19.17   72.32+7.29\n    Qwen3-32B   SFT-AV     40.54+23.43   47.20+16.49   42.0"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "label encoding, mishandling NaNs), and unreliable type inference. Such shortcuts led to fragile\npipelines and frequent errors.\nTime-Series Task Failures. Performance on ‘time-series-CF’ was especially poor. Reflecting a lack\nof exposure to complex time-series reasoning, LLMs often failed to produce valid output formats or\nrelied on trivial heuristics (last value, mean), resulting in near-zero predictive accuracy.\nThis qualitative analysis reveals that current agent failures are multi-faceted. They range from ba-\nsic API misuse and poor instruction following to, most critically, a lack of robust, generalizable\nreasoning for complex tasks. The widespread use of brittle preprocessing and the near-total failure\non complex time-series formatting suggest that current agents, while proficient at simple code\ngeneration, still lack the deep, domain-specific reasoning required for autonomous data "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "5     F INE - TUNING LLM S WITH DARE- BENCH\nTo further strengthen the performance of foundation LLMs on DARE-bench, we explore two com-\nplementary training paradigms: supervised fine-tuning (SFT) and reinforcement learning (RL). SFT\nleverages curated supervision from rejection-sampled traces to align models more closely with task\nrequirements, while RL directly optimizes models with verifiable outcome rewards. The following\nsubsections detail each approach, their implementation, and the improvements they yield.\nRejection Sampling and Supervised Fine-tuning. To obtain high-quality supervision signals, we\nrejection-sample traces generated across multiple runs, using task-specific filtering strategies.\nWe generate data for supervised fine-tuning through rejection sampling using task-independent fil-\nters that evaluate trajectories for validity, quality, and speed. A trajectory is valid if i"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "8\n\fPublished as a conference paper at ICLR 2026\n\nTable 7: Ablation study on the impact of Instruction Following (IF) and ML Modeling (MM) data\nwith SFT-DV rejection sampling data.\n            Train Data    class-IF     class-MM            reg-IF    reg-MM         time-XF      time-CF\n            baseline        17.11         30.71         15.21          35.86          26.96        0.00\n            IF           40.99+23.88    22.38-8.33    47.82+32.61    27.85-8.01     23.83-3.13   0.00+0.00\n            MM            11.71-5.40   45.69+14.98    18.84+3.63    45.38+9.52     34.12+7.16    0.00+0.00\n            IF+MM        38.58+21.47   43.82+13.11    39.13+23.92   51.00+15.14    38.92+11.96   0.00+0.00"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Table 8: External validation on DSBench (Jing et al., 2024) after converting tasks into our format.\nSuperscripts denote absolute gains over the baseline of the same model.\n                         Model                  Setting             Competition-level Accuracy\n                         Qwen3-32B              Baseline                      32.38\n                         Qwen3-32B              SFT-FV                      37.82+5.44\n                         Qwen3-32B              SFT-AV                      41.08+8.70\n                         Qwen3-32B              SFT-BV                      40.06+7.68\n                         Qwen3-32B              SFT-DV                      42.41+10.03\n                         Qwen3-4B               Baseline                      18.23\n                         Qwen3-4B                 RL                        40.00+21.77"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "predictive scores exceeds a threshold. We study four strategies: FV (Fastest-Valid), which keeps the\nquickest valid trace for each task; AV (All-Valid), which retains all valid traces; BV (Best-Valid),\nwhich for diverse tasks selects the single best valid trace; and DV (Duo-Valid), which for diverse\ntasks retains the top-2 valid traces (fastest for IF, highest-scoring above the mean for predictive).\nBoth IF and predictive tasks use their natural evaluation metrics (exact match or macro-F1 / clipped\nR2 ) to define validity and rank trajectories. More details are provided in Appendix L.\nReinforcement Learning. We perform reinforcement learning with GRPO (Shao et al., 2024) on\nQwen3-4B (Yang et al., 2025) using the DARE-Bench training tasks with the verl (Sheng et al.,\n2025) framework. During training, we found that the group normalization used in GRPO intro-\nduces training instability. The"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "9\n\fPublished as a conference paper at ICLR 2026\n\nTable 9: Failure mode analysis across different models.\n                 Model                   Inst Adhere         Code Error       Code Exec Limit     Max Token Limit\n                 gpt-5                      126                 333                 0                     0\n                 Claude-Sonnet-3.7          158                 262                 0                     0\n                 Qwen3-32B                   48                 106                257                    372\n                 Qwen3-32B + SFT-DV          43                  80                236                    256\n                 Qwen3-4B                    79                 174                661                    102\n                 Qwen3-4B + RL               49                  91                331                    119"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Table 10: Comparison between Native Function Call4 and DataWiseAgent on DARE-bench and\nDSBench.\n        Framework          Model                  class-IF   class-MM     reg-IF   reg-MM       time-XF    time-CF    DSBench\n        Native Function Call Qwen3-32B             17.11      30.71       15.21     35.86        26.96          0.0    32.38\n        Native Function Call Qwen3-32B + SFT-DV    38.58      43.82       39.13     51.00        38.92          0.0    42.41\n        DataWiseAgent        Qwen3-32B             21.62      29.63       34.78     34.40        30.45          0.0    29.17"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "and halves code execution limit errors, demonstrating that our supervision significantly enhances\nboth code correctness and efficiency.\nCase Studies of Fine-tuning Effects. To further illustrate the benefits of fine-tuning, we highlight\ntwo representative failure modes that were substantially reduced. First, a common pre-fine-tuning er-\nror occurred when LLM provided tool with incorrectly generated tool arguments. The code executor\ntool requires three explicit arguments including code, input file and output file. However, LLMs fre-\nquently generated correct Python code that opened files but failed to pass the filename into the tool’s\nfile to load argument, causing sandbox execution to fail. After fine-tuning, the frequency of\nsuch mismatches decreased remarkably. Second, the baseline models tried to use natural-language\ncolumn names from the task description without checking the provided"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "6       C ONCLUSION AND F UTURE W ORKS\nWe present DARE-bench, a training-focused benchmark for DS agents which enables executable\nevaluation and trainable supervision through two verifiable task families: (i) process-aware instruc-\ntion following with reference-code ground truths, and (ii) ML modeling with dataset ground truths.\nThe 6,300 Kaggle-derived tasks show poor performance from strong general-purpose LLMs until\nthey receive task-specific data but fine-tuning on DARE-bench artifacts produce reliable and repeat-\nable enhancements in process fidelity and predictive performance and execution failure reduction.\nOur design uses the executable-benchmark approach which software engineering professionals have\nadopted to solve DS-specific problems that recent evaluations have identified.\nWe will expand our task type coverage (figures/speeches/clustering), strengthen procedural con-\nstraint"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "10\n\fPublished as a conference paper at ICLR 2026\n\nACKNOWLEDGMENTS\nThis work is partially supported by NSF CAREER-2305491. We would like to thank Jeff Rasley for\nhis help with the open-source release. We would like to thank the Area Chair and reviewers for their\nvaluable feedback and suggestions.\n\n11\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "R EFERENCES\nAnthropic.       Claude sonnet 3.7.  https://cloud.google.com/vertex-ai/\n  generative-ai/docs/partner-models/claude, 2025a. Extended thinking mode,\n  step-by-step reasoning capability.\nAnthropic. Introducing claude sonnet 4. https://www.anthropic.com/news/claude-4,\n  2025b. Improved coding and reasoning, available via API / Bedrock / Vertex.\nJacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan,\n  Ellen Jiang, Carrie Cai, Michael Terry, Quoc Le, et al. Program synthesis with large language\n  models. arXiv preprint arXiv:2108.07732, 2021.\nMislav Balunović, Jasper Dekoninck, Ivo Petrov, Nikola Jovanović, and Martin Vechev. Matharena:\n Evaluating llms on uncontaminated math competitions. arXiv preprint arXiv:2505.23281, 2025.\nTommaso Bendinelli, Artur Dox, and Christian Holz. Exploring llm agents for cleaning tabular\n  machine learning datas"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "12\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Qian Huang, Jian Vora, Percy Liang, and Jure Leskovec. Mlagentbench: Evaluating language agents\n  on machine learning experimentation. arXiv preprint arXiv:2310.03302, 2023.\nYiming Huang, Jianwen Luo, Yan Yu, Yitong Zhang, Fangyu Lei, Yifan Wei, Shizhu He, Lifu\n  Huang, Xiao Liu, Jun Zhao, et al. Da-code: Agent data science code generation benchmark for\n  large language models. arXiv preprint arXiv:2410.07331, 2024.\nCarlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik\n  Narasimhan. Swe-bench: Can language models resolve real-world github issues?, 2024. URL\n  https://arxiv.org/abs/2310.06770.\nLiqiang Jing, Zhehui Huang, Xiaoyang Wang, Wenlin Yao, Wenhao Yu, Kaixin Ma, Hongming\n  Zhang, Xinya Du, and Dong Yu. Dsbench: How far are data science agents from becoming data\n  science experts? arXiv preprint arXiv:2409.07703, 2024.\nRam Mohan Rao Kadiyala,"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "13\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Pengcheng Yin, Wen-Ding Li, Kefan Xiao, Abhishek Rao, Yeming Wen, Kensen Shi, Joshua How-\n  land, Paige Bailey, Michele Catasta, Henryk Michalewski, et al. Natural language to code gener-\n  ation in interactive data science notebooks. arXiv preprint arXiv:2212.09248, 2022.\nZiming You, Yumiao Zhang, Dexuan Xu, Yiwei Lou, Yandong Yan, Wei Wang, Huaming Zhang,\n  and Yu Huang. Datawiseagent: A notebook-centric llm agent framework for automated data\n  science. arXiv preprint arXiv:2503.07044, 2025.\nQiying Yu, Zheng Zhang, Ruofei Zhu, Yufeng Yuan, Xiaochen Zuo, Yu Yue, Weinan Dai, Tiantian\n  Fan, Gaohong Liu, Lingjun Liu, et al. Dapo: An open-source llm reinforcement learning system\n  at scale. arXiv preprint arXiv:2503.14476, 2025.\nDan Zhang, Sining Zhoubian, Min Cai, Fengzu Li, Lekang Yang, Wei Wang, Tianjiao Dong, Ziniu\n  Hu, Jie Tang, and Yisong Yue. Datascibench: An llm agent benchmark fo"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "14\n\fPublished as a conference paper at ICLR 2026\n\nOVERVIEW OF THE A PPENDIX\nThe Appendix is organized as follows:"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "• Appendix A contains reproducibility statement.\n       • Appendix B contains the use of LLMs in this work.\n       • Appendix C provides the limitation of the work.\n       • Appendix D contains the explanation of the evaluation metrics used in this work.\n       • Appendix E provides the performance on the strictly open-sourceable subset.\n       • Appendix F provides average number of tokens and tool calls for completions of different\n         models and prompts.\n       • Appendix G provides training details of the RL experiments in this work.\n       • Appendix H contains detailed description of DARE-bench features.\n       • Appendix I provides example prompt of the preprocessing steps of this work, including\n         column inference and task identification.\n       • Appendix J contains reference code for instruction-following tasks in this work.\n       • Appendix K contains tool schema "
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "A    R EPRODUCIBILITY S TATEMENT\nWe have attached the subet of our test set in the supplementary materials. Once accepted, we will\nrelease the full test set of our benchmark. The training set and model checkpoints will also be\nprovided upon request, and we plan to release them publicly depending on the feedback we receive\nfrom the research community. Also, a detailed description of our data processing procedure is\nincluded in subsection 3.1. These resources are intended to facilitate reproducibility and allow\nfuture researchers to build upon our work."
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "B    T HE U SE OF L ARGE L ANGUAGE M ODELS (LLM S )\nIn this project, LLMs were used as assistive tools. Specifically, we used LLMs to polish the writing\nof the paper and to assist in finding related works. In addition, LLMs were used during the data pro-\ncessing stage, for tasks such as data filtering, question rewriting, and identifying task targets. Beyond\nthese uses, the research ideas, experimental design, and analyses were developed independently by\nthe authors. The authors take full responsibility for all content presented in this paper.\n\nC    LIMITATIONS"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "While DARE-bench provides a large-scale, verifiable, and trainable benchmark, several limitations\nremain. First, the current tasks are primarily tabular based, so the benchmark does not yet cover\nmultimodal inputs such as text–image combinations or code–diagram interactions. Second, the cost\nof generating large numbers of executable traces can be high, and the rejection sampling strategies,\nwhile effective, may introduce biases toward shorter trajectories.\n\nD    E VALUATION M ETRICS\nWe report results using two standard metrics for classification and regression tasks: macro-F1 and\nR2 .\n\n15\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Macro-F1. For a classification task with C classes, let TPc , FPc , and FNc denote the number of\ntrue positives, false positives, and false negatives for class c, respectively. The precision and recall\nfor class c are defined as\n                                           TPc                          TPc\n                        Precisionc =                , Recallc =                  .\n                                       TPc + FPc                    TPc + FNc\nThe F1-score for class c is\n                                      2 · Precisionc · Recallc\n                                       F1c =                   .\n                                       Precisionc + Recallc\nThe macro-F1 is then the unweighted mean across all classes:\n                                                              C\n                                                         1 X\n                                "
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "R2 (Coefficient of Determination). For regression/time-series tasks with ground-truth   Pn         values\n{yi }ni=1 and predictions {ŷi }ni=1 , define the mean of ground-truth values as ȳ = n1 i=1 yi . The R2\nmetric is                                           Pn\n                                                          (yi − ŷi )2\n                                         R2 = 1 − Pi=1 n             2\n                                                                       .\n                                                       i=1 (yi − ȳ)\nAn R2 value close to 1 indicates strong predictive performance, while values close to 0 or nega-\ntive indicate weak or worse-than-baseline performance. Since R2 can be negative when the model\nperforms worse than predicting the mean, we adopt a clipped R2 defined as\n                                           2\n                                       "
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "E    P ERFORMANCE ON THE S TRICTLY O PEN -S OURCEABLE S UBSET\nTo ensure broad applicability and adherence to strict compliance standards, we constructed a strictly\nopen-sourceable subset of our benchmark. While the full benchmark aggregates data from diverse\nsources to maximize coverage, certain sources impose licensing constraints (e.g., ShareAlike or\nNon-Commercial clauses) or lack explicit licensing information, which may limit their utility in\nproprietary model development.\nThe strictly open-sourceable subset explicitly excludes data sources governed by restrictive licenses,\nincluding Creative Commons ShareAlike (SA), Non-Commercial (NC), and sources with Unknown\nor custom restrictive terms. This subset is composed exclusively of data distributed under permissive\nlicenses, such as MIT, Apache-2.0, CC0, and CC-BY-4.0. This ensures that the subset can be freely\nused, modified, and inte"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Table 11: Performance on the Strictly Open-Sourceable Subset\n        Model               class-IF     class-MM    reg-IF       reg-MM   time-XF     time-CF\n        gpt-4o                31.86       41.10      20.63        39.74     37.09       5.24\n        gpt-4.1               55.39       57.75      50.00        57.68     41.19       6.81\n        gpt-5                 70.10       43.18      55.56        55.21     36.78       7.84\n        gpt-o4-mini           68.14       59.14      51.59        57.48     42.15       8.15\n        Claude-Sonnet-3.7     61.52       61.22      46.03        61.36     51.21       12.08\n        Claude-Sonnet-4       14.71       17.70      14.29        10.50      5.27        0.02\n        Qwen3-32B             16.67       30.92      15.08        35.42     27.26       0.00\n        Qwen3-4B               3.43        4.99      0.79          2.28      7.00       0.0"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "Table 11 presents the evaluation results on this filtered subset using the same experimental configu-\nration as the main evaluation (5 turns, 200 s sandbox time).\nWe observe that the performance trends on this subset are largely consistent with the full benchmark,\nindicating that the permissive subset retains sufficient difficulty and representativeness to serve as a\nreliable proxy for the full evaluation.\n\n16\n\fPublished as a conference paper at ICLR 2026\n\nF     AVERAGE NUMBER OF TOKENS AND TOOL CALLS\nDetailed statistics on the average token counts and tool invocations are provided in Table 12. All\ntoken metrics are standardized using the Qwen3 tokenizer."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Table 12: Average number of tokens and tool calls for completions of different models and prompts.\nAll token counts are calculated using the Qwen3 tokenizer.\n                                                                                                   Overall Tool\n      Model               IF Tokens     IF Tool Calls   MM Tokens   MM Tool Calls Overall Tokens\n                                                                                                      Calls\n      prompt               596.7              -           224.6           -            350.7            -\n      gpt-5                609.5            2.2           582.5          2.4           591.2           2.4\n      Claude-Sonnet-3.7     675.2           3.6           894.3          4.8           830.0           4.4\n      Qwen3-32B            2093.3           3.1          1693.0          3.5          1816.8           3."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "G     R EINFORCEMENT L EARNING T RAINING D ETAILS\nG.1    R EWARD DESIGN\n\nInstruction following tasks. For instruction following tasks including Classification-IF and\nRegression-IF tasks. We have reference solution code Cref with corresponding simulated predic-\ntion for data Dtest as yref = Cref (Dtest ). Given the model prediction ŷ = G(Q, Dtrain , Dtest , M, T )\nand simulated ground truth yref , we use the following reward:\n                                              \n                                              0.1, ŷ exists,\n                                         r = 1.1, ŷ = yref ,                                         (1)\n                                              \n                                                0,    otherwise.\n\nNote that LLMs may be unable to generate a prediction.csv file due to the max turns or\nsandbox execution time limit."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Predictive ML tasks. For other tasks, including classification-PM, regression-PM, time-series-\nXF, and time-series-CF, we have masked ground-truth data ygt . Given the prediction provided by\nLLM ŷ, we define the reward as\n                                  \u001a\n                                    0.1 + d(ŷ, ygt ), ŷ exists,\n                               r=                                                           (2)\n                                    0,                 otherwise,\nwhere d : X × Y → [0, 1] denotes the distance measure between the prediction and the target. For\nclassification tasks, we adopt the macro-F1 score to account for class imbalance. For regression and\ntime-series tasks, we use the clipped coefficient of determination, defined as\n                                      clip(R2 ) = min{1, max{0, R2 }}.\nIf there are multiple prediction targets, we compute the distance"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "G.2    OTHER T RAINING PARAMETERS\n\nReinforcement learning.        We summarize our RL training hyper-parameters in Table 13.\n\n17\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Hyper-parameter                                             Value\n                 RL algorithm                            GRPO (Shao et al., 2024)\n                 Loss aggregation                                Sequence level\n                 Group normalization                                     False\n                 Learning rate                                         1 × 10−6\n                 Training mini-batch size                                      64\n                 KL regularization                                       False\n                 Rollout batch size                                            64\n                 Number of rollouts per question                                8\n                 Rollout backend                      SGLang (Zheng et al., 2024)\n                 Rollout temperature                                            1.0\n                 top p"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Table 13: Hyper-parameters used for reinforcement learning experiments.\n\nH    D ETAILED D ESCRIPTION OF OTHER DARE- BENCH F EATURES\nAutomated and Scalable Curation. The task generation process in DARE-bench uses a defined\napproach which collects data from Kaggle and incorporates web-scraped content before LLMs ver-\nify the tasks and produce standardized definitions. The automated pipeline generates authentic work\nassignments at large scale across multiple fields through an approach that needs minimal human\ninvolvement."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Diverse and Realistic Coverage. The benchmark contains 6,300 tasks which cover multiple do-\nmains and languages, including tabular classification and regression as well as advanced time-series\nforecasting. By drawing directly from real-world Kaggle datasets, it naturally incorporates common\ndata challenges such as class imbalance, missing values, noise, and temporal irregularities, providing\na more faithful simulation of practical data science scenarios."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Time and interaction constraints. DARE-bench implements realistic usage scenarios through\nits requirement for both time-limited wall-clock operation and restricted interaction turn counts.\nIn practice, end users are unlikely to wait hours for a model to train a full pipeline; hence, we\ncap execution time to 10 minutes for fast-response settings. The system limits the total number of\nagent-environment dialogues which forces models to find efficient solutions instead of performing\nendless exploration. The established limitations in this benchmark create a testing environment\nwhich mirrors actual operational conditions for interactive data science agents.\n\n18\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "I   E XAMPLE P ROMPT FOR C OLUMN I NFERENCE AND TASK I DENTIFICATION\nThe following prompt guides the model to check task suitability and identify prediction target and\nrelevant features from the provided dataset description and data information.\n    Task Target and Feature Identification Prompt\n\nYou are given a dataset along with its description.\n    Your tasks are as follows:"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Task 1: Assess Logistic/Linear Regression Suitability\n    Determine whether logistic regression (for classification) or linear regression (for regression) can be\n    appropriately used to model this dataset.\n    Use this strict checklist:\n             • Classification: target must be categorical; features structured; manageable missing values.\n             • Regression: target must be numeric and continuous; features structured; manageable missing\n               values; categorical targets not allowed.\n    If all conditions are met, the method is appropriate. Otherwise, it is not. When uncertain, output False.\n\nTask 2: Identify Task Type, Target Column, and Feature Columns\n    You must select column names only from the list below inside Column list:, avoid using names from\n    Context / description:.\n    Column list:\n    {all_columns}"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Context / description:\n    {filtered_metadata}\n    {scraper}\n    Infer:\n             • The task type (classification or regression)\n             • A list (≤ 3) of candidate target columns\n             • The best set of feature columns\n\nTask 3: Column Type Inference\n    For each column in the list, classify it as:\n             • “numerical”: meaningful arithmetic operations\n             • “categorical”: groups/codes, arithmetic not meaningful\n    Instructions:\n             • Return a Python dictionary with every column as a key\n             • Value must be either “numerical” or “categorical”\n             • Use dataset description to guide decisions"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Final Output Format\n    Output exactly 5 lines, in LaTeX-boxed format:\n    1. Method suitability → \\boxed{True} or \\boxed{False}\n    2. Task type → \\boxed{classification} or \\boxed{regression}\n    3. Target column candidates → \\boxed{[\"target1\", \"target2\"]}\n    4. Feature columns → \\boxed{[\"col1\", \"col2\", ...]}\n    5. Column types → \\boxed{{{\"col1\": \"numerical\", \"col2\": \"categorical\"}}}\n\n19\n\fPublished as a conference paper at ICLR 2026\n\nThe following prompt reformulates the user question into a precise and well-structured instruction.\n   Rewrite Question Prompt"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "You are given a machine learning task described in final_question and a dictionary of column\n   metadata in metadata_description. Your job is to rewrite the final_question in fluent\n   natural language, making it easier to read while keeping the meaning and structure intact.\n   Here’s what you must do:\n          1. Replace all column names and feature names in final_question with their natural lan-\n             guage descriptions from metadata_description. Preserve the original ordering of\n             features in lists.\n          2. If a column or feature name is not present in metadata_description, rewrite it into a\n             natural-sounding phrase using best judgment.\n          3. Rewrite structured formats (lists, dicts) into natural language paragraphs, while retaining\n             original item order.\n          4. Keep existing natural language unchanged.\n          5. Keep all "
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "---\n   Here is the final_question:\n   {question}\n   ---\n   Here is the metadata_description:\n   {description}\n   ---\n   Now return only the rewritten version of the question, using natural language descriptions where pos-\n   sible. Preserve file paths, model names, and categorical values exactly as given.\n\n20\n\fPublished as a conference paper at ICLR 2026\n\nThe following prompt determines whether the dataset is time-series and infers the appropriate tem-\nporal type information.\n   Time-Series Identification and Typing Prompt\n\nYou are given a dataset and its description."
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Task 1: Assess Suitability\n   Check if Time Series Forecasting applies. Conditions:\n          1. Must have a clear timestamp column (e.g., ‘date‘, ‘time‘).\n          2. Must have a target variable changing over time (e.g., sales, temperature).\n          3. Observations should be sequential and time-dependent.\n          4. Time interval must be regular or resample-able (e.g., daily, hourly).\n   If all are met, output True; otherwise False.\n\nTask 2: Identify Key Columns\n   From the list below, infer:\n           • Best timestamp column\n           • Best target column\n           • Optional exogenous feature columns\n\nTask 3: Column Typing\n   For each column, classify as: \"timestamp\", \"numerical\", \"categorical\", or \"other\".\n   If timestamp exists, also infer its format (Python strftime)."
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Final Output Format (6 lines, LaTeX-boxed):\n          1. Suitability → \\boxed{True} or \\boxed{False}\n          2. Timestamp column → \\boxed{column_name} or \\boxed{ambiguous}\n          3. Target column → \\boxed{column_name} or \\boxed{ambiguous}\n          4. Exogenous features → \\boxed{[\"col1\", ...]} or \\boxed{[]}\n          5. Column types → \\boxed{{\"col1\": \"timestamp\", \"col2\": \"numerical\"}}\n          6. Time format → \\boxed{%Y-%m-%d %H:%M:%S} or \\boxed{ambiguous}\n\n21\n\fPublished as a conference paper at ICLR 2026\n\nThe following prompt identifies grouping entities (e.g., users, products, or regions) that structure the\ndataset for time-CF tasks.\n    Entity (Group) Identification Prompt"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "You are given a dataset for time series forecasting. The dataset includes a timestamp column, a tar-\n    get column to be predicted, and possibly multiple other columns representing categorical or numeric\n    features. Your task is to identify which column(s) represent the entity (or group ID) — that is, the\n    column(s) that differentiate multiple independent time series within the dataset.\n    Please analyze the column names and a sample of the data (including at least the first few rows), and\n    answer the following:\n          1. Which column(s) should be used to distinguish different time series entities?\n          2. Briefly explain why those column(s) were selected as entity identifiers.\n          3. If no entity column is needed because the dataset represents a single time series, say so\n             explicitly.\n    ---\n    Dataset Description\n    {description}\n    ---\n    Addit"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "22\n\fPublished as a conference paper at ICLR 2026\n\nThe following prompt decides whether resampling is needed for the dataset and, if so, specifies the\nappropriate resampling strategy.\n   Resampling Decision Prompt\n\nYou are an expert data scientist assisting with time series preprocessing.\n   Your goal is to decide whether a given time series dataset needs resampling (i.e., converting irregular\n   or overly fine-grained timestamps to a fixed frequency like daily/hourly)."
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "Task Description\n   You are given:\n         1. A brief description of the dataset and task.\n         2. The first 30 rows of the dataset (including timestamps and relevant columns).\n                • For each time value, up to 5 rows are shown.\n                • If a time value had more than 5 rows, it is marked with a comment.\n         3. The target column for forecasting or analysis: {target col}.\n   Please analyze:\n          • Whether the time column appears irregular, too granular, or dense.\n          • Whether each row represents a meaningful unit (e.g., per-day summary) or a low-level log\n            (e.g., events).\n          • Whether resampling could make the series easier to model.\n          • If resampling is needed, recommend:\n                – The resampling rule (e.g., 1min, 5min, 1H, 1D).\n                – The aggregation function for the target column ({target col}): choos"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "23\n\fPublished as a conference paper at ICLR 2026\n\nJ   R EFERENCE C ODE FOR I NSTRUCTION -F OLLOWING E VALUATION\nBelow we include the reference implementation used to evaluate instruction-following tasks in our\nbenchmark.\n    Reference Code for Instruction-Following Evaluation"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "import json\n    import os\n    import sqlite3\n    import pandas as pd\n    import numpy as np\n    from sklearn.model_selection import train_test_split\n    from sklearn.preprocessing import StandardScaler, OneHotEncoder\n    from sklearn.impute import SimpleImputer\n    from sklearn.compose import ColumnTransformer\n    from sklearn.pipeline import Pipeline\n    from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso\n    from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor\n    from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor\n    from sklearn.neural_network import MLPClassifier, MLPRegressor\n    from sklearn.naive_bayes import GaussianNB\n    from sklearn.svm import LinearSVC\n    from sklearn.multioutput import MultiOutputClassifier\n    from sklearn.metrics import accuracy_score, classification_report, mean_squared_error,\n      "
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "# Function to load and join tables from a SQLite file\n    def load_and_join(sqlite_path):\n        conn = sqlite3.connect(sqlite_path)\n        tables = pd.read_sql_query(\"SELECT name FROM sqlite_master WHERE type=’table’;\",\n             conn)[’name’].tolist()\n        df = None\n        for table in tables:\n            df_tab = pd.read_sql_query(f\"SELECT * FROM ’{table}’\", conn)\n            if ’row_id’ not in df_tab.columns:\n                continue\n            if df is None:\n                df = df_tab\n            else:\n                df = df.merge(df_tab, on=’row_id’, how=’inner’)\n        conn.close()\n        return df"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "def train_predict_model(train_df, eval_df, feature_cols, model_type,\n         column_type_inference, target_cols=[’answer’], imputer_type=\"most_frequent\",\n                           problem_type=\"classification\", random_state=42):\n        print(f\"MACHINE LEARNING PIPELINE\")\n        print(\"=\" * 60)\n\n# Check if target column exists in training data\n        for target_column in target_cols:\n            if target_column not in train_df.columns:\n                print(f\"Target column ’{target_column}’ not found in training data!\")\n                print(f\"Available columns in train_df: {list(train_df.columns)}\")\n                return None\n\n# Check if all feature columns exist in both datasets\n        missing_features_train = [col for col in feature_cols if col not in train_df.\n             columns]\n        missing_features_eval = [col for col in feature_cols if col not in eval_df.columns]"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "if missing_features_train:\n            print(f\"Missing feature columns in train_df: {missing_features_train}\")\n            return None\n\nif missing_features_eval:\n            print(f\"Missing feature columns in eval_df: {missing_features_eval}\")\n            return None\n\nformatted_targets = \", \".join(\"‘{}‘\".format(col) for col in target_cols)\n        print(f\"Target column {formatted_targets} found in training data\")\n        print(f\" Training dataset shape: {train_df.shape}\")\n        print(f\" Evaluation dataset shape: {eval_df.shape}\")\n\n# Prepare training features and target\n\n24\n\fPublished as a conference paper at ICLR 2026\n\nX_train = train_df[feature_cols].copy()\n       y_train = train_df[target_cols].copy()\n\n# Prepare evaluation features (and target if it exists)\n       X_eval = eval_df[feature_cols].copy()"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "# Check if target column exists in eval_df for evaluation\n       has_eval_target = True\n       for target_column in target_cols:\n           if target_column not in eval_df.columns:\n               has_eval_target = False\n       if has_eval_target:\n           y_eval = eval_df[target_cols].copy()\n           print(f\"Target column found in evaluation data - will compute metrics\")\n       else:\n           y_eval = None\n           print(f\" Target column not found in evaluation data - will only make\n                predictions\")"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "# Check for null targets in training data\n       null_targets_train = y_train.isnull().sum().sum() # use two sum to get the total\n            null number\n       if null_targets_train > 0:\n           print(f\" Found {null_targets_train} null targets in training data - removing\n                these rows\")\n           valid_indices = ˜y_train.isnull().any(axis=1) # make sure no null target row\n           X_train = X_train[valid_indices]\n           y_train = y_train[valid_indices]\n\nprint(f\" Final training data: {X_train.shape[0]} rows\")\n       print(f\" Final evaluation data: {X_eval.shape[0]} rows\")\n\n# Separate numeric and categorical features\n       numeric_features = []\n       categorical_features = []"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "for col in feature_cols:\n           # Check data type in training data\n           if column_type_inference[col].lower() == \"numerical\":\n               numeric_features.append(col)\n           elif column_type_inference[col].lower() == \"categorical\":\n               categorical_features.append(col)\n\nprint(f\" Numeric features ({len(numeric_features)}): {numeric_features}\")\n       print(f\" Categorical features ({len(categorical_features)}): {categorical_features\n            }\")\n       assert len(numeric_features) + len(categorical_features) == len(feature_cols)\n\n# Create preprocessing pipeline\n       transformers = []\n\nif numeric_features:\n           transformers.append((’num’, Pipeline([\n               (’imputer’, SimpleImputer(strategy=imputer_type)),\n               (’scaler’, StandardScaler())\n           ]), numeric_features))"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "if categorical_features:\n           transformers.append((’cat’, Pipeline([\n               (’imputer’, SimpleImputer(strategy=\"most_frequent\")),\n               (’onehot’, OneHotEncoder(handle_unknown=’ignore’, sparse_output=False))\n           ]), categorical_features))\n\npreprocessor = ColumnTransformer(transformers=transformers)"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "# Choose model based on problem type\n       if problem_type.lower() == \"classification\":\n           if model_type == \"LogisticRegression\":\n               model = LogisticRegression(random_state=random_state)\n               if len(target_cols) > 1:\n                   model = MultiOutputClassifier(model)\n           elif model_type == \"DecisionTreeClassifier\":\n               model = DecisionTreeClassifier(random_state=random_state)\n           elif model_type == \"GaussianNB\":\n               model = GaussianNB()\n               if len(target_cols) > 1:\n                   model = MultiOutputClassifier(model)\n           elif model_type == \"LinearSVC\":\n\n25\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "model = LinearSVC(random_state=random_state)\n               if len(target_cols) > 1:\n                   model = MultiOutputClassifier(model)\n           elif model_type == \"MLPClassifier\":\n               model = MLPClassifier(random_state=random_state)\n           else:\n               raise ValueError(f\"Invalid model type: {model_type}\")\n           print(f\" Using {model_type} for classification\")"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "elif problem_type.lower() == \"regression\":\n           if model_type == \"LinearRegression\":\n               model = LinearRegression()\n           elif model_type == \"DecisionTreeRegressor\":\n               model = DecisionTreeRegressor(random_state=random_state)\n           elif model_type == \"Ridge\":\n               model = Ridge(random_state=random_state)\n           elif model_type == \"Lasso\":\n               model = Lasso(random_state=random_state)\n           elif model_type == \"MLPRegressor\":\n               model = MLPRegressor(random_state=random_state)\n           else:\n               raise ValueError(f\"Invalid model type: {model_type}\")\n\nprint(f\" Using {model_type} for regression\")\n\n# Create full pipeline\n       ml_pipeline = Pipeline([\n           (’preprocessor’, preprocessor),\n           (’model’, model)\n       ])"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "# Train the model\n       print(f\"TRAINING MODEL...\")\n       try:\n           ml_pipeline.fit(X_train, y_train)\n           print(f\" Model trained successfully\")\n       except Exception as e:\n           print(f\" Error during training: {e}\")\n           return None\n\n# Make predictions\n       print(f\"MAKING PREDICTIONS...\")\n       try:\n           y_pred = ml_pipeline.predict(X_eval)\n           print(f\"Predictions completed\")\n       except Exception as e:\n           print(f\"Error during prediction: {e}\")\n           return None\n\n# Evaluate model (only if we have evaluation targets)\n       if has_eval_target and y_eval is not None:\n           print(f\"MODEL EVALUATION\")\n           print(\"=\" * 30)\n\n# Remove rows with null targets in evaluation for metrics\n           valid_eval_mask = y_eval.notna()\n           y_eval_clean = y_eval[valid_eval_mask]\n           y_pred_clean = y_pred[valid_eval_mask]"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "if len(y_eval_clean) == 0:\n               print(\" No valid evaluation targets found - skipping evaluation metrics\")\n           else:\n               if problem_type.lower() == \"classification\":\n                   accuracy = accuracy_score(y_eval_clean, y_pred_clean)\n                   print(f\" Accuracy: {accuracy:.4f}\")\n                   print(f\"Classification Report:\")\n                   print(classification_report(y_eval_clean, y_pred_clean))\n\n# Show sample predictions\n                   print(f\"Sample Predictions:\")\n                   for i in range(min(10, len(y_eval_clean))):\n                       actual = y_eval_clean.iloc[i]\n                       predicted = y_pred_clean[i]\n                       status = \"right\" if actual == predicted else \"wrong\"\n                       print(f\"{status} Row {i}: Actual={actual}, Predicted={predicted}\")\n\nelse:"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "26\n\fPublished as a conference paper at ICLR 2026\n\nmse = mean_squared_error(y_eval_clean, y_pred_clean)\n                   r2 = r2_score(y_eval_clean, y_pred_clean)\n                   rmse = np.sqrt(mse)\n\nprint(f\" Rˆ{2} Score: {r2:.4f}\")\n                   print(f\" RMSE: {rmse:.4f}\")\n                   print(f\" MSE: {mse:.4f}\")"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "# Show sample predictions\n                   print(f\"Sample Predictions:\")\n                   for i in range(min(10, len(y_eval_clean))):\n                       actual = y_eval_clean.iloc[i]\n                       predicted = y_pred_clean[i]\n                       diff = abs(actual - predicted)\n                       print(f\"   Row {i}: Actual={actual:.3f}, Predicted={predicted:.3f},\n                             Diff={diff:.3f}\")\n       else:\n           print(f\"EVALUATION SKIPPED - No target column in evaluation data\")\n           print(f\" Generated {len(y_pred)} predictions\")"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "y_pred_df = pd.DataFrame(y_pred, columns=y_train.columns)\n       y_pred_df.insert(0, ’row_id’, eval_df[\"row_id\"].values)\n       return {\n           ’pipeline’: ml_pipeline,\n           ’predictions’: y_pred_df,\n           ’eval_indices’: X_eval.index,\n           ’problem_type’: problem_type,\n           ’X_train’: X_train,\n           ’y_train’: y_train,\n           ’X_eval’: X_eval,\n           ’y_eval’: y_eval if has_eval_target else None,\n           ’has_eval_target’: has_eval_target,\n           \"numeric_features\": numeric_features,\n           \"categorical_features\": categorical_features,\n       }\n\nfeature_cols = $feature_cols\n   model_type = \"$model_type\"\n   column_type_inference = $column_type_inference\n   target_cols = $target_cols\n   imputer_type = \"$imputer_type\"\n   problem_type = \"$problem_type\"\n   random_state = $random_state\n   save_file_type = \"$save_file_type\""
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "if save_file_type == ’sqlite’:\n       conn = sqlite3.connect(\"train_v1_no_err.sqlite\")\n       train_df = pd.read_sql(\"SELECT * FROM train_set\", conn)\n       train_df = train_df.replace({None: np.nan})\n       conn.close()\n\neval_df = load_and_join(\"val_v1.sqlite\")\n       eval_df = eval_df.replace({None: np.nan})\n   elif save_file_type == ’csv’:\n       train_df = pd.read_csv(’train_v1_no_err.csv’, keep_default_na=False, na_values\n            =[\"\"])\n       eval_df = pd.read_csv(’val_v1.csv’, keep_default_na=False, na_values=[\"\"])\n   elif save_file_type == ’parquet’:\n       train_df = pd.read_parquet(’train_v1_no_err.parquet’)\n       train_df = train_df.replace({None: np.nan})\n       eval_df = pd.read_parquet(’val_v1.parquet’)\n       eval_df = eval_df.replace({None: np.nan})"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "result = train_predict_model(\n       train_df = train_df,\n       eval_df = eval_df,\n       feature_cols = feature_cols,\n       model_type = model_type,\n       column_type_inference=column_type_inference,\n       target_cols=target_cols,\n       imputer_type=imputer_type,\n       problem_type=problem_type,\n       random_state=random_state\n   )\n\nresult[’predictions’].to_csv(’simulated_pred_local.csv’, index=False)\n\n27\n\fPublished as a conference paper at ICLR 2026\n\nK       T OOL S CHEMA AND TASK E XAMPLES\nThe following schema defines the details of our code executor tool.\n    Tool Schema: python executor"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "{\n        \"type\": \"function\",\n        \"name\": \"python_executor\",\n        \"description\": \"Execute a Python script in an isolated HTTP sandbox with a 200-second\n                time limit. Each run is single-shot and stateless (no REPL, no persistent\n               environment between runs). You may upload input files via ‘files_to_load‘ and\n               retrieve results via ‘files_to_save‘. The maximum file size for both upload and\n               download is 200 MB. The tool returns the full program output, including both\n               stdout and stderr. Use explicit ‘print(...)‘ statements to capture values in the\n                output. This tool can be invoked up to 3 times per conversation.\",\n        \"parameters\": {\n           \"type\": \"object\",\n           \"properties\": {\n              \"code\": {\n                \"type\": \"string\",\n                \"description\": \"The Python code to exe"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "28\n\fPublished as a conference paper at ICLR 2026\n\nThe following provides a example of IF task.\n   Instruction Following Task Example"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "Question\n   Please complete the task as described below without asking any follow-up questions or requesting ad-\n   ditional information. Proceed under the assumption that all required information is provided. You are\n   given access to a training Parquet file named train v1.parquet, which contains a single table,\n   and a metadata file metadata.txt that describes the original dataset and each of its columns. Your\n   task is to perform classification using this data and predict the target column Personality for the\n   validation set located at val v1.parquet. Unless stated otherwise, you should use default parame-\n   ters for all steps including model training and preprocessing. First, load the training file directly. Then,\n   filter the training dataset using the expected ranges while retaining any rows that have missing values in\n   the relevant columns, excluding only those rows where"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "Metadata\n   Overview\n   Dive into the Extrovert vs. Introvert Personality Traits Dataset, a rich collection of behavioral and\n   social data designed to explore the spectrum of human personality. This dataset captures key indicators\n   of extroversion and introversion, making it a valuable resource for psychologists, data scientists, and\n   researchers studying social behavior, personality prediction, or data preprocessing techniques.\n   Context\n   Personality traits like extroversion and introversion shape how individuals interact with their social\n   environments. This dataset provides insights into behaviors such as time spent alone, social event\n   attendance, and social media engagement, enabling applications in psychology, sociology, marketing,\n   and machine learning. Whether you’re predicting personality types or analyzing social patterns, this\n   dataset is your gateway to uncov"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "29\n\fPublished as a conference paper at ICLR 2026\n\n• Contains missing values in columns like Time spent Alone and Going outside, of-\n            fering opportunities for data cleaning practice.\n          • Balanced classes ensure robust model training.\n          • Binary categorical variables simplify encoding tasks."
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "Potential Use Cases\n          • Build machine learning models to predict personality types.\n          • Analyze correlations between social behaviors and personality traits.\n          • Explore social media engagement patterns.\n          • Practice data preprocessing techniques like imputation and encoding.\n          • Create visualizations to uncover behavioral trends.\n   === About this file ===\n   About this file This dataset contains 2,900 entries with 8 features related to social behavior and per-\n   sonality traits, designed to explore and classify individuals as Extroverts or Introverts.\n\n30\n\fPublished as a conference paper at ICLR 2026\n\nThe following provides an example of ML Modeling task.\n   ML Modeling Task Example"
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Question\n   Please complete the task as described below without asking any follow-up questions or requesting\n   additional information. Your task is to achieve good performance while balancing training time\n   and accuracy in the sandbox. You are provided with a processed dataset, along with a metadata\n   file metadata.txt that describes the original dataset and each of its columns. Load data in\n   train v2.parquet as your full training set. Once that’s done, using only CPU resources, train\n   a classification model on this training data. Then use val v2.parquet to generate a prediction for\n   Internet Access for each row id. The model should output a file named prediction.csv.\n   The file must contain the column row id (as provided in the original val v2.parquet and the\n   corresponding predictions. Each prediction should be aligned with its row id so that performance can\n   be computed"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "Metadata\n   AI Tool Usage by Indian College Students 2025\n   This unique dataset, collected via a May 2025 survey, captures how 496 Indian college students use AI\n   tools (e.g., ChatGPT, Gemini, Copilot) in academics. It includes 16 attributes like AI tool usage, trust,\n   impact on grades, and internet access, ideal for education analytics and machine learning.\n   Columns\n          • Student Name: Anonymized student name.\n          • College Name: College attended.\n          • Stream: Academic discipline (e.g., Engineering, Arts).\n          • Year of Study: Year of study (1–4).\n          • AI Tools Used: Tools used (e.g., ChatGPT, Gemini).\n          • Daily Usage Hours: Hours spent daily on AI tools.\n          • Use Cases: Purposes (e.g., Assignments, Exam Prep).\n          • Trust in AI Tools: Trust level (1–5).\n          • Impact on Grades: Grade impact (-3 to +3).\n          • Do Prof"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "31\n\fPublished as a conference paper at ICLR 2026\n\nThe following provides an example of Time Series Canonical Forecasting Task.\n   Time Series Canonical Forecasting Task Example"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "Question\n   Please complete the task as described below without asking any follow-up questions or requesting\n   additional information. Your task is to achieve good performance while balancing time and accu-\n   racy in the sandbox environment. You are provided with a processed dataset, along with a meta-\n   data file metadata.txt that describes the original dataset and each of its columns. Load the file\n   train.csv as your complete training data. This file contains the raw, non-resampled time series\n   data. Once that’s done, using only CPU resources, train time series analysis model(s) on the training\n   data. Then, based on the file val v2.csv, forecast the target column Close. Generate predictions\n   exactly for each row id present in the validation data, Output a file named prediction.csv. The\n   file must contain the column row id (as provided in the original val v2.csv and the cor"
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "Metadata\n   Here’s to the crazy ones—the data dreamers, the analysts, the visionaries who believe that a handful\n   of numbers can reveal the DNA of innovation. This dataset is more than a collection of Apple Inc.’s\n   historical stock prices; it’s a chronicle of invention, perseverance, and thinking differently.\n   What’s Inside\n   - Time Span: Daily stock price data for Apple Inc. over multiple years - Features: - ‘Date’: The day\n   of the record - ‘Close’: Price at market close - Format: CSV, clean and ready for analysis\n   Why This Matters\n   Apple is not just a company, it’s a movement. Its stock price reflects not only financial performance,\n   but the world’s response to innovation—launches, leadership changes, economic cycles, and the occa-\n   sional “one more thing.”\n   Possibilities\n   - Visualize long-term growth and volatility - Model trends, moving averages, or momentum - Fo"
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "32\n\fPublished as a conference paper at ICLR 2026\n\nL     R EJECTION S AMPLING I MPLEMENTATION D ETAILS\nWe sample up to K=8 candidate trajectories per task. Each trajectory records: (i) final score\nand (ii) end-to-end wall-clock time. For IF tasks, final score is exact match ∈ {0, 1}; for\npredictive tasks, final score is a normalized metric such as macro-F1 or clipped R2 .\n\nL.1   VALIDITY AND D IVERSITY C ONDITIONS\n\nValidity.    A trajectory is considered valid if:\n\n• For IF tasks: final score = 1.\n       • For predictive tasks: final score ≥ type-specific threshold:\n                       class-MM: 0.8,      reg-MM: 0.7,        time-XF: 0.6,   time-CF: 0.3.\n\nDiversity.    A task is considered diverse if:"
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "• For IF tasks: among the K trials, at least one final score = 1 and at least one\n         final score = 0.\n       • For predictive tasks: the variance of the K scores satisfies\n               Var(Si ) ≥ threshold,     class-MM/reg-MM: 0.15, time-XF: 0.15, time-CF: 0.1.\n\nL.2   R EJECTION S AMPLING S TRATEGIES\n\nFV (Fastest-Valid).     For every task that has at least one valid trajectory:\n\n• IF tasks: keep the single fastest valid trajectory.\n       • Predictive tasks: keep the trajectory with the highest final score.\n\nAV (All-Valid).     For every task:\n\n• Keep all valid trajectories (as defined above).\n\nBV (Best-Valid).      For every diverse task:\n\n• IF tasks: keep the single fastest valid trajectory.\n       • Predictive tasks: keep the trajectory with the highest final score.\n\nThus BV applies the same selection rule as FV, but restricted to diverse tasks only."
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "DV (Duo-Valid).      For every diverse task:\n\n• IF tasks: keep the two fastest valid trajectories (or one if fewer exist).\n       • Predictive tasks: keep the top-2 trajectories by score, restricted to those with s(t) > si\n         (above mean).\n\nN OTES\n       • FV applies to all tasks with valid traces; BV and DV apply only to diverse tasks.\n       • AV is the only strategy that may return multiple valid trajectories even for non-diverse\n         tasks.\n       • FV/BV always select at most one trajectory; DV at most two; AV can return more.\n       • This design ensures a balance between efficiency (FV), diversity (AV), quality (BV), and\n         complementary coverage (DV).\n\n33\n\fPublished as a conference paper at ICLR 2026"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "M     TASK DOMAIN CLASSIFICATION METHODOLOGY\nTo assess the diversity of DARE-bench and verify its coverage across real-world scenarios, we clas-\nsified each task into a primary domain (e.g., Finance, Health, Technology). Given the scale of the\nbenchmark (6,300 tasks), manual classification was infeasible. Therefore, we employed an auto-\nmated LLM-based classification pipeline utilizing the rich metadata associated with each Kaggle-\nderived dataset.\nMetadata Usage. The classification relies on four key metadata fields:\n\n• Title: The official name of the dataset.\n       • Subtitle: A short phrase summarizing the dataset content.\n       • Description: The full natural language description of the dataset context.\n       • Keywords: User-provided tags from the original Kaggle source."
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "Classification Taxonomy. To ensuring consistency, we defined a controlled vocabulary of allowed\ndomains based on common industry verticals: finance, health, business, technology, automotive,\neducation, environment, and others.\nPrompt Design. We constructed a strict prompt to instruct the LLM to identify the single best\ndomain label. The prompt enforces a hierarchical reasoning logic: it prioritizes explicit domain\nterms found in the user-provided keywords before inferring the domain from the title or description.\nThe full prompt template is provided below:\n    Domain Classification Prompt\n\nInstruction: Identify the single best domain for a task using the provided metadata.\n\nInput Data:\n           • Title: {title}\n           • Subtitle: {subtitle}\n           • Description: {description}\n           • Keywords: {keywords}"
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "Example Domains: [agriculture, finance, health, business, technology, automotive, education, envi-\n    ronment, other]\n\nReasoning Steps:\n          1. Keyword Check: First, strictly check the provided ‘keywords’ list for any explicit domain\n             word (e.g., ‘finance’, ‘health’). If a match is found from the allowed list, select it immedi-\n             ately.\n          2. Inference: If no direct domain appears in the keywords, infer the most appropriate domain\n             based on the semantic context of the ‘title’, ‘subtitle’, and ‘description’.\n          3. Output Formatting: Output exactly ONE lowercase word from the allowed domains list.\n             Do not output punctuation, explanations, or spaces. If the domain is uncertain or does not fit\n             the specific categories, output ‘other’.\n    Output:\n\n34"
+    }
+  ]
+}
