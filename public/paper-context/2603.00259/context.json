@@ -1,0 +1,287 @@
+{
+  "arxivId": "2603.00259",
+  "paperTitle": "Data-driven, non-Markovian modelling of weather in the presence of non-stationary, non-Gaussian, and heteroskedastic climate dynamics",
+  "abstract": "While the generalized Langevin equation (GLE) is a powerful tool to understand the behavior of complex dissipative systems, driving by external fields renders standard GLE construction workflows invalid. Filtering approaches that separate fluctuations from the non-equilibrium response can sometimes circumvent the need for a non-equilibrium formalism when the residual fluctuations are homoskedastic, stationary, and preferably Gaussian. Here, we introduce the temperature time series from Boulder, Colorado, as representative of the more general and complex case where the filtered time series remains non-Gaussian, non-stationary, and heteroskedastic. With this example, we develop a protocol to build an accurate and efficient low-dimensional description of the weather fluctuations. Our protocol classifies the weather data based on the position in the annual cycle, and introduces local homoskedasticity as a metric to identify seasons of likely stationarity. Within these seasons, we build pseudo-equilibrium models. Leveraging state-based generalized master equation modelling as an alternative to the GLE, we resolve difficulties like non-Gaussianity and position dependence of the memory (friction) kernel. Our data-driven approach accurately reproduces the evolving fluctuations of the Boulder temperature time series, illustrating the feasibility of our method as a general tool to describe driven, dissipative systems.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "While the generalized Langevin equation (GLE) is a powerful tool to understand the behavior of complex dissipative systems, driving by external fields renders standard GLE construction workflows invalid. Filtering approaches that separate fluctuations from the non-equilibrium response can sometimes circumvent the need for a non-equilibrium formalism when the residual fluctuations are homoskedastic, stationary, and preferably Gaussian. Here, we introduce the temperature time series from Boulder, Colorado, as representative of the more general and complex case where the filtered time series remains non-Gaussian, non-stationary, and heteroskedastic. With this example, we develop a protocol to build an accurate and efficient low-dimensional description of the weather fluctuations. Our protocol classifies the weather data based on the position in the annual cycle, and introduces local homoskedasticity as a metric to identify seasons of likely stationarity. Within these seasons, we build pseudo-equilibrium models. Leveraging state-based generalized master equation modelling as an alternative to the GLE, we resolve difficulties like non-Gaussianity and position dependence of the memory (friction) kernel. Our data-driven approach accurately reproduces the evolving fluctuations of the Boulder temperature time series, illustrating the feasibility of our method as a general tool to describe driven, dissipative systems."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Data-driven, non-Markovian modelling of weather in the presence of\n                                                      non-stationary, non-Gaussian, and heteroskedastic climate dynamics\n                                                                 Thomas Sayer1, a) and Andrés Montoya-Castillo2, b)\n                                                                 1)\n                                                                      Department of Chemistry, Durham University, Durham, DH1 3LE, United Kingdom\n                                                                 2)\n                                                                      Department of Chemistry, University of Colorado Boulder, Boulder, CO 80309, USA\n                                                                 (Dated: 3 March 2026)\n                                                                 While the g"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "for a non-equilibrium formalism when the residual fluctuations are homoskedastic, stationary, and preferably\n                                                                 Gaussian. Here, we introduce the temperature time series from Boulder, Colorado, as representative of the\n                                                                 more general and complex case where the filtered time series remains non-Gaussian, non-stationary, and het-\n                                                                 eroskedastic. With this example, we develop a protocol to build an accurate and efficient low-dimensional\n                                                                 description of the weather fluctuations. Our protocol classifies the weather data based on the position in\n                                                                 the annual cycle, and introduces local "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "I.    INTRODUCTION                                                       even for systems at equilibrium. While various algo-\n                                                                                                                               rithms to extract the kernel and random force can be\n                                                         Simulating the dynamics of driven, dissipative many-                  adapted to suit the particular problem,2–6 this challenge\n                                                      body systems remains a fundamental theoretical and                       becomes foundational in systems with limited observa-\n                                                      computational challenge. These systems are ubiquitous,                   tions, like weather and climate. To address this challenge,\n                                         "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "render it amenable to a GLE description. For exam-              tude (∼ 1 mile above sea level) and around more cen-\nple, Fourier filtering27 of the temperature time series         tral latitude (40 degrees north) around 15 degrees fur-\nat Berlin-Tegel airport between January 15, 2006, and           ther south than Berlin and Durham. Boulder is known\nFebruary 22, 2010, gave a pseudo-equilibrium trajec-            to have somewhat variable weather.\ntory that could be analyzed with an equilibrium Mori-               To perform the reduced dimensionality analysis, we ex-\ntype GLE.28 That is, while the system dictating sur-            tract several different objects which we introduce below\nface temperature dynamics constitutes a driven, dissi-          (see Appendix VIII for details). This approach requires\npative many-body system,29–32 filtering the annual parts        that we assume the e"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "(a)                                             (b)\n\n(c)                                             (d)"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "FIG. 1: Daily average temperature data from Boulder, Colorado, from 1992 to 2025.43 (a) Four-year window of the\nraw data, with the traditional summer and winter calendar months highlighted with red and blue markers, respectively.\nThe spread in the winter is much larger. (b) Histogram of the raw data showing a bistable and strongly asymmetric\ndistribution. Histograms of just the summer or winter months have different forms. (c) Filtered time series data\nshowing the fluctuations in red and the residual periodic “baseline” in orange. Grey bars show regions excluded from\nour analysis due to filter-induced artifacts. See Fig. 8 for further details. (d) Filtered fluctuations become unimodal\nbut remain asymmetric. Again, the statistics differ qualitatively when considering only summer or winter months."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "summer months give a sub-population that is fairly sym-\nmetric and Gaussian, with slightly fat tails. In contrast,\nwinter months exhibit an asymmetric distribution with\na thin tail to the hot side and a thick tail to the cold.\n   The necessity of filtering is evident if one applies the\n‘equilibrium’ workflow. This is instructive because the\nartifacts that arise as a result are clear: the correla-\ntion function extracted from the unfiltered data oscil-\nlates about a non-zero value representing the periodicity\nof the data (Fig. 8a). Hence, the associated memory ker-\nnel will never decay to zero. In contrast, the correlation\nfunction of the filtered time series decays rapidly, but\nthen exhibits permanent oscillations about zero (Fig. 8a).\nWe track this to the presence of a frequency contribu-\n                                                              FIG. 2: Histograms resulting from pro"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "this procedure: it persists down to the most highly fil-        (velocity-limited) regimes when it crosses the barrier.\ntered data with only fast timescales remaining.                 After obtaining position and velocity time series (see\n   Turning to the lifetimes, we investigate how the non-        App. VIII D), we construct correlation functions like\nequilibrium nature of the system is reflected in the cor-       those we built using the temperature data series in the\nrelation functions. We compare the autocorrelation of           previous section.\nv ≡ Ṫ with that of x ≡ T . Even without any filtering,           One may close the GLE by integrating against ẋ0 and\nthe velocity time series yields a short-lived autocorrela-      averaging over the equilibrium distribution to obtain the\ntion function without oscillations (τV V ∼ 1 week). This        velocity autocorrelation function C("
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "(a)                                             (b)\n\n(c)                                             (d)"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "FIG. 3: Position-dependent friction for degenerate double-well; the mass is independent of position because the GLE\ndescribes a phase-space coordinate. (a) GLE applied directly to the position time series using a variety of definitions\nfor the kernel. Inset: fragment of the trajectory showing the jumps between wells, with larger fluctuations in the left\nwell. (b) Partitioning of the position coordinate into 7 states. Inset: PMF, where the dashed line is a guide to the\neye showing asymmetry caused by the friction. (c) Diagonal elements of the memory kernel from the states defined in\npanel (b). Qualitatively different behavior in the two wells’ signals with position-dependent friction in a state-based\npicture (inset). (d) State-based modelling allows an early memory cutoff GME. Inset: crosses show the Markov limit\n(i.e., a Markov state model) with lagtime equal to the GME cutoff and resolu"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "definition for these states remains an open question, the       K(iδt) = 0 ∀ i > 1, the dynamics are Markovian and\nidea is to remove the multitude of “unimportant” fast           the resulting equation is that of a Markov State Model\nmotions of the structure and concentrate on slow confor-        (MSM).71,72 The key point is that Equation 12 tacitly\nmational switching. Simulation data can then be used to         includes position-dependence because the rates of mov-\nbuild the transition probability matrix (TPM), which is         ing between different states are separate quantities, each\nthe conditional average                                         associated with a different friction component. Allow-\n                                                                ing different equations of motion for each pair of states\n            Cij (t) = P (χ(t) ∈ Vj | χ(0) ∈ Vi )        (11)\n    "
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "as the number of states grows. Figure 3b displays the         ory kernel becomes an infinite-dimensional matrix in the\nresulting residence probabilities (Cii (t)), which quanti-    basis of positions, which requires converging the transi-\ntatively capture the differing dynamics of the two wells      tions between states in this basis. In this latter case, one\nthat we qualitatively understand from observing the tra-      can imagine the state-based TPM-GME approaching a\njectory. With this time-dependent matrix, we can invert       position-only GLE in the limit of delta-function states.\nEq. 12 to obtain K(t). Figure 3c shows its diagonal ele-\nments, which change qualitatively as one moves between\nleft and right wells. Indeed, these elements have both        IV.   FLOQUET DRIVE AND HOMOSKEDASTICITY\nmagnitudes and lifetimes that depend upon their posi-\ntion. The longest lifetime is that of "
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "(a)                 (b)                                       (c)\n\nFIG. 4: (a) The baseline temperature series, Tb (i.e., the part removed by the filter) and its time derivative Ṫb\nmapped to normalized polar coordinates. We split this map into regularly spaced (angular) states (Top), which we\nthen aggregate into seasons based on clustering (Bottom). (b) K-means clustering is performed on the A parameter\nresulting from a fit of Eq. 15 to the filtered temperature histogram conditioned on each regular state; visually, we\nchoose k = 4; we then include the outlier with its nearest cluster to have sufficient statistics, resulting in 3 clusters in\ntotal. (c) Histograms conditioned on each aggregated\n                                               √        state or ‘season’. Open circles have n < 30 observations and\nare not included in the fit; error bars are 2σ/ n."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "In the extreme case, one might imagine building a            in autumn for a combined ‘equinoctial’ season, as shown\nTPM quantifying the transition probability between a            in Fig. 4a-bottom. Thus, although there is some corre-\ngiven day and its specific temperature fluctuations into        spondence, the mathematical seasons of similar fluctua-\nsubsequent days. This amounts to the delta-function             tions differ from both equally divided calendar seasons\nTPM-GME, which would have prohibitively large data              and orbitally-derived astronomical seasons.\ncosts. To maintain a balance between the number of                 We reanalyze the combined histograms of these three\nstates and data availability, and because we suspect cer-       seasons and present them in Fig. 4c. Again, we use the\ntain months will behave similarly (the ‘summer’ and ‘win-       asymmetric for"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "(a)                                     (b)                                     (c)\n\n(d)                                                         (e)\n\nFIG. 5: (a)–(c) Markov stochastic matrices at fixed 2 °F resolution for winter (blue), summer (brown), and equinoctial\n(pink) seasons. (d) Tf (t) time series generated via Markov chain unraveling for each season, half-overlaid with the\ntrue data to show successful generation of colored, non-Gaussian noise. (e) Example of a fully predicted time series\nof baseline plus fluctuations, including changing between different seasons (colored lines). We displace historic data\nby 30 °F (in black) to facilitate comparison."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "treatment: we assume that each (connected) segment of              Appendix IX B). Although the magnitudes of the kernel\nthe total time series within a single season is a fragment         vary between seasons, in each case, the functional form\nof a pseudo-stationary trajectory. This enables us to con-         is reasonably well fit by a delta-like term and an expo-\nstruct pseudo-equilibrium correlation functions for each           nential tail, as in Ref. 28 (although the sign of our ex-\nsegment, and then average over segments. To blend the              ponential is flipped). As with many GLEs, the memory\nmodels across seasonal changes, we would need to com-              kernels appear to live longer than the correlation func-\npare a zero-correlation renewal process with a mixed,              tions they encode, although not by much: for every sea-\ninter-state memory. However, anticipatin"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "simplicity, we set a 2 °F temperature resolution across         therefore support a finer grain. Hence, we can generate a\nour intra-season models, but note that this is a partic-        high-resolution twin of our unravelled TPM-GME trajec-\nular choice. In fact, as the seasons have both different        tory by stochastically drawing specific values with sub-\nranges for their fluctuations and different durations, they     2 °F resolution from our previously interpolated distribu-\nare not equally sampled, and so do not afford the same          tion (see Eq. (15)), whose shape we already know can be\nlevel of convergence: our choice of 2 °F represents a more      captured by the stretched exponential with 1 < a ≤ 2.\nchallenging resolution for the high-variance winter season      This hierarchical protocol draws values from each bin’s\nthan the other lower-variance seasons. Ultimately, the   "
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "change in the feedback mechanism that governs the local       namical model. Our homoskedastic projector provided\nweather system, manifesting as a seasonal heteroskedas-       the means to isolate periods of well-defined statistics—\nticity. It gets cold in the winter, and the Boulder weather   indeed, distinctly non-Gaussian ones, with marked asym-\nfluctuates more when it is cold, not only because it is       metry and polynomial tails into the cold. Identifying\ncold, but because it is winter. Despite the global inap-      the microscopic and even phenomenological origins of\nplicability of the equilibrium approach in such cases, we     non-Gaussian statistics, which are common in climate\npropose that a statistical measure—local skedasticity—        science,78–88 continues to motivate a vibrant field of\ncan be used to identify time spans over which stationarity    study. Yet, their inclus"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "FIG. 7: Outline of the overall workflow clockwise from\n                                                              top left. Top left: Begin with a periodically driven time\n                                                              series suspected of having multiple heteroskedastic un-\n                                                              derlying processes that contribute based on their position\n                                                              in the cycle. Top right: Extract a baseline time series\n                                                              (orange line) using one’s choice of filtering (e.g., Fourier),\n                                                              and split the trajectory into microstates. Bottom right:\n                                                              Cluster the microstates based on the histograms of their\n     "
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "and exploit the equilibrium fluctuation-dissipation theo-      VIII.     METHODS\nrem to construct the memory kernel. The GLE is most ef-\nficient when its memory is position-independent, its ran-         Filtering: we used scipy butter filters with values of\ndom force characterized by Gaussian statistics, and its              lowcut = 2.4E-3\nPMF easily accessible, either through enhanced sampling              highcut = 1 * 3E-3\nor appropriate filtering. Gaussian statistics are particu-           zero_band = 5E-4\nlarly convenient as they require only the second dynamic       We followed the workflow of Ref. 28.           For Boul-\nmoment to determine their statistics, and robust proto-        der, Colorado specifically, we removed the har-\ncols exist to generate their noise trajectories, whether       monic        between       [0.25*highcut+1.75*lowcut,\nwith white or colored noise. When a"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "To obtain higher resolution, we binned observations in             Figure 13 shows each term in the GLE.\neach state again and fitted the stretched exponential,\n\nA|Tf |a + c                     (16)    C.    GME"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "to each (see Fig. 12). A sufficiently flexible function is         To locate the memory lifetime, τ , we used an error plot\ncrucial because the end-bins require that: 1) a cutoff be       of the L1-norm of predicted versus actual TPM against\nachieved so as not to present ultra-extreme values as pos-      the choice of upper limit in the convolution (see Eq. 12).\nsible, and 2) more extreme values become progressively          The error is expected to decrease as a function of increas-\nless likely, otherwise the histogram of our predicted data      ing τ until it plateaus. For the double well, this is what\nwould not even qualitatively agree with the historic data       we find, and we identify the start of the plateau as τ .\non which it was parameterized. Then, when drawing                  For the seasonal state models, the TPMs and memory\nfrom this distribution, we used                  "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "REFERENCES                                                                sponse force: What happens if you push a brownian particle,”\n                                                                          Physical Review Research 6, L012032 (2024).\n                                                                       23 G. Galanis, P. Louka, P. Katsafados, I. Pytharoulis, and G. Kal-\n 1 R. Zwanzig, Nonequilibrium statistical mechanics (Oxford Uni-\n                                                                          los, “Applications of kalman filters based on non-linear func-\n  versity Press, 2001) p. 222.                                            tions to numerical weather predictions,” Annales Geophysicae\n 2 G. D. Harp and B. J. Berne, “Time-correlation functions, mem-\n                                                                          24, 2451–2460 (2006).\n   ory fun"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "beyond,” Nature Reviews Physics 2023 5:12 5, 744–765 (2023).           64 R. B. Best and G. Hummer, “Diffusive model of protein fold-\n43 “Boulder daily weather data: Noaa physical sciences laboratory,”         ing dynamics with kramers turnover in rate,” Physical Review\n    (2025).                                                                 Letters 96, 228104 (2006).\n44 S. Burt and T. Burt, Durham weather and climate since 1841            65 R. B. Best and G. Hummer, “Coordinate-dependent diffusion in"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "(Oxford University Press, 2022) p. 580.                                  protein folding,” Proceedings of the National Academy of Sci-\n45 M. Lak, S. Hosseinabadi, and A. A. Masoudi, “Markov analysis             ences 107, 1088–1093 (2010).\n   and the langevin equation of the earth surface temperature data,”     66 K. Neupane, A. P. Manuel,         and M. T. Woodside, “Protein\n   Scientific Reports 2025 15:1 15, 29403– (2025).                          folding trajectories can be described quantitatively by one-\n46 In the original problem appropriate to Langevin dynamics, the            dimensional diffusion over measured energy landscapes,” Nature\n   probability is uniform because the Brownian particle is free; gen-       Physics 2016 12:7 12, 700–703 (2016).\n   erally, particles move in a potential field that influences the dy-   67 C. Ayaz, L. Tepper, F. N. Brünig, J. Kappler, J. O. Da"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "namics in a Markovian way (see Appendix IX).                             and R. R. Netz, “Non-markovian modeling of protein folding,”\n47 The data reveal a warming equivalent to around 0.5 degrees per           Proceedings of the National Academy of Sciences of the United\n   decade.                                                                  States of America 118, e2023856118 (2021).\n48 This is because double differentiation in the time domain is equiv-   68 R. Zwanzig, “From classical dynamics to continuous time random\n\nalent to applying a quadratic function in the frequency domain           walks,” Journal of Statistical Physics 30, 255–262 (1983).\n   ∂ 2 /∂t2 → −ω 2 , and this has the effect of down-weighting the       69 G. Hummer and A. Szabo, “Optimal dimensionality reduction of"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "low-frequency spectrum (removing the DC ω = 0 contribution               multistate kinetic and markov-state models,” Journal of Physical\n   completely). The same observation is made in Ref. 28.                    Chemistry B 119, 9029–9037 (2014).\n49 P. Ge, Z. Zhang, and H. Lei, “Data-driven learning of the gener-      70 J. Cerrillo and J. Cao, “Non-markovian dynamical maps: Numer-\n\nalized langevin equation with state-dependent memory,” Physical          ical processing of open quantum trajectories,” Physical Review\n   Review Letters 133, 077301 (2024).                                       Letters 112, 110401 (2014).\n50 O. Bridge, P. Lazzaroni, R. Martinazzo, M. Rossi, S. C. Althorpe,     71 J. D. Chodera and F. Noé, “Markov state models of biomolec-"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "and Y. Litman, “Quantum rates in dissipative systems with spa-           ular conformational dynamics,” Current Opinion in Structural\n   tially varying friction,” Journal of Chemical Physics 161 (2024),        Biology 25, 135–144 (2014).\n   10.1063/5.0216823.                                                    72 B. E. Husic and V. S. Pande, “Markov state models: From an\n51 H. A. Kramers, “Brownian motion in a field of force and the dif-         art to a science,” Journal of the American Chemical Society 140,\n   fusion model of chemical reactions,” Physica 7, 284–304 (1940).          2386–2396 (2018).\n52 V. I. Mel’Nikov and S. V. Meshkov, “Theory of activated rate          73 J. H. Prinz, H. Wu, M. Sarich, B. Keller, M. Senne, M. Held,"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "processes: Exact solution of the kramers problem,” The Journal           J. D. Chodera, C. Schtte, and F. Noé, “Markov models of molec-\n   of Chemical Physics 85, 1018–1027 (1986).                                ular kinetics: Generation and validation,” Journal of Chemical\n53 L. Lavacchi, B. A. Dalton, and R. R. Netz, “Non-markovian equi-          Physics 134, 174105 (2011).\n   librium and non-equilibrium barrier-crossing kinetics in asym-        74 V. L. Todd, T. M. Shanahan, P. N. DiNezio, J. M. Klavans, P. J."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "metric double-well potentials,” The European Physical Journal            Fawcett, R. S. Anderson, G. Jiménez-Moreno, A. N. LeGrande,\n   E 2025 48:4 48, 1–13 (2025).                                             F. S. Pausata, A. J. Thompson, and J. Zhu, “North pacific\n54 T. Sayer and A. Montoya-Castillo, “Efficient formulation of mul-         ocean–atmosphere responses to holocene and future warming\n   titime generalized quantum master equations: Taming the cost             drive southwest us drought,” Nature Geoscience 18, 646–652\n   of simulating 2d spectra,” The Journal of Chemical Physics 160,          (2025).\n   044108 (2024).                                                        75 The width of the circle represents the range of variations aris-\n55 O. F. Lange and H. Grubmüller, “Collective langevin dynamics            ing from multiple driving frequencies. If there were just one "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "244 (2014).                                                              tracellular reaction processes with molecular memory,” Proceed-\n57 D. Lesnicki, R. Vuilleumier, A. Carof, and B. Rotenberg, “Molec-         ings of the National Academy of Sciences of the United States of\n   ular hydrodynamics from memory kernels,” Physical Review Let-            America 116, 23542–23550 (2019).\n   ters 116, 147804 (2016).                                              78 R. Bhagavatula and C. Jayaprakash, “Non-gaussian distributions\n58 B. Kowalik, J. O. Daldrop, J. Kappler, J. C. Schulz, A. Schlaich,        in extended dynamical systems,” Physical Review Letters 71,\n   and R. R. Netz, “Memory-kernel extraction for different molecu-          3657 (1993).\n   lar solutes in solvents of varying viscosity in confinement,” Phys-   79 Y. Li and C. Meneveau, “Origin of non-gaussian statistics in"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "ical Review E 100, 012126 (2019).                                        hydrodynamic turbulence,” Physical Review Letters 95, 164502\n59 F. N. Brünig, O. Geburtig, A. V. Canal, J. Kappler, and R. R.           (2005).\n   Netz, “Time-dependent friction effects on vibrational infrared fre-   80 P. D. Sardeshmukh and P. Sura, “Reconciling non-gaussian cli-\n\nquencies and line shapes of liquid water,” The Journal of Physical       mate statistics with linear dynamics,” Journal of Climate 22,\n   Chemistry B 126, 1579–1589 (2022).                                       1193–1207 (2009).\n60 H. Kiefer, B. J. Héry, L. Tepper, B. A. Dalton, C. Ayaz, and         81 K. Wen, F. Sakata, Z. X. Li, X. Z. Wu, Y. X. Zhang, and S. G."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "R. R. Netz, “Analysis and simulation of generalized langevin             Zhou, “Non-gaussian fluctuations and non-markovian effects in\n   equations with non-gaussian orthogonal forces,” Journal of               the nuclear fusion process: Langevin dynamics emerging from\n   Chemical Physics 163, 184114 (2025).                                     quantum molecular dynamics simulations,” Physical Review Let-\n61 H. Vroylandt, “On the derivation of the generalized langevin             ters 111, 012501 (2013).\n   equation and the fluctuation-dissipation theorem,” Europhysics        82 J. M. Miotto, S. Pigolotti, A. V. Chechkin, and S. Roldán-"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Letters 140, 62003 (2022).                                               Vargas, “Length scales in brownian yet non-gaussian dynamics,”\n62 M. Jacob, M. Geeves, G. Holtermann, and F. X. Schmid, “Dif-              Physical Review X 11, 031002 (2021).\n   fusional barrier crossing in a two-state protein folding reaction,”   83 K. T. Tallakstad, R. Toussaint, S. Santucci, and K. J. Måløy,\n\nNature Structural Biology 1999 6:10 6, 923–926 (1999).                   “Non-gaussian nature of fracture and the survival of fat-tail ex-\n63 R. B. Best and G. Hummer, “Reaction coordinates and rates                ponents,” Physical Review Letters 110, 145501 (2013).\n   from transition paths,” Proceedings of the National Academy of        84 D. M. Packwood and Y. Tanimura, “Non-gaussian stochastic dy-"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Sciences of the United States of America 102, 6732–6737 (2005).          namics of spins and oscillators: A continuous-time random walk\n\f                                                                                                                                      15"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "approach,” Physical Review E 84, 061111 (2011).                         N. J. Holbrook, M. Newman, C. Penland, D. J. Vimont, and\n85 M. Perron, P. Sura, M. Perron, and P. Sura, “Climatology of non-       A. T. Wittenberg, “A low-order data-driven model of enso diver-\n   gaussian atmospheric statistics,” Journal of Climate 26, 1063–         sity,” Geophysical Research Letters 52, e2025GL118649 (2025).\n   1083 (2013).                                                        89 N. G. van. Kampen, Stochastic processes in physics and chem-\n86 L. T. Giorgini, K. Deck, T. Bischoff, and A. Souza, “Response          istry (Elsevier, 2007) p. 463.\n   theory via generative score modeling,” Physical Review Letters      90 R. Lam, A. Sanchez-Gonzalez, M. Willson, P. Wirnsberger,"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "133, 267302 (2024).                                                    M. Fortunato, F. Alet, S. Ravuri, T. Ewalds, Z. Eaton-Rosen,\n87 G. A. Gottwald, E. Tziperman, and A. Fedorov, “Contrasting             W. Hu, A. Merose, S. Hoyer, G. Holland, O. Vinyals, J. Stott,\n   different noise models for representing westerly wind bursts in a      A. Pritzel, S. Mohamed, and P. Battaglia, “Learning skillful\n   recharge oscillator model of enso,” arXiv:2512.22710 [physics.ao-      medium-range global weather forecasting,” Science 382, 1416–\n   ph] (2025), https://doi.org/10.48550/arXiv.2512.22710.                 1422 (2023).\n88 C. Martinez-Villalobos, A. Capotondi, C. Deser, B. Dewitte,\n\nSUPPORTING INFORMATION\n\nIX.   GENERALIZED LANGEVIN EQUATIONS"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "The GLE is a general—indeed, formally exact—result from projection operator theory1 . In the standard, equilib-\nrium derivation, one considers only tracking a small part of a larger, closed space that evolves according to a Markovian\nequation of motion. This could be carving out a smaller, open system in the style of system-bath Hamiltonians that\nform the basis of perturbation theory approaches, or it could be a projection that considers the whole spatial extent\nbut selects only a subset of the possible observables and discards the others. The operator P is idempotent, P 2 = P,\nacts in the full space to give the projected quantity, and can be used to define its orthogonal complement, Q ≡ 1 − P.\nUpon acting with the projector, one is required to take an average with respect to a particular distribution, enabling\nthis framework to span both equilibrium and nonequilibrium scenarios.\n   To d"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "we recover Eq. 1 in the main text. Different projectors generate distinct instantiations of the GLE.\n  Below, we illustrate how freedom in the projection operator allows us to obtain various versions of the exact GLE\n(Mori, Zwanzig, etc.) for a generalized velocity-like observable and review commonly adopted simplifications that\nrender the GLE simpler to parameterize. We delineate the derivation and, when widely adopted, approximations\nused in various GLEs that describe the evolution of the velocity of a tagged particle in a fluid, i.e., we select X ≡ ẋ.\nThis example enables us to connect to the wider literature in chemical physics and fluid dynamics. It also provides\na suggestive form that serves as the starting point for considering the GLE obeyed by the temperature fluctuations\nand their derivative, T and Ṫ .\n\nA.    Exact and approximate GLEs for a tagged particle"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Mori GLE. The Mori projector generally spans an observable, B, and its time derivative, Ḃ, with the inner\nproduct generally defined over the equilibrium distribution (or any other time-translationally invariant distribution)\n\f                                                                                                                       16\n\nthat causes the members of the projector to be orthogonal, and acts on observable X:"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "⟨B(0)|X(t)⟩        ⟨Ḃ(0)|X(t)⟩\n                                   PM X(t) =             2\n                                                            B(0) +              Ḃ(0).                               (19)\n                                                  ⟨B(0)⟩             ⟨Ḃ(0)⟩2\nTaking X to be the velocity of a tagged particle, v = ẋ, and B ≡ x, we find its Mori GLE,\n                                                         Z t\n                                                                                  R\n                                  ẍt = −Ω(xt − xeq ) −      ds ẋs ΓM (t − s) + fM (t).                             (20)\n                                                              0"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "The first (spring) term is often written as K = ⟨ẋ2 ⟩/⟨x2 ⟩. f R (t) is the ‘random’ force, which is a deterministic\nfunction that depends on the initial distribution of the full system’s coordinates, χ, and captures all non-linearities.\nCommon approximations: f R (t) is often replaced by a colored, Gaussian noise, which is only appropriate if the\nsystem behaves linearly.\n  Zwanzig GLE. Here, we employ the Zwanzig projector, which performs a conditional average predicated on a\nparticular value of observables B and Ḃ as functions of the entire phase space variables at t = 0, χ0 ,\n                                   ⟨X(t)⟩B0 ,Ḃ0 = PZ X(t)\n                                       D                                                 E\n                                         δ[B(χ̂0 ) − B(χ)]δ[Ḃ(χ̂0 ) − Ḃ(χ)], X(χ̂0 , t)                            (21)\n                                    =   "
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Here, the inner product requires performing an integral over χ0 and an average over a distribution f (χ0 ), with the\nhat distinguishing the integrated variable. With this projector, the Zwanzig GLE for ẋt takes the form,\n                                           1     d\n                                 ẍt = −            [ΦMF (xt ) + log(M (xt ))]\n                                        M (xt ) dxt\n                                       Z t \u0014                  \u0015                                                      (22)\n                                                  ∇ẋ\n                                     −    ds            − ẋs ΓZ (t − s, xs , ẋs ) + fZR (t),\n                                        0      βM (xs )\nwhere the PMF, ΦMF (xt ), is the histogram − log P(xt ), and the term in square brackets is the ‘effective’ potential,\nΦ(xt ). We note that the Zwanzig friction kernel g"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "which is no longer exact and hence referred to as the ‘approximate’ GLE.\n   Minimal GLE. One can go beyond these projectors and consider an entire manifold of choices for the basis,14\nincluding a combination13 of the previous two. From a data-driven perspective, the simplest choice is to use the PMF\nitself as the basis function, upon which the “minimal” reads as\n                                            ∇x ΦMF (xt )\n                                    ẍt = −\n                                                  M\n                                           Z t\n                                         −     ds ẋs ∇2 ΦMF (xs )Γmin (t − s) + fmin\n                                                                                  R\n                                                                                      (t).                           (24)\n                                           "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "That is, one assumes that the position dependence of the memory kernel is separable, leading to a term that goes\nas the curvature of the PMF. For a full derivation, see Ref. 14. Common approximations: The minimal GLE is\nderived under the assumption of constant mass.\n\f                                                                                                                    17\n\nB.   Apparent Potential\n\nIn general, the mass is not a constant with position, but one may decide to invoke this position independence of\nthe mass as an approximation. In this case, the first term on the right-hand side of the GLE expression—the effective\nforce term (Eq. 22)—would be reduced to the mass independent expression (Eq. 23). That is"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "∇x Φapp (xt )    ∇x Φ(xt )\n                                            −                 ≡−           ,                                      (25)\n                                                    M             M (xt )"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "where M is the value taken for the constant mass (probably from equipartition) and due to the approximation, Φapp\nis not measured PMF. Instead, one might derive the force or use some model function, e.g., the Mori (harmonic)\nform. If one uses the PMF directly, it would lead to some error. To quantify the error incurred in this case, one must\nappreciate that the potential of the effective force Φ(x) is not the only source of position dependence, since one must\nalso consider the mass denominator. In other words\n                                                                   ∇x′ Φ(x′t )\n                                                            Z\n                                              Φapp (x) = M dx′                                                     (26)\n                                                                    M (x′t )"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "is the apparent potential whose derivative gives the conservative force. This potential is compared to the PMF in\nFig. 13. If Φapp is more Gaussian than the ΦMF , then the combined approximations of constant mass and harmonic\npotential enjoy a serendipitous cancellation of errors that moves the system closer to the Mori GLE in Eq. 20. This\nalignment appears to be accidental, but may also hint at the applicability if the Mori GLE, even when it is not\nimmediately obvious. It bears emphasizing that the Mori GLE in Eq. 20 arises from the choice of projector, is exact,\nand does not require the aforementioned approximations. However, the resulting random force can be a complicated\nobject, and the next step in the usual workflow, which is to replace it with normally distributed random numbers, is\nnot always valid.\n\nX.   2D STATE AGGREGATION"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "One could consider a hybrid approach: augmenting the data series to include a measure of the position in the\nyear (a local velocity). In this 2D approach, we can separate summer from winter, unlike in a filtering approach.\nUnfortunately, dividing the data into higher dimensions has seriously deleterious scaling for measuring transitions and\nquickly results in unconverged statistics. This could be compensated by a gain in efficiency since the new TPM decays\nmuch faster compared to the 1D case: the mixing of autumn and spring in the 1D case leads to longer memories since\ntheir temperature distributions evolve in opposite directions but are treated as equivalent in a 1D memory. However,\ndescribing autumn and spring separately only partially solves the problem, as we still cannot properly distinguish\nfluctuations from the periodic, steady-state motion between extremes within one season (see "
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "(a)                                                  (b)\n\n(c)                                                  (d)"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "FIG. 8: Constructing the temperature correlation function. (a) Seasonal data is annually periodic with an initial\ndecay. Filtering in panel (b) (dot-dashed lines) removes the average correlation part but leaves oscillation about zero\non a half-year timescale. (b) Filtering of FT data (solid lines) in frequency space at the DC and annual frequencies\n(gray shading). In this first attempt, we do not remove the first harmonic (which is in the imaginary part); as in\nRef. 28, this component was not significant. (c) Using a high pass with an increasing cutoff results in changes until\nreaching 167 days (half a year). Now the harmonic is removed. Further filtering changes the correlation cage region\ndepth and timescale. (d) Applying a time derivative on the raw and filtered (panel b) data gives the same result since\nthe analytically derived multiplication by ω suppresses low-frequency contributio"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "FIG. 9: Average temperature data for Boulder, Colorado averaged by week. That is, every week has a data point for\nevery year in the data set. Blue is winter, red is summer. Spread captures fluctuations but also the incommensurate\n‘beating’ of the underlying frequencies in the baseline temperature: see Fig. 4 and text of Section IV for how these\nare separated.\n\nFIG. 10: The conditional average of the velocity squared given the position is the mass, and can be position dependent.\nThe solid orange line is a fit to be used in a GLE analysis, and the black dashed line is the average value. When split\ninto states it becomes 3 linear functions, see Fig. 13."
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "FIG. 11: Top: Upper 3 × 3 block of the winter season TPM. Green is the extracted value, orange is the Markov state\nmodel. Bottom: Upper 3 × 3 block of the memory kernel for the above TPM, showing the delta-like component and\nthen noise around zero. Choosing τ = 1 gives the orange MSM in the top panel.\n\f                                                                                                                  20"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "FIG. 12: Top: Fluctuation probability density for a season partitioned into 2 °F bins and two end bins. End bins\nare aggregated from all extreme bins that fall below the threshold, here set as the median number of observations.\nMiddle: Actual and randomly sampled observations for a standard 2 °F bin within the center of the distribution of\nthe equinoctial season, where a roughly-straight line is sufficient to capture the local probability density. Bottom:\nActual and randomly sampled observations for an end bin of the winter season, where the probability density is\nstrongly curved, defining an effective width of around 25 °F.\n\fFIG. 13: The approximate GLE with variable mass. Each row represents one of the three seasons found by clustering. Column 1: position dependent\nmass with linear fits, 2 sigma error, empty points not included. Column 2: Apparent potential from Eq. 22 compared to just"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "(a)\n\n(b)                                               (c)\n\n(d)\n\nFIG. 14: Attempts to move weather time series into a state picture. a) Partitioning the temperature series into regular\nintervals. The periodicity is fatal because the half-year recurrence comes in before the summer/winter temperatures\ndecorrelate. b) 2D projection taking also the derivative of the temperature locally, creating a donut with 3 basins. c)\nDiagonal elements of the TPM from the 2D partitioning in panel (b) are more dissipative than panel (a), but noisier,\nand still have non-vanishing elements representing the steady-state contribution. d) Separation into a 2D baseline\nplus fluctuations (filtered). It can be seen that the range of temperatures is compressed in summer (purple/top)\ncompared to very large deviations in winter (white/bottom). To be compared with the predicted version Fig. 6"
+    }
+  ]
+}
