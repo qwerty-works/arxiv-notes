@@ -1,0 +1,152 @@
+{
+  "arxivId": "2603.03168",
+  "paperTitle": "Data Unfolding: From Problem Formulation to Result Assessment",
+  "abstract": "Experimental data in particle and nuclear physics, particle astrophysics, and radiation protection dosimetry are collected using experimental facilities that consist of a complex system of sensors, electronics, and software. Measured spectra or cross sections are considered as Probability Density Functions (PDFs) that deviate from true PDFs due to resolution, bias, and efficiency effects. Unfolding is viewed as a procedure for estimating an unknown true PDF. Reliable estimates of the true PDF are necessary for testing theoretical models, comparing results from different experiments, and combining results from various research endeavors. Both external and internal quality assessment methods can be applied for this purpose. In some cases, external criteria exist to evaluate deconvolution quality. A typical example is the deconvolution of a blurred image, where the sharpness of the restored image serves as an indicator of quality. However, defining such external criteria can be challenging, particularly when a measurement has not been performed previously. This paper discusses various internal criteria for assessing the quality of the results independently of external information, as well as factors that influence the quality of the unfolded distribution.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Experimental data in particle and nuclear physics, particle astrophysics, and radiation protection dosimetry are collected using experimental facilities that consist of a complex system of sensors, electronics, and software. Measured spectra or cross sections are considered as Probability Density Functions (PDFs) that deviate from true PDFs due to resolution, bias, and efficiency effects. Unfolding is viewed as a procedure for estimating an unknown true PDF. Reliable estimates of the true PDF are necessary for testing theoretical models, comparing results from different experiments, and combining results from various research endeavors. Both external and internal quality assessment methods can be applied for this purpose. In some cases, external criteria exist to evaluate deconvolution quality. A typical example is the deconvolution of a blurred image, where the sharpness of the restored image serves as an indicator of quality. However, defining such external criteria can be challenging, particularly when a measurement has not been performed previously. This paper discusses various internal criteria for assessing the quality of the results independently of external information, as well as factors that influence the quality of the unfolded distribution."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Data Unfolding: From Problem Formulation to\n                                                                  Result Assessment\n\nNikolay D. Gagunashvili\narXiv:2603.03168v1 [physics.data-an] 3 Mar 2026\n\nUniversity of Iceland, Sæmundargata 2, 101 Reykjavik, Iceland"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract\n                                                  Experimental data in particle and nuclear physics, particle astrophysics, and\n                                                  radiation protection dosimetry are collected using experimental facilities that\n                                                  consist of a complex system of sensors, electronics, and software. Measured\n                                                  spectra or cross sections are considered as Probability Density Functions\n                                                  (PDFs) that deviate from true PDFs due to resolution, bias, and efficiency\n                                                  effects. Unfolding is viewed as a procedure for estimating an unknown true\n                                                  PDF. Reliable estimates of the true PDF are necessary for testing theoretical\n     "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Email address: nikolay@hi.is (Nikolay D. Gagunashvili)\n\f1. Introduction"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "A measurement is produced by an experimental setup comprising a com-\nplex set of sensors, electronics, and software. The measured Probability\nDensity Function (PDF) f (y) differs from the true PDF ϕ(x) due to the res-\nolution of an experimental setup, the recording efficiency, and other factors.\n    As a typical example, noise components are added to the kinematic pa-\nrameters of a particle after it passes through the material of a detector. In\nsome cases may not be recorded at all because of its energy loss.\n    The problem of estimating an unknown PDF ϕ(x) which may represent\na spectrum or a differential cross section, is one of the main subjects of anal-\nysis in particle physics, nuclear physics, particle astrophysics, and radiation\nprotection dosimetry. It is common part of data analysis and traditionally\nreferred to as unfolding. Computer modeling is often employed to study the\nregi"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "As discussed in [1, 2], the data under analysis are represented by two sets\nof random variables:\n  1. The measured data sample is a collection of independent, identically\n     distributed (IID) of n random variables:\n\ny1 , y2 , . . . , yn                    (1)"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "with the Probability Density Function (PDF) f (y).\n        • The true PDF ϕ(x) is not known.\n        • The measured PDF f (y) is also unknown, however, it can be\n          estimated.\n  2. The simulated data sample is a collection of k pairs of IID random\n     variables:\n                          xs1 , y1s ; xs2 , y2s ; . . . xsk , yks    (2)\n      with PDF’s ϕs (x) and f s (y).\n        • The generated PDF ϕs (x) is an analog of the true PDF ϕ(x).\n          In the common case, ϕs (x) ̸= ϕ(x) and the PDF ϕs (x) can be\n          estimated.\n        • The reconstructed PDF f s (x) is an analog of the measured PDF\n          f (x) and the PDF f s (x) can be estimated."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\fThe simulated sample serves the purpose of constructing a mathematical\nmodel for the measurement system.\n    A commonly employed model for this case is the Fredholm integral equa-\ntion, which describes the relationship between the measured PDF denoted\nas f (y) and the true PDF ϕ(x).\n                       +∞\n                       Z\n                         R(x, y)A(x)ϕ(x)dx = f (y),                        (3)\n                      −∞"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "where A(x) is the probability of recording of an event with a characteristic x\n(the acceptance); R(x, y), is the probability of obtaining y instead of x (the\nexperimental resolution). In the special case where R(x, y) = R(y − x), a\nformal solution can be expressed using Fourier transform as follows:\n                                      +∞\n                                      Z\n                                1            fe(p)\n                        ϕ(x) =          eipx       dp,                     (4)\n                               A(x)          R(p)\n                                              e\n                                      −∞"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "where the sign ∼ denotes the Fourier transform of the corresponding func-\ntions.\n    If the Fourier transform of the kernel, R(p),\n                                              e      vanishes within the high-\nfrequency region of the spectrum, this implies that the measured PDF f (y)\ndoes not contain information about the high-frequency behavior of ϕ(x).\nFormally, it is not possible to determine ϕ(x) from equation (4) in this fre-\nquency domain, just as it is impossible to define ϕ(x) in regions where the\nacceptance A(x) equals zero.\n    Fredholm integral equations 3) are therefore ill-posed. Regularization ad-\ndresses the difficulties described above by restricting the admissible solution\nspace, thereby transforming the ill-posed problem into a well-posed one.\n    The Fredholm equation example demonstrated the liner dependence of\nthe measured PDF f (y) on the true PDF ϕ(x). Although thi"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "2. Quality assessment of the unfolding procedure\n\nBoth external and internal criteria are employed to assess the quality of\nthe unfolding procedure. In certain instances, external criteria are available,\nproviding a framework for evaluating the reliability of the procedure. How-\never, in experimental physics, defining external criteria can be challenging,"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3\n\fparticularly when no prior measurements exist. In such scenarios, model-\nbased assumptions often serve as a guide. Conversely, internal criteria for\nevaluating the quality of the unfolding result become essential when external\nreferences are unavailable.\n    The quality criteria for the data unfolding procedure presented below\nare integral to the evaluation process. Notably, these criteria not only help\ndetermine the optimal values of the parameters of unfolding algorithms but\nalso facilitate the comparison of different algorithms.\n    The unfolded distribution is an estimator of the true distribution of ϕ(x)\nand therefore differs from it. In order to develop a method that produces an\nestimator ϕ̂(x) that is close as possible to ϕ(x), appropriate measures must\nbe defined to quantify this discrepancy."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "2.1. Mean Integrated Square Error\n    One commonly used measure of the accuracy of the estimator ϕ̂(x) is the\nMean Integrated Square Error (MISE) [3, 4, 5, 6]. To define MISE, we first\nintroduce the Integrated Square Error (ISE):\n                                  Z\n                                                \u00012\n                     ISE(ϕ̂(x)) =   ϕ̂(x) − ϕ(x) dx.\n\nThen MISE can be written as\n                                          \u0014Z                         \u0015\n                                                              \u00012\n            MISE(ϕ̂(x)) = E(ISE) = E           ϕ̂(x) − ϕ(x)        dx .\n\nIt is also possible give an equivalent formula for MISE:\n                                   Z h\n                                                    \u00012 i\n                   MISE(ϕ̂(x)) = E ϕ̂(x) − ϕ(x)          dx."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Substituting the formula\n               h            \u00012 i       \u0002     \u0003\u00012             \u0001\n              E ϕ̂(x) − ϕ(x)     = Bias ϕ̂(x)    + Var ϕ̂(x)\n\ninto the above expression, we obtain a useful representation of MISE:\n                            Z h\n                                     \u0002      \u0003\u00012            \u0001i\n             MISE(ϕ̂(x)) =       Bias ϕ̂(x)     + Var ϕ̂(x) dx.\n\nAn unfolded distribution that minimizes the Mean Integrated Square Error\nachieves an optimal trade-off between bias and variance. An algorithm with\nthe lowest value of MISE is therefore preferable.\n\n4\n\f   Below we consider internal quality criteria for an unfolding distribution\nrepresented through step-function approximation.\n   Let us define the positions of the m steps as {a1 , a2 , ..., am+1 } and the\nprobability density function estimate of the unfolded distribution as"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "ϕ̂i\n                            ϕ̂(x) =             for ai ≤ x < ai+1 ,                             (5)\n                                      ai+1 − ai\n\nwhere ϕ̂i , is an estimator of\n                                                aZi+1\n\nϕi =             ϕ(x)dx.                                 (6)\n                                               ai\n\nIn this case, the MISE is expressed as\n                     aZ\n                      m+1                       aZ\n                                                 m+1                           aZ\n                                                                                m+1"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "MISE =             E [ϕ̂(x)2 ]dx − 2             ϕ(x)E[ϕ̂(x)]dx +            ϕ(x)2 dx\n                     a1                         a1                              a1\n                                                                    aZ\n                                                                     m+1\n                                                                                                (7)\n                     m          2         m\n                     X       Eϕ̂i         X         Eϕ̂i\n                 =                   −2                    ϕi +              ϕ(x)2 dx.\n                           ai+1 − ai             ai+1 − ai\n                     i=1                  i=1                           a1"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "The last term in expression (7) does not depend on the estimators ϕ̂i ; it is a\nconstant. Therefore, the choice of parameters and factors that minimize the\nMISE does not depend on this part of the equation.\n    Another well-known and useful representation of MISE is\n            m                               m Z ai+1 \u0012                   \u00132\n          X         1      h\n                                       2\n                                         i X                      ϕi\n MISE =                   E (ϕ̂i − ϕi ) +              ϕ(x) −               dx\n               a     − ai                                      ai+1 − ai\n           i=1 i+1                         i=1 ai\n                                                                             (8)\nor equivalently,\n          m                                          m Z ai+1 \u0012                  \u00132\n         X        1     h      \u0002 \u0003"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "since\n         h            i                                  \u0002 \u0003\u00012\n        E (ϕ̂i − ϕi )2 = (Eϕ̂i − ϕi )2 + Var(ϕ̂i ) = Bias ϕ̂i  + Var(ϕ̂i ).\n\nHere, only the first term is affected by regularization. The second term\ndefines the bias associated with binning and represents the minimal bias\ninherent in the step-function representation of the unfolded distribution.\n\n5\n\f2.2. Variance of ISE\n   The variability of the estimation can be defined as\n                                        \u0003 \u0010      \u00112\n                       Var(ISE) = E ISE2 − E[ISE]\n                                   \u0002\n\nAn algorithm with the lowest value of Var(ISE) is preferable because it pro-\nvides a more stable solution to the unfolding problem."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "2.3. Minimal Condition number\n   Another measure of the quality of the unfolding process is the condition\nnumber of the correlation matrix for ϕ̂i /(ai+1 − ai ). The estimators of the\nprobabilities ϕ̂i satisfy the equation\n                                 m\n                                 X\n                                       ϕ̂i = 1                            (9)\n                                 i=1\n\nand, as a result, the correlation matrix is often nearly singular. To address\nthis, it is advisable to determine the minimum condition number (MCN) of\nthe correlation matrix when excluding one bin from consideration.\n\nMCN = argmin[COND(C−k )],                       (10)\n                                  k"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "where C−k is full correlation matrix with bin k removed. The condition\nnumber of correlation matrix measures the numerical stability of unfolding\nprocedure and its sensitivity to small perturbations, In particular, an algo-\nrithm with the lowest MCN value is preferable.\n\n2.4. Mean Square Error\n  A popular measure of the accuracy of the unfolded distribution [7] is the\nMean Squared Error (MSE):\n             m                m\n           1 X \u0010         \u00112 1 Xh     \u0002 \u0003\u00012            i\n     MSE =     E ϕ̂i − ϕi =      Bias ϕ̂i  + Var(ϕ̂i )                  (11)\n           m                m\n                i=1                        i=1\n\nThe main disadvantage of MSE is that it cannot be used to compare\nthe accuracy of two unfolded distributions obtained with different binning\nschemes. However, such a comparison is important when selecting an optimal\nbinning scheme for an unfolding procedure."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "6\n\f2.5. Coverage probability\n    The coverage probability [8] is defined according as\n                            m\n                        1 X \u0010                              \u0011\n                 Pcov =    P ϕ̂i − σ̂ϕ̂i < ϕi < ϕ̂i + σ̂ϕ̂i ,               (12)\n                        m\n                            i=1\n\nwhere σ̂ϕ̂i is estimated uncertainty (e.g., standard deviation) of ϕ̂i . The main\ndisadvantage of Pcov is that it also cannot be used to compare the accuracy\nof two unfolded distributions obtained with different binning schemes. Such\na comparison is important when selecting a better binning scheme for an\nunfolding procedure."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "2.6. Post-resolution\n    Post-resolution, if can be estimated, provides information about the im-\nprovement of the effective resolution function compared with the intrinsic\nresolution of the experimental setup. An example of estimating the post-\nresolution function can be found in [7, 9].\n\n3. Factors and parameters influencing internal and external quality\n   criteria.\n\nDifferent factors and parameters of the unfolding algorithm influence the\nquality of the unfolded distribution, as defined by the quality assessment\nmethods presented in the previous section.These factors and parameters are\nlisted below:"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "1. Whether the measurement system is linear or nonlinear.\n  2. The generated probability distribution function ϕs (x) used to calculate\n     the response matrix R, and whether it is close to the true distribution\n     ϕ(x)\n  3. The method used to calculate the response matrix R (system identifi-\n     cation), It can be:\n         • The traditional method [10], which may lead to bias in unfolding\n           result, if the generated distribution used in the simulation, ϕs (x),\n           does not coincide with the true distribution ϕ(x).\n         • A system identification approach [11] presented in [1].\n  4. The number of simulated events k used to create the mathematical\n     model of measurement system."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "7\n\f  5. The number of experimental events n.\n  6. The number of bins in the experimental (measured) distribution.\n  7. The number of bins m in the unfolded distribution\n  8. The type of binning:\n        • Equidistant binning.\n        • Non-equidistant binning, which can be defined using the k-means\n          clustering method [12] and, in the multidimensional case, by the\n          Voronoi method [13] additionally.\n  9. The regularization parameter of unfolding algorithm. In Richardson-\n     Lucy method [14, 15] is the number of iterations.\n 10. The initial guess for the unfolded distribution. This is particularly im-\n     portant for Richardson-Lucy method in the case of small experimental\n     statistics."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "The MISE, Var(ISE) and MCN can be used as internal quality criteria\nof to compare different unfolding algorithm under variation of factors and\nparameters on which they depend. This approach was first time used in\n[1, 2].\n    The use MSN and Pcov as internal quality criteria is rather restrictive.\nAs shown in [10] it is possible to compare different algorithms when the\nsame equidistant binning is used. However, it is not possible to compare two\ndifferent algorithm that present unfolded distributions with two different\nbinning schemes, as was done in [2].\n\n4. Conclusions"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Unfolding is considered a procedure for estimating an unknown prob-\nability density function. The main factors and parameter influencing the\nquality of unfolding results have been identified and formulated. The qual-\nity of the estimation is characterized in terms of the Mean Integrated Square\nError (MISE), the variance of the Integrated Square Error (Var(ISE)), and\nthe Minimal Condition Number (MCN) of the correlation matrix of the es-\ntimated distribution. Presenting the unfolded distribution together with a\ncorresponding quality assessment of the unfolding results significantly en-\nhances the physical interpretation of experimental data.\n\n8\n\fReferences\n\nReferences\n\n[1] N. D. Gagunashvili. Data unfolding with mean integrated square error\n     optimization. Comp. Phys. Comm., 308:109473, 2025."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "[2] N. D. Gagunashvili. Comparative analysis of richardson-lucy deconvolu-\n     tion and data unfolding with mean integrated square error optimization.\n     Comp. Phys. Comm., 318:109894, 2026.\n\n[3] B. W. Silverman. Density estimation for statistics and data analysis.\n     Chapman and Hall, 1986.\n\n[4] A. B. Tsybakov. Introduction to Nonparametric Estimation. Springer,\n     2009.\n\n[5] D. W. Scott. Multivariate Density Estimation: Theory, Practice, and\n     Visualization. John Wiley & Sons, 2015.\n\n[6] M. P. Wand and M. C. Jones. Kernel Smoothing. Chapman & Hall,\n     1995.\n\n[7] V. P. Zhigunov. Improvement of resolution function as an inverse prob-\n     lem. Nucl. Instrum. Meth. A, 322(1-2):183, 1983."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "[8] M. Kuusela and V. M. Panaretos. Statistical unfolding of elementary\n     particle spectra: Empirical bayes estimation and bias-corrected uncer-\n     tainty quantification. Ann. Appl. Stat., 9:1671, 2015.\n\n[9] M. Schmelling. Regularised unfolding with a discrete-valued penalty\n     function. Nucl. Instrum. Meth., 1056:168566, 2023.\n\n[10] L. Brenner, R. Balasubramanian, C. Burgard, W. Verkerke, G. Cowan,\n     P. Verschuuren, and V. Croft. Comparison of unfolding methods\n     using RooFitUnfold. International Journal of Modern Physics A,\n     35(24):2050145, 2020.\n\n[11] D. Graupe. Identification of system. Krieger and Huntington„ 1976.\n\n[12] P. N. Tan, M. Steinbach, A. Karpatne, and V. Kumar. Introduction to\n     Data Mining. Pearson, 2018.\n\n[13] G. Voronoi. Nouvelles applications des parametres continus a la theorie\n     des formes quadratiques. J. reine angew. Math., 133:97, 1907."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "9\n\f[14] W. H. Richardson. Bayesian-based iterative method of image restora-\n     tion. J. Opt. Soc. Am., 62(1):55–59, 1972.\n\n[15] L. B. Lucy. An iterative technique for the rectification of observed\n     distributions. The Astronomical Journal, 79:745, 1974.\n\n10"
+    }
+  ]
+}
