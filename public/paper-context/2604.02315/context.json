@@ -1,0 +1,532 @@
+{
+  "arxivId": "2604.02315",
+  "paperTitle": "Beyond the Assistant Turn: User Turn Generation as a Probe of Interaction Awareness in Language Models",
+  "abstract": "Standard LLM benchmarks evaluate the assistant turn: the model generates a response to an input, a verifier scores correctness, and the analysis ends. This paradigm leaves unmeasured whether the LLM encodes any awareness of what follows the assistant response. We propose user-turn generation as a probe of this gap: given a conversation context of user query and assistant response, we let a model generate under the user role. If the model&#39;s weights encode interaction awareness, the generated user turn will be a grounded follow-up that reacts to the preceding context. Through experiments across $11$ open-weight LLMs (Qwen3.5, gpt-oss, GLM) and $5$ datasets (math reasoning, instruction following, conversation), we show that interaction awareness is decoupled from task accuracy. In particular, within the Qwen3.5 family, GSM8K accuracy scales from $41\\%$ ($0.8$B) to $96.8\\%$ ($397$B-A$17$B), yet genuine follow-up rates under deterministic generation remain near zero. In contrast, higher temperature sampling reveals interaction awareness is latent with follow up rates reaching $22\\%$. Controlled perturbations validate that the proposed probe measures a real property of the model, and collaboration-oriented post-training on Qwen3.5-2B demonstrates an increase in follow-up rates. Our results show that user-turn generation captures a dimension of LLM behavior, interaction awareness, that is unexplored and invisible with current assistant-only benchmarks.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Standard LLM benchmarks evaluate the assistant turn: the model generates a response to an input, a verifier scores correctness, and the analysis ends. This paradigm leaves unmeasured whether the LLM encodes any awareness of what follows the assistant response. We propose user-turn generation as a probe of this gap: given a conversation context of user query and assistant response, we let a model generate under the user role. If the model&#39;s weights encode interaction awareness, the generated user turn will be a grounded follow-up that reacts to the preceding context. Through experiments across $11$ open-weight LLMs (Qwen3.5, gpt-oss, GLM) and $5$ datasets (math reasoning, instruction following, conversation), we show that interaction awareness is decoupled from task accuracy. In particular, within the Qwen3.5 family, GSM8K accuracy scales from $41\\%$ ($0.8$B) to $96.8\\%$ ($397$B-A$17$B), yet genuine follow-up rates under deterministic generation remain near zero. In contrast, higher temperature sampling reveals interaction awareness is latent with follow up rates reaching $22\\%$. Controlled perturbations validate that the proposed probe measures a real property of the model, and collaboration-oriented post-training on Qwen3.5-2B demonstrates an increase in follow-up rates. Our results show that user-turn generation captures a dimension of LLM behavior, interaction awareness, that is unexplored and invisible with current assistant-only benchmarks."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: User-turn generation as a probe of interaction awareness. Left: A conversation"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Controlled perturbation examples. Left: Truncation removes the end of the"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: Cross-family dissociation: task accuracy vs. followup rate. Top row: task"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: Qwen3.5 family: interaction awareness across temperature. Genuine follow-up"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Same question, same correct answer, different interaction awareness. Both mod-"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 1: Controlled perturbations confirm the metric. Genuine-followup rate (%) under"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 2: Post-training on Qwen3.5-2B. GSM8K accuracy for reference. Followup rates on"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 3: Qwen3.5 scaling: GSM8K answer accuracy (%) and genuine-followup rate (%)"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 4: Full Qwen3.5 temperature sweep: genuine-followup rate (%) across all eight models"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 5: Cross-family genuine-followup rate (%) on the self-generated benchmark. Includes"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 6: Failure mode distribution across model families on the self-generated benchmark (all"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 7: Same-family GPT-5.4 judge validation. Agreement rates are percentages; κ val-"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Figure 6: Manual review interface. Screenshot of the annotation tool used for LLM judge"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Salesforce AI Research\n\nBeyond the Assistant Turn: User Turn Generation as a Probe\n                                        of Interaction Awareness in Language Models\n\nSarath Shekkizhar∗, Romain Cosentino, Adam Earle\n\nAbstract\n\nStandard LLM benchmarks evaluate the assistant turn: the model gener-\n                                                  ates a response to an input, a verifier scores correctness, and the analysis\n                                                  ends. This paradigm leaves unmeasured whether the LLM encodes any\narXiv:2604.02315v1 [cs.AI] 2 Apr 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "awareness of what follows the assistant response. We propose user-turn\n                                                  generation as a probe of this gap: given a conversation context of user query\n                                                  and assistant response, we let a model generate under the user role. If the\n                                                  model’s weights encode interaction awareness, the generated user turn will\n                                                  be a grounded follow-up that reacts to the preceding context. Through\n                                                  experiments across 11 open-weight LLMs (Qwen3.5, gpt-oss, GLM) and 5\n                                                  datasets (math reasoning, instruction following, conversation), we show\n                                                  that interaction awareness is decoupled"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1     Introduction"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Large language models (LLMs) are post-trained on token sequences that span both sides\n                                        of a conversation, i.e., the user and assistant (Qwen Team, 2026; OpenAI, 2025; Zeng et al.,\n                                        2025). Yet, standard evaluation benchmarks focus only on the response generated under the\n                                        assistant role (Cobbe et al., 2021; Rein et al., 2024; Pyatkin et al., 2025). Consequently, a model\n                                        can score 96% on GSM8K and yet, when made to continue under the user role, completely\n                                        fall apart. Failures show up as generating text from a previous turn or continuing as the\n                                        assistant, a case of identity drift (Shekkizhar et al., 2025). The assistant response is correct;\n                 "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\fSalesforce AI Research\n\nGSM8K Math reasoning\n                                                                                                                              22.0\n                                                                                     20\n\nGenuine Follow-up (%)\n                                                                                                                              18.0\n\n15                                       15.2\n\n10\n                                                                                                                              7.7\n\n5\n                                                                                                                              2.5\n\n0                                       0.1"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "GPQA Diamond Expert QA\n                                                                                                                              47.0\n\nGenuine Follow-up (%)\n                                                                                     40\n                                                                                                                              35.9\n                                                                                                                              35.4\n                                                                                     30\n\n20                                       19.7\n\n12.1\n                                                                                                                              11.6\n                                                                                     10\n\n0"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "IFBench Instruction following\n                                                                                                                              43.7\n                                                                                     40\n\nGenuine Follow-up (%)\n                                                                                                                              36.0\n\n30                                       30.7\n\n22.0\n                                                                                     20"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "10\n                                                                                                                              4.0\n                                                                                                                              1.7\n                                                                                      0\n                                                                                          0      0.3              0.7      1.0\n                                                                                                         Temperature\n                                                             Qwen3.5-9B                                Qwen3.5-397B-A17B         gpt-oss-120B\n                                                             Qwen3.5-27B                               gpt-oss-20B               GLM-4.7"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "Figure 1: User-turn generation as a probe of interaction awareness. Left: A conversation\ncontext consisting of system, user, and assistant turns delimited by special tokens (e.g.,\n<|im start|>, <|im end|>). Standard evaluation scores the assistant response for task accuracy.\nOur probe appends a <|im start|>user header and lets model Mθ generate under the user\nrole. A genuine follow-up indicates the model’s weights encode conversational awareness.\nRight: Genuine follow-up rate (%) vs. sampling temperature for six models across three\ndatasets. At greedy decoding (T =0), most models produce near-zero follow-ups. Increasing\ntemperature surfaces latent interaction awareness in Qwen3.5 and GLM (e.g., Qwen3.5-27B\nrises from 0% to 22% on GSM8K), while gpt-oss remains near zero. Qwen3.5-9B starts with\nhigher baseline follow-up on GPQA Diamond (13.1%) and rises further with temperature."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "use of LLMs in multi-turn conversation often requires user reactions as part of the training\n(Wu et al., 2025; Wang et al., 2026; Buening et al., 2026) to enable better and more capable\nmodels. Our work asks a complementary question to these works (see App. E for additional\ndiscussion). We provide an evaluation measure of the interaction capabilities of LLMs.\nThis work makes the following contributions: (i) We formalize user-turn generation as a\nprobe of interaction awareness and jointly measure assistant accuracy, follow-up quality\nin LLMs (§ 2). (ii) Across 11 models spanning 0.8B to 397B parameters, we demonstrate\ninteraction awareness is decoupled from task accuracy across model families (§ 3.1). (iii)\nWe show that this ability can be latent in a model’s generation distribution, surfaced with\nhigher temperature sampling, yet does not scale with model size even within a single\nfamily "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "2   User Turn Generation\n\nEffective conversation requires more than producing correct response for a given input.\nIt requires, in addition, anticipating the consequence to the response provided from the\nother side. Recent work on multi-agent and agent to agent systems shows that such partner\nmodels are necessary and only emerge when the training environment imposes sufficient\npressure for them to matter (Mon-Williams et al., 2025). To this end, we ask the question:\n\n2\n\fSalesforce AI Research\n\neven without explicitly optimizing for user-turn generation, can current LLMs generate user\nturns that are grounded in the preceding assistant response?\n\n2.1   Problem Formulation"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Consider an LLM parameterized by θ, Mθ , post-trained with a chat template that defines\nuser and assistant role headers. Given a conversation context consisting of a user query q\nand an assistant response a, we define user-turn generation as the sequence produced when\nMθ generates under the user role header, conditioned on the preceding context (Figure 1):\n                                         u = Mθ ([q; a])                                       (1)\nThe question of study in this work is whether u constitutes a grounded follow-up to a, a\nreaction that could arise from processing the content of the assistant response. A grounded\nu is evidence that θ has learned to produce contextually appropriate user continuations; a\ndegenerate u indicates that, at least under the model’s modal continuation, the training has\nnot shaped the weights to generate plausible conversational consequences.\nThi"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "2.2   Measuring Interaction Awareness"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "We define a genuine follow-up as a generated user turn u whose content is grounded in the\ncontext (q, a), i.e., u references, reacts to, or builds upon specific content in the conversation.\nConversely, a degenerate user turn is one that fails this grounding criterion: verbatim restate-\nment of q, continuation of the assistant response under the user role, emission of planning\nartifacts, or generation of another task query. These failure modes indicate that the model\ndefaults to task-solving behavior without producing a contextually grounded user reaction.\nWe propose to measure interaction awareness through an LLM-based evaluator (Zheng\net al., 2023) that analyzes the full conversation trace. Given the query q, a, u, the evaluator\nperforms an assessment:\n                         F OLLOW U P E VAL (q, a, u) = {rationale, ℓ, σ },                     (2)\nwhere σ ∈ {0, 1} is a binary genuine-"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "2.3   Experimental Setup\n\nWe evaluate user-turn generation across 11 open-weight models, 5 benchmark datasets, and\n2 held-out conversational datasets. We complement these with controlled perturbations and\ncollaboration-oriented post-training.\n\n3\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Truncation                      GSM8K             Explicit Question                  IFEval\n   [Assistant]                                       [Assistant]\n   1. Total eggs laid per day: 16.                   ... So let us praise the eucalyptus tree,\n   2. Eggs eaten for breakfast: 3.                   For all the beauty and the use it brings,\n   3. Eggs used for muffins: 4.                      A wild and wonderful legacy,\n   4. Remaining eggs: 16 - 3 - 4 = 9.                That lifts the soul and makes the spirit sing.\n   5. Price per egg: $2.\n   6. Daily earnings: 9 x $2 = $18.                  [User turn] --> meta_planning (nongenuine)\n   Answer: 18\n                                                     [Assistant -- with appended question]\n   [User turn] --> meta_planning (nongenuine)        ... So let us praise the eucalyptus tree,\n                                                  "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Figure 2: Controlled perturbation examples. Left: Truncation removes the end of the\nassistant response, prompting the model to produce a reaction to complete the response.\nRight: Appending a generic question elicits a grounded critique rather than a prompt\nrestatement. Assistant and user turns in the examples are generated by GLM-4.7. These\ncontrols demonstrate that interaction awareness can surface in specific contexts."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Generation settings. In the self-generated setting, given a prompt q, we generate a from\nMθ and then u from the same model under the user role (Eq. 1). In the held-out setting,\nused for post-training transfer checks and judge validation, we remove the final user turn\nfrom multi-turn conversations and ask the model to generate under the user role. All\ngeneration uses vLLM1 with modified chat templates that permit user-role continuation.\nWe primarily use temperature 0 (deterministic/greedy) generation; additional sampled\ngenerations (T ∈ {0.3, 0.7, 1.0}) probe whether interaction awareness is present in a model’s\nbroader distribution (§3.3)."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Datasets. We use 5 benchmark datasets where assistant behavior is independently ver-\nifiable, enabling joint measurement of task accuracy and interaction awareness: GSM8K\n(Cobbe et al., 2021) (1319 examples, math reasoning), IFEval (Zhou et al., 2023) (541 exam-\nples) and IFBench (Pyatkin et al., 2025) (300 examples, instruction following), and GPQA\nmain (448 examples) and GPQA diamond (198 examples) (Rein et al., 2024) (expert QA).\nOn GSM8K we extract the final numeric answer; on GPQA the final letter, with extraction\nfailures counted as incorrect. Held-out datasets are HealthBench (Arora et al., 2025) (1470\nexamples) and a subset of Coval (100 examples) (Hitzig et al., 2026), where existing human\nfollow-ups provide a natural setup for interaction."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "Models. We evaluate 11 open-weight models: eight Qwen3.5 models from 0.8B to 397B-\nA17B (Qwen Team, 2026), two gpt-oss models (20B, 120B) (OpenAI, 2025), and GLM-4.7\n(Zeng et al., 2025). The Qwen3.5 sweep provides within-family scaling analysis; cross-model\ncomparison controls for differences in training data and post-training recipes."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Controlled perturbations. If the genuine-followup rate measures something real about\ninteraction awareness, it should respond to causal manipulations of the assistant turn. We\ndesign two perturbations as positive controls (Figure 2). Truncation removes max(25, ⌈0.25 ×\nntokens ⌉) tokens from the end of the assistant response before generating the user turn;\na model that attends to assistant-turn content should produce more genuine follow-ups\n  1 Our generations can be verified with verlai/verl:vllm017.latest docker image. We made use of\nH200 gpus for all experiments.\n\n4\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "GSM8K                                       GPQA Diamond                                         IFBench\n                                       Math reasoning                              Expert QA                                            Instruction following\n                    100                         96.8    93.9   95.8    95.3                  86.1                                 60                        57.8   58.3\n                                         89.5                                       78.6                                                                                  54.6\n                                                                              80                                                                     51.6\nTask Accuracy (%)\n                           80                                                                                   67.2   66."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "5                                                                                              12\n                                                                              25\n                                   4                                                                    20.7                      10                  9.7\n           Genuine Follow-up (%)"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "20\n                                                                                                                16.7               8\n                                   3                                          15    13.1\n                                                                                                                                   6\n                                   2                    1.4                   10\n                                                                       1.2                                                         4                               3.3\n                                                0.8                                                                                       2.0\n                                   1     0.5                                   5                                                   2                    "
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Qwen3.5-9B    Qwen3.5-397B-A17B          gpt-oss-20B     gpt-oss-120B            GLM-4.7\n\nFigure 3: Cross-family dissociation: task accuracy vs. followup rate. Top row: task\naccuracy (%). Bottom row: followup rate (%). Five representative models on GSM8K, GPQA\nDiamond, and IFBench. Task accuracy does not predict follow-up quality: gpt-oss models\nproduce the highest follow-up on GPQA despite lower accuracy than Qwen3.5 or GLM-4.7.\nFull results including IFEval and GPQA Main in Table 5.\n\nwhen the response is visibly incomplete. Explicit question appends a question sampled\nfrom a pool of generic follow-ups (e.g., “What do you think?”, “Any questions?”) to the\nassistant response, testing sensitivity to an overt conversational cue rather than an implicit\ndegradation."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Post-training interventions. To test whether interaction awareness is trainable, we apply\nthe CollabLLM recipe (Wu et al., 2025) to Qwen3.5-2B, which optimizes for multi-turn collab-\noration quality via forward-sampled conversation rewards. Training data comes from 200\nlevel-5 MATH problems (Hendrycks et al., 2021), expanded into ≈ 5k multi-turn examples\n(≈ 5 turns each). We train two variants for 1 epoch: (i) SFT with masked loss on assistant\nturns, and (ii) online RL with PPO (Schulman et al., 2017) using multiturn rollouts and con-\nversational rewards. Crucially, neither intervention explicitly trains for user-turn generation;\nboth target assistant response quality only. Any change in follow-up rate therefore reflects\nan indirect effect of collaboration-aware training. Neither the evaluation benchmarks nor\nheld-out datasets appear in training, so gains reflect transfer."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "3                                      Results\n\nWe present the results of our analysis in five parts: (i) task accuracy does not reflect follow-up\nquality across model families (§3.1); (ii) temperature sampling reveals interaction awareness\nis latent in the generation distribution while appearing absent with deterministic generation\n(§3.3); (iii) a within-family deep dive shows interaction awareness does not scale with\nmodel size (§3.2); (iv) controlled perturbations confirm the proposed metric (§3.4); and (v)\ncollaboration-oriented post-training can increase interaction awareness (§3.5).\n\n3.1                                    Task Accuracy Does Not Predict Follow-Up Quality Across Families"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "If interaction awareness were simply a function of general capability, we would expect\nmodels with higher task accuracy to also produce better follow-ups. We evaluate representa-\ntive models from the Qwen3.5 and gpt-oss families alongside GLM-4.7 under deterministic\n\n5\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "GSM8K Math reasoning                                                    GPQA Diamond Expert QA                                                            IFBench Instruction following\n                                                                 22.0                                                                          35.9                                                                         43.7\n                                                                                                     35\n                        20                                                                                                                                                         40"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Genuine Follow-up (%)                                            18.0                                30                                                                                                                     36.0\n\nGenuine Follow-up (%)"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Genuine Follow-up (%)\n                                                                                                                                                                                                                            30.7\n                        15                                                                           25                                                                            30\n                                                                 13.7                                                                                                                                                       27.7\n                                                                                                                                                                                                                            25.3\n                     "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "0                                                                            0                                                                             0\n\n0       0.3          0.7      1.0                                             0    0.3          0.7          1.0                                           0         0.3           0.7       1.0\n                                            Temperature                                                                Temperature                                                                       Temperature\n                                                                                                                      Qwen3.5\n                                                          0.8B          2B                                4B   9B      27B           35B-A3B          122B-A10B                             397B-A17B"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Figure 4: Qwen3.5 family: interaction awareness across temperature. Genuine follow-up\nrate (%) vs. sampling temperature for all eight Qwen3.5 models on three datasets. At T =0\n(greedy), follow-up is near zero for most models despite high task accuracy (Table 3). Higher\ntemperatures surface latent interaction awareness, but this does not scale monotonically\nwith model size: Qwen3.5-9B and Qwen3.5-27B often match or exceed larger models. MoE\nvariants (35B-A3B, 122B-A10B) consistently lag their dense counterparts."
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "generation (T =0). Figure 3 presents the results: task accuracy (top row) and followup rate\n(bottom row) show distinctive behavior and remain largely uncorrelated.\ngpt-oss models produce 17-21% follow-ups on GPQA Diamond despite lower answer\naccuracy (61-67%) than GLM-4.7 (66.4% accuracy, 1.5% follow-up) or Qwen3.5-397B (86.1%\naccuracy, 0.5% follow-up). Qwen3.5-397B-A17B follow up rate is strongest on IFBench (9.7%)\nbut weak on GPQA. Thus, different families develop interaction awareness on different\ninput contexts, and follow-up quality is not a monotone function of answer quality. This\nprovides deeper evidence for why LLMs struggle when repurposed as user proxies for self-\nplay or multi-agent interaction (Shekkizhar et al., 2025; Zhou et al., 2026): the disconnect is\nrooted in absent interaction awareness, not insufficient task competence. Appendix C gives\nrepresentative traces for dif"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "3.2                              Within-Family Analysis: Model Size Does Not Predict Interaction Awareness\n\n3.3                              Interaction Awareness Is Latent in the Distribution"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "The cross-family results above use deterministic generation (T =0), which probes only\nthe model’s most likely user continuation. A natural question is whether the near-zero\nfollow-up rates reflect a genuine absence of interaction awareness or whether the capability\nexists in the distribution but is suppressed at the mode. We run a temperature sweep\n(T ∈ {0, 0.3, 0.7, 1.0}) on six representative models across GSM8K, GPQA Diamond, and\nIFBench (Figure 1, right).\nThe results reveal a clear separation between model families. Qwen3.5 and GLM show\nstrong temperature scaling: Qwen3.5-27B rises from 0% to 22% on GSM8K, from 1.5% to\n35.9% on GPQA Diamond, and from 1% to 30.7% on IFBench. GLM-4.7 shows a similar\npattern, reaching 15.2% on GSM8K and 35.4% on GPQA Diamond at T =1.0. In contrast,\ngpt-oss models demonstrate mixed response to sampling: gpt-oss-120b remains at 0.1%\non GSM8K even at T =1."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "6\n\fSalesforce AI Research\n\nQwen3.5-9B            genuine follow-up            Qwen3.5-27B         prompt restatement\n      [Assistant] ... The Corey-Chaykovsky reagent       [Assistant] ... The reagent contributes 1\n      reacts with ketones to form epoxides ...           carbon atom (the methylene group) ...\n      The final product has 11 carbon atoms.             Total carbons in Product 3: 10 + 1 = 11.\n      Answer: D                                          Answer: D"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "[User turn]                                        [User turn]\n      In the previous turn, you identified the           Answer the following multiple-choice\n      reagent as dimethylsulfoxonium methylide           question. Keep the explanation concise.\n      (Corey-Chaykovsky reagent) and concluded           The last line of your response must be\n      that it adds a methylene group to the              exactly of the form Answer: <letter>\n      ketone, resulting in an epoxide with 11            where <letter> is A, B, C, or D.\n      carbons. However, the reaction conditions\n      specified \"in DMSO at elevated temperature\".       Question: trans-cinnamaldehyde was treated\n      Let's re-evaluate the reagent name ...             with methylmagnesium bromide ..."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Figure 5: Same question, same correct answer, different interaction awareness. Both mod-\nels correctly answer a GPQA chemistry question (Answer: D). Left: Qwen3.5-9B generates a\nuser turn that critically engages with the assistant’s reasoning about the Corey-Chaykovsky\nreagent and reaction conditions. Right: Qwen3.5-27B, a 3× larger model, restates the original\nprompt verbatim, an inability to generate realistic user turn after an assistant response."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "qualitatively different training outcome: these models have not learned interaction-aware\ncontinuations for these contexts at any probability. This distinction between latent and\ngenuinely-absent interaction awareness motivates the next section on Qwen3.5 analysis.\nTo disentangle model size from training recipe, we examine the full Qwen3.5 family (0.8B\nto 397B-A17B) under both deterministic and sampled generation. At T =0, task accuracy\nscales reliably: GSM8K climbs from 41.6% (0.8B) to 96.8% (397B-A17B), GPQA Diamond\nfrom 23.6% to 86.1%, and IFBench from 21.6% to 51.6%2 . Follow-up rates, however, stay\nnear zero: five of eight models produce 0.0% on GSM8K (Table 3). Results on IFEval and\nGPQA Main are consistent (Appendix A).\nThe full temperature sweep (Figure 4) reveals that this non-scaling persists even when\ninteraction awareness is surfaced through sampling. On IFBench at T =1.0, th"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "3.4    Controlled Perturbations Confirm the Metric\n\nBoth perturbations move the metric in the expected direction for models that attend to\nassistant-turn content, confirming that the genuine-followup rate measures something real\nabout interaction awareness.\n\n2Accuracy results on GSM8K was computed while we make use of reported performance in\nGPQA-Diamond and IFBench from artificialanalysis.ai\n\n7\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "GSM8K         GPQA Dia.                                    IFBench\n      Model          Full   Trunc.   Full   Trunc.       Model          Base   +Question     % Changed\n      Qwen3.5-27B     0.0      0.0    1.0      1.0       Qwen3.5-27B     1.0         0.0           6.3\n      Qwen3.5-397B    0.8      4.9    2.0      2.0       Qwen3.5-397B    7.7         4.7          40.3\n      gpt-oss-20b     1.2      5.8    1.0     18.7       gpt-oss-20b     1.0         6.0          97.3\n      gpt-oss-120b    0.0     24.2   20.7     65.7       gpt-oss-120b    1.3        25.7          99.0\n      GLM-4.7         1.0     55.0    2.0     39.4       GLM-4.7         4.7         5.0          99.0"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Table 1: Controlled perturbations confirm the metric. Genuine-followup rate (%) under\ntwo perturbations. Left: Truncating the assistant response increases follow-up for non-\nQwen models, confirming sensitivity to assistant-turn content. Right: Appending a generic\nquestion (e.g., “What do you think?”) to the assistant response. Base: unperturbed follow-\nup rate; +Question: follow-up rate after appending the question; % Changed: fraction of\nuser turns whose text differs from the unperturbed generation, measuring whether the\nmodel attends to the perturbation at all. gpt-oss models respond most strongly to both\nperturbations; Qwen models are largely insensitive. Additional results in Appendix A."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Truncation. Table 1 (Left) shows the effect of truncating assistant responses. On GSM8K,\nwhere unperturbed follow-up is near zero, truncation sharply increases genuine follow-up\nfor GLM-4.7 (1.0% → 55.0%) and gpt-oss-120b (0.0% → 24.2%). The effect extends to GPQA\nDiamond: GLM-4.7 rises from 2.0% to 39.4%, and gpt-oss-120b from 20.7% to 65.7%. Qwen\nmodels are notably less sensitive: Qwen3.5-27B shows no change on GSM8K and remains\nflat on GPQA Diamond. This family-level asymmetry suggests qualitatively different failure\nmodes: Qwen defaults to prompt restatement regardless of assistant content, while gpt-oss\nand GLM attend to the assistant turn even when their continuation is not a follow-up."
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Explicit question. Table 1 (Right) shows the complementary perturbation on the\ninstruction-following datasets. gpt-oss-120b shows the strongest response: genuine\nfollow-up jumps from 1.3% to 25.7% on IFBench, with 99.0% of user turns changing\ntext. gpt-oss-20b follows at smaller magnitude (1.0% → 6.0%). GLM-4.7 changes 99%\nof its user turns but genuine follow-up barely increases (4.7% → 5.0% on IFBench).\nQwen models again show low sensitivity: Qwen3.5-27B changes only 6.3% of turns, and\nQwen3.5-397B-A17B decreases in genuine follow-up (7.7% → 4.7% on IFBench), suggesting\nthe perturbation disrupts its existing follow-up behavior rather than eliciting new responses.\nAcross both perturbations, gpt-oss models are the most responsive: they attend to assistant-\nturn content and convert that attention into genuine follow-ups. GLM-4.7 attends strongly\n(high changed rates) but does not proportion"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "3.5    Post-Training Can Move Interaction Awareness"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "The preceding results establish that interaction awareness is largely absent from current\nmodels under default generation. A natural question is whether it can be moved through\ntraining. We apply collaboration-oriented post-training to Qwen3.5-2B (§2.3) and find that\nboth SFT and RL raise the genuine-followup rate (Table 2), despite no overlap between the\ntraining data and the evaluation datasets in our results.\nSupervised finetuning (SFT) produces large gains: follow-up rises from 1.0-2.0% to 46-48%\non verifiable benchmarks and from 36.7% to 54.4% on held-out HealthBench, at the cost of\nGSM8K accuracy (62.9% → 40.3%), likely due to forgetting/overfitting to ≈ 5k multi-turn\nexamples. The reinforcement learning (RL) variant avoids this tradeoff, preserving task\naccuracy (67.4%) while giving moderate follow-up gains across all datasets. Recall that\nneither intervention explicitly trains fo"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "8\n\fSalesforce AI Research\n\nGSM8K      Genuine Follow-up (%)          Held-out\n                   Model     Acc.   IFBench   GPQA-Diamond      HealthBench     Coval\n                   Base      62.9       1.0               2.0          36.7      19.4\n                   SFT       40.3      48.0              46.0          54.4      45.2\n                   RL        67.4      10.0               9.1          46.5      29.0\n\nTable 2: Post-training on Qwen3.5-2B. GSM8K accuracy for reference. Followup rates on\nIFBench, GPQA Diamond and held-out conversational datasets (HealthBench, Coval).\n\nThese preliminary results suggest the follow-up eval metric can serve as an indicator of\ncollaboration quality and post-training design on this dimension.\n\n4   Discussion and Conclusion"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "This work formalizes user-turn generation as a probe of interaction awareness in LLMs.\nAcross 11 open-weight models spanning Qwen3.5, gpt-oss families and GLM-4.7, evaluated\non 5 benchmark datasets, we demonstrate that interaction awareness is largely decoupled\nfrom task performance. Within Qwen3.5, accuracy scales from 41.6% to 96.8% on GSM8K\nwhile grounded follow-up rate stays near zero at every scale. This gap is not uniform:\ngpt-oss shows relatively higher follow up on GPQA, Qwen3.5-397B-A17B on IFBench, and\nQwen3.5-9B as a within-family outlier. Controlled perturbations and collaboration-oriented\npost-training both move the metric in interpretable directions, confirming that interaction\nawareness is latent, measurable, and can be increased through targeted training. Both\nSFT and RL on Qwen3.5-2B raise follow-up rates across datasets despite neither explicitly\ntraining for user-turn "
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "Author Contributions\n\n9\n\fSalesforce AI Research\n\nReferences\nChinmaya Andukuri, Jan-Philipp Fränken, Tobias Gerstenberg, and Noah D. Goodman.\n Star-gate: Teaching language models to ask clarifying questions. CoRR, abs/2403.19154,\n 2024.\nRahul K. Arora, Jason Wei, Rebecca Soskin Hicks, Preston Bowman, Joaquin Quiñonero-\n  Candela, Foivos Tsimpourlas, Michael Sharman, Meghan Shah, Andrea Vallone, Alex\n  Beutel, Johannes Heidecke, and Karan Singhal. Healthbench: Evaluating large language\n  models towards improved human health. arXiv preprint arXiv:2505.08775, 2025."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Victor Barres, Honghua Dong, Soham Ray, Xujie Si, and Karthik Narasimhan. τ 2 -bench:\n  Evaluating conversational agents in a dual-control environment, 2025.\nThomas Kleine Buening, Jonas Hübotter, Barna Pásztor, Idan Shenfeld, Giorgia Ramponi,\n  and Andreas Krause. Aligning language models from user interactions. arXiv preprint\n  arXiv:2603.12273, 2026.\nKarl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser,\n  Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, et al. Training verifiers\n  to solve math word problems. arXiv preprint arXiv:2110.14168, 2021.\nYang Deng, Wenqiang Lei, Wai Lam, and Tat-Seng Chua. A survey on proactive dialogue\n  systems: Problems, methods, and prospects. In IJCAI, 2023.\nYao Dou, Michel Galley, Baolin Peng, Chris Kedzie, Weixin Cai, Alan Ritter, Chris Quirk, Wei\n  Xu, and Jianfeng Gao. Simulatorarena: Are user simula"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "10\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "Hyunwoo Kim, Melanie Sclar, Xuhui Zhou, Ronan Le Bras, Gunhee Kim, Yejin Choi, and\n Maarten Sap. FANToM: A benchmark for stress-testing machine theory of mind in\n interactions. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language\n Processing, pp. 14397–14413, 2023.\nZiqiao Ma, Jacob Sansom, Run Peng, and Joyce Chai. Towards a holistic landscape of situated\n  theory of mind in large language models. In Findings of the Association for Computational\n  Linguistics: EMNLP 2023, pp. 1011–1031, 2023.\nRuaridh Mon-Williams, Max Taylor-Davies, Elizabeth Mieczkowski, Natalia Vélez, Neil R.\n  Bramley, Yanwei Wang, Thomas L. Griffiths, and Christopher G. Lucas. Partner modelling\n  emerges in recurrent agents (but only when it matters). arXiv preprint arXiv:2505.17323,\n  2025.\nTarek Naous, Philippe Laban, Wei Xu, and Jennifer Neville.      Flipping the di-\n  alogue: Training "
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "11\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "Shirley Wu, Michel Galley, Baolin Peng, Hao Cheng, Gavin Li, Yao Dou, Weixin Cai, James\n  Zou, Jure Leskovec, and Jianfeng Gao. Collabllm: From passive responders to active\n  collaborators. In International Conference on Machine Learning, pp. 67260–67283. PMLR,\n  2025.\nCanwen Xu, Daya Guo, Nan Duan, and Julian McAuley. Baize: An open-source chat model\n  with parameter-efficient tuning on self-chat data. In Proceedings of the 2023 Conference on\n  Empirical Methods in Natural Language Processing, pp. 6268–6278, 2023.\nAohan Zeng, Xin Lv, Qinkai Zheng, Zhenyu Hou, Bin Chen, Chengxing Xie, Cunxiang\n Wang, Da Yin, Hao Zeng, Jiajie Zhang, et al. Glm-4.5: Agentic, reasoning, and coding (arc)\n foundation models. arXiv preprint arXiv:2508.06471, 2025.\nLianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao\n  Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. Judging l"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "12\n\fSalesforce AI Research\n\nA    Full Results Tables\n\nTables 3 and 5 report the complete results across all five benchmark datasets, complementing\nthe three-dataset figures in the main text. IFEval and GPQA Main follow the same patterns\nas IFBench and GPQA Diamond respectively. Table 4 reports the full Qwen3.5 temperature\nsweep data underlying Figure 4."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "Model                   GSM8K Acc.       GSM8K        IFEval    IFBench      GPQA Main      GPQA Dia.\n Qwen3.5-0.8B                    41.6          1.0        0.0          3.0             0.0           0.5\n Qwen3.5-2B                      62.2          0.0        0.6          0.7             0.0           0.0\n Qwen3.5-4B                      86.5          0.0        1.1          1.0             0.0           0.5\n Qwen3.5-9B                      89.5          0.5        5.4          2.0            14.7          13.1\n Qwen3.5-27B                     95.8          0.0        1.1          1.0             1.8           1.5\n Qwen3.5-35B-A3B                 95.8          0.0        0.7          0.3             0.0           0.0\n Qwen3.5-122B-A10B               95.9          0.0        0.6          0.7             0.0           0.0\n Qwen3.5-397B-A17B               96.8          0.8       10.5  "
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Table 3: Qwen3.5 scaling: GSM8K answer accuracy (%) and genuine-followup rate (%)\nacross all five benchmark datasets."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "GSM8K                      GPQA Diamond                       IFBench\n Model                   T =0   0.3      0.7    1.0    T =0      0.3    0.7     1.0   T =0    0.3    0.7    1.0\n Qwen3.5-0.8B             1.0   2.7      6.6   13.7      0.5    24.2   32.3    16.2    3.0    3.3   11.3   27.7\n Qwen3.5-2B               0.0   0.0      1.7    4.7      0.0     1.5    0.0     7.6    0.7    2.0   13.3   21.7\n Qwen3.5-4B               0.0   0.1      5.1    9.0      0.5     0.0    4.5     8.6    1.0    1.0   18.0   25.0\n Qwen3.5-9B               0.5   0.5      3.2    7.7     13.1    15.2   16.2    19.7    2.0    3.3   10.0   36.0\n Qwen3.5-27B              0.0   0.1      4.5   22.0      1.5     7.1   17.2    35.9    1.0    1.3   11.7   30.7\n Qwen3.5-35B-A3B          0.0   0.1      1.0    5.5      0.0     0.0    1.0     2.5    0.3    0.3    6.0   13.3\n Qwen3.5-122B-A10B        0.0   0.0      0.2  "
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Table 4: Full Qwen3.5 temperature sweep: genuine-followup rate (%) across all eight models\nand four temperatures on three datasets.\n\nB   Failure Mode Taxonomy\n\nThe LLM judge assigns one of eight primary labels to each generated user turn (§2.2).\nTable 6 reports the distribution of these labels across model families on the self-generated\nbenchmark datasets (GSM8K, IFEval, IFBench, GPQA Main, GPQA Diamond). The three\nfamilies exhibit qualitatively distinct failure profiles.\nQwen3.5 defaults to previous turn restate (78.5%): the model regenerates the original\nprompt verbatim under the user role, as if starting a new conversation. This pattern is\nconsistent across model sizes, with Qwen3.5-27B and Qwen3.5-35B-A3B reaching nearly 100%"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Model                   GSM8K Acc.       GSM8K        IFEval    IFBench      GPQA Main      GPQA Dia.\n Qwen3.5-9B                      89.5          0.5        5.4          2.0            14.7          13.1\n Qwen3.5-27B                     95.8          0.0        1.1          1.0             1.8           1.5\n Qwen3.5-397B-A17B               96.8          0.8       10.5          9.7             1.3           0.5\n gpt-oss-20b                     93.9          1.4        3.3          0.0            14.1          20.7\n gpt-oss-120b                    95.8          0.0        3.7          3.3            17.4          16.7\n GLM-4.7                         95.3          1.2        3.0          1.3             4.2           1.5\n\nTable 5: Cross-family genuine-followup rate (%) on the self-generated benchmark. Includes\nQwen3.5-9B as a within-family outlier. GSM8K accuracy shown for reference."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "13\n\fSalesforce AI Research\n\nPrimary Label              Qwen3.5 (%)        gpt-oss (%)   GLM-4.7 (%)\n              previous turn restate                  78.5          11.9          20.2\n              assistant turn restate                  0.0          70.2          23.0\n              meta planning                           0.4           6.8          43.0\n              degenerate short                       16.6           5.1           0.1\n              malformed artifact                      0.8           1.0          10.8\n              new task prompt                         1.4           0.8           0.9\n              plausible followup                      2.1           4.2           1.9\n              other                                   0.0           0.0           0.0\n              N                                  5,612            5,612         2,806"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Table 6: Failure mode distribution across model families on the self-generated benchmark (all\nfive datasets pooled). Qwen3.5 is dominated by prompt restatement, gpt-oss by assistant-\nturn restatement (copying the assistant response under the user role), and GLM-4.7 by\nmeta-planning (continuing to plan as the assistant despite the user-role header). Each\nfamily’s dominant failure mode accounts for 43–78% of all generations, indicating that\ninteraction awareness failures are systematic and family-specific rather than random."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "restatement on GSM8K. The second most common mode is degenerate short (16.6%),\nparticularly for Qwen3.5-397B-A17B, which frequently emits single tokens or empty strings.\ngpt-oss shows a fundamentally different failure: assistant turn restate (70.2%). Rather\nthan restating the prompt, gpt-oss models copy or paraphrase the assistant response under\nthe user role, an identity failure where the model continues in its assistant voice despite\nthe role-header change. This is accompanied by moderate meta planning (6.8%), where the\nmodel generates planning text (e.g., “Let me think about how to approach this. . . ”) under\nthe user role.\nGLM-4.7 is dominated by meta planning (43.0%) and assistant turn restate (23.0%), with\na notable malformed artifact rate (10.8%). The high meta-planning rate suggests that\nGLM-4.7 attends to the role-header change (unlike Qwen’s prompt restatement) but fails to\ncon"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "C    Representative Generation Examples\n\nWe present one dominant failure mode and one genuine follow-up per model family,\nillustrating the distinct failure profiles described in Appendix B. Each example abridges the\noriginal prompt and shows the assistant excerpt and generated user turn.\n\nQwen3.5-27B: prompt restatement (GSM8K).\n\nTask (abridged). “John arm wrestles 20 people. He beats 80%. How many did he\n        lose to?”\n        Assistant excerpt. “Step 1: 80% of 20 = 16 wins. Step 2: 20 − 16 = 4 losses.\n        Answer: 4”\n        Generated user turn. Verbatim copy of the original prompt, character-for-character.\n        Judge. previous turn restate; nongenuine.\n\nThis is the modal Qwen failure (78.5% of all generations). The model ignores the assistant\nresponse entirely and restarts the conversation. On GSM8K, Qwen3.5-27B produces 100%\nrestatement.\n\n14\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Qwen3.5-9B: grounded challenge (GPQA Diamond).\n        Task (abridged). Astrophysics question about relativistic travel from the Large\n        Magellanic Cloud.\n        Assistant excerpt. “. . . 22 + 81.6 = 103.6 years. Since 103.6 ¡ 150, the astronaut\n        survives . . . Answer: C”\n        Generated user turn. “In the previous question, the distance from the Large\n        Magellanic Cloud to Earth was not explicitly stated in the problem description.\n        How did you determine the distance used in your calculation?”\n        Judge. plausible followup; genuine.\n\nA natural clarification request grounded in a specific gap in the assistant’s reasoning.\nQwen3.5-9B produces 13.1% genuine follow-ups on GPQA Diamond versus near-zero for\nmost other Qwen sizes."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "gpt-oss-120b: internal verification leak (GSM8K).\n        Task (abridged). “A robe takes 2 bolts of blue fiber and half that much white fiber.\n        How many bolts in total?”\n        Assistant excerpt. “Blue fiber = 2 bolts. White fiber = half of 2 = 1 bolt. Total = 3.\n        Answer: 3”\n        Generated user turn. <|channel|>analysis<|message|> “We need to ensure final\n        answer line exactly ‘Answer: ¡final answer¿’ with no extra spaces . . . The solution\n        must be at most 6 short steps, we have 3 steps, fine . . . ”\n        Judge. assistant turn restate; nongenuine.\n\nThe gpt-oss dominant failure (70.2%): the model emits internal chain-of-thought verification\nunder the user role, complete with a <|channel|>analysis prefix that is clearly model\nscaffolding, not a human follow-up."
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "gpt-oss-120b: grounded continuation (GPQA Diamond).\n        Task (abridged). Chemistry question about optically active compounds.\n        Assistant excerpt. “We need to count chiral compounds. Evaluate each: (Z)-1-\n        chloro-2-methylbut-1-ene . . . ”\n        Generated user turn. <|channel|>analysis<|message|> “We need to decide if\n        (1s,3s,5s)-cyclohexane-1,3,5-triol is chiral. Let’s draw chair conformation . . . The\n        stereochemistry S at each carbon defines orientation . . . ”\n        Judge. plausible followup; genuine.\n\nDespite retaining the <|channel|>analysis framing, this example drills into a specific sub-\nproblem that the assistant left partially unresolved, a genuine continuation rather than mere\nverification."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "GLM-4.7: planning as user (IFEval).\n        Task (abridged). “Write a resume for a fresh high school graduate with at least 12\n        placeholders in square brackets.”\n        Assistant excerpt. “[Name] [Address] [Phone Number] [Email Address] OBJEC-\n        TIVE Motivated and reliable high school graduate . . . ”\n        Generated user turn. “Here’s a thinking process that leads to the suggested resume:\n        1. Analyze the Request: Target Audience: Fresh high school graduate. Constraint:\n        Must include at least 12 placeholders . . . 2. Determine the Structure . . . ”\n        Judge. meta planning; nongenuine.\n\nGLM’s dominant failure (43%): the model generates assistant-style reasoning under the user\nrole, beginning with “Here’s a thinking process.” It attends to the role-header change but\nfails to adopt a user perspective."
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "GLM-4.7: natural revision request (IFEval).\n        Task (abridged). “Write two different cover letters for a software engineer role at\n        Google—a concise version and a long version.”\n\n15\n\fSalesforce AI Research\n\nSlice / Judge Pair                N    Gen. Agr.    Gen. κ    Label Agr.    Label κ\n        Full panel / nano vs mini      7815          81.7     0.480         48.0      0.396\n        Random / nano vs mini          1965          82.5     0.477         48.6      0.406\n        Balanced / nano vs mini         965          72.8     0.373         47.0      0.379\n        Balanced / nano vs gpt-5.4      965          73.2     0.366         44.7      0.358\n        Balanced / mini vs gpt-5.4      965          90.9     0.722         77.3      0.721"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Table 7: Same-family GPT-5.4 judge validation. Agreement rates are percentages; κ val-\nues are unitless. The full-panel row reruns the entire real-follow-up benchmark with\ngpt-5.4-mini; the random slice is prevalence-preserving, while the balanced slice is a hard-\ncase agreement slice.\n\nAssistant excerpt. “Of course! Here are two cover letters tailored for a Software\n        Engineer role at Google: a concise version and a more detailed, long version . . . ”\n        Generated user turn. “The concise version is too long. Please shorten it further.”\n        Judge. plausible followup; genuine.\n\nA terse, grounded critique: the user evaluated the output and requested a specific revision.\nGLM produces such genuine follow-ups in roughly 2–3% of cases."
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "These examples illustrate the family-specific failure profiles from Table 6: Qwen restates\nthe prompt, gpt-oss leaks internal verification, and GLM emits planning text. Genuine\nfollow-ups, when they occur, are grounded in specific content of the assistant response, such\nas, clarification requests, factual challenges, or revision instructions.\n\nD     LLM Judge Validation and Human Annotation\n\nTo validate the reliability of our LLM-based evaluation system, we conducted both same-\nfamily judge comparisons and a blinded manual review study with human annotators.\nThis section details the judge selection rationale, cross-judge agreement, human annotation\nprotocol, and correlation analysis.\n\nD.1   Same-Family Judge Validation"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "Paper-facing tables in this draft use exact-match preprocessing followed by a gpt-5.4-mini\njudge. We switched from the earlier gpt-5.4-nano-2026-03-17 operational judge because\nsame-family judge validation and two blinded human packets both favored mini. The\nrelevant question here is therefore not cross-family agreement, but how much the older\nnano results contract under mini and whether mini tracks full gpt-5.4. We report three\nsame-family checks. First, we rerun the entire real-follow-up panel with gpt-5.4-mini.\nSecond, we keep a prevalence-preserving random slice with all Coval examples plus 300\nrandom HealthBench examples per model. Third, we keep a balanced hard-case slice with\nall Coval examples plus 100 HealthBench examples per model, balanced by the nano judge’s\ngenuine-versus-nongenuine decision.\nTable 7 gives a more useful signal than a cross-family comparison would. On the ful"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "16\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "followup agreement with κ = 0.477, plus moderate file-level rate correlation (Pearson\nr = 0.642, Spearman ρ = 0.685). But the balanced hard-case slice is harsher. There,\ngpt-5.4-nano-2026-03-17 agrees with gpt-5.4-mini and gpt-5.4 on only about 73% of\ngenuine-followup decisions, with κ ≈ 0.37 in both cases. The direction of disagreement\nis systematic there as well: nano is looser on the hard slice, marking 37.9% of examples\nas genuine follow-up, compared with 22.4% for mini and 18.1% for gpt-5.4. By con-\ntrast, gpt-5.4-mini and gpt-5.4 agree strongly on the same balanced slice: 90.9% genuine-\nfollowup agreement with κ = 0.722, and 77.3% primary-label agreement with κ = 0.721.\nThis does not justify claiming that nano is interchangeable with the larger judges on chal-\nlenging borderline cases. It does justify the switch made in this draft: paper-facing tables use\nmini, while the older nano"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "D.2    Manual Review Methodology\n\nTo validate the reliability of our LLM-based evaluation system beyond judge-to-judge\ncomparison, we conducted a blinded manual review study with human annotators."
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "Annotation protocol. We constructed multiple 100-example annotation packets sampled\nfrom the full evaluation panel. Each packet was drawn as a random sample from the mix\nof all datasets used in the paper. We constructed two types of packets: hard-case packets\nbuilt from nano versus gpt-5.4 disagreements plus judge-agree genuine and judge-agree\nnongenuine examples, and natural-prevalence packets sampled proportionally from the full\nnano versus mini panel. Packets were distributed to peer AI researchers with expertise in\nLLMs; we obtained 5 completed annotation returns.\nEach conversation was presented through a standardized annotation interface (Figure 6)\nshowing the conversation context and the generated user turn. Annotators did not see\nthe model identity, dataset metadata, reference user turn, or any judge label or rationale,\nensuring that human labels were not biased by automated class"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "Correlation analysis. We report human-vs-judge agreement at the binary genuine-\nfollowup level, as this is the primary metric used throughout the paper. We did not compute\ninter-annotator agreement, as our focus was on coverage across packets and correlation\nwith the LLM judge rather than cross-annotator reliability.\nOn the hard packet, gpt-5.4-mini aligned best with blinded human annotators: 87.0%\ngenuine-followup agreement with κ = 0.688, versus 67.0% / 0.255 for nano and 77.0%\n/ 0.481 for full gpt-5.4. On the natural-prevalence packet, mini again beats nano: 94.0%\ngenuine-followup agreement with κ = 0.766, versus 79.0% / 0.354. Pooled across both\nblinded packets, mini reaches 90.5% genuine-followup agreement with κ = 0.726, versus\n73.0% / 0.311 for nano. Primary-label agreement remains materially lower (58.5% with\nκ = 0.481 for pooled mini), so the human evidence supports the binary j"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "E     Related Work\n\nTheory of mind in LLMs. Evaluating whether LLMs can attribute beliefs and intentions\nto others has produced a consistent finding: models pass explicit belief-attribution probes\nbut fail when the same reasoning must be expressed behaviorally (Sap et al., 2022; Kim\net al., 2023; Ma et al., 2023). Gu et al. (2024) make this precise: frontier models achieve\n> 95% on mental-state inference yet drop below 50% on behavior prediction and below\n\n17\n\fSalesforce AI Research\n\nFigure 6: Manual review interface. Screenshot of the annotation tool used for LLM judge\nvalidation. The interface presents the conversation context and the generated user turn to\nannotate, along with the primary-label inventory and a binary genuine-followup decision.\nModel identity, dataset metadata, and judge labels are hidden from annotators."
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "20% on judgment. This illustrates “knowing versus applying” dissociation. Our accuracy\nvs followup gap is structurally analogous, but where SimpleToM probes reasoning about\nanother agent’s mental state (third-person inference), we probe whether a model encodes\nthe consequence of its own response (first-person behavioral readout). Both converge on\nthe same conclusion: solving the immediate task does not guarantee modeling what comes\nnext."
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "User simulation. User simulation has a long history in dialogue systems (Schatzmann\net al., 2007; Shi et al., 2019), and same-model self-play has been used for data generation and\nevaluation (Ghandeharioun et al., 2019; Xu et al., 2023). Recent work builds dedicated user\nproxies: Naous et al. (2026) train user models by flipping dialogue turns, Dou et al. (2025)\nbenchmark simulator reliability, Hathidara et al. (2026) evaluate human-likeness, and Zhou\net al. (2026) show that current simulators are overly cooperative and inflate agent scores.\n\n18\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "Our goal is different: we do not build a reusable user proxy but use user-turn generation as\na probe of the assistant model’s own weights. A high-quality external simulator does not\nimply that the assistant itself possesses interaction awareness. The failure modes we catalog\n(prompt restatement, meta-planning, identity leakage) characterize the same behaviors\nZhou et al. (2026) observe when assistant models are repurposed as user proxies without\ndedicated training."
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Multi-turn optimization and interaction-aware training. Standard post-training opti-\nmizes the current response via single-turn preferences or rewards (Ouyang et al., 2022;\nRafailov et al., 2023). Recent work extends the training signal beyond the current turn: Wu\net al. (2025) optimize for future collaboration quality via forward-sampled multiturn rollouts,\nBuening et al. (2026) use post-action user states as supervision, ArCHer (Zhou et al., 2024)\napplies hierarchical multi-turn RL, and Wang et al. (2026) frame every agent interaction as\nproducing a “next-state signal” that encodes evaluative and directive information for online\nlearning. In multi-agent RL, Mon-Williams et al. (2025) show that partner models emerge in\nrecurrent agents but only when the environment provides influence over partner behavior,\na conditional emergence paralleled by our perturbation results (§3.4), where inte"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "Interactive benchmarks. τ 2 -Bench (Barres et al., 2025), and CRMArena (Huang et al.,\n2025) evaluate agents in tool-mediated settings with simulated users and task-level rewards,\nembedding consequence modeling in richer environments. Proactive dialogue work (Deng\net al., 2023; Andukuri et al., 2024; Faltings et al., 2023) similarly argues that agents must\nmodel the interaction trajectory. Our probe is narrower and this simplicity enables attribu-\ntion of differences to model weights and training rather than environment confounds. A\nmodel that fails our probe lacks the interaction awareness needed for the richer settings\nthese benchmarks target.\n\nF   Continued Discussion"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "A natural concern is whether the near-zero follow-up rates on benchmark datasets reflect\nan absence of interaction awareness or are better explained by artifacts of the training\ndistribution and chat template design. We consider three alternative explanations and\ndiscuss the evidence for and against each."
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "Single-turn training data. Models post-trained predominantly on single-turn (query,\nresponse) pairs will have learned that the most likely token sequence under the user role\nis a new query, not a follow-up to the preceding response. Under this explanation, the\nlow follow-up rate is a distributional artifact rather than evidence about what the model’s\nrepresentations encode. We view this as complementary to our framing: if the training\ndata did not include multi-turn continuations, then the model’s training did not instill\ninteraction awareness, which is precisely the gap we identify. The post-training results (§3.5)\ndirectly test this: collaboration-oriented training on multi-turn data raises follow-up rates,\nconfirming that the training distribution is a causal factor."
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "Chat template conventions. The <|im end|> token after the assistant turn may function\nas a strong “conversation complete” signal in some training pipelines, biasing the model\ntoward starting a new exchange rather than continuing the current one. If this were the\nsole explanation, we would expect all models using the same chat template to show similar\nfollow-up rates. However, within the Qwen3.5 family (which shares a template), follow-up\nrates vary from 0.0% to 13.1% across model sizes and datasets. Cross-family, gpt-oss models\n\n19\n\fSalesforce AI Research"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "produce substantially higher follow-up than Qwen models of comparable or larger size\non GPQA, despite all models using role-delimited chat formats. The perturbation results\nfurther argue against a purely template-level explanation: truncation and explicit-question\nperturbations change gpt-oss and GLM follow-up rates substantially while leaving Qwen\nlargely unaffected (§3.4)."
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "Role-header semantics. Different model families may have been trained with different\nconventions for what follows a user-role header (a new independent query versus a con-\ntinuation of the same conversation). We do not have access to the post-training data for\nany of the evaluated models, so we cannot rule this out entirely. However, we control for it\nindirectly through the held-out evaluation setting (§2.3), where the model generates a user\nturn given a real multi-turn conversation context. On HealthBench and Coval, follow-up\nrates are substantially higher (19–48%) than on benchmark datasets, suggesting that when\nthe conversational context is richer, even models with low benchmark follow-up rates can\nproduce grounded continuations. This is consistent with interaction awareness being latent\nbut context-dependent, rather than absent."
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Behavioral versus representational claims. We emphasize that our probe measures the\nmodel’s behavioral output under the user role, not its internal representations. A model\ncould in principle encode rich conversational structure internally while still producing\nrestatement as the modal continuation, if its training objective did not incentivize expressing\nthat structure under the user role. Representation-level analyses (e.g., probing internal\nactivations for next-turn content) would complement the behavioral probe we propose. Our\nclaims are therefore about what the model produces, conditioned on the experimental setup,\nrather than about the totality of what the model knows. We view this as a feature of the\nprobe rather than a limitation: deployment-relevant interaction awareness must ultimately\nmanifest in generated text, not only in latent representations.\n\nG    LLM Usage"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "For this paper, we made use of LLM tools for three specific purposes: (i) writing code, in\nparticular, for overseeing GPU runs and plotting results from jsonl and csv logs, (ii) review\nand polish writing, such as, making content concise, checking for statements and claims\nthat were not backed by results in the paper, and (iii) searching for references related to\na particular topic. In all scenarios, the responses generated by the LLM were verified for\naccuracy by the authors, to the best of their knowledge.\n\n20"
+    }
+  ]
+}
