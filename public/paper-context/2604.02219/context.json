@@ -1,0 +1,552 @@
+{
+  "arxivId": "2604.02219",
+  "paperTitle": "Many Wrongs Make a Right: Leveraging Biased Simulations Towards Unbiased Parameter Inference",
+  "abstract": "In particle physics, as in many areas of science, parameter inference relies on simulations to bridge the gap between theory and experiment. Recent developments in simulation-based inference have boosted the sensitivity of analyses; however, biases induced by simulation-data mismodeling can be difficult to control within standard inference pipelines. In this work, we propose a Template-Adapted Mixture Model to confront this problem in the context of signal fraction estimation: inferring the population proportion of signal in a mixed sample of signal and background, both of which follow arbitrarily complex distributions. We harness many biased simulations to perform data-driven estimates of each process distribution in the signal region, substantially reducing the bias on the signal fraction due to the domain shift between simulation and reality. We explore different methodological choices, including model selection, feature representation, and statistical method, and apply them to a Gaussian toy example and to a semi-realistic di-Higgs measurement. We find that the presented methods successfully leverage the biased simulations to provide estimates with well-calibrated uncertainties.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "In particle physics, as in many areas of science, parameter inference relies on simulations to bridge the gap between theory and experiment. Recent developments in simulation-based inference have boosted the sensitivity of analyses; however, biases induced by simulation-data mismodeling can be difficult to control within standard inference pipelines. In this work, we propose a Template-Adapted Mixture Model to confront this problem in the context of signal fraction estimation: inferring the population proportion of signal in a mixed sample of signal and background, both of which follow arbitrarily complex distributions. We harness many biased simulations to perform data-driven estimates of each process distribution in the signal region, substantially reducing the bias on the signal fraction due to the domain shift between simulation and reality. We explore different methodological choices, including model selection, feature representation, and statistical method, and apply them to a Gaussian toy example and to a semi-realistic di-Higgs measurement. We find that the presented methods successfully leverage the biased simulations to provide estimates with well-calibrated uncertainties."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "MIT-CTP/6024"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Many Wrongs Make a Right:\n                                                    Leveraging Biased Simulations Towards Unbiased Parameter Inference\n                                                         Ezequiel Alvarez,1, ∗ Sean Benevedes,2, 3, † Manuel Szewc,1, ‡ and Jesse Thaler2, 3, 4, 5, §\n                                                             1\n                                                             International Center for Advanced Studies (ICAS) and ICIFI-CONICET, UNSAM,\n                                                                      25 de Mayo y Francia, CP1650, San Martín, Buenos Aires, Argentina\n                                                       2\n                                                         Center for Theoretical Physics – a Leinweber Institute, Massachusetts Institute of Technology,\n                                                             "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "be difficult to control within standard inference pipelines. In this work, we propose a Template-\n                                                      Adapted Mixture Model to confront this problem in the context of signal fraction estimation:\n                                                      inferring the population proportion of signal in a mixed sample of signal and background, both\n                                                      of which follow arbitrarily complex distributions. We harness many biased simulations to perform\n                                                      data-driven estimates of each process distribution in the signal region, substantially reducing the\n                                                      bias on the signal fraction due to the domain shift between simulation and reality. We explore\n                                                    "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "CONTENTS                                          A. Frequentist Neural Estimation                  12\n                                                                                                                   B. Bayesian Topic Modeling                        14\n                                            I. Introduction                                           1\n                                                                                                              VI. Di-Higgs to Four B-jet Analysis                    16\n                                           II. Problem Statement and Solution Outline                 3           A. Frequentist Neural Estimation                   17\n                                               A. Signal Fraction Estimation with                                 B. Bayesian Topic Modeling                         19\n                     "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "∗ sequi@unsam.edu.ar                                                 In science, we construct and test models of reality. Of-\n                                         † seanmb@mit.edu                                                   ten, as in high-energy physics with its Standard Model,\n                                         ‡ mszewc@unsam.edu.ar\n                                                                                                            these models are parametrized and probabilistic: we per-\n                                         § jthaler@mit.edu\n                                                                                                            form an experiment to estimate the parameters of the\n\f                                                                                                                        2"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "model, generate predictions about the expected distribu-         Our approach is complementary to the traditional\ntion of observations, and then test these predictions in      treatment of systematic uncertainties via nuisance pa-\nother experiments. Statistical inference, through param-      rameters. The standard approach parametrizes known\neter estimation and hypothesis testing, is the toolkit that   sources of uncertainty and profiles or marginalizes over\nallows us to rigorously evaluate our models. However,         them during inference, which works when the TD lies\nthis statement of the scientific method relies on there be-   within the model family indexed by the nuisance param-\ning a model that we actually expect to describe the data      eters. This approach, however, does not address resid-\nin its entirety. Instead, we often find ourselves in situa-   ual misspecification beyond"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "these two pipelines to a toy model in Sec. V and to a              distinct models each of starget (x) and of btarget (x), de-\nsemi-realistic example based on di-Higgs simulations in            noted as sm (x) and bm (x) with m ∈ {1, . . . , M }.1 Fur-\nSec. VI. We discuss the results and the complementarity            thermore, we are interested in performing simulation-\nof the two proposed methods in Sec. VII, before conclud-           based inference (SBI), where these distributions them-\ning in Sec. VIII. Additional details can be found in the           selves are inferred from simulations which can be sam-\nappendices, including details on the uncertainty estima-           pled, but for which we do not know their functional forms\ntion of the frequentist method (App. A), a discussion of           a priori. We refer to these simulated distributions as\nthe penalties in the unbinned analy"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "ification, we will not take the true starget (x) and btarget (x)     final theory of physics from which all phenomena are emergent;\nto be known. Rather, we will suppose that we have M                  such a model could exist and not be wrong.\n\f                                                                                                                                    4"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "Signal                                                      Background\n                                                                                        b1(x)\n                                s2(x)                        s3(x)\n                                                                                                           b2(x)\n ptarget(x) = κtarget                     ̂\n                                         s(x)                        + (1 − κtarget)\n                                                starget(x)                                                           ̂\n                                                                                                                    b(x)\n                                                                                                       btarget(x)\n                                                                        "
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Target Dataset ⟹ κ ̂ s(x)\n                                                          infer\n                                                                               ̂\n                                                                 ̂ + (1 − κ)̂ b(x)"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "FIG. 1. A schematic representation of the domain shift problem which we seek to address. The left panel corresponds to the\nsignal and the right to the background. Each panel shows three MSDs and the corresponding TD. The black lines connecting\nthe MSDs represent the possibility that the MSDs may (or may not) be generated through variations of continuous nuisance\nparameters, but that we have in mind the scenario where there is no value of these nuisance parameters exactly corresponding\nto the real TDs. The blue arrows show how the MSDs are utilized to form the best-fit signal and background models, ŝ(x) and\nb̂(x), which are likely to be closer to the true signal and background distributions than any of the individual MSDs. The bottom\nline emphasizes that the best-fit signal fraction κ̂, signal model ŝ(x), and background model b̂(x) are simultaneously inferred\nfrom the TD. Black quantiti"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "B.    Template-Adapted Mixture Model                             coded in the MSDs) and reality (embodied by the TD),\n                                                                     a TAMM models the true signal and background distri-\n                                                                     butions as a combination of different component mod-\n   We are motivated by the case where none of the avail-\n                                                                     els, which are themselves derived from their respective\nable simulations constitute faithful models of the TDs\n                                                                     simulated distributions. This can be operationalized in\n(for any value of their nuisance parameters), such that\n                                                                     several ways; if we denote our signal and backgroun"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "These constraints can be satisfied by many functions F                       The exponential TAMM has a variety of appealing\nand G, and it would be infeasible to exhaustively explore                 features: it has a natural statistical interpretation as\nall possible choices. As such, we will restrict ourselves to              an exponential family with the log component models\nexploring two of the simplest possibilities.                              providing the sufficient statistic; it interpolates between\n                                                                          distributions rather than creating a mixture model of\n                                                                          them; and it allows for more extrapolation than the lin-\n                           1.   Linear TAMM                               ear TAMM because the wk and vk can take arbitrarily"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Strategy                   Mixture Model        Feature Rep.     Components          Statistical Method\n  Frequentist Neural Estimation Exponential: Eq. (6)             Unbinned      MSDs: Eq. (9)       M -estimation: Eq. (11)\n      Bayesian Topic Modeling              Linear: Eq. (5)        Binned       Topics: Eq. (19) Posterior Estimation: Eq. (24)\n\nTABLE I. The two complementary inference strategies for TAMM explored in this work. These strategies operationalize\ninference with the models introduced in Sec. II by choosing a feature representation, a set of component models, and a\nstatistical pipeline."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "each bin to a fixed desired level grows exponentially with         this is not an inherent limitation of the unbinned fea-\nD. This means that binned methods are not suitable                 ture representation, which can in principle handle high-\nfor direct use on high-dimensional feature spaces, and             dimensional and even variable-dimensional data.\none must instead reduce each event to a small number of\nsummary statistics, necessitating a further loss of infor-\nmation.                                                                     D.    Choice of Statistical Framework\n   This motivates the family of methods known as neural\nSBI (NSBI), which use neural networks (NNs) trained on                The other analysis choice that we must make is the\nthe simulated samples as unbinned estimates of functions           statistical framework with which we infer the parameter\n(e.g. den"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "III.   Frequentist Neural Estimation                             use quantified uncertainties in the density ratio, correla-\n                                                                       tions between the NNs and their weights do not need to\n   In this section, we build up Frequentist Neural                     be captured, so we use the same dataset to estimate the\nEstimation piece by piece. This strategy takes the                     wi fi weights wi as we use to draw bootstrap resamples\ncomponent models to simply be a subset of the MSDs                     and fit the ensemble constituent networks fi .\nthemselves, identifying sk (x) ≡ sk (x) and bk (x) ≡ bk (x).              In both of our experiments, we impose cuts on the\nFirst, in Sec. III A, we discuss our NRE methodology                   phase space and restrict our attention to a fiducial re-\nto estimate ratios of the "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "where the notation ⟨·⟩P denotes an expectation value                   in a breakdown of the asymptotics when the best-fit value\nwith respect to the distribution P , which we estimate                 for κ is close to the boundaries as the Hessian of the\nin practice with sample averages. This optimization ob-                loss becomes non-invertible, and LD prevents this break-\njective is the maximum likelihood classification (MLC)                 down by ensuring that there is residual dependence on\nloss first introduced in Ref. [21] and derived in Ref. [22]            the shape parameters even at the boundary. Unlike λN ,\nfor maximum likelihood estimation with normalization                   λD constitutes a genuine hyperparameter and will some-\nimposed via Lagrange multiplier, rather than at the level              what affect the result of the inference, but this effect is\nof the mo"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "not qualitatively: the estimator obtained by minimiz-            defined over a set of bins, and use posterior estimation\ning Eq. (11) is asymptotically unbiased, normally dis-           techniques to obtain the posterior distribution over κ and\ntributed, and has a variance that can be estimated from          the TDs, which are controlled by the parameters wk and\nthe data. The asymptotic covariance matrix C for the             vk specified in Eq. (5).\nparameter vector θd (of which one component is the sig-             First, in Sec. IV A, we discuss why Bayesian Topic\nnal fraction) can be estimated as:                               Modeling uses topic models as component models to\n                       ′               ′ ′\n                                                                 take advantage of a large number of MSDs without over-\n                   C dd = V dl Ull′ V l d ,    "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "where ϕ denotes the non-κ parameters and ϕ̂(κ) is the               In principle, one could use all generated MSDs as com-\nset of ϕ minimizing the loss for fixed κ, V and C are            ponent models to define a linear TAMM. However, this\nagain calculated as above, and as shown in App. A this           risks being too flexible, yielding very high variance es-\ntest statistic is asymptotically distributed as a χ21 vari-      timates of κ due to the model being able to effectively\nable for the true value of κ. These intervals then con-          overfit DTD . Although this is possible irrespective of the\nstitute an equivalent to the profile likelihood intervals        feature representation, binning increases this risk since\nfavored in high-energy physics, which typically enjoy su-        it effectively curtails the space of possible functions and\nperior coverage properties to Wald interva"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "IV.   Bayesian Topic Modeling\n\n7 We consider equal numbers of topics for signal and background\n In this section, we introduce the Bayesian Topic\nModeling method where we consider a linear TAMM                    modeling, but this is not necessary.\n\f                                                                                                                                   10"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "fixed topics as component models to infer the parameters           fractions as\nof interest in the target dataset using Eq. (24) below.                        s\n                                                                         ln p(θm , S|MSDs) = ln p(S)\n                                                                                                  M\n                                                                                                  X\n                                                                                                              s\n            B.   Construction of the Topics                                                   +         ln p(θm )\n                                                                                                  m=1\n                                                                                                  M\n   To lear"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "posterior distribution over the topics. That is, we define           bution over the topics, but using the MAP values speeds up the\nthe log-posterior of the topics and MSD-specific mixture             inference significantly.\n\f                                                                                                                              11"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "and the likelihood is                                                inferred parameters and distributions to the true values\n                                                                     of κ and the individual TDs. We leave the matter of\n                         J                   K\n                                            \u0012X                \u0013\n                         X                                           a data-driven method for selecting the number of topics\n  ln p(DTD |κ, w, v) =          NTDj ln κ           wk sMAP\n                                                        kj           (via a posterior predictive check or with a hierarchical\n                          j=1                 k=1\n                                                                     model) for future work.\n                                K         \u0013!\n                                           "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "We observe that the added prior uncertainty induces con-\n   To perform a two-stage Bayesian analysis using this               servative over-coverage in some cases, which is not an is-\nmethod, we then need to define both the number of topics             sue for searches but may yield loose exclusion limits [35].\nand the relevant priors over all parameters of interest.             However, this can be improved if a tighter (but still prin-\nRegarding the number of topics, we know that for the                 cipled) prior on κ is available.\ninference to be meaningful, we need enough topics to be\nable to effectively fit the data sampled from the MSDs.\nThis requirement can be parametrized as saying that,                           V.   GAUSSIAN TOY EXAMPLE\nwith M MSDs and J bins, we need at least r1 M (J − 1)\nparameters for some parameter r1 (with r1 < 1 to avoid                  As an initia"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Data distribution in fiducial region for Gaussian Case Study        For both Frequentist Neural Estimation and\n    4                                                                    Bayesian Topic Modeling, we benchmark the\n                                                        Signal\n                                                        Background       TAMMs by performing tests in which we sample many\n    3                                                                    datasets DTD , inferring the TAMM parameters for each\n    2                                                                    pseudo-experiment. We quantify whether the confidence\n                                                                         or credible intervals provide the correct coverage by lever-\n    1                                                                    aging our access to the tru"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "3\n                                                                               A.    Frequentist Neural Estimation\n    4\n        4       3      2      1      0      1       2      3         4\n                                                                            To estimate the signal fraction with Frequentist\n                                                                         Neural Estimation, we first select a subset of the\nFIG. 2. Gaussian case study TD dataset, showing 20% of the               MSDs to use as component models. In this case study,\nsample. 50k background (red) points are distributed accord-              we consider subsets of size K ∈ {2, 4, 6, 8, 10} each for\ning to N (µb , Cb ) and 5k signal (blue) points are distributed\n                                                                         the signal and background models. We then carry out\naccording t"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "(a) Gaussian Wald Intervals              (b) Gaussian Profile Intervals\n                             1.0\n                                     2          Nominal                        2             Nominal\n                                     4          Baseline                       4             Baseline\n                             0.8     6                                         6\n                                     8                                         8\n                                     10                                        10\n         Observed Coverage\n\n0.6\n\n0.4\n\n0.2\n\n0.0\n                               0.0   0.2     0.4      0.6      0.8   1.0       0.2      0.4      0.6          0.8       1.0\n                                           Expected Coverage                          Expected Coverage"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "FIG. 3. Coverage performance plot for the Gaussian case using Frequentist Neural Estimation with Wald intervals in the\nleft panel and profile intervals in the right panel, for a varying number of MSDs. The solid gray line in each panel shows the\nperformance of the baseline model, while the dashed black line shows the nominal behavior where the observed and expected\ncoverage are equal. Each colorful line corresponds to a model with a different number K of MSDs each for the signal and\nbackground. Each solid line corresponds to an average over 30 choices of MSDs, and the spread depicted corresponds to the\nstandard error in that average."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "DTD and Dbm , fitting the best value of κ using Eq. (14),            ing the domain shift. Furthermore, coverage improves as\ncalculating uncertainties and Tbaseline (κ∗ ) using Eqs. (17)        K grows due to the model coming increasingly closer to\nand (18), and record zWald and zProfile for each pseudo-             satisfying the well-specified assumption, with the K = 10\nexperiment.                                                          Wald intervals nearly saturating nominal coverage.\n   Since the degree of well-specification of the models\ns(x) and b(x) will depend on the particular choices of                 Since the exponential TAMM of these MSDs is exactly\nthe MSDs which we use as component models, we ran-                   well-specified for K ≥ 5, it is unsurprising that the expo-\ndomly select 30 configurations of component models and               nential TAMM works well her"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "K = 10        Baseline         Standard Normal                                    Signal                           Background\n                                                                                 30\n                                                                                                 Individual MSDs\n                                                                                 25                              80\n                                                                                                 K = 10\n\n20                                 60"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Density\n                                                                                 15\n      0.150                                                                                                         40\n                                                                                 10\n      0.125                                                                                                         20\n                                                                                  5\n      0.100                                                                       0                                  0\n                                                                                      0.0        0.1        0.2          0.00     0.05     0.10     0.15\n                                                                                       Hellinger Distance from TD          Helling"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "0.075"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "0.050                                                           FIG. 5. In black, the distribution of Hellinger distances ob-\n                                                                      tained from comparing the MSDs to their corresponding TD\n      0.025                                                           signal (left) and background (right) for the Gaussian case.\n                                                                      In blue, the distribution of Hellinger distances obtained from\n      0.000                                                           comparing the learned ŝ and b̂ from all pseudo-experiments\n          −5.0    −2.5     0.0     2.5      5.0\n                         zWald                                        with their corresponding TD signal (left) and background\n                                                                      (right) d"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "FIG. 4.√ A 2D histogram of the estimated uncertainty in κ,\nσκ ≡ C κκ versus the pull in κ, zWald , for Frequentist               close enough to zero that the estimated uncertainty is\nNeural Estimation with K = 10 MSDs for the Gaussian                   dominated by the contribution of the penalty term.\ncase. The top (right) panel shows the marginal distribution              Finally, we can directly investigate the learned signal\nof zWald (σκ ). Blue is the K = 10 model, gray is the baseline,       and background shapes by using the inferred s(x)/pref (x)\nand the dashed black line in the top panel corresponds to the\n                                                                      and b(x)/pref (x) to reweight reference data to signal and\nnominal standard normal distribution of zWald .\n                                                                      to background, and measuring "
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "To perform Bayesian Topic Modeling, we bin the\n11 This dependence becomes less severe as K    grows because the      2D data in 10 equal size bins per dimension, yielding 100\n  variations between different sets of MSDs are less significant as   bins in total. The 2D histogram is then flattened to a 1D\n  the size of the sets grows; for K = 10 it is a small but visible    histogram and used as input for the topic modeling pro-\n  effect.                                                             cedure. The loss of local spatial information by binning\n\f                                                                                                                                15"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Gaussian Case Study                            20 topics Gaussian Case Study       Baseline\n                                 Bayesian Topic Modeling\n                     1.0         4 topics       Nominal\n                                 20 topics\n                                 100 topics\n                     0.8         Baseline                               0.08\n Observed Coverage\n\n0.6                                                0.06\n                     0.4                                                0.04\n                     0.2                                                0.02\n                     0.0                                                0.00 4\n                           0.0    0.2      0.4 0.6 0.8      1.0                        2     0      2            4\n                                        Expected Coverage                                  MAP Pull"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "FIG. 6. Coverage performance plot for κ inference in the          FIG. 7. 68% credible interval half-width on κ versus the κ\nGaussian case using Bayesian Topic Modeling, for a vary-          MAP pull for Bayesian Topic Modeling with K = 20\ning number of topics and a baseline consisting of inference       topics for the Gaussian case. Blue is the learned distribution,\nwith a single topic where the signal and background topics        gray is the baseline, and the dashed black is the expected\nare arbitrarily chosen pairs of MSDs per pseudo-experiment.       standard normal."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "obtaining\nand flattening is offset by the use of the same binning over\nall the MSDs, with the subsequent topic model inherit-            {(r1 , r2 )} = {(0.038, 0.071), (0.232, 0.393), (1.20, 2.01)}.\ning their inductive bias. We consider M = 500 MSDs for                                                                       (32)\nsignal and for background.\n  As a baseline, we perform κ inference with a single             These benchmarks are chosen to cover a large variety of\nMSD chosen at random for signal and for background                values, to test whether the TAMM underfit, overfit, or\nper pseudo-experiment (corresponding to Eq. (24) with             find an equilibrium between generalization and expressiv-\nK = 1 and taking the sole topic to be that MSD). The              ity (in other terms, between bias and variance). In the\nsampling of different MSDs per pseudo-experiment allow"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Signal fraction for Gaussian Case Study                                              Signal                                                        Background\n           25                                                      True                                                     Individual MSDs                                                      Individual MSDs\n                                                                   Prior                                                    Posterior              300                                           Posterior\n                                                                   Posterior       40                                       MAP                                                                  MAP\n           20                                                                                                                        "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "30                                                              200\n           15\n Density\n\n150\n                                                                                   20\n           10\n                                                                                                                                                   100\n\n5                                                                       10\n                                                                                                                                                   50"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "0                                                                       0 0.000 0.025 0.050 0.075 0.100 0.125 0.150 0.175 0.200          0 0.00   0.01        0.02        0.03        0.04       0.05\n           0.000   0.025   0.050   0.075   0.100   0.125   0.150   0.175   0.200\n                                                                                                     Hellinger Distance from TD                                     Hellinger Distance from TD"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "FIG. 8. Left panel: κ posterior for Bayesian Topic Modeling with K = 20 topics for one DTD in the Gaussian case. Center\nand right panels: In black, the distribution of Hellinger distances obtained from comparing individual MSD distributions to\nthe given true signal (center) and background (right) distributions for the Gaussian case for one DTD . In blue, the distribution\nof Hellinger distances obtained from comparing the same true distributions to the posterior samples of signal (center) and\nbackground (right) distributions obtained from the mixed data. As can be seen, the model not only learns the correct signal\nfraction in the mixed dataset, but also learns the signal and background distributions."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "for dimensionality reduction while taking advantage of                                                                  VI.        DI-HIGGS TO FOUR B-JET ANALYSIS\na large number of MSDs is a key aspect of Bayesian\nTopic Modeling.                                                                                                         To demonstrate our approach to model misspecifica-\n                                                                                                                     tions on a physics example, we consider a di-Higgs search\n                                                                                                                     in an all-hadronic final state, targeting hh → bb̄bb̄. Di-\n                                                                                                                     Higgs is a useful benchmark since it is relevan"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Data distribution in fiducial region for di-Higgs Case Study        formula:\n     150\n                                                           Signal                                            s\n                                                                                                                             2\n                                                           Background                                            (θ1 − θ2 |η|)\n                                                                                                       ⃗ =\n                                                                                           JES(pT , η, θ)                      + θ3 ,        (34)\n     140                                                                                                              pT"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "where pT and η are the transverse momentum and rapid-\n     130\n                                                                               ity of the calorimeter jet, and θ⃗ is a vector of parameters,\n                                                                               whose nominal value we take to be θ⃗ = (2.5, 0.15, 1.0), the\nm2"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "120                                                                       defaults of Delphes’s CMS card.\n                                                                                  The JES is among the main uncertainties when deal-\n                                                                               ing with hadronic physics at the LHC, and by varying its\n     110\n                                                                               parameterization we can obtain many different distribu-\n                                                                               tions p(m1 , m2 ) that are still physical but different from\n     100                                                                       the nominal one. We sample values of θ⃗ at random using\n        100          110         120         130         140         150\n                                 "
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "simulations and is the main bottleneck in generating large\nsamples. Because of this, we bias the background simu-                                A.    Frequentist Neural Estimation\nlation to enhance efficiency by requiring mbb̄ > 90 GeV\nfor all bb̄ pairs in an event.                                                    To evaluate Frequentist Neural Estimation for\n   For each event that passes these kinematics cuts, we                        the di-Higgs case study, we use an almost identical\nstore the two masses m1 and m2 defined above. We de-                           methodology to that of Sec. V A. We consider subsets\nfine a fiducial signal region by selecting events where the                    of the MSDs of size K ∈ {2, 4, 6, 8} as component models\ntwo masses fall in the [110, 140] GeV window. A result-                        each for the signal and background models, with the ref-\n"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "⃗ · Pcalo ,\n                    Pcalib = JES(Pcalo , θ)                             (33)\n                                                                               12 The exact dataset size varies depending on the selected MSDs,\n\nwhere P is the four-momentum of the jet either at the                            and is taken to be the size of the smallest MSD dataset after the\ncalorimeter or after calibration. We consider the JES                            fiducial region cut.\n\f                                                                                                                                18"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "(a) Di-Higgs Wald Intervals               (b) Di-Higgs Profile Intervals\n                             1.0\n                                     2         Nominal                         2            Nominal\n                                     4         Baseline                        4            Baseline\n                             0.8     6                                         6\n                                     8                                         8\n         Observed Coverage\n\n0.6\n\n0.4\n\n0.2\n\n0.0\n                               0.0   0.2     0.4      0.6      0.8   1.0       0.2       0.4      0.6          0.8       1.0\n                                           Expected Coverage                           Expected Coverage"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "FIG. 10. Coverage performance plot for the di-Higgs case using Frequentist Neural Estimation with Wald intervals in the\nleft panel and profile intervals in the right panel, for a varying number of MSDs. The solid gray line in each panel shows the\nperformance of the baseline model, while the dashed black line shows the nominal behavior where the observed and expected\ncoverage are equal. Each colorful line corresponds to a model with a different number K of MSDs each for the signal and\nbackground. Each solid line corresponds to an average over 30 choices of MSDs, and the spread depicted corresponds to the\nstandard error in that average."
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "For each of the pseudo-experiments, we again find the             is again due to higher order asymptotic effects, and we\nbest-fit value of all the parameters, including the best-            observe in our experiments that the discrepancy between\nfit mixture fraction κ̂, using Eq. (11), estimate the un-            the profile and Wald intervals decreases for larger sample\ncertainty σκ on κ using Eq. (15), and obtain zWald and               sizes.\nzProfile via Eq. (30). We show coverage performance re-                 As in the Gaussian case study, we further showcase\nsults for Wald and profile intervals in Fig. 10. The first           the performance of the model by plotting in Fig. 11 the\nfeature to note is that these plots are again quite similar,         distribution  of the estimated uncertainties on κ, σκ ≡\n                                                                     √\nwhich"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "K=8        Baseline         Standard Normal\n                                                                                            Signal                            Background\n\nIndividual MSDs 300\n                                                                             30              K=8\n\nDensity\n                                                                             20                                 200\n      0.150\n                                                                             10                                 100\n      0.125"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "0.100                                                                   0                                   0\n                                                                                  0.0           0.2                   0.00     0.01     0.02     0.03\n                                                                                   Hellinger Distance from TD           Hellinger Distance from TD\n σκ\n\n0.075"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "0.050                                                       FIG. 12. In black, the distribution of Hellinger distances ob-\n                                                                  tained from comparing the MSDs and their corresponding TD\n      0.025                                                       signal (left) and background (right) for the di-Higgs case. In\n                                                                  blue, the distribution of Hellinger distances obtained from\n      0.000                                                       comparing the learned ŝ and b̂ from all pseudo-experiments\n          −5.0   −2.5    0.0     2.5      5.0\n                                                                  with their corresponding TD signal (left) and background\n                        zWald                                     (right) distributions."
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "FIG. 11.\n       √ A 2D histogram of the estimated uncertainty in κ,\nσκ ≡ C κκ versus the pull in κ, zWald , for Frequentist                                B.    Bayesian Topic Modeling\nNeural Estimation with K = 8 MSDs for the di-Higgs\ncase. The top (right) panel shows the marginal distribution\n                                                                     To perform Bayesian Topic Modeling on the di-\nof zWald (σκ ). Blue is the K = 8 model, gray is the baseline,\nand the dashed black line in the top panel corresponds to the     Higgs example, we again bin the 2D data in 10 equal size\nnominal standard normal distribution of zWald .                   bins per dimension, yielding 100 bins in total. We con-\n                                                                  sider M = 500 MSDs for signal and for background. As\n                                                              "
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Physics Di-Higgs Study                          20 topics di-Higgs Case Study       Baseline\n                                 Bayesian Topic Modeling\n                     1.0          4 topics      Nominal\n                                  20 topics\n                     0.8          100 topics\n                                                                         0.20\n Observed Coverage\n\nBaseline\n                     0.6                                                 0.15\n                     0.4                                                 0.10\n                     0.2                                                 0.05\n                     0.0\n                           0.0     0.2 0.4 0.6 0.8         1.0           0.00 4         2     0      2            4\n                                      Expected Coverage                                     MAP Pull"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "FIG. 13. Coverage performance plot for κ inference in the di-      FIG. 14. 68% credible interval half-width on κ versus the\nHiggs case using Bayesian Topic Modeling, for a varying            κ MAP pull for Bayesian Topic Modeling with K = 20\nnumber of topics and a baseline consisting of a single topic in-   topics for the di-Higgs case. Blue is the learned distribution,\nference where the signal and background topics are arbitrarily     gray is the baseline, and the dashed black is the expected\nchosen pairs of MSDs per pseudo-experiment.                        standard normal."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "small variance indicating stability, while the pulls show          observe larger uncertainties for the di-Higgs case, due to\nthe same kind of small bias as in the Gaussian case, which         the larger overlap between signal and background TDs\noriginates from the interplay of pseudo-experiment gener-          limiting the statistical power of the analyses.\nation and prior effects (as explored in App. C). Moreover,            Additionally, the fact that the Gaussian distributions\nthe uncertainties are still larger for larger pulls and the        are sharper in feature space than for the di-Higgs ren-\ncoverage is close to nominal, signaling a correct behav-           ders the modeling of the TDs using the MSDs trickier,\nior of the model. The baseline in this case showcases              particularly for the unbinned case where there is no nat-\na broad spread of uncertainties with no clear"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Signal fraction for di-Higgs Case Study                                                  Signal                                                                 Background\n            8                                                                  100                                                                        700\n                                                             True                                                               Individual MSDs                                                            Individual MSDs\n                                                             Prior                                                              Posterior                                                                  Posterior\n            7                                                Posterior                                                          MAP        "
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "4\n                                                                               40                                                                         300\n            3\n                                                                                                                                                          200\n            2\n                                                                               20\n            1                                                                                                                                             100"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "0                                                                   0 0.00   0.02   0.04 0.06 0.08 0.10             0.12   0.14                0 0.000   0.005   0.010      0.015      0.020    0.025     0.030\n             0.0   0.1         0.2         0.3        0.4                0.5\n                                                                                                   Hellinger Distance from TD                                                Hellinger Distance from TD"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "FIG. 15. Left panel: κ posterior for Bayesian Topic Modeling with K = 20 topics for the di-Higgs case. Center and\nright panels: In black, the distribution of Hellinger distances obtained from comparing individual MSD distributions to the\ngiven true signal (center) and background (right) distributions for the di-Higgs case. In blue, the distribution of Hellinger\ndistances obtained from comparing the same true distributions to the posterior samples of signal (center) and background\n(right) distributions obtained from the mixed data. As can be seen, the model not only learns the correct signal fraction in the\nmixed dataset, but also learns the signal and background distributions."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "On the other hand, the topic modeling in Bayesian                                                                                              VIII.         CONCLUSION\nTopic Modeling very naturally incorporates the infor-\nmation in an arbitrarily large set of MSDs. However,                                                                    In this work, we proposed a new model, called the\nconversely, it does not work well if the number of MSDs is                                                           Template-Adapted Mixture Model, to address the\nnot large enough to appropriately learn meaningful top-                                                              problem of model misspecification: the use of multiple\nics. We have found in our experiments that directly using                                                            distributions generated with different misspecification"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "K) to ensure both coverage and precision.                      Foundation (NSF) under Cooperative Agreement PHY-\n   Thus, it would be interesting to study data-driven hy-      2019786 (The NSF Institute for Artificial Intelligence and\nperparameter selection procedures for each model that          Fundamental Interactions, http://iaifi.org/) and by\napproximate the information provided by coverage stud-         the U.S. Department of Energy (DOE) Office of High\nies in the absence of truth-level information. One pos-        Energy Physics under grant number DE-SC0012567. JT\nsible strategy would be to consider individual MSDs as         is additionally supported by the Simons Foundation\nTDs and perform the analysis and pseudo-experiments            through Investigator grant 929241, and he thanks the In-\nto check the coverage, which could serve as a heuristic        stitut des Hautes Études "
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "universities and the state research organizations of Ar-                       θ̂d′ − θd∗′ = −V̂ d d Ldata,d (θ∗ ),          (A2)\ngentina for their enduring commitment in the face of on-\ngoing challenges. EA thanks D. Blei for insightful discus-\n                                                               13 Recall that satisfying this assumption is why we needed the back-\nsions regarding some of the results presented in this work.\nSB and JT are supported by the U.S. National Science             ground normalization penalty in the first place!\n\f                                                                                                                                      23"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "where we have used the symmetry of the Hessian matrix                where N denotes a normal distribution and the covari-\nto transpose the indices (and we have again used the                 ance matrix C of the estimated parameters θ̂ has com-\nassumption that the extremum is a minimum rather than                ponents:\na saddle point, so that the Hessian is invertible).\n                                                                                                 ′               ′ ′\n   Since V̂ is O(1), its inverse is as well. To determine the                                C dd = V dl Ull′ V l d ,           (A6)\npower counting of θ̂d′ − θd∗′ , we then need only calculate\nthe power counting of the derivative of the loss evaluated           where we are entitled to replace V̂ with its expectation\nat the true parameters. We dub the derivative of the                 value V at this asy"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "1       X        bd (xα ) − sd (xα )            wardly estimated from data as:\n                ×                                         .   (A3)\n                    Npen                   pref (xα )                                    \u0012         X pref (xα )2 pd (xα )pd′ (xα )\n                           xα ∈Dpen\n                                                                        TD         1         1\n                                                                       Udd′ ≈\n                                                                                  NTD      NTD             p(xα )2    pref (xα )2\nAgain, by the central limit theorem, the term in paren-                                          xα ∈DTD\ntheses is normally distributed and of order O(N −1/2 )\n                                                                                           \"                                "
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "the remainder will be higher order: this means that the                           Nref     Nref              pref (xα )2\n                                                                                                 xα ∈Dref\ncontribution to the score from the normalization penalty                                   \"                           #\n                                                                                               1     X pd (xα )\nis normal. Therefore, we have that the score overall is                                  −\nO(N −1/2 ), and then that:                                                                   Nref           pref (xβ )\n                                                                                                   xα ∈Dref\n                                                                                                                      \n "
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "before. Therefore, we can estimate:                             κ−κ component of the inverse of the full Hessian). More-\n                                                              over, we know that κ̂ − κ∗ is normally distributed with\n            λ 2        X \u0012 b(xα ) − s(xα ) \u00132                   variance C κκ , so the test statistic\n    norm\n   Udd′  ≈ 4N                                  \n            Npen                pref (xα )                                                               \u0001 V κκ\n                    xα ∈Dpen\n                                                                         T (κ) = 2 L(κ, ϕ̂(κ) − L(κ̂, ϕ̂) κκ                 (A16)\n                                                                                                         C\n                       X bd (xβ ) − sd (xβ )\n                ×                                             is (when"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "This concludes the estimation of U , and therefore of C.          Appendix B: Detailed Role of Unbinned Penalties\n   This is everything we need to calculate z-sigma confi-\ndence intervals with Wald intervals, i.e. [κ−zσκ , κ+zσκ ].        As discussed in Sec. III B, the optimization objective\nWe also wish to consider uncertainties calculated using         for the parameter fit in the unbinned analysis involves\nthe analog of the profile likelihood, forming a test statis-    two penalty terms. The first of these penalties addresses\ntic as a function of κ. In other words, we consider a test      the Davies problem and the second addresses a model de-\nstatistic of the form:                                          generacy due to the floating signal and background nor-\n                                                 \u0001              malizations. We discuss the Davies penalty and a peda-\n     "
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "V =  Vsκ Vss Vsb  .                (B2)\n                                        dd\n               ϕ̂d (κ) = ϕ̂d + (κ̂ − κ)Vϕϕ\n                                          ′\n                                           Vϕκ,d′ ,     (A14)                              Vbκ Vbs Vbb"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "where Vϕϕdd′\n             denotes the inverse of the ϕ − ϕ block of the      Now, consider what happens as κ → 0.15 A brief calcu-\n                                                                lation shows that in this case, Vsb = Vbs ∼ O(κ), so\nHessian (not the ϕ−ϕ block of the inverse of the Hessian).\n                                                                these components all vanish at κ = 0. Moreover, at\n  Substituting this back into the quadratic expansion of\n                                                                the best-fit parameters, extremizing the loss ensures that\nthe loss and evaluating at the true value of κ, κ∗ , we find:\n                                                                Vκs = Vsκ ∼ O(κ) as well, and that Vss ∼ O(κ2 ) (at lead-\n  2 L(κ∗ ,ϕ̂(κ∗ )) − L(κ̂, ϕ̂)\n                              \u0001                                 ing asymptotic orde"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "This means that, in the κ → 0 limit, the whole block            penalty breaks this degeneracy, so vflat,d gd ̸= 0. To find\ncontaining derivatives with respect to the θ(s) vanishes,          the variance σκ2 = uT Cu for the parameter κ, where\nand V becomes noninvertible. This breaks the assump-               u is the unit vector selecting the κ component, we de-\ntion of the asymptotics that the optimizer of the loss is a        fine w = V −1 u. This yields the system of equations\nminimum, rather than a saddle point. This is the reason            (V0,dd′ + λN gd gd′ )wj = ui . Left-multiplying by vflat iso-\nwhy we add the penalty LD to restore this property and             lates the constraint projection:\nrescue the asymptotics. We note that we take LD only\n                                                                                                  vflat,d vd\nto constrain the w and v"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "acy, the penalty picks out the point along the degenerate                              = (V0+ u⊥ )d U0,dd′ (V0+ u⊥ )d′ .   (B9)\nline of minima which sets itself exactly to zero regardless\nof its coefficient.                                                Since u⊥ has no dependence on λN , this term is also en-\n   It is conceptually guaranteed that the exact value of           tirely independent of the hyperparameter, and as desired\nλN > 0 does not affect the optimization result or the              the uncertainty in κ is exactly independent of the chosen\nestimated uncertainties of the model parameters, but               value of λN .\nit is informative to see this explicitly. We can demon-\nstrate this from the expression for the estimated uncer-\ntainty, Eq. (A6). Let V0 and U0 be the Hessian and                   Appendix C: Bayesian Pulls for Sampled Signal\nscore covariance of Pthe unpen"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "20 topics Gaussian Case Study (true ~ Prior)                      20 topics di-Higgs Case Study (True ~ Prior)\n\n0.08                                                              0.30\n                                                                        0.25\n      0.06\n                                                                        0.20\n      0.04                                                              0.15\n                                                                        0.10\n      0.02\n                                                                        0.05\n      0.00 4        2     0      2          4                           0.00 4         2     0      2         4\n                        MAP Pull                                                           MAP Pull"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "FIG. 16. Left (right) panel: κ 68% credible interval half-width versus κ MAP pull for Bayesian Topic Modeling with K = 20\ntopics for the Gaussian (di-Higgs) case with κ randomly sampled according to the prior. Blue is the learned distribution, dashed\nblack is the expected standard normal."
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "pseudo-experiment according to the prior distribution,            emphasizes how the TAMM is learning intricate patterns\nκtarget ∼ Uniform(0, 1). If we compare to Figs. 7 and             from the MSDs to match the TD and infer κ. To do so,\n14, we observe how the pulls are closer to the standard           we visualize the TD and MSD distributions considered\nnormal, effectively signaling that the relative deviations        in the case studies of Secs. V and VI as 2D histograms in\nseen in the main text are a consequence of the lack of            Figs. 17 and 18 respectively. The top row of each of these\nκtarget sampling and overall prior effects. In particular,        figures shows the TDs, with the remaining rows showing\nthe agreement is better for the di-Higgs case, which is           four random MSDs. In each figure, the left column cor-\nconsistent with the results presented in Secs. V a"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "In this appendix, we show how the MSDs differ from\nthe signal and background TDs in non-trivial ways. This"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "[1] A. L. Read, Linear interpolation of histograms, Nucl. In-     [4] G. E. P. Box, Science and statistics, Journal of the Amer-\n     strum. Meth. A 425, 357 (1999).                                   ican Statistical Association 71, 791 (1976).\n [2] K. Cranmer, G. Lewis, L. Moneta, A. Shibata, and              [5] C. M. Bishop, Pattern Recognition and Machine Learn-\n     W. Verkerke (ROOT), HistFactory: A tool for creat-                ing (Springer-VerlagBerlin, Heidelberg, 2006).\n     ing statistical models for use with RooFit and RooStats,      [6] G. Hinton, Products of experts, in 1999 Ninth Interna-\n     (2012).                                                           tional Conference on Artificial Neural Networks ICANN\n [3] M. Baak, S. Gadatsch, R. Harrington, and W. Verkerke,             99. (Conf. Publ. No. 470), Vol. 1 (1999) pp. 1–6 vol.1.\n     Interpolation between multi-di"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "2.0\n              TD signal distribution for Gaussian Case Study           2.0\n                                                                             TD background distribution for Gaussian Case Study                                 140\n                                                                                                                                                                         TD signal distribution for di-Higgs Case Study                    140\n                                                                                                                                                                                                                                                 TD background distribution for di-Higgs Case Study"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "1.5                                                                  1.5\n                                                                                                                                                                135                                                                        135\n  1.0                                                                  1.0\n                                                                                                                                                                130                                                                        130\n  0.5                                                                  0.5\n\nmbb, 2"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "mbb, 2\n  0.0                                                                  0.0                                                                                      125                                                                        125"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "0.5                                                                  0.5\n                                                                                                                                                                120                                                                        120\n  1.0                                                                  1.0\n                                                                                                                                                                115                                                                        115\n  1.5                                                                  1.5"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "2.0                                                                  2.0                                                                                      110                                                                        110\n        2.0     1.5    1.0    0.5    0.0    0.5    1.0    1.5    2.0         2.0       1.5     1.0     0.5     0.0     0.5     1.0     1.5     2.0                 110      115       120      125       130       135      140               110         115      120      125        130      135      140\n                                                                                                                                                                                               mbb, 1                                                                       mbb, 1"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "MSD Signal distribution for Gaussian Case Study                       MSD Background distribution for Gaussian Case Study                                  MSD Signal distribution for di-Higgs Case Study                              MSD Background distribution for di-Higgs Case Study\n  2.0                                                                    2.0                                                                                    140                                                                           140"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "1.5                                                                    1.5\n                                                                                                                                                                135                                                                           135\n  1.0                                                                    1.0\n                                                                                                                                                                130                                                                           130\n  0.5                                                                    0.5\n\nmbb, 2"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "mbb, 2\n  0.0                                                                    0.0                                                                                    125                                                                           125"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "0.5                                                                    0.5\n                                                                                                                                                                120                                                                           120\n  1.0                                                                    1.0\n                                                                                                                                                                115                                                                           115\n  1.5                                                                    1.5"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "2.0                                                                    2.0                                                                                    110                                                                           110\n        2.0     1.5    1.0    0.5    0.0    0.5    1.0    1.5    2.0           2.0       1.5     1.0     0.5     0.0     0.5     1.0     1.5     2.0               110      115       120      125       130       135      140                  110       115       120      125       130      135         140\n                                                                                                                                                                                               mbb, 1                                                                         mbb, 1"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "MSD Signal distribution for Gaussian Case Study                       MSD Background distribution for Gaussian Case Study                                  MSD Signal distribution for di-Higgs Case Study                              MSD Background distribution for di-Higgs Case Study\n  2.0                                                                    2.0                                                                                    140                                                                           140"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "1.5                                                                    1.5\n                                                                                                                                                                135                                                                           135\n  1.0                                                                    1.0\n                                                                                                                                                                130                                                                           130\n  0.5                                                                    0.5\n\nmbb, 2"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "mbb, 2\n  0.0                                                                    0.0                                                                                    125                                                                           125"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "0.5                                                                    0.5\n                                                                                                                                                                120                                                                           120\n  1.0                                                                    1.0\n                                                                                                                                                                115                                                                           115\n  1.5                                                                    1.5"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "2.0                                                                    2.0                                                                                    110                                                                           110\n        2.0     1.5    1.0    0.5    0.0    0.5    1.0    1.5    2.0           2.0       1.5     1.0     0.5     0.0     0.5     1.0     1.5     2.0               110      115       120      125       130       135      140                  110       115       120      125       130      135         140\n                                                                                                                                                                                               mbb, 1                                                                         mbb, 1"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "MSD Signal distribution for Gaussian Case Study                       MSD Background distribution for Gaussian Case Study                                  MSD Signal distribution for di-Higgs Case Study                              MSD Background distribution for di-Higgs Case Study\n  2.0                                                                    2.0                                                                                    140                                                                           140"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "1.5                                                                    1.5\n                                                                                                                                                                135                                                                           135\n  1.0                                                                    1.0\n                                                                                                                                                                130                                                                           130\n  0.5                                                                    0.5\n                                                                                                                                                       mbb, 2"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "mbb, 2\n  0.0                                                                    0.0                                                                                    125                                                                           125"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "0.5                                                                    0.5\n                                                                                                                                                                120                                                                           120\n  1.0                                                                    1.0\n                                                                                                                                                                115                                                                           115\n  1.5                                                                    1.5"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "2.0                                                                    2.0                                                                                    110                                                                           110\n        2.0     1.5    1.0    0.5    0.0    0.5    1.0    1.5    2.0           2.0       1.5     1.0     0.5     0.0     0.5     1.0     1.5     2.0               110      115       120      125       130       135      140                  110       115       120      125       130      135         140\n                                                                                                                                                                                               mbb, 1                                                                         mbb, 1"
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "MSD Signal distribution for Gaussian Case Study                       MSD Background distribution for Gaussian Case Study                                  MSD Signal distribution for di-Higgs Case Study                              MSD Background distribution for di-Higgs Case Study\n  2.0                                                                    2.0                                                                                    140                                                                           140"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "1.5                                                                    1.5\n                                                                                                                                                                135                                                                           135\n  1.0                                                                    1.0\n                                                                                                                                                                130                                                                           130\n  0.5                                                                    0.5\n                                                                                                                                                       mbb, 2\n\nmbb, 2"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "0.0                                                                    0.0                                                                                    125                                                                           125"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "0.5                                                                    0.5\n                                                                                                                                                                120                                                                           120\n  1.0                                                                    1.0\n                                                                                                                                                                115                                                                           115\n  1.5                                                                    1.5"
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "2.0                                                                    2.0                                                                                    110                                                                           110\n        2.0     1.5    1.0    0.5    0.0    0.5    1.0    1.5    2.0           2.0       1.5     1.0     0.5     0.0     0.5     1.0     1.5     2.0               110      115       120      125       130       135      140                  110       115       120      125       130      135         140\n                                                                                                                                                                                               mbb, 1                                                                         mbb, 1"
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "FIG. 17. Gaussian model signal (left) and background (right)                                                                                           FIG. 18. Di-Higgs signal (left) and background (right) TD\nTD distributions in the top row, and a set of their correspond-                                                                                        distributions in the top row, and a set of their corresponding\ning MSDs in the following panels. Darker means more events.                                                                                            MSDs in the following panels. Darker means more events.\nObserve that the MSDs have a similarity to their correspond-                                                                                           Observe that the MSDs have a similarity to their correspond-\ning TD, but they do not match because of the systematic   "
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "[8] K. Cranmer, J. Pavez, and G. Louppe, Approximating                                                                                                [11] H. Bahl and S. Brass, Constraining CP-violation in\n     Likelihood Ratios with Calibrated Discriminative Classi-                                                                                               the Higgs-top-quark interaction using machine-learning-\n     fiers, (2015), arXiv:1506.02169 [stat.AP].                                                                                                             based inference, JHEP 03, 017, arXiv:2110.10177 [hep-\n [9] A. Ghosh, Measuring quantum interference in the off-                                                                                                   ph].\n     shell Higgs to four leptons process with Machine Learn-                                                   "
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "[14] S. Chai, J. Gu, and L. Li, From optimal observables                ering latent jet substructure, Phys. Rev. D 100, 056002\n     to machine learning: an effective-field-theory analysis of         (2019), arXiv:1904.04200 [hep-ph].\n     e+ e− → W+ W− at future lepton colliders, JHEP 05, 292,       [31] B. M. Dillon, D. A. Faroughy, J. F. Kamenik, and\n     arXiv:2401.02474 [hep-ph].                                         M. Szewc, Learning the latent structure of collider events,\n[15] R. Mastandrea, B. Nachman, and T. Plehn, Constraining              JHEP 10, 206, arXiv:2005.12319 [hep-ph].\n     the Higgs potential with neural simulation-based infer-       [32] B. M. Dillon, D. A. Faroughy, J. F. Kamenik, and\n     ence for di-Higgs production, Phys. Rev. D 110, 056004             M. Szewc, Learning Latent Jet Structure, Symmetry 13,\n     (2024), arXiv:2405.15847 [hep-ph].             "
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "ph].                                                           duction of Higgs bosons in the bb¯bb¯ final state in pp\n[48] J. de Favereau, C. Delaere, P. Demin, A. Giammanco,            collisions at s=13 TeV with the ATLAS detector, Phys.\n     V. Lemaître, A. Mertens, and M. Selvaggi (DELPHES              Rev. D 108, 052003 (2023), arXiv:2301.03212 [hep-ex].\n     3), DELPHES 3, A modular framework for fast simu-         [51] M. S. Bartlett, Properties of sufficiency and statisti-\n     lation of a generic collider experiment, JHEP 02, 057,         cal tests, Proceedings of the Royal Society of Lon-\n     arXiv:1307.6346 [hep-ex].                                      don. A. Mathematical and Physical Sciences 160, 268\n[49] M. Cacciari, G. P. Salam, and G. Soyez, The anti-kt            (1937), https://royalsocietypublishing.org/rspa/article-\n     jet clustering algorithm, JHEP 04, 063, arX"
+    }
+  ]
+}
