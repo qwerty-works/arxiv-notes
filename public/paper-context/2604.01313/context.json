@@ -1,0 +1,722 @@
+{
+  "arxivId": "2604.01313",
+  "paperTitle": "JetPrism: diagnosing convergence for generative simulation and inverse problems in nuclear physics",
+  "abstract": "High-fidelity Monte Carlo simulations and complex inverse problems, such as mapping smeared experimental observations to ground-truth states, are computationally intensive yet essential for robust data analysis. Conditional Flow Matching (CFM) offers a mathematically robust approach to accelerating these tasks, but we demonstrate its standard training loss is fundamentally misleading. In rigorous physics applications, CFM loss plateaus prematurely, serving as an unreliable indicator of true convergence and physical fidelity. To investigate this disconnect, we designed JetPrism, a configurable CFM framework acting as an efficient generative surrogate for evaluating unconditional generation and conditional detector unfolding. Using synthetic stress tests and a Jefferson Lab kinematic dataset ($\\gamma p \\to \\rho^0 p \\to \\pi^+\\pi^- p$) relevant to the forthcoming Electron-Ion Collider (EIC), we establish that physics-informed metrics continue to improve significantly long after the standard loss converges. Consequently, we propose a multi-metric evaluation protocol incorporating marginal and pairwise $\\chi^2$ statistics, $W_1$ distances, correlation matrix distances ($D_{\\mathrm{corr}}$), and nearest-neighbor distance ratios ($R_{\\mathrm{NN}}$). By demonstrating that domain-specific evaluations must supersede generic loss metrics, this work establishes JetPrism as a dependable generative surrogate that ensures precise statistical agreement with ground-truth data without memorizing the training set. While demonstrated in nuclear physics, this diagnostic framework is readily extensible to parameter generation and complex inverse problems across broad domains. Potential applications span medical imaging, astrophysics, semiconductor discovery, and quantitative finance, where high-fidelity simulation, rigorous inversion, and generative reliability are critical.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "High-fidelity Monte Carlo simulations and complex inverse problems, such as mapping smeared experimental observations to ground-truth states, are computationally intensive yet essential for robust data analysis. Conditional Flow Matching (CFM) offers a mathematically robust approach to accelerating these tasks, but we demonstrate its standard training loss is fundamentally misleading. In rigorous physics applications, CFM loss plateaus prematurely, serving as an unreliable indicator of true convergence and physical fidelity. To investigate this disconnect, we designed JetPrism, a configurable CFM framework acting as an efficient generative surrogate for evaluating unconditional generation and conditional detector unfolding. Using synthetic stress tests and a Jefferson Lab kinematic dataset ($\\gamma p \\to \\rho^0 p \\to \\pi^+\\pi^- p$) relevant to the forthcoming Electron-Ion Collider (EIC), we establish that physics-informed metrics continue to improve significantly long after the standard loss converges. Consequently, we propose a multi-metric evaluation protocol incorporating marginal and pairwise $\\chi^2$ statistics, $W_1$ distances, correlation matrix distances ($D_{\\mathrm{corr}}$), and nearest-neighbor distance ratios ($R_{\\mathrm{NN}}$). By demonstrating that domain-specific evaluations must supersede generic loss metrics, this work establishes JetPrism as a dependable generative surrogate that ensures precise statistical agreement with ground-truth data without memorizing the training set. While demonstrated in nuclear physics, this diagnostic framework is readily extensible to parameter generation and complex inverse problems across broad domains. Potential applications span medical imaging, astrophysics, semiconductor discovery, and quantitative finance, where high-fidelity simulation, rigorous inversion, and generative reliability are critical."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Prepared for submission to JINST\n\n4th Artificial Intelligence for the Electron Ion Collider (2025)\n                                        27 October 2025–29 October 2025\n                                        MIT, Boston, USA\n\nJetPrism: diagnosing convergence for generative\n                                        simulation and inverse problems in nuclear physics\narXiv:2604.01313v1 [cs.LG] 1 Apr 2026\n\nZeyu Xia,𝑎,1 Tyler Kim,𝑎 Trevor Reed,𝑏 Judy Fox,𝑏 Geoffrey Fox𝑎 and Adam Szczepaniak𝑐\n                                        𝑎 Department of Computer Science, University of Virginia,\n\n85 Engineer’s Way, Charlottesville, VA 22904, USA\n                                        𝑏 School of Data Science, University of Virginia,\n\n1919 Ivy Road, Charlottesville, VA 22903, USA\n                                        𝑐 Department of Physics, Indiana University Bloomington,"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "727 East Third Street, Bloomington, IN 47405, USA\n\nE-mail: zeyu.xia@virginia.edu"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Abstract: High-fidelity Monte Carlo simulations and complex inverse problems, such as map-\n                                        ping smeared experimental observations to ground-truth states, are computationally intensive yet\n                                        essential for robust data analysis. Conditional Flow Matching (CFM) offers a mathematically robust\n                                        approach to accelerating these tasks, but we demonstrate its standard training loss is fundamentally\n                                        misleading. In rigorous physics applications, CFM loss plateaus prematurely, serving as an unreli-\n                                        able indicator of true convergence and physical fidelity. To investigate this disconnect, we designed\n                                        JetPrism, a configurable CFM framework acting as an efficient generativ"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Keywords: Simulation methods and programs, analysis and statistical methods, software architec-\n                                        tures, data processing methods\n                                          1 Corresponding author.\n\f1    Introduction"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "Experimental nuclear and particle physics analyses require massive simulation datasets to populate\nphase space. While raw Monte Carlo generation is computationally inexpensive per event, the\nrequired volume imposes a significant computational burden. For Jefferson Lab experiments\n(e.g., CLAS12, GlueX), modeling complex particle transport, secondary interactions, and detector\nresponses makes GEANT-based detector simulation a primary computational bottleneck.\n     Detector unfolding—recovering true event-level observables from smeared measurements—relies\nheavily on these detailed simulations to determine precise detector responses and acceptance correc-\ntions. The immense computational demands of this process motivate developing AI-based surrogate\nmodels that approximate traditional simulations at a fraction of the cost.\n     Deep generative models, particularly Conditional Flow Matching ("
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "1. Convergence diagnostics and validation suite. We identify the premature plateau of standard\n       CFM loss, which obscures ongoing physical refinement, and establish a rigorous multi-metric\n       protocol (𝜒2 , 𝑊1 , 𝐷 corr , NFE, 𝑅NN ) to accurately track true convergence, verify generative\n       fidelity, and prevent data memorization.\n\n2. JetPrism Framework. We introduce JetPrism, a configurable CFM-based tool, and validate\n       its capabilities for event generation and conditional detector unfolding on a realistic Jefferson\n       Lab dataset (𝛾 𝑝 → 𝜌 0 𝑝 → 𝜋 + 𝜋 − 𝑝) relevant to the forthcoming Electron-Ion Collider (EIC)."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "3. Synthetic stress tests. We provide controlled 1D benchmarks (gaussian, high-cut, multi-\n       peak, high-frequency, delta, uniform, and exponential) to isolate generative capa-\n       bilities and diagnose topological failure modes prior to deployment on real physics data.\n\n2    Related work"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Detector unfolding is a cornerstone High-Energy Physics (HEP) challenge [1]. Traditional binned\ntechniques like Iterative Bayesian Unfolding (IBU) routinely suffer from dimensionality curses.\nOmniFold [2] overcame these limitations via unbinned neural classifiers, enabling simultaneous\nhigh-dimensional unfolding [3]. The field subsequently shifted toward deep generative sampling [4].\nWhile Generative Adversarial Networks (GANs) can recover true distributions [5], they remain\nhard to converge. Continuous Normalizing Flows (CNFs) and diffusion models [6, 7] improve\nscalability but demand costly Ordinary Differential Equation (ODE) evaluations. Conditional Flow\nMatching [8] bypasses this via a simulation-free regression objective, further refined by Optimal\nTransport Conditional Flow Matching (OT-CFM) [9] and physics-constrained variants [10–12].\n     These foundations rapidly populate HEP "
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "–2–\n\farchitectures yield analysis-ready generative unfolding [16, 17] for complex final states [18, 19].\nWhile generative Artificial Intelligence (AI) is vital for EIC simulations [20, 21], current imple-\nmentations often assume generic metrics safely indicate modeling quality. A crucial gap remains:\nto our knowledge, no prior work systematically addresses the disconnect between training loss\nconvergence and true kinematic fidelity of CFM model in HEP. We fill this gap with JetPrism.\nBy coupling a stable CFM architecture with a strict physics-informed validation protocol (𝜒2 , 𝑊1 ,\n𝐷 corr ), JetPrism overcomes flow optimization blindness, providing a reproducible tool expressly\ndesigned to verify physical convergence.\n\n3     Methodology"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "3.1    Datasets and feature representation\nMC-POM dataset. The MC-POM (Monte Carlo Pomeron) dataset models exclusive photopro-\nduction 𝛾 𝑝 → 𝜌 0 𝑝 → 𝜋 + 𝜋 − 𝑝. We focus on forward kinematics with low momentum transfer\n(|𝑡| < 1 GeV2 ), where pomeron exchange dominates. In this regime, the P-wave 𝜌(770) resonance\nis prominent in the 𝑀 (𝜋 + 𝜋 − ) mass spectrum. We utilize a fixed dataset of 8,000,000 events.\n       Events initially consist of 24-dimensional vectors encoding the four-momenta of all involved\nparticles (𝑝 𝛾 , 𝑝 1 , 𝑝 2 , 𝜋 ± ) and derived variables (𝑡, 𝑀 𝜋 𝜋 , cos 𝜃, 𝜙) evaluated in the 𝜋 + 𝜋 − helicity rest\n                  𝜇   𝜇    𝜇"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "frame. To eliminate redundancy, we project the data into a 10-dimensional phase space. Exclud-\ning the recoil proton (fixed by four-momentum conservation) and extracting the spatial momenta\n( 𝑝 𝑥 , 𝑝 𝑦 , 𝑝 𝑧 ) of the remaining four particles yields 12 components. Dropping the identically zero\n𝑝 𝑦 components of the incident photon and target proton results in the final 10 dimensions. Each\nfeature was standardized to zero mean and unit variance, and subsequently scaled by a factor of\n5.0. Empirically, this specific scaling factor yielded marginal performance improvements compared\nto baseline factors of 1.0 and 2.0. This deliberate mismatch with the unit-variance prior N (0, 𝐼)\nseparates source and target supports along 𝑥 𝑡 = 𝑡 𝑥 1 + (1−𝑡) 𝑥0 , amplifying the deterministic velocity\nsignal and improving training stability. The inverse transform recovers physical units.\n       For detector un"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Synthetic mock datasets. To isolate modeling challenges, we construct a diverse suite of 1D\nsynthetic benchmarks (gaussian, high-cut, multi-peak, high-frequency, delta, uniform,\nand exponential) across configuration presets. These controlled environments enable rigorous\nablation studies of mode collapse and fine-grained resolution prior to real physics deployment.\nDetailed formulations and extended results are in Appendix C.\n\n–3–\n\f3.2   Conditional flow matching framework\n\n4\n                      t=0                                                                         t=1\n\n3\n                                                                                                            0.5\n\n2\n                                                                                                            0.4\n                  1\n\nDensity\n          Value"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "0                                                                                         0.3\n\n1\n                                                                                                            0.2\n\n2\n                                                                                                            0.1\n                  3\n\n4                                                                                         0.0\n                      Density 0.0         0.2             0.4            0.6          0.8     1.0 Density\n                                                                Time t\n\nFigure 1. An illustration of the CFM generation process. The model learns to transform a simple base\nGaussian distribution (left) to a complex three-peak mixed-Gaussian target distribution (right) by learning\nthe intermediate velocity field (middle)."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Flow Matching (FM) defines the objective of learning a time-dependent velocity field 𝑣 𝜃 (𝑥, 𝑡)\nwhose induced ODE transports samples from a simple prior 𝑝 0 = N (0, 𝐼) to the target data\ndistribution 𝑝 1 . Because the marginal FM objective is intractable, we employ Conditional Flow\nMatching (CFM) [8]. This approach conditions on individual data samples to construct simple\nprobability paths, yielding a tractable regression loss that recovers the exact marginal velocity field.\n     Given a target data sample 𝑥 1 ∼ 𝑝 data and noise 𝑥0 ∼ N (0, 𝐼), CFM constructs interpolated\nsamples along a linear conditional path:\n\n𝑥 𝑡 = (1 − 𝑡)𝑥 0 + 𝑡𝑥 1 ,      𝑡 ∈ [0, 1].                              (3.1)\n\nThe conditional vector field generating this path is the constant derivative: 𝑢 𝑡 = 𝑑𝑑𝑡𝑥𝑡 = 𝑥1 − 𝑥 0 . The\nCFM loss then trains a neural network to regress against this target velocity:"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "LCFM (𝜃) = E𝑡 , 𝑥0 , 𝑥1 ∥𝑣 𝜃 (𝑥 𝑡 , 𝑡) − (𝑥 1 − 𝑥 0 ) ∥ 2 .\n                                                           \u0002                                 \u0003\n                                                                                                                        (3.2)\n\nAn intuitive visual representation of this learned velocity mapping, transporting samples from a base\nGaussian noise state through intermediate trajectories toward a multi-modal deterministic target, is\nprovided in Figure 1.\n    We use two distinct network variants under this shared CFM objective:\n\nUnconditional generation network. For generative simulation, we train an unconditional velocity\nnetwork 𝑣 𝜃 (𝑥 𝑡 , 𝑡) that takes as input the current state 𝑥 𝑡 concatenated with a Fourier embedding of\n𝑡, autonomously mapping pure Gaussian noise into the target physics distribution."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "–4–\n\fConditional unfolding network. For detector unfolding, we train a conditional velocity network\n𝑣 𝜃 (𝑥 𝑡 , 𝑡 | 𝑐) parameterized by the detector-level measurement 𝑐. The conditioning vector 𝑐 is\nprocessed through a learned two-layer SiLU-activated Multi-Layer Perceptron (MLP) and con-\ncatenated alongside the 𝑥 𝑡 state and time embedding. During inference, this condition 𝑐 is held\nconstant throughout the entire ODE integration, allowing the network to deterministically recover\nparticle-level kinematics from localized, smeared observations.\n      Both variants utilize residual backbone architectures [22] with SiLU activations. At inference,\ngeneration is performed by integrating the learned ODE from 𝑡 = 0 to 𝑡 = 1 via an adaptive\nDormand-Prince solver using deterministic paths, establishing a deterministic mapping between\nthe prior and target distributions. Comprehensive hyperparameter "
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "3.3     Physics-informed metrics\nTo rigorously evaluate model performance, we monitor the following physics-informed metrics in\naddition to standard training metrics, such as loss, during the validation and testing phases:\n\n1. Marginals: We report the 𝜒2 statistic and the Wasserstein-1 distance (𝑊1 ) between generated\n         and true univariate distributions.\n\n2. Pairwise joints: We report the 2D binned 𝜒2 statistic (𝜒2D\n                                                                 2 ) over all feature pairs, testing\n\nwhether the model captures bivariate dependencies beyond individual marginals.\n\n3. Global correlation structure: We report the correlation matrix distance 𝐷 corr = ∥corr(truth)−\n         corr(gen) ∥ 𝐹 , the Frobenius norm of the Pearson correlation-matrix difference, measuring the\n         holistic reproduction of linear dependencies across all channels."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "4. Memorization: We report the nearest-neighbor distance ratio 𝑅NN = 𝑑¯gen→train /𝑑¯train→train ,\n         where 𝑑¯ denotes the mean 𝐿 2 nearest-neighbor distance. A ratio 𝑅NN ≈ 1 indicates general-\n         ization, whereas 𝑅NN ≪ 1 flags memorization.\n\nIn tabular summaries, we present 𝜒2 , 𝑊1 , 𝜒2D  2 ,𝐷\n                                                         corr , and 𝑅NN . For dynamic tracking (figures),\nwe monitor training loss, Number of Function Evaluations (NFE) (lower values indicate straighter\nflows for adaptive solvers), 𝑊1 , and 𝐷 corr . Detailed mathematical formulations are in Appendix B.\n\n4      Results\n\n4.1     Synthetic benchmark validation\nTo isolate modeling challenges, we first validated the architecture on synthetic 1D distributions;\ndetailed results with complex topologies are provided in Appendix C."
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "4.2     Performance on MC-POM dataset\nA crucial observation during MC-POM training is that the convergence of the standard CFM\nvelocity loss does not align with true physical fidelity. As Figure 2 shows, the CFM loss plateaus\nrapidly after ∼25 epochs. In contrast, physics-informed metrics (𝑊1 , 𝐷 corr ) improve steadily until\n\n–5–\n\fepoch 500. Additionally, the NFE stabilizes around epoch 600, indicating extended training is\nrequired to find stable probability paths, as adaptive ODE solvers require fewer steps (NFE) when\nthe learned velocity field becomes straighter. Thus, CFM loss alone cannot guarantee accurate\nkinematic reconstruction, necessitating decoupled physical validation metrics."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "7.0                                                           0.12\n                                                             CFM\n                                                            W1\n      6.5                                                           0.10\n                                                                                                                   Ground truth                                Ground truth\n CFM\n\n6.0                                                           0.08\n\nW1\n                                                                                           50                      Generated                         50        Generated\n\n5.5                                                           0.06                   40                                                        40\n\n5.0                                                           0.04"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Density\n                                                                                           30                                                        30\n\n0.12                   20                                                        20\n                                                            NFE\n      600                                                   Dcorr                          10                                                        10\n                                                                    0.10\n      575                                                                                    0                                                         0\nNFE"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Dcorr\n                                                                                           1.5                                                       1.5\n                                                                    0.08\n\nGen/Truth\n\nGen/Truth\n      550                                                                                  1.0                                                       1.0"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "0.06\n      525                                                                                  0.5\n                                                                                              0.42   0.41   0.40   0.39           0.38\n                                                                                                                                                     0.5\n                                                                                                                                                        1.02     1.01         1.00   0.99   0.98\n            0   100   200   300    400    500   600   700                                                   t                                                                 t\n                                  Epoch"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Figure 3. Close-up comparison of generated and\nFigure 2. Training metrics tracking over time during ground-truth distributions in two sharp cut-off regions\nthe MC-POM generation task, comparing the CFM of the 𝑡-channel.\nloss LCFM against physics-informed indicators (𝑊1 ,\nNFE, and 𝐷 corr )."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Table 1 summarizes quantitative performance on the MC-POM dataset for generation and\nunfolding tasks. All evaluations report metrics from the best-performing checkpoint. Distributional\nmetrics (𝜒2 , 𝑊1 , 𝜒2D\n                     2 , 𝐷\n                           corr ) are computed over 1,000,000 generated events, whereas 𝑅NN is\nevaluated by comparing 80,000 events against the full 8M-event training set.\n     For unconditional generation, the model achieves high-fidelity sampling over the entire phase\nspace, with 𝑅NN ≈ 1.00 confirming excellent generalization. Figure 4 shows strong visual agree-\nment between generated and ground-truth distributions (a supplemental correlation matrix is in\nAppendix D, Figure 15). Exact-zero constraint channels and axis units (GeV, GeV2 , radians) are\nomitted for clarity. A close-up of the 𝑡-channel distribution (Figure 3), where 𝑡 is computed from\nthe gene"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "–6–\n\fTable 1. MC-POM generation and detector unfolding performance across various smearing scales 𝜎smear .\nThe reported 𝜒2 values are unnormalized aggregates summed over all 10 features (50 bins each) for 1,000,000\nevents, not reduced 𝜒2 per degree of freedom. Lower 𝜒2 , 𝑊1 , 𝜒2D\n                                                               2 , and 𝐷\n                                                                         corr values indicate higher generative\nfidelity. A ratio 𝑅NN ≈ 1 indicates generalization, whereas 𝑅NN ≪ 1 flags memorization.\n                                 Task                                            𝜎smear                                𝜒2 (↓)                                  𝑊1 (↓)                                    2 (↓)\n                                                                                                                                           "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "t                                                                                  M                                                                               cos\n             6                                                                                                                                                             0.6\n                                                                                           3                                                                                                                                                     0.2\n             4                                                                             2                                                                               0.4\n   Density\n\nDensity\n\nDensity"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Density\n                                                                                                                                                                                                                                                 0.1\n             2                                                                             1                                                                               0.2"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "0                                                                            0                                                                                 0.0                                                                   0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                   1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                   1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                   0.5\n                   1.0          0.8                0.6               0.4                             0.4     0.6       0.8         1.0       1.2         1.4                       1.0           0.5          0.0          0.5       1.0               0              2                  4             6\n                                      Value                                                                "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2\n                                                                                                                                                                               1                                                                 0.2\n                                                                                           2\n\n0                                                                            0                                                                                   0                                                                   0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                   1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                   1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                   0.5\n             0.6          0.8         1.0                1.2           1.4                     1.1         1.0         0.9             0.8         0.7         0.6                         1.0         0.5           0.0         0.5                   2              4                  6             8\n                                      Value                                                                "
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n\n2                                                                         0.2                                                                                     2                                                                 0.5\n\n0                                                                          0.0                                                                                   0                                                                   0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                   1.5\nRatio\n\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                   1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                   0.5\n             0.6         0.7    0.8               0.9          1.0         1.1                  8                  6                     4                2                              0.2           0.4            0.6            0.8                       0.5             0.0           0.5\n                                      Value                                                                              Value     "
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n\n0.5                                                                          0.5                                                                                     2                                                                 0.5\n\n0.0                                                                          0.0                                                                                   0                                                                   0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                   1.5\nRatio\n\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                   1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                   0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                   0.2           0.4            0.6            0.8                       0.5             0.0           0.5\n                                      Value                                                                              Value     "
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n\n0.5                                                                                                                                                              0.2                                                                   0.2\n                                                                                       0.5\n\n0.0                                                                          0.0                                                                                 0.0                                                                   0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                   1.5\nRatio\n\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                   1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                   0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                    2            4             6           8                         8              6              4         2\n                                      Value                                                                              Value "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Figure 4. Comparison of generated kinematic distributions produced by the CFM model against the ground\ntruth on the JLab MC-POM dataset."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "–7–\n\f                                          t                                                                                  M                                                                                cos\n                                                                                           3                                                                               0.6                                                                    0.20\n             4                                                                                                                                                                                                                                    0.15\n                                                                                           2                                                                               0.4\n   Density"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Density\n\nDensity"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Density\n                                                                                                                                                                                                                                                  0.10\n             2                                                                             1                                                                               0.2\n                                                                                                                                                                                                                                                  0.05\n            0                                                                            0                                                                                 0.0                                                 "
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                     1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                     0.5\n                   1.0          0.8                0.6               0.4                             0.4     0.6       0.8         1.0       1.2         1.4                       1.0            0.5          0.0          0.5       1.0                 0             2                  4             6\n                                      Value                                                          "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2\n                                                                                                                                                                               1                                                                    0.2\n                                                                                           2\n             1\n            0                                                                            0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n             0.6          0.8         1.0                1.2           1.4                     1.1         1.0         0.9             0.8         0.7         0.6                         1.0          0.5           0.0         0.5                     2             4                  6             8\n                                      Value                                                        "
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2                                                                         0.2                                                                                     2                                                                    0.5\n\n0                                                                          0.0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n             0.6         0.7    0.8               0.9          1.0         1.1                  8                  6                     4                2                              0.2            0.4            0.6            0.8                         0.5            0.0           0.5\n                                      Value                                                                "
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n          1.0                                                                          1.0\n          0.5                                                                          0.5                                                                                     2                                                                    0.5\n\n0.0                                                                          0.0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                   0.2            0.4            0.6            0.8                         0.5            0.0           0.5\n                                      Value                                                                "
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "1.0                                                                          1.0\n                                                                                                                                                                           0.2                                                                      0.2\n          0.5                                                                          0.5\n          0.0                                                                          0.0                                                                                 0.0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                          "
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Ratio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                    2             4             6           8                           8             6              4         2\n                                      Value                                                                            "
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Figure 5. Unfolding results (𝜎smear = 1.0) mapping detector-level distributions back to the original particle-\nlevel truth, compared with both the target ground-truth and the initial smeared detector-level distributions.\n\n5                Discussion and conclusion"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "For practitioners applying generative models to HEP, our results underscore a critical training\ndynamic: the convergence of the standard CFM velocity loss can be misleading and does not\nensure the fidelity of physical observables. Because physical distributions require significantly\nlonger training to stabilize, decoupled evaluation using domain-specific observables is essential.\nAccounting for this discrepancy, we demonstrated through JetPrism—validated on synthetic and\nJLab MC-POM datasets—that CFM provides a robust, deterministic framework for capturing\ncomplex phase spaces and unfolding detector-level kinematics.\n    By learning flexible mappings between detector observables and particle truths, JetPrism offers\nan AI-driven, unbinned alternative to computationally expensive Monte Carlo simulations. This"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "–8–\n\fevent-level approach reduces binning artifacts and facilitates exploring low cross-section topologies\n(e.g., near-threshold 𝐽/𝜓 photoproduction, 𝜙 SDMEs, exotic hybrid mesons). This accelerated\npipeline is highly advantageous for EIC development, enabling rapid systematic iterations of de-\ntector configurations without repeated simulation campaigns.A detailed quantification of these\ncomputational throughput gains is provided in Appendix F.\n     JetPrism prioritizes modularity and reproducibility using a PyTorch Lightning [23], Hydra [24],\nand Weights & Biases [25] backend. We utilized standard CFM, which achieves high-fidelity\ngeneration and unfolding across joint and marginal distributions without the high computational\ncosts of calculating optimal pairings via OT-CFM on large datasets.\n     Beyond nuclear physics, this methodology naturally extends to other scientific fields tackl"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Acknowledgments\n\nWe thank Xuweiyi Chen (University of Virginia) for sharing his valuable experience in developing\nthe model. We also thank Huilin Huang (University of Virginia) for her financial support. This\nwork was partially supported by the National Science Foundation under POSE award 2346173.\n\nArtificial Intelligence Disclosure\n\nThe authors utilized generative AI (Gemini 3.1 Pro, Claude Opus 4.5/4.6) to refine prose and assist\nwith code/documentation. All AI-generated content was thoroughly reviewed, verified, and edited.\nThe authors take full responsibility for the content, accuracy, and integrity of this publication.\n\nData and Code Availability\n\nCode, models, and datasets are available on GitHub (https://github.com/xiazeyu/JetPrism)\nand Zenodo (https://doi.org/10.5281/zenodo.19277778, https://doi.org/10.5281/\nzenodo.19364485)."
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "–9–\n\fReferences\n [1] N. Huetsch, J. Mariño Villadamigo, A. Shmakov, S. Diefenbacher, V. Mikuni, T. Heimel et al., The\n     landscape of unfolding with machine learning, SciPost Physics 18 (2025) 070.\n [2] A. Andreassen, P.T. Komiske, E.M. Metodiev, B. Nachman and J. Thaler, OmniFold: A Method to\n     Simultaneously Unfold All Observables, Physical Review Letters 124 (2020) 182001.\n [3] H1 Collaboration, V. Andreev, M. Arratia, A. Baghdasaryan, A. Baty, K. Begzsuren et al.,\n     Measurement of Lepton-Jet Correlation in Deep-Inelastic Scattering with the H1 Detector Using\n     Machine Learning for Unfolding, Physical Review Letters 128 (2022) 132002.\n [4] M. Bellagente, A. Butter, G. Kasieczka, T. Plehn, A. Rousselot, R. Winterhalder et al., Invertible\n     networks or partons to detector and back again, SciPost Physics 9 (2020) 074.\n [5] T. Alghamdi, T. Vittorini, M. Spreafico, M. Battagl"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "– 10 –\n\f[18] A. Shmakov, K. Greif, M. Fenton, A. Ghosh, P. Baldi and D. Whiteson, End-To-End Latent\n     Variational Diffusion Models for Inverse Problems in High Energy Physics, Advances in Neural\n     Information Processing Systems 36 (2023) 65102.\n[19] A. Shmakov, K. Greif, M.J. Fenton, A. Ghosh, P. Baldi and D. Whiteson, Full Event Particle-Level\n     Unfolding with Variable-Length Latent Variational Diffusion, Apr., 2024.\n     10.48550/arXiv.2404.14332.\n[20] C. Allaire, R. Ammendola, E.-C. Aschenauer, M. Balandat, M. Battaglieri, J. Bernauer et al.,\n     Artificial Intelligence for the Electron Ion Collider (AI4EIC), Computing and Software for Big\n     Science 8 (2024) 5.\n[21] J. Giroux, M. Martinez and C. Fanelli, Generative models for fast simulation of Cherenkov detectors\n     at the electron–ion collider, Machine Learning: Science and Technology 6 (2025) 040501.\n[22] K. He, X. Z"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "A   Network architecture and training details\n\nBuilding upon the methodology in Section 3.2, both network variants share a residual MLP ar-\nchitecture. Table 2 lists the primary hyperparameters. The unconditional network evaluates the\nconcatenated state [𝑥 𝑡 ∥ 𝑒 𝑡 ] ∈ R𝐷+𝑑𝑡 , where 𝑒 𝑡 is the Fourier time embedding. For the conditional\nvariant, the detector measurement 𝑐 ∈ R𝐷 is embedded into 𝑒 𝑐 ∈ R128 , expanding the input to\n[𝑥 𝑡 ∥ 𝑒 𝑡 ∥ 𝑒 𝑐 ] ∈ R𝐷+𝑑𝑡 +128 ."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Table 2. Network architecture and training hyperparameters.\n    Architecture               Value                  Training        Value\n    Input dimension 𝐷          10                     Optimizer       AdamW\n    Hidden dimensions          [512] 6 (6 layers)     Learning rate   10−4 (decay 0.5, patience 50)\n    Time embedding dim.        64                     Weight decay    10−5\n    Activation function        SiLU                   Batch size      20,000\n    Total parameters           ∼2.7M                  Total epochs    800\n\nTime conditioning. The scalar time 𝑡 ∈ [0, 1] is embedded using 32 geometrically-spaced fre-\nquencies up to a maximum frequency 𝜔max = 64. A learned linear projection maps this Fourier\n\n– 11 –\n\ffeature into a R64 vector, providing the network with high-frequency temporal components necessary\nfor resolving sharp changes in the velocity field."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "Residual blocks. The core backbone comprises five residual blocks. Each block applies a two-\n                                                              \u0001\nlayer SiLU-activated sequence, SiLU Linear(SiLU(Linear(ℎ))) + ℎ, promoting stable gradient\nflow and facilitating the learning of identity mappings where the vector field is approximately\nconstant."
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Optimization details. We optimize parameters with AdamW. A ReduceLROnPlateau scheduler\ntracks the epoch-level validation CFM loss (val/loss_epoch), decaying the initial 10−4 learning\nrate by a factor of 0.5 upon detecting plateaus over a 50-epoch patience threshold (capped minimally\nat 10−7 ). For efficiency, validation metrics are computed over a random subset of 50,000 events.\nInstead, the globally optimal checkpoint persisting into final tabular summaries monitors the pure\ngenerative physical reconstruction (val/chi2_mean) over the raw CFM velocity loss, as discussed\nin detail throughout Section 4.2."
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Generation and inference details. For the Dormand-Prince (DOPRI5) ODE solver introduced in\nSection 3.2, absolute and relative tolerances are uniformly set to 10−7 for unconditional generation\nand relaxed to 10−3 for unfolding tasks. On a single NVIDIA Tesla V100-SXM2 GPU, one training\niteration on a 20,000-event batch completes in ∼32 ms (∼630K samples/s). Inference throughput\nreaches ∼2.6K samples/s for strict unconditional generation and ∼71.7K samples/s for conditional\nunfolding, with a detailed breakdown provided in Section F."
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Implementation and environment details. The JetPrism framework is implemented in Python\n(≥3.13) utilizing PyTorch (2.10.0) and PyTorch Lightning (2.6.1) [23] for hardware-agnostic train-\ning. Core underlying dependencies include torchdyn (1.0.6) for numerical ODE integration.\n     All model training and computational evaluations were primarily executed on the UVA Rivanna\nHigh-Performance Computing Cluster. GPU acceleration was performed using a single NVIDIA\nTesla V100-SXM2 tensor core GPU (32 GB VRAM) and an NVIDIA A100-SXM4 GPU (40 GB\nVRAM) with CUDA 12.8. CPU-based inference and data processing were performed on an Intel(R)\nXeon(R) Gold 6230 CPU @ 2.10GHz.\n\nB   Evaluation metrics"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "To rigorously assess the fidelity of the generated kinematic distributions against the ground truth, we\nutilize a structured set of evaluation metrics spanning marginal distributions, multivariate structures,\nand network memorization characteristics:\n\nMarginals. The quality of individual feature distributions is measured primarily using the 𝜒2\nstatistic and the Wasserstein-1 distance (𝑊1 ):\n\n• Mean 𝜒2 (val/chi2_mean): Evaluated over 1D binned histograms of individual features.\n      To prevent artifacts from outlier limits, exactly 50 uniform bins are dynamically bound\n      between the minimum and maximum values of the true expected distribution. The generated"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "– 12 –\n\f      histograms are normalized to match the total event count of the truth distribution before\n      evaluation. Formally, for a single feature, the statistic is:\n                                                  50\n                                                  ∑︁ (𝑂 𝑖 − 𝐸 𝑖 ) 2\n                                           𝜒2 =                                                (B.1)\n                                                  𝑖=1\n                                                              𝐸𝑖\n\nwhere 𝑂 𝑖 is the normalized generated count and 𝐸 𝑖 is the expected true count in the 𝑖-th bin."
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "• Mean Wasserstein distance (val/wasserstein_mean): Measures the minimum mass-\n      transport distance required to transform the generated 1D marginal distributions to the true\n      distributions. To explicitly circumvent the manual binning limits of 𝜒2 , this metric evaluates\n      the raw, unbinned 1D distributions via their cumulative distribution functions (CDFs) 𝐹 (𝑥)\n      and 𝐺 (𝑥):                             ∫    ∞\n                                      𝑊1 =            |𝐹 (𝑥) − 𝐺 (𝑥)| 𝑑𝑥                       (B.2)\n                                              −∞\n\nPairwise joints. To evaluate bivariate dependencies between kinematic variables, we examine\ntwo-dimensional distributions:"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "• Mean 2D 𝜒2 (val/chi2_2d_mean): Extends the 𝜒2 formulation to two-dimensional cross-\n      sections across all 45 unique pairwise feature combinations, returning the arithmetic mean.\n      Each axis is divided into 20 uniform bins (yielding exactly 400 rectangular bins per pair),\n      determined entirely by the ground-truth coordinate extremes. This rigorously tests whether\n      the generator captures underlying multivariate dependencies beyond independent marginals.\n\nGlobal correlation structure. To verify that generated events accurately reproduce multi-dimensional\nkinematic constraints, we assess holistic structural fidelity using:"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "• Correlation matrix distance 𝐷 corr (val/correlation_distance): A holistic measure of\n      how effectively the network reconstructs global linear relationships. It is evaluated as the\n      Frobenius norm of the difference between the sample Pearson correlation matrices:\n\n𝐷 corr = ∥corr(truth) − corr(gen) ∥ 𝐹                       (B.3)\n\nMemorization.     We test for generative generalization using comparative 𝐿 2 nearest-neighbor\nmappings:"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "• Nearest-neighbor distance ratio 𝑅NN (nn/memorization_ratio): Serves as our principal\n      guard against model over-fitting. It calculates the ratio of the mean nearest-neighbor distance\n      from generated samples to the training set (𝑑¯gen→train ) versus the mean nearest-neighbor\n      distance natively found within the training set itself (𝑑¯train→train ):\n                                                         𝑑¯gen→train\n                                            𝑅NN =                                              (B.4)\n                                                        𝑑¯train→train\n      A ratio 𝑅NN ≈ 1 indicates high-fidelity generalization, whereas 𝑅NN ≪ 1 flags strict dataset\n      memorization. Notably, for certain synthetic mock datasets, the native distance 𝑑¯train→train\n      can be exceptionally small, causing 𝑅NN to appear abnormally large; this is an expected\n  "
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "– 13 –\n\f    Additional auxiliary scalars monitored behind the 𝑅NN evaluation include:\n\n• nn/D_gen_to_train_mean: The arithmetic mean 𝐿 2 Euclidean distance from generated\n      events to their single closest element in the true training manifold.\n\n• nn/D_train_to_train_mean: The native baseline mean 𝐿 2 distance computed by match-\n      ing points from a random sub-sample of the training set to the remainder of the training\n      elements.\n\n• nn/D_gen_to_train_min and nn/D_train_to_train_min: The corresponding absolute\n      minimum scalar values computed for the distributions above.\n\nC   Synthetic benchmark analysis"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "To isolate and understand the fundamental generative capabilities of the architecture independent of\nphysical kinematics, we conducted extensive evaluations on a suite of synthetic 1D mock datasets.\nThese benchmarks are specifically designed to stress-test the model against complex topological\nstructures commonly encountered in physics, such as multi-modal overlapping resonances, sharp\nkinematic cut-offs, and high-frequency perturbative noise.\n      Table 3 summarizes the quantitative generation fidelity and memorization metrics across these\ndiverse 1D topologies. Across the majority of datasets, the model achieves exceptionally low\nWasserstein (𝑊1 ) distances and minimal 𝜒2 deviations, indicating robust macro-level distribution\nreconstruction. Crucially, the nearest-neighbor distance tracking parameters confirm that the frame-\nwork successfully generalizes without merely duplicating the"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "– 14 –\n\fTable 3. Quantitative evaluation on synthetic 1D benchmarks. The table reports marginal fidelity (𝜒2 , 𝑊1 )\nand memorization characteristics (𝐷 𝑔→𝑡 , 𝐷 𝑡→𝑡 , 𝑅NN ) across diverse topological structures.\n    Dataset                       Epoch      𝜒2 (↓)        𝑊1 (↓)           𝐷 𝑔→𝑡             𝐷 𝑡→𝑡            𝑅NN\n    Bimodal-Asym                     169     477.3     7.18 × 10−3       5.95 × 10−7      8.58 × 10−7         0.69\n    Exponential-Decay                359      83.1     1.82 × 10−3       8.19 × 10−6      8.70 × 10−7         9.41\n    Gauss-Cutoff                     279     212.4     3.39 × 10−3       7.23 × 10−6      9.90 × 10−8        73.09\n    Narrow-Wide-Overlap              229     197.2     7.63 × 10−3       4.07 × 10−6      7.38 × 10−6         0.55\n    Noise-3Spikes                    239     182.8     6.42 × 10−3       2.43 × 10−6      1.59 × 10−9       1523.4"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "𝐷 𝑡→𝑡 → 0, inflating 𝑅NN . The model generalizes correctly—this does not indicate memorization."
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "However, perfectly resolving these dense spatial features fundamentally requires decoupled val-\nidation schemas. Common physical modeling failure modes before full convergence are depicted\nin Figure 13, revealing the inherent edge-case sensitivities of flow-based generation. When under-\ntrained, the generated manifolds frequently exhibit smeared mass boundaries along strict kinematic\nlimits, or they produce spurious, bridged population points between completely separate disjoint\npeaks. Figure 14 actively tracks the resolution of these artifacts by charting the progressive struc-\ntural refinement over the different training stages. These sequential density profiles underscore that\nwhile the general macroscopic envelope of the distribution is identified rapidly, extended parameter\noptimization is strictly required for the velocity field to harden and reliably resolve targeted physical\nnuan"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "D     Extended unconditional generation validation\n\nBeyond analyzing individual 1D marginal distributions, predicting complex multivariate correla-\ntions is crucial for validating physical simulations. Figure 15 presents the comparative Pearson cor-\nrelation matrices for both the generated and ground-truth kinematics in the unconditional MC-POM\ngeneration task. The high degree of concordance across the entire parameter space demonstrates\nthe model’s capacity to naturally reconstruct global linear relationships and couple interdependent\nphysical limits, confirming high-fidelity multidimensional learning.\n\nE     Extended detector unfolding validation"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "To further assess the robustness of conditional generation across varying degrees of signal degra-\ndation, we profile the unfolding consistency under diverse smearing intensities. Figure 16 demon-\nstrates the model’s structural recovery when initialized with severe synthetic resolution degradation\n\n– 15 –\n\f                                                                                                     Ground truth                                                                                             Ground truth\n                                                                                                     Generated                    0.8                                                                         Generated\n              0.8\n\n0.6\n              0.6\nDensity"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "Density\n              0.4                                                                                                                 0.4\n\n0.2                                                                                                                 0.2\n\n0.0                                                                                                                 0.0\n              1.5                                                                                                                 1.5\nGen / Truth\n\nGen / Truth\n              1.0                                                                                                                 1.0"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "0.5                                                                                                                 0.5\n                       0         2         4         6              8         10         12      14            16                          3           2       1       0     1            2           3       4            5\n                                                               Value                                                                                                       Value\n\nFigure 6. Accurate representation of a sharp ex- Figure 7. High-fidelity reconstruction of an asym-\nponential decay distribution, smoothly capturing the metric bimodal topology, preserving the distinct in-\nsteep initial drop-off.                              dependent peak heights."
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Ground truth                                                                                             Ground truth\n              0.20                                                                                   Generated                                                                                                Generated\n                                                                                                                                  0.30\n\n0.25\n              0.15\n                                                                                                                                  0.20\nDensity\n\nDensity\n\n0.10                                                                                                                0.15"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "0.10\n              0.05\n                                                                                                                                  0.05\n\n0.00                                                                                                                0.00\n               1.5                                                                                                                 1.5\n   Gen / Truth\n\nGen / Truth\n\n1.0                                                                                                                 1.0"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "0.5                                                                                                                 0.5\n                           5.0       2.5       0.0       2.5            5.0        7.5        10.0          12.5                                   2       0       2          4               6           8       10\n                                                               Value                                                                                                       Value"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "Figure 8. Morphological reproduction of a three- Figure 9. Reconstruction of widely separated multi-\npeak mixed Gaussian distribution, matching strict modal peaks with disparate amplitudes in the tall-flat-\nboundaries.                                       far dataset.\n              0.30\n                                                                                                     Ground truth                 0.30                                     Ground truth\n                                                                                                     Generated                                                             Generated\n              0.25\n                                                                                                                                  0.25"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "0.20                                                                                                                0.20\n                                                                                                                    Density\nDensity\n\n0.15                                                                                                                0.15\n\n0.10                                                                                                                0.10\n\n0.05                                                                                                                0.05"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "0.00                                                                                                                0.00\n               1.5                                                                                                                 1.5\n                                                                                                                       Gen / Truth\n   Gen / Truth\n\n1.0                                                                                                                 1.0"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "0.5                                                                                                                 0.5\n                           10              5                    0                   5                     10                                   2               1             0                    1                    2\n                                                               Value                                                                                                       Value"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Figure 10. Detailed capture of high-frequency noise Figure 11. Generation on the uniform-flat distribu-\nspikes, successfully resolving dense structural pertur- tion, illustrating boundary smearing at sharp discon-\nbations.                                                tinuous density edges.\n                                                                                                               – 16 –\n\f                                      4\n                                          t=0                                                                                                          t=1\n                                                                                                                                                                       16\n                                      3\n                                                                                   "
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "1\n                                                                                                                                                                       10\n\nDensity\n                              Value\n\n0\n                                                                                                                                                                       8\n\n1\n                                                                                                                                                                       6\n\n2                                                                                                                                4\n\n3                                                                                                                                2"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "4                                                                                                                                0\n                                          Density 0.0            0.2           0.4                               0.6                0.8            1.0 Density\n                                                                                         Time t\n\nFigure 12. Velocity field density demonstrating the deterministic mapping of base noise vectors into a sharp,\nlocalized delta function target."
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "(a) Underfitting Artifacts                                                                  (b) Boundary Smearing Effect\n                                                                           Ground truth                                                                                         Ground truth\n                      0.25                                                                                              2.5\n                                                                           Generated                                                                                            Generated\nProbability Density\n\nProbability Density\n\n0.20                                                                                              2.0\n\n0.15                                                                                              1.5"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "0.10   Smeared peak                                                                               1.0"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "0.05                    Spurious              Blended peaks                                       0.5                                       Boundary leakage\n                                                                   (modes merged)                                                   Hard cutoff                  (intrinsic FM error)\n                                               spikes\n                      0.00                                                                                              0.0\n                                          0              2             4             6                                        0.6            0.8       1.0            1.2             1.4\n                                                         Value                                                                                       Value"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "Figure 13. Common generative failure modes before full convergence. (a) Underfitting artifacts exhibit\nsmeared, spurious, and blended peaks. (b) Boundary smearing effects show slight macroscopic edge\ndeviations along strict numerical cutoffs.\n\n(𝜎smear = 2.0), while Figure 17 illustrates the near-perfect, high-fidelity phase space restoration\nachieved from optimally calibrated, low-uncertainty detector signals (𝜎smear = 0.5). Together, these\nmappings highlight the stable deterministic pathways formed by the conditional CFM architecture\nregardless of the initial smearing scale.\n\nF                      Computational performance"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "To evaluate the computational efficiency of both training and inference, we benchmark the uncondi-\ntional generation and conditional unfolding tasks on CPU and GPU hardware. Table 4 summarizes\nthe training throughput (over 10 iterations with batch size 20,000) and inference throughput (over\n5 repeated runs of 50,000 samples). The GPU evaluations utilize either a single NVIDIA Tesla"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "– 17 –\n\f                             epoch 9                           epoch 19                                   epoch 29                                       epoch 39                           epoch 49\n                                                0.25                                       0.3\n          0.20                                  0.20\n                                                                                                                              0.2                                            0.2\n          0.15                                  0.15                                       0.2"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "0.10                                  0.10\n                                                                                           0.1                                0.1                                            0.1\n          0.05                                  0.05\n          0.00                                  0.00                                       0.0                                0.0                                            0.0\n                  4     2       0       2   4          4   2          0         2      4         4    2       0       2   4                4         2       0       2   4         4    2       0       2           4\n                            epoch 59                           epoch 69                                   epoch 79                                       epoch 109                          epoch 209\n           0.3                        "
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "0.2                                   0.2                                       0.2                                0.2                                            0.2\nDensity\n\n0.1                                   0.1                                       0.1                                0.1                                            0.1"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "0.0                                   0.0                                       0.0                                0.0                                            0.0\n                  4     2       0       2   4          4   2          0         2      4         4    2       0       2   4                4         2       0       2   4         4    2       0       2           4\n                            epoch 309                          epoch 409                                  epoch 509                                      epoch 609                          epoch 709\n           0.3                                   0.3                                       0.3                                0.3                                            0.3"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "0.2                                   0.2                                       0.2                                0.2                                            0.2\n\n0.1                                   0.1                                       0.1                                0.1                                            0.1\n\n0.0                                   0.0                                       0.0                                0.0                                            0.0\n                  4     2       0       2   4          4   2          0         2      4         4    2       0       2   4                4         2       0       2   4         4    2       0       2           4\n\nValue"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "Figure 14. Progressive convergence of the generated distribution evaluated on the high-frequency noise\ndataset. Initial smearing effects and spurious spikes systematically disappear as the model achieves conver-\ngence."
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "Difference (Gen - Truth)\n                      Truth Correlation Matrix                                         Generated Correlation Matrix                                                 Max |diff| = 0.0032\n           t                                                   1.00             t                                               1.00                 t                                                      0.003\n   M                                                                      M                                                                    M\n  cos                                                          0.75       cos                                                   0.75           cos\n     E                                                                      E                                                                    E                                           "
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "Correlation Difference\n    pz                                                                     pz                                                                   pz\n    Ep1                                                                    Ep1                                                                  Ep1                                                         0.001\n                                                               0.25                                                             0.25\n    p1x                                                                    p1x                                                                  p1x\n    p1z                                                                    p1z                                                                  p1z\n   E+                                                          0.00       E+               "
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "Mt\n\nMt\n                      p +\n\np +\n\np +\n                      p y\n\np y\n\np y\n\np y\n\np y\n\np y\n                       Ep z\n\nEp z\n\nEp z\n                        px\n\npx\n\npx\n                        px\n\npx\n\npx\n                      p +x\n\np x\n\np +x\n\np x\n\np +x\n\np x\n                      E 1z\n\nz\n\nE 1z\n\nz\n\nE 1z\n\nz\n                      Ez\n\nEpz\n\nEz\n\nEpz\n\nEz\n\nEpz\n                          +\n\n+\n\n+\n                        p11\n\np22\n\np11\n\np22\n\np11\n\np22\n                          +\n\n+\n\n+\n                         E\n\nE\n\nE\n                        p\n\np\n\np\n                  s\n\ns\n\ns\n               co\n\nco\n\nco\n                      p\n\np\n\np\n\nFigure 15. Pearson correlation matrices for the MC-POM unconditional generation task. Assessing the\ndependencies between generated kinematics and the ground-truth manifold reveals excellent reproduction of\ncomplex multivariate physics constraints."
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "V100-SXM2 or an NVIDIA A100-SXM4 GPU, while the CPU evaluation is performed on an\nIntel(R) Xeon(R) Gold 6230 Processor. The V100 GPU delivers a ∼25× speedup over the CPU\nin both phases and tasks, and the A100 further accelerates this, reaching throughputs exceeding\n880K samples/s during training. These significant performance gains enable the high-throughput\ngeneration characteristic of specialized fast simulation workflows.\n     While training throughput is comparable across both tasks, inference speed differs dramati-\ncally: conditional unfolding achieves substantially higher throughput than unconditional generation.\nOn the A100, unfolding operates at 1.01 × 105 events/s compared to 3.70 × 103 events/s for un-\nconditional generation (an ∼27× speed disparity consistent across GPU hardware). This disparity\narises primarily from the ODE solver tolerances: unconditional generation uses str"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "– 18 –\n\f                                          t                                                                                  M                                                                                cos\n                                                                                           3                                                                             1.00\n             4                                                                                                                                                                                                                                    0.2\n                                                                                           2                                                                             0.75\n   Density\n\nDensity\n\nDensity"
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "Density\n                                                                                                                                                                         0.50                                                                     0.1\n             2                                                                             1\n                                                                                                                                                                         0.25\n            0                                                                            0                                                                               0.00                                                                     0.0\n          1.5                                                                          1.5                                           "
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                1.0                                                                     1.0\n          0.5                                                                          0.5                                                                                0.5                                                                     0.5\n                   1.0          0.8                0.6               0.4                             0.4     0.6       0.8         1.0       1.2         1.4                       1.0            0.5          0.0          0.5       1.0               0             2                  4             6\n                                      Value                                                              "
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2\n                                                                                                                                                                               1                                                                  0.2\n                                                                                           2\n             1\n            0                                                                            0                                                                                   0                                                                    0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                    1.5\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "Ratio"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                    1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                    0.5\n             0.6          0.8         1.0                1.2           1.4                     1.1         1.0         0.9             0.8         0.7         0.6                         1.0          0.5           0.0         0.5                   2             4                  6             8\n                                      Value                                                              "
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "Density\n\nDensity"
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "Density\n                                                                                                                                                                                                                                                  1.0\n             2                                                                         0.2                                                                                     2                                                                  0.5\n            0                                                                          0.0                                                                                   0                                                                    0.0\n          1.5                                                                          1.5                                                                "
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-117",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                    1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                    0.5\n             0.6         0.7    0.8               0.9          1.0         1.1                  8                  6                     4                2                              0.2            0.4            0.6            0.8                       0.5            0.0           0.5\n                                      Value                                                                      "
+    },
+    {
+      "id": "b-118",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n          1.0                                                                          1.0                                                                                                                                                        1.0"
+    },
+    {
+      "id": "b-119",
+      "type": "body",
+      "text": "0.5                                                                                                                                                                  2                                                                  0.5\n                                                                                       0.5\n          0.0                                                                          0.0                                                                                   0                                                                    0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                    1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-120",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                    1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                    0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                   0.2            0.4            0.6            0.8                       0.5            0.0           0.5\n                                      Value                                                                      "
+    },
+    {
+      "id": "b-121",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity"
+    },
+    {
+      "id": "b-122",
+      "type": "body",
+      "text": "1.0                                                                          1.0\n                                                                                                                                                                           0.2                                                                    0.2\n          0.5                                                                          0.5\n          0.0                                                                          0.0                                                                                 0.0                                                                    0.0\n          1.5                                                                          1.5                                                                                 1.5                                                              "
+    },
+    {
+      "id": "b-123",
+      "type": "body",
+      "text": "Ratio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-124",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                    1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                    0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                    2             4             6           8                         8             6              4         2\n                                      Value                                                                              Valu"
+    },
+    {
+      "id": "b-125",
+      "type": "body",
+      "text": "Figure 16. Detector-level unfolding reconstruction initialized from severe simulated momentum smearing\n(𝜎smear = 2.0). Despite heavy initial degradation, the generative model successfully localizes and recovers\nthe macroscopic physical distributions.\n\nrequiring far fewer function evaluations per integration. Notably, the relaxed tolerances introduce no\nmeasurable degradation in unfolding fidelity (Table 1), suggesting that the conservative generation\ntolerances could be substantially loosened to achieve comparable speedups without compromising\ndistributional accuracy—a promising avenue for future optimization."
+    },
+    {
+      "id": "b-126",
+      "type": "body",
+      "text": "– 19 –\n\f                                          t                                                                                  M                                                                                cos\n                                                                                           3                                                                               0.6\n                                                                                                                                                                                                                                                  0.20\n             4                                                                                                                                                                                                                                    0.15\n             "
+    },
+    {
+      "id": "b-127",
+      "type": "body",
+      "text": "Density\n\nDensity"
+    },
+    {
+      "id": "b-128",
+      "type": "body",
+      "text": "Density\n                                                                                                                                                                                                                                                  0.10\n             2                                                                             1                                                                               0.2\n                                                                                                                                                                                                                                                  0.05\n            0                                                                            0                                                                                 0.0                                                 "
+    },
+    {
+      "id": "b-129",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-130",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                     1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                     0.5\n                   1.0          0.8                0.6               0.4                             0.4     0.6       0.8         1.0       1.2         1.4                       1.0            0.5          0.0          0.5       1.0                 0             2                  4             6\n                                      Value                                                          "
+    },
+    {
+      "id": "b-131",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2\n                                                                                                                                                                               1                                                                    0.2\n                                                                                           2\n             1\n            0                                                                            0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio"
+    },
+    {
+      "id": "b-132",
+      "type": "body",
+      "text": "Ratio\n\nRatio"
+    },
+    {
+      "id": "b-133",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n             0.6          0.8         1.0                1.2           1.4                     1.1         1.0         0.9             0.8         0.7         0.6                         1.0          0.5           0.0         0.5                     2             4                  6             8\n                                      Value                                                        "
+    },
+    {
+      "id": "b-134",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n             2                                                                         0.2                                                                                     2                                                                    0.5\n\n0                                                                          0.0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-135",
+      "type": "body",
+      "text": "Ratio\n          1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n             0.6         0.7    0.8               0.9          1.0         1.1                  8                  6                     4                2                              0.2            0.4            0.6            0.8                         0.5            0.0           0.5\n                                      Value                                                                "
+    },
+    {
+      "id": "b-136",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n\n0.5                                                                          0.5                                                                                     2                                                                    0.5\n\n0.0                                                                          0.0                                                                                   0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio\n\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-137",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                   0.2            0.4            0.6            0.8                         0.5            0.0           0.5\n                                      Value                                                                              Va"
+    },
+    {
+      "id": "b-138",
+      "type": "body",
+      "text": "Density\n\nDensity\n\nDensity\n\n0.5                                                                                                                                                              0.2                                                                      0.2\n                                                                                       0.5\n\n0.0                                                                          0.0                                                                                 0.0                                                                      0.0\n          1.5                                                                          1.5                                                                                 1.5                                                                      1.5\nRatio\n\nRatio\n\nRatio\n\nRatio"
+    },
+    {
+      "id": "b-139",
+      "type": "body",
+      "text": "1.0                                                                          1.0                                                                                 1.0                                                                      1.0\n          0.5                                                                          0.5                                                                                 0.5                                                                      0.5\n                         0.5           0.0                     0.5                                         0.5               0.0                   0.5                                    2             4             6           8                           8             6              4         2\n                                      Value                                                                            "
+    },
+    {
+      "id": "b-140",
+      "type": "body",
+      "text": "Figure 17. High-fidelity detector state unfolding mapped from precise, finely calibrated detector uncertainties\n(𝜎smear = 0.5). The generated recovery profiles display exceptional alignment with the underlying particle-\nlevel parameters."
+    },
+    {
+      "id": "b-141",
+      "type": "body",
+      "text": "– 20 –\n\f                            Table 4. Compute Speed\n                                   Training                     Inference\nTask         Hardware      ms / iter ↓   samples / s ↑    s / run ↓     events / s ↑\n             CPU (6230)   829.1 ± 28.7    2.42 × 104     477.7 ± 6.4    1.05 × 102\nGeneration   GPU (V100)    31.7 ± 1.1     6.32 × 105     19.2 ± 0.2     2.61 × 103\n             GPU (A100)    22.6 ± 0.3     8.84 × 105     13.5 ± 0.05    3.70 × 103\n             CPU (6230)   825.6 ± 16.1    2.42 × 104      17.5 ± 0.1    2.85 × 103\nUnfolding    GPU (V100)    32.4 ± 0.6     6.18 × 105     0.70 ± 0.001   7.17 × 104\n             GPU (A100)    23.5 ± 0.1     8.50 × 105     0.49 ± 0.001   1.01 × 105\n\n– 21 –"
+    }
+  ]
+}
