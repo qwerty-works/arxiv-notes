@@ -1,0 +1,252 @@
+{
+  "arxivId": "2604.04194",
+  "paperTitle": "PATHFINDER: Multi-objective discovery in structural and spectral spaces",
+  "abstract": "Automated decision-making is becoming key for automated characterization including electron and scanning probe microscopies and nano indentation. Most machine learning driven workflows optimize a single predefined objective and tend to converge prematurely on familiar responses, overlooking rare but scientifically important states. More broadly, the challenge is not only where to measure next, but how to coordinate exploration across structural, spectral, and measurement spaces under finite experimental budgets while balancing target-driven optimization with novelty discovery. Here we introduce PATHFINDER, a framework for autonomous microscopy that combines novelty driven exploration with optimization, helping the system discover more diverse and useful representations across structural, spectral, and measurement spaces. By combining latent space representations of local structure, surrogate modeling of functional response, and Pareto-based acquisition, the framework selects measurements that balance novelty discovery in feature and object space and are informative and experimentally actionable. Benchmarked on pre acquired STEM EELS data and realized experimentally in scanning probe microscopy of ferroelectric materials, this approach expands the accessible structure property landscape and avoids collapse onto a single apparent optimum. These results point to a new mode of autonomous microscopy that is not only optimization-driven, but also discovery-oriented, broad in its search, and responsive to human guidance.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Automated decision-making is becoming key for automated characterization including electron and scanning probe microscopies and nano indentation. Most machine learning driven workflows optimize a single predefined objective and tend to converge prematurely on familiar responses, overlooking rare but scientifically important states. More broadly, the challenge is not only where to measure next, but how to coordinate exploration across structural, spectral, and measurement spaces under finite experimental budgets while balancing target-driven optimization with novelty discovery. Here we introduce PATHFINDER, a framework for autonomous microscopy that combines novelty driven exploration with optimization, helping the system discover more diverse and useful representations across structural, spectral, and measurement spaces. By combining latent space representations of local structure, surrogate modeling of functional response, and Pareto-based acquisition, the framework selects measurements that balance novelty discovery in feature and object space and are informative and experimentally actionable. Benchmarked on pre acquired STEM EELS data and realized experimentally in scanning probe microscopy of ferroelectric materials, this approach expands the accessible structure property landscape and avoids collapse onto a single apparent optimum. These results point to a new mode of autonomous microscopy that is not only optimization-driven, but also discovery-oriented, broad in its search, and responsive to human guidance."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 2: Structural novelty and spectral reward in real and latent spaces. a) Representative HAADF image of the"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 3: Multi-objective autonomous experiment in structural and spectral spaces. a) Pareto-optimal solutions in"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 4: Active realization of the workflow in structural and functional spaces. a) Real-space acquisition trajectory"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 5: Stepwise evolution of the active experiment. a) Measured points in the joint reward space (𝑅1 , 𝑅2 ), where"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 6: Coverage and stepwise reward evolution in static and adaptive novelty formulations. a) Cumulative latent-"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "PATHFINDER: Multi-objective discovery in structural and spectral spaces\n    Kamyar Barakati1, * , Boris N. Slautin1, Utkarsh Pratiush1, Hiroshi Funakubo2, and Sergei V.\n                                             Kalinin1, †\n\n1 Department of Materials Science and Engineering, University of Tennessee, Knoxville, TN, USA\n\n2 Department of Materials Science and Engineering, Institute of Science Tokyo, Yokohama, Japan"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "ABSTRACT\nAutomated decision-making is becoming key for automated characterization including electron\nand scanning probe microscopies and nanoindentation. Most machine-learning-driven workflows\noptimize a single predefined objective and tend to converge prematurely on familiar responses,\noverlooking rare but scientifically important states. More broadly, the challenge is not only where\nto measure next, but how to coordinate exploration across structural, spectral, and measurement\nspaces under finite experimental budgets while balancing target-driven optimization with novelty\ndiscovery. Here we introduce PATHFINDER, a framework for autonomous microscopy that\ncombines novelty-driven exploration with optimization, helping the system discover more diverse\nand useful representations across structural, spectral, and measurement spaces. By combining\nlatent-space representations of local structur"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "*\n kbarakat@vols.utk.edu\n†\n  Sergei2@utk.edu"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\fI. INTRODUCTION\n      Automated instrumentation is now widely recognized as a prerequisite for self-driving\nlaboratories and materials exploration platforms. In materials characterization, recurring tasks\ninclude structural and functional imaging, the discovery of structure–property relationships via\ncoupled imaging and spectroscopy, and multimodal measurements that fuses complementary\ncontrasts or co-orchestrates several characterization tools.1-5 In principle, these measurements can\nbe integrated across heterogeneous platforms; in practice, a dominant latency bottleneck arises\nfrom physically relocating specimens between instruments, with associated alignment and\nenvironment-history effects. By contrast, modern electron and scanning probe microscopes\nalready provide rich in situ spectroscopic toolkit within a single tool (e.g., EELS/EDS,\nvibrational/optical probes, and bias- or forc"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\finformation of interest, discover physical phenomena and structure–property relations that fixed\npolicy pipelines miss.\n       On of the central tasks in the context of microscopy is a structure-property discovery via\ncombination of fast low information density imaging and slow high information density\nmicroscopy. The examples include STEM-EELS in electron microscopy13,14, topography imaging\nand a broad gamut of spectroscopies in SPM 15, nanoindentation assisted by optical or scanning\nelectron microscopy16, and many others. Here, practical considerations dictate that acquisition of\nthe spectroscopic data over dense spatial grids is both time consuming, associated with possible\nprobe and sample damage, and in some cases impossible due to the destructive nature of\nmeasurements. These considerations necessitate development of the active sampling strategies in\nthe image plane, selecting t"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "3\n\f       A second class of approaches focuses on discovering informative targets in the spectral\ndomain. The workflow typically begins with an acquisition of fast structural image and defining\nproperty of interest (scalarizer or reward) in from spectral data.27,28 The ML agent then learns a\nsurrogate model for the structure–property relationship. Using active learning, the controller\nselects locations to acquire new spectra balancing exploration (minimization of predictive\nuncertainty) and exploitation (maximizing the reward) goals. Variants of this strategy have been\ndemonstrated in both electron microscopy and scanning probe microscopy.29-33\n       Both fixed policy image-based approaches and reward-based approaches face practical\nlimitations. In the policy-driven, object-finding regime, success depends on the human operator\ncapability to identify features of interest a priori, while "
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "4\n\fsingle-optimum acquisition behavior with a probabilistic policy designed to recover multiple high-\nvalue regions while incorporating a domain-informed surrogate gate to suppress spurious optima\ninduced by noise. An allied formulation is provided by INS2 ANE,39 which augments strategic\nexploration with an explicit novelty score so that sampling decisions are not dictated solely by\nimmediate reward maximization, but also by the capacity of a measurement to expand the diversity\nof observed phenomena. These developments establish that expert intervention, multi-optima\nsearch, and novelty-aware acquisition can substantially broaden and stabilize autonomous\nmicroscopy workflows; however, they remain embedded within a single adaptive decision layer\nand therefore do not, by themselves, resolve the more fundamental problem of allocating\nmeasurement effort across competing modes of observation "
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "5\n\fdesign helps limit premature convergence and favors measurements that expand coverage of the\naccessible structure–property landscape while supporting downstream hypothesis generation. The\noverall architecture is shown schematically in Fig. 1.\n\nFigure 1. The PATHFINDER approach balances the novelty measures in the feature and target space as a multi-\nobjective discovery, providing principled approach for exploring structure-property relationships and human in the\nloop interventions."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "II. CONCEPTUAL OVERVIEW\n        The general approach of the workflow is chosen to fully represent and automate the human-\nbased decision making when operating the microscope, specifically selecting the regions for the\ndetailed spectroscopic studies. Generally, human decision making in this case can be driven either\nby the selection of certain objects of interest in the structural image, or by the search for specific\nspectroscopic signatures.\n        For the structural image, human operators can select objects of interest based either on the\nprior knowledge, statistically significant features, or some form of subjective novelty. The\nstructural image is generally available before selection of the objects of interest for spectroscopic\nstudies is performed. It is important to note that the human definition of objects of interest can\nevolve during the experiment as new data becomes available "
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "6\n\f       The second set of reward functions are associated with the spectroscopic measurements.\nUnlike structural descriptors, the spectroscopic measurements are not available in the beginning\nof the experiment, and locations are chosen sequentially based on the fully available structural data\nand partially available spectral data. In this case, the exploratory strategies require defining both\nthe reward function specifying the interest to spectral data (scalarizers) and learning the correlative\nrelationship between structural descriptors and the scalarizers. Over the last several years, these\nworkflows have been realized via versions of Deep Kernel Learning (DKL) within the Bayesian\nOptimization cycles, but other surrogate models can be created. Like structural descriptors, the\nscalarizers are known only probabilistically and can be dynamically updated during the experiment\nbased on th"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "II.1.STRUCTURAL REWARD 𝑹𝟏\n       To develop intuition behind algorithm, we first consider the case of fully available\nstructural and spectral data, illustrated here for the STEM-EELS data set. Here, both the structural\npatches and the spectra are available at all spatial locations. Such pre-acquired data sets are ideal\nboth to benchmark the algorithm as instrument emulators, and to generate ground truth answers.\nIt is important to note though that experimentally the limitations on possible data volumes usually\nlimit their applicability to only short experimental campaigns.35 43\n       In this study, we define the structural reward, 𝑅1, as novelty in feature space. Specifically,\nwe define the novelty as the distance of measured point from previously measured points in the\nlatent space of the variational autoencoder (VAE) representation of the image patches. The use of"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "7\n\fthe VAE for building compact representations of complex microstructures has been explored.44-48\nIn this setting, latent-space distance provides a natural measure of structural novelty, although\nother definitions could also be adopted, for example similarity to a selected object of interest when\nsuch external information is available."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "II.2.FUNCTIONAL REWARD 𝑹𝟐\n       We further define the spectral or functional reward, 𝑅2, as the target response modeled by\nthe surrogate. Depending on the experimental modality, this response may correspond to EDS or\nEELS signals in STEM, nonlinearity or hysteresis-loop observables in AFM, or other\nmeasurement-specific quantities of interest. In this way, 𝑅2 captures the functional objective,\nwhereas 𝑅1 promotes exploration of structurally distinct states. These two rewards are combined\nthrough multi-objective Bayesian optimization to guide measurement selection."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "II.3.WORKFLOW\n       The rationale of the workflow is that optimal experimental outcomes in heterogeneous\nsystems need not arise from the most prevalent structural class. Accordingly, the full workflow\nleverages contextual information to define a prior over structural heterogeneity, rather than using\ncandidate locations solely as coordinates for sampling. By embedding local candidates into a latent\nspace and defining 𝑅1through latent-space isolation, the method preferentially emphasizes rare or\nweakly represented motifs, thereby introducing structural informativeness before costly\nmeasurement.\n       Experimental feedback enters through a second objective, 𝑅2, which is observed only at\nsampled locations. A surrogate model is updated sequentially on measured 𝑅2values to infer the\nexpected response and its uncertainty over the unsampled set. The central design choice is to retain\n𝑅1and 𝑅2a"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "and experimental performance, rather than maximizing either objective in isolation. As a result,\nthe workflow the workflow described in Algorithm 1 avoids premature convergence to a single\n\n8\n\fapparent optimum and instead promotes efficient discovery of diverse, high-value structure–\nproperty relationships under limited experimental budget."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Algorithm 1: Contextual reward-driven microscopy with VAE structural prior\nInput:\n       I.     Map amplitude Channel : 𝑰 ∶ 𝜴 → ℝ\n     II.      Patch Size: 𝒘\n    III.      Stride: 𝒔\n    IV.       Seed budget: 𝒏𝟎\n     V.       Total budget: 𝑻\nSteps:\n   1. Construct the candidate patch set 𝓟 = {𝑷ᵢ}ᵢ₌₁ᴺ by sliding-window sampling of 𝑰, with\n                𝑷ᵢ = 𝓦(𝑰; 𝒄𝒊 ), where 𝒄𝒊 is the center of patch 𝒊.\n   2. Train a VAE encoder 𝒒𝝓 (𝒛 | 𝑷) 𝒐𝒏 {𝑷ᵢ}ᵢ₌₁ᴺ.\n   3. For each candidate 𝒊 ∈ [𝑵], encode patch 𝑷𝒊 and compute the latent embedding\n                𝒒𝝓 (𝒛𝒊 | 𝑷𝒊 ) = 𝒩 (𝛍𝒊, 𝚺𝒊),\n                𝒛𝒊 = 𝛍𝒊 ∈ ℝ 𝒎 .\n   4. Compute the structural reward map 𝑹𝟏 over all candidates. For example,\n                     𝟏\n                z̄ = 𝑵 ∑𝑵 𝒊 = 𝟏 𝒛𝒊 ,\n                𝑹𝟏 (𝒊) = ‖𝒛𝒊 − 𝐳̄‖𝟐,\n          or, alternatively,\n                             𝟏\n                𝑹𝟏 (𝒊) = 𝒌 ∑{𝒋 ∈ 𝓝𝒌 (𝒊) ‖𝒛𝒊 − 𝒛𝒋 ‖"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "c. Let\n                𝓨{𝒕−𝟏} = { (𝑹𝟏 (𝒋), 𝑹𝟐 (𝒋): 𝐣 ∈ 𝑺{𝒕−𝟏} }\n        d. For each candidate 𝐢 ∉ 𝑺{𝒕−𝟏} }, define the hypervolume improvement\n                𝑨𝑯𝑽𝒕 (𝒊: 𝒚) = 𝑯𝑽(𝓨{𝒕−𝟏} ) ∪ {𝐲}; 𝒓) − 𝑯𝑽(𝓨{𝒕−𝟏} ); 𝒓,\n\n9\n\f                and evaluate the acquisition score\n                                            (𝒕)\n                     𝛂𝒕(𝒊) = 𝑬 [𝑨𝑯𝑽𝒕 (𝒊; 𝐘𝒊 )]\n       e. Select the next location 𝒊𝒕 = 𝒂𝒓𝒈𝒎𝒂𝒙𝐢∉ 𝑺{𝒕−𝟏}} 𝛂𝒕(𝒊)\n       f. Perform experiment at 𝒊𝒕 and measure 𝑹𝟐 (𝒊𝒕 ) = 𝓜(𝒊𝒕 )\n       g. Augment the measured set and dataset:\n                𝑺𝒕 = 𝑺{𝒕−𝟏} ∪ {𝒊𝒕 }\n              𝑫𝒕 = 𝑫{𝒕−𝟏} ∪ {(𝑷𝒊𝒕 , 𝑹𝟏 (𝒊𝒕 ), 𝑹𝟐 (𝒊𝒕 ))}\n       h. end for\n    9. Return the visited trajectory 𝑺𝑻 , the measured rewards {𝑹𝟏 (𝒊), 𝑹𝟐 (𝒊)}𝒊 ∈ 𝑺𝑻 , the\n       surrogate reward maps, and the Pareto set in (𝑹₁, 𝑹₂)-space."
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "III. MATERIALS SYSTEMS AND EXPERIMENTAL SETTINGS\n       To evaluate the framework in both fully observed and sequential autonomous settings, we\nconsider two complementary experimental systems. The first is a pre-acquired STEM–EELS\ndataset of fluorine- and tin-co-doped indium oxide nanoparticles with near-infrared plasmon\nresonances.49-52 This system provides a structurally and spectrally heterogeneous landscape in\nwhich both the HAADF image and the corresponding spectral response are available throughout\nthe field of view, making it well suited as a benchmark for analyzing joint structural–spectral\ndiscovery under controlled conditions. The second is an on-the-fly scanning probe experiment on\nepitaxial PbTiO3 thin films grown on (100) KTaO3 single-crystal substrates. In this\nheterostructure, epitaxial tensile strain stabilizes the in-plane ferroelectric state and produces\npronounced spat"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "III.1.      PRE-ACQUIRED BENCHMARK: STEM–EELS NANOPARTICLE DATA\nThe pre-acquired STEM–EELS benchmark consists of a nanoparticle dataset in which both the\nstructural image and the corresponding spectral response are available across the full field of view.\nA representative HAADF image of the ensemble is shown in Fig. 2a."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "10\n\fFigure 2: Structural novelty and spectral reward in real and latent spaces. a) Representative HAADF image of the\nnanoparticle sample. Colored boxes indicate two examples 12 × 12pixel image patches used for structural analysis.\nb) Enlarged views of the corresponding structural patches. c) Spatial map of the structural novelty reward 𝑅1 ,\ncomputed from the VAE latent representation of local patches using the neighbourhood-based novelty metric. Colored\nsquares mark representative locations discussed in d–f. d) Distribution of the same patches in the two-dimensional\nlatent space (𝑍1, 𝑍2 ), colored by the corresponding structural novelty score. The marked points correspond to the\nlocations highlighted in c. e) Spatial map of the spectral reward 𝑅2 , defined from the scalarized EELS response and\noverlaid on the structural image. f) EELS spectra extracted from the locations marked in c and "
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "To parameterize local structure, the HAADF field of view shown in Fig. 3a was\ndecomposed into overlapping 12 × 12 pixel patches, with two representative examples shown in\nFig. 3b. Each patch was encoded by a pretrained variational autoencoder (VAE) into a latent vector\n𝑧𝑖 ∈ ℝ𝑚 , such that Euclidean distances in latent space quantify structural similarity. This latent\nrepresentation defines the structural reward 𝑅1. In the main-text analysis, 𝑅1 was taken as a local\nnovelty measure, computed from the separation of a patch from a reference point identified within\nits latent-space neighborhood. The resulting spatial map of structural novelty is shown in Fig. 3e,"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "11\n\fand its distribution in the two-dimensional latent embedding is shown in Fig. 3f. For comparison,\nSI Fig. S1 presents both reward definitions considered here. In SI Fig. S1a,b, novelty is defined\n                                         1\nrelative to the global latent mean, 𝑧ˉ = 𝑁 ∑𝑁                   𝑚𝑒𝑎𝑛\n                                            𝑖=1 𝑧𝑖 , such that 𝑑𝑖    =∥ 𝑧𝑖 − 𝑧ˉ ∥2 , whereas SI Fig.\n                                                                          (𝑛)\nS1c, d show the neighborhood-based definition used in the main text, 𝑑𝑖         =∥ 𝑧𝑖 − 𝑧(𝑛) ∥2 . These\ntwo constructions provide complementary notions of structural novelty, corresponding to\ndeviation from the dominant latent manifold and dissimilarity at the neighborhood scale,\nrespectively.\n       The second objective, 𝑅2, was defined directly from the EELS response. For a spectrum\n                     "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "denotes the energy window associated with the spectral feature of interest. In discrete form, this is\nequivalently written as the mean or summed intensity over the selected energy interval. The spatial\ndistribution of this spectral reward is shown in Fig. 3e, overlaid on the structural image, and three\nrepresentative spectra extracted from the marked positions are displayed in Fig. 3f. The shaded\ninterval in Fig. 3f indicates the energy range used for scalarization.\n        We formulated the experiment as a discrete multi-objective Bayesian optimization problem\nover all (7755, 12, 12)HAADF patches extracted with unit stride from the field of view in Fig.\n3a. Each candidate location was assigned two rewards: a structural novelty score 𝑅1, derived from\nthe pretrained 2D VAE latent embedding of the local patch, and a spectral score 𝑅2, defined from\nthe scalarized EELS intensity in the 0.4–0"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "12\n\fFigure 3: Multi-objective autonomous experiment in structural and spectral spaces. a) Pareto-optimal solutions in\nthe two-objective reward space defined by the structural reward 𝑅1 derived from the VAE latent representation and\nthe spectral reward 𝑅2 derived from the EELS response. Marker color denotes acquisition step. b) Corresponding\ntrajectory of the selected measurements in the VAE latent space. c) Spatial distribution of the measured locations\noverlaid on the structural image. d) Representative EELS spectra acquired at the circled locations in c, with the\nshaded band indicating the energy window used to define 𝑅2 ."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "The optimization trajectory reveals a search process that remains exploratory while\nprogressively concentrating on high-value measurements. In the joint reward space (Fig. 3a),\nsuccessive acquisitions populate a broad set of Pareto-optimal trade-offs between structural\nnovelty, 𝑅1, and spectral reward, 𝑅2, rather than collapsing rapidly onto a single corner of the\nobjective space. This behavior is mirrored in the VAE latent embedding (Fig. 3b), where queried\npoints continue to sample distinct structural regions of the manifold, indicating that convergence\nin reward space is achieved without loss of structural coverage. In real space (Fig. 3c), the selected\nlocations are distributed across the field of view, with repeated attention to the interfacial region\nwhile still retaining measurements in more weakly varying areas, consistent with a balance\nbetween refinement and continued explorati"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "13\n\fcontrast. Taken together, this workflow indicates that the search does not proceed by simple\nexploitation of a single apparent optimum but instead develops along a structured frontier that\npreserves diversity in local structure while enriching for regions with strong spectral response."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "III.2.      ON-THE-FLY EXPERIMENT: FERROELECTRIC SPM\n       The on-the-fly ferroelectric experiment was initialized from a single structural scan of the\nPbTiO3 film surface. The image was normalized and tessellated into overlapping 20 × 20 patches\nwith a stride of 5 pixels, and the center of each patch was converted from image coordinates into\nreal-space probe coordinates after correction for scan rotation. Each candidate measurement was\nthus represented by both a local structural patch and an experimentally accessible tip position. A\ntwo-dimensional invariant variational autoencoder was trained on the full patch library to embed\nevery candidate into a latent structural manifold 𝑧𝑖 . A visual summary of this experimental setup,\nincluding the measurement map, latent-space embedding, and structural reward representations, is\nprovided in SI Figure S3.\n       In this case, novelty was refere"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "14\n\fworkflow operated as a multi-objective, budget-aware controller that balanced structural\nexploration against functional discovery.\n       The behavior of the active experiment is summarized in Fig. 4. In real space Fig. 4a, the\nacquisition trajectory is clearly non-uniform, concentrating instead on specific domain\nconfigurations, junctions and interfacial regions. This selective sampling reflects the central design\nof the method: measurements are directed not by geometric coverage alone, but by their expected\ncontribution to the joint structural–functional objective. The corresponding trajectory in the\nlearned latent manifold Fig. 4b spans multiple separated regions of the VAE space, indicating that\nthe controller does not collapse rapidly onto a single structural class, but continues to interrogate\ndiverse local environments throughout the run. The origin of this behavior is evident"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "15\n\fFigure 4: Active realization of the workflow in structural and functional spaces. a) Real-space acquisition trajectory\noverlaid on the structural image; coloured markers denote autonomous measurements and white squares indicate the\ninitial seed points. b, Corresponding trajectory in the VAE latent space. c) Structural novelty landscape in latent\nspace, defined by the VAE-based reward 𝑅1 . d) Real-space projection of the structural reward 𝑅1 . e) Surrogate\nprediction of the functional reward 𝑅2 associated with the nonlinear spectroscopic response. f) Acquisition landscape\ngiven by expected hypervolume improvement, highlighting locations predicted to yield the largest gain in Pareto-\noptimal structure–function trade-offs."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "The stepwise evolution is summarized in Fig. 5. In the joint reward space Fig. 5a, the initial\nseed measurements (white squares) sample only a limited portion of the accessible (𝑅 , 𝑅 )                     1   2"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "landscape. Subsequent autonomous acquisitions (colored points) progressively expand this\ncoverage towards the Pareto-relevant region, indicating that the controller does not optimize\nnovelty or functionality in isolation, but refines the trade-off between them. Early steps broaden\nstructural coverage, whereas later steps increasingly populate points that combine high VAE-space\nnovelty with enhanced nonlinear response. The corresponding spectra (Fig. 5b) confirm that points\nselected at different stages of the run exhibit distinct nonlinear behavior, showing that the\ntrajectory continues to diversify the measured set rather than repeatedly sampling equivalent states.\nThe corresponding analysis for the static experiment is provided in SI Figure S5, which shows the\nsame evolution of measured points and the associated spectroscopic responses."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "16\n\fFigure 5: Stepwise evolution of the active experiment. a) Measured points in the joint reward space (𝑅1 , 𝑅2 ), where\ngrey squares denote the initial seeds and coloured points indicate subsequent acquisitions; circled markers highlight\nrepresentative measurements. b) Corresponding nonlinear responses for the circled points in a, showing distinct\nspectroscopic behaviors sampled during the experiment."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "IV. DISCUSSION\nThe contrast between the static formulation, where novelty is computed relative to the full set of\npre-acquired points, and the adaptive formulation, where novelty is computed only from the set of\npoints measured up to the current step, becomes most evident in the cumulative latent-space\ncoverage shown in Fig. 6a. The adaptive formulation achieves a systematically larger explored\nfraction of the structural manifold over the same acquisition budget, indicating that redefining\nnovelty with respect to the measurement history materially changes the trajectory of the\nexperiment. In the static case, structural rarity is fixed at initialization; once a high-value region\nhas been identified, nearby states can remain attractive because their novelty is referenced to the\nglobal latent distribution rather than to the path already taken. In the adaptive case, by contrast,\neach new acq"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "17\n\fneighborhood decreases, the acquisition rule redirects the search toward alternative regions that\nmay offer a better overall trade-off between structure and function. The resulting fluctuations\nshould therefore not be interpreted as instability, but as the expected signature of a controller that\nalternates between local refinement and global exploration. The same logic is apparent in the\nlatent-space displacement between consecutive measurements, 𝑧𝑡+1 − 𝑧𝑡 , shown in Fig. 6d, e. In\nthe static mode Fig. 6d, large jumps are interspersed with intervals of shorter motion, indicating\nthat the experiment can remain within favorable structural neighborhoods before relocating. In the\nadaptive mode Fig. 6e, large displacements occur more persistently, consistent with the fact that\neach acquisition reduces the novelty of its local surroundings and thereby suppresses redundant\nresampling. The a"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Figure 6: Coverage and stepwise reward evolution in static and adaptive novelty formulations. a) Cumulative latent-\nspace coverage, 𝐶𝐿𝑆,𝑝𝑎𝑡ℎ , as a function of acquisition step for the static (red) and dynamic (blue) modes. b, c) Evolution\nof the nonlinear-response objective, 𝛼𝑁𝐿 , during the static and dynamic runs, respectively; dashed lines indicate local\n\n18\n\ftrends. d, e) Consecutive latent-space displacement, 𝑧𝑡+1 − 𝑧𝑡 , for the static and dynamic runs, respectively, showing\nthe balance between local refinement and redirection to structurally distinct regions."
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "SUMMARY AND OUTLOOK\nBy coupling structural novelty with functional optimization, this work outlines a broader\nexperimental logic for autonomous microscopy: one that does not simply pursue the strongest\nimmediate response but instead allocates measurement effort across diverse local states to uncover\ninformative structure–property relationships under finite budget. In both the STEM–EELS\nbenchmark and the active ferroelectric microscopy experiments, the framework expands\nexploration of the accessible landscape while retaining the ability to refine regions of high\nfunctional interest, thereby avoiding the premature collapse that often accompanies single-\nobjective acquisition. The distinction between static and adaptive novelty further shows that\nredefining structural reward during experiment progression can materially improve coverage of\nthe latent manifold and redirect the search towards "
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "19\n\fDATA AVAILABILITY\nAdditional workflow details and visual summaries are provided in the Supplementary Information,\nincluding representative realizations of the experimental setup and acquisition maps\n\nCODE AVAILABILITY\nThe code used to generate and analyze the datasets during the current study is available at GitHub."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "ACKNOWLEDGEMENTS\nThis work (workflow development and conceptualization) was supported (K.B., B.S., and S.V.K.)\nby the U.S. Department of Energy, Office of Science, Office of Basic Energy Sciences, through\nthe Energy Frontier Research Centers program: CSSAS—The Center for the Science of Synthesis\nAcross Scales (Award No. DE-SC0019288), which supported prototyping on EELS, and the\nCenter for 3D Ferroelectric Microelectronics Manufacturing (3DFeM2) (Award No. DE-\nSC0021118), which supported implementation in the automated experiment. The work was\npartially supported (U.P.) by the AI Tennessee Initiative at the University of Tennessee, Knoxville.\nFilm growth (H.F.) was supported by MEXT Program: Data Creation and Utilization Type\nMaterial Research and Development Project (No. JPMXP1122683430) and MEXT Initiative to\nEstablish Next-generation Novel Integrated Circuits Centers (X-NICS) (JPJ0114"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "COMPETING INTERESTS\nThe authors declare no competing interests."
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "20\n\fREFERENCES\n1    Kalinin, S. V. et al. Automated and autonomous experiments in electron and scanning\n     probe microscopy. ACS nano 15, 12604-12627 (2021).\n2    Kandel, S. et al. Demonstration of an AI-driven workflow for autonomous high-\n     resolution scanning microscopy. Nature Communications 14, 5501 (2023).\n3    Roccapriore, K. M., Kalinin, S. V. & Ziatdinov, M. Physics discovery in nanoplasmonic\n     systems via autonomous experiments in scanning transmission electron\n     microscopy. Advanced Science 9, 2203422 (2022).\n4    Liu, Y. et al. Experimental discovery of structure–property relationships in\n     ferroelectric materials via active learning. Nature Machine Intelligence 4, 341-350\n     (2022).\n5    Stach, E. et al. Autonomous experimentation systems for materials development: A\n     community perspective. Matter 4, 2702-2726 (2021).\n6    Pratiush, U. et al. Building wor"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "21\n\f17   Susi, T., Meyer, J. C. & Kotakoski, J. Manipulating low-dimensional materials down to\n     the level of single atoms with electron irradiation. Ultramicroscopy 180, 163-172\n     (2017).\n18   Dyck, O. et al. Atom-by-atom fabrication with electron beams. Nature Reviews\n     Materials 4, 497-507 (2019).\n19   Ziatdinov, M. et al. Causal analysis of competing atomistic mechanisms in\n     ferroelectric materials from high-resolution scanning transmission electron\n     microscopy data. npj Computational Materials 6, 127 (2020).\n20   Barakati, K. et al. Mapping causal patterns in crystalline solid. APL Machine Learning\n     3 (2025).\n21   Barakati, K. et al. Causal discovery from data assisted by large language models.\n     Applied Physics Letters 127 (2025).\n22   Wyrick, J. et al. Atom‐by‐atom fabrication of single and few dopant quantum devices.\n     Advanced Functional Materials 29, "
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "22\n\f35   Slautin, B. N., Liu, Y., Funakubo, H. & Kalinin, S. V. Unraveling the impact of initial\n     choices and in-loop interventions on learning dynamics in autonomous scanning\n     probe microscopy. Journal of Applied Physics 135 (2024).\n36   Liu, Y. et al. Learning the right channel in multimodal imaging: automated experiment\n     in piezoresponse force microscopy. npj Computational Materials 9, 34 (2023).\n37   Ziatdinov, M. A. et al. Hypothesis learning in automated experiment: application to\n     combinatorial materials libraries. Advanced Materials 34, 2201345 (2022).\n38   Biswas, A. et al. SANE: strategic autonomous non-smooth exploration for multiple\n     optima discovery in multi-modal and non-differentiable black-box functions. Digital\n     Discovery 4, 853-867 (2025).\n39   Bulanadi, R. et al. Beyond optimization: Exploring novelty discovery in autonomous\n     experiments. AC"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "23\n\f52   Cho, S. H. et al. Spectrally tunable infrared plasmonic F, Sn: In2O3 nanocrystal\n     cubes. The Journal of Chemical Physics 152 (2020).\n\n24"
+    }
+  ]
+}

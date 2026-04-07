@@ -1,0 +1,297 @@
+{
+  "arxivId": "2604.04853",
+  "paperTitle": "MemMachine: A Ground-Truth-Preserving Memory System for Personalized AI Agents",
+  "abstract": "Large Language Model (LLM) agents require persistent memory to maintain personalization, factual continuity, and long-horizon reasoning, yet standard context-window and retrieval-augmented generation (RAG) pipelines degrade over multi-session interactions. We present MemMachine, an open-source memory system that integrates short-term, long-term episodic, and profile memory within a ground-truth-preserving architecture that stores entire conversational episodes and reduces lossy LLM-based extraction. MemMachine uses contextualized retrieval that expands nucleus matches with surrounding context, improving recall when relevant evidence spans multiple dialogue turns. Across benchmarks, MemMachine achieves strong accuracy-efficiency tradeoffs: on LoCoMo it reaches 0.9169 using gpt4.1-mini; on LongMemEvalS (ICLR 2025), a six-dimension ablation yields 93.0 percent accuracy, with retrieval-stage optimizations -- retrieval depth tuning (+4.2 percent), context formatting (+2.0 percent), search prompt design (+1.8 percent), and query bias correction (+1.4 percent) -- outperforming ingestion-stage gains such as sentence chunking (+0.8 percent). GPT-5-mini exceeds GPT-5 by 2.6 percent when paired with optimized prompts, making it the most cost-efficient setup. Compared to Mem0, MemMachine uses roughly 80 percent fewer input tokens under matched conditions. A companion Retrieval Agent adaptively routes queries among direct retrieval, parallel decomposition, or iterative chain-of-query strategies, achieving 93.2 percent on HotpotQA-hard and 92.6 percent on WikiMultiHop under randomized-noise conditions. These results show that preserving episodic ground truth while layering adaptive retrieval yields robust, efficient long-term memory for personalized LLM agents.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Large Language Model (LLM) agents require persistent memory to maintain personalization, factual continuity, and long-horizon reasoning, yet standard context-window and retrieval-augmented generation (RAG) pipelines degrade over multi-session interactions. We present MemMachine, an open-source memory system that integrates short-term, long-term episodic, and profile memory within a ground-truth-preserving architecture that stores entire conversational episodes and reduces lossy LLM-based extraction. MemMachine uses contextualized retrieval that expands nucleus matches with surrounding context, improving recall when relevant evidence spans multiple dialogue turns. Across benchmarks, MemMachine achieves strong accuracy-efficiency tradeoffs: on LoCoMo it reaches 0.9169 using gpt4.1-mini; on LongMemEvalS (ICLR 2025), a six-dimension ablation yields 93.0 percent accuracy, with retrieval-stage optimizations -- retrieval depth tuning (+4.2 percent), context formatting (+2.0 percent), search prompt design (+1.8 percent), and query bias correction (+1.4 percent) -- outperforming ingestion-stage gains such as sentence chunking (+0.8 percent). GPT-5-mini exceeds GPT-5 by 2.6 percent when paired with optimized prompts, making it the most cost-efficient setup. Compared to Mem0, MemMachine uses roughly 80 percent fewer input tokens under matched conditions. A companion Retrieval Agent adaptively routes queries among direct retrieval, parallel decomposition, or iterative chain-of-query strategies, achieving 93.2 percent on HotpotQA-hard and 92.6 percent on WikiMultiHop under randomized-noise conditions. These results show that preserving episodic ground truth while layering adaptive retrieval yields robust, efficient long-term memory for personalized LLM agents."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 2: Memory recall workflow. The query passes"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 1: MemMachine system architecture. Clients"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: Retrieval Agent tool tree. The ToolSelectA-             lation for dependency chains. It executes up to 3 itera-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 3: Retrieval Agent benchmark results across five datasets. Accuracy is LLM-judge score; Recall measures gold"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Table 4: HotpotQA hard set: per-tool performance                            Table 5: Average token cost per question by Retrieval"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 6: Decision guidance for enabling agent mode.            6      LLM Integration and Model"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 7: Impact of eval-LLM on MemMachine v0.2 Lo-"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 8: Token usage comparison on LoCoMo (gpt-4.1-              rated questions embedded in chat histories of approx-"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 9: Benchmark test environment."
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 10: MemMachine v0.2 LoCoMo results by category (LLM Judge Score)."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 11: LoCoMo benchmark comparison across AI agent memory systems (LLM Judge Score). MemMachine"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 12: LongMemEvalS configuration matrix (n = 500 questions per run). “Chunk” = sentence-level chunking"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 13: LongMemEvalS ablation: contribution of each             This has architectural implications: systems that in-"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 14: LongMemEvalS per-category LLM scores for selected configurations (n = 500). SSU = single-session-user,"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Table 15: LongMemEvalS token consumption per 500-                    while achieving 3–40× compression. This enables"
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Table 16: Architectural design space comparison across agent memory systems."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "MemMachine: A Ground-Truth-Preserving Memory System\n                                                               for Personalized AI Agents\n\nShu Wang∗1 , Edwin Yu†1 , Oscar Love‡1 , Tom Zhang§1 , Tom Wong¶1 , Steve Scargall‖1 , and\n                                                                                Charles Fan∗∗1\n                                                                                           1\n                                                                                               MemVerge, Inc.\n\nMarch 2026\narXiv:2604.04853v1 [cs.AI] 6 Apr 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract                                                          Table 1: Benchmark snapshot (quick overview). De-\n                                                                                                          tailed setup and full breakdowns are provided in later\n                                        Large language model (LLM) agents require persis-                 sections.\n                                        tent memory to maintain personalization, factual con-\n                                        tinuity, and long-horizon task performance, yet stan-                 Benchmark                       Metric                Result"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "dard context-window and retrieval-augmented gener-                    LoCoMo                Overall score (gpt-4.1-mini)    91.69%\n                                                                                                              LongMemEvalS          Ablation best (gpt-5-mini)       93.0%\n                                        ation (RAG) workflows remain brittle under multi-                     HotpotQA hard          Retrieval Agent accuracy       93.2%\n                                        session interactions. We present MemMachine, an open-                 WikiMultiHop†          Retrieval Agent accuracy        92.6%\n                                                                                                              Mem0 comparison         Input token reduction        ~80% less\n                                        source memory system that combines short-ter"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1\n\flections and do not support the dynamic, bidirectional              sults for open memory frameworks and above re-\ninteractions characteristic of AI agents that must learn            ported Mem0, Zep, Memobase, LangMem, and Ope-\nfrom, and adapt to, evolving user contexts across ses-              nAI baseline scores.\nsions.                                                           6. LongMemEvalS ablation study.               A system-\n   What AI agents require is a memory system—a mech-                atic evaluation on LongMemEval (ICLR 2025)\nanism that goes beyond document retrieval to store, or-             across six optimization dimensions—sentence chunk-\nganize, recall, and reason over past experiences. Draw-             ing, query bias correction, context formatting, re-\ning on established models from cognitive science [10, 11],          trieval depth, search prompt design, and"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\f   Zep [5] implements a temporal knowledge graph ar-             provider without modification.\nchitecture that tracks how facts evolve over time, com-             These diverse approaches highlight a fundamental de-\nbining graph-based memory with vector search. Zep                sign tension in agent memory: compression vs. preser-\nexcels at relationship modeling and temporal reasoning           vation. Systems that aggressively compress (Mastra,\nbut introduces complexity in deployment and configura-           Mem0) achieve smaller context windows and lower per-\ntion.                                                            query cost but risk losing critical detail. Systems that\n   Memobase1 and LangMem2 represent additional                   preserve raw data (MemMachine) maintain factual in-\napproaches, with Memobase providing structured mem-              tegrity at the cost of"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "3\n\fcontext, each conversational turn or interaction consti-          3.5      Episodic vs. Semantic: When to Use\ntutes an episode, a discrete unit of experience with asso-                 Each\nciated metadata (timestamp, participants, session iden-\ntifier).                                                          The choice between episodic and semantic retrieval de-\n                                                                  pends on the query type:\n   Episodic memory serves as ground truth. When an\nagent needs to recall what a user said, what was decided,               Table 2: Episodic vs. Semantic Memory Usage\nor what sequence of events occurred, it queries episodic\nmemory for the raw record. This is essential for factual\n                                                                      Criterion       Episodic             Semantic\naccuracy, auditability, and trust.\n       "
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "4\n\f       AI Agent           Python SDK          MCP Server                          User Query + Filters\n\nSTM Search\n                    MEMMACHINE\n               REST API          Python SDK\n                                                                                   LTM Vector Search\n\nContextualization\n             Episodic Memory             Semantic Memory\n\nWorking        Persistent                                             De-duplicate Episodes\n            Memory          Memory           Profile\n           (short-term)    (long-term)       Memory\n                                                                                    Rerank Clusters\n\nSort Chronologically\n                          Databases\n                SQL        Vector        Graph\n                                                                                     Return Results"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Figure 2: Memory recall workflow. The query passes\nFigure 1: MemMachine system architecture. Clients\n                                                               through STM, LTM vector search, contextualization,\n(AI agents, Python SDK, MCP servers) access Mem-\n                                                               deduplication, reranking, and chronological sorting be-\nMachine through REST API and SDK interfaces. In-\n                                                               fore returning results.\nternally, episodic memory comprises working memory\n(short-term) and persistent memory (long-term), while\nsemantic memory stores user profiles. All memory types\nare backed by SQL, vector, and graph databases.                   ducer, session) and receives a unique identifier.\n                                                               3. Relational Mapping: Sentences are linke"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "5\n\fplicates overlapping episodes between STM and LTM,             org_id/project_id pair and maintains separate mem-\nsorts all results chronologically to preserve conversa-        ory instances. Sessions are further isolated by user_id,\ntional flow, and returns STM episodes, the STM sum-            agent_id, and session_id, enabling multi-tenant de-\nmary, and LTM episodes for agent-driven context as-            ployments where multiple users and agents operate with\nsembly.                                                        fully isolated memory stores."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "4.6    Contextualization\n                                                               5     Retrieval Agent\nA key challenge in conversational memory retrieval is\nthat contextually important episodes may have embed-           MemMachine’s baseline retrieval mechanism—vector\ndings quite dissimilar from the query. Unlike document         similarity search with optional reranking—performs well\nretrieval in traditional RAG, where each chunk is rel-         on single-hop queries where the answer resides in a sin-\natively self-contained, conversational turns are highly        gle episode cluster. However, production AI agents rou-\ninterdependent. A question about “the restaurant rec-          tinely encounter queries that require multi-hop reason-\nommendation” requires not just the turn containing the         ing, multi-entity fan-out, or cross-referential dependency\nrecommendation, but the s"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "6\n\f                         ToolSelectAgent                          nal answer prompt improved accuracy by approximately\n                                                                  4% (with baseline prompt quality also improving), while\n                         (LLM query router)\n\nroutes to exactly one\n                                                                  jointly tuning all agent prompts improved accuracy by\n        ChainOfQuery         SplitQuery          MemMachine       approximately 6%. We do not perform live tuning at\n           Agent               Agent               Agent          inference time, so these gains add no runtime token or\n          (multi-hop)          (fan-out)           (direct)\n                                                                  latency overhead."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "DeclarativeMemory                         5.4    Strategy Details\n                    (vector search + reranker)"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "ChainOfQuery implements iterative evidence accumu-\nFigure 3: Retrieval Agent tool tree. The ToolSelectA-             lation for dependency chains. It executes up to 3 itera-\ngent classifies each query and routes it to one of three          tions, each consisting of: (1) retrieval against the current\nstrategies. All strategies ultimately delegate to the same        query, (2) a combined sufficiency judgment and query\ndeclarative memory search, ensuring that index and                rewrite via a single LLM call, and (3) evidence accumu-\nreranker improvements propagate automatically.                    lation. The sufficiency prompt enforces evidence-only\n                                                                  judgment (no external knowledge), strict completeness\n                                                                  standards, entity grounding (rewrites use only entit"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "7\n\fTable 3: Retrieval Agent benchmark results across five datasets. Accuracy is LLM-judge score; Recall measures gold\nsupporting fact retrieval. Best result per benchmark in bold. All MemMachine and Agent results use surrounding\nepisodes enabled unless noted."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Benchmark               Questions       Answer LLM              MemMachine         Retrieval Agent        Baseline\n                                                                           Acc.    Recall      Acc.       Recall         Acc.\n           LoCoMo                  1,540              gpt-5-mini           90.5%   82.2%      90.2%       82.5%          91.7%\n           WikiMultiHop            500               gpt-4.1-mini          88.8%   90.8%      90.0%       92.5%          96.7%\n           WikiMultiHop†           500                gpt-5-mini           87.4%   91.7%      92.6%       83.3%          96.7%\n           MRCR                    300                 gpt-5.2             79.6%   99.1%      81.4%       99.4%          32.3%\n           EpBench                 546                gpt-5-mini           73.4%   66.1%      71.8%       65.3%          77.5%\n           EpBench      "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Table 4: HotpotQA hard set: per-tool performance                            Table 5: Average token cost per question by Retrieval\nbreakdown for the Retrieval Agent (n=500, gpt-5-mini).                      Agent strategy (HotpotQA hard set)."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Tool                  Questions       Accuracy         Recall              Component                Input Tokens        Output Tokens\n  MemMachine                     201        93.53%       89.31%              ToolSelect (router)                 1,049               195\n  SplitQuery                     118        94.07%       92.83%              ChainOfQuery                        2,874             1,614\n  ChainOfQuery                   181        92.27%      95.31%               SplitQuery                          1,229               435\n                                                                             MemMachine                              0                 0\n  Overall (Agent)                500       93.20%       92.31%"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "HotpotQA provides the clearest demonstration of                          vides minimal benefit.\nthe Retrieval Agent’s value. On the hard validation set                       EpBench results are mixed and benchmark-\n(500 questions), the agent achieves 93.2% overall accu-                     dependent. With gpt-4o-mini as the answer model, the\nracy and 92.31% gold-supporting-fact recall, compared                       Retrieval Agent improves over baseline MemMachine\nto 91.2% accuracy and 90.98% recall for baseline Mem-                       (73.3% vs. 71.4%). With gpt-5-mini, baseline MemMa-\nMachine—a +2.0 and +1.3 percentage point improve-                           chine slightly outperforms (73.4% vs. 71.8%), suggesting\nment respectively. The per-tool breakdown (Table 4)                         model-prompt sensitivity.\nshows that ChainOfQuery achieves the highest recall\n(95.31%) on mul"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "8\n\f Table 6: Decision guidance for enabling agent mode.            6      LLM Integration and Model\n        Use        Agent   When. . .                                   Impact\n        Mode\n        Best fit           Queries involve multi-\n                                                                6.1      How LLMs Are Used in MemMa-\n                           hop reasoning,       co-                      chine\n                           reference resolution, or             A distinguishing design principle of MemMachine is that\n                           multi-entity fan-out.\n                                                                LLMs are used sparingly and strategically, rather than\n                           Accuracy is prioritized\n                           over latency.       Use\n                                                                for every memory operatio"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "6.2      Impact of Model Choice on Perfor-\n                                                                         mance\nagent mode is enabled per-query via a single flag,\nand the router itself filters simple queries to the zero-       The choice of LLM significantly affects both benchmark\noverhead direct path. In production, applications can           performance and operational cost. Table 7 summarizes\nenable agent mode selectively based on query complex-           the impact of eval-LLM selection on LoCoMo scores.\nity heuristics or always-on with acceptable overhead for\nthe majority of single-hop queries that route directly.\n                                                                Table 7: Impact of eval-LLM on MemMachine v0.2 Lo-\n5.9    OpenClaw Integration                                     CoMo scores."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "The Retrieval Agent is also available through Open-                   Configuration           LLM Score    Mode\nClaw4 , an open-source AI agent framework. The\nMemMachine OpenClaw integration is implemented as                     gpt-4.1-mini (agent)      0.9169     Agent\na standard plugin using the OpenClaw Plugin SDK                       gpt-4.1-mini (memory)     0.9123    Memory\n                                                                      gpt-4o-mini (agent)       0.8812     Agent\n(openclaw/plugin-sdk), not OpenClaw “agent mode.”\n                                                                      gpt-4o-mini (memory)      0.8747    Memory\nConcretely, the plugin imports SDK types and ex-\nposes the canonical plugin object with register(api:\nOpenClawPluginApi), where lifecycle hooks and tool\nregistrations connect MemMachine capabilities to the              The transition from "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "9\n\fTable 8: Token usage comparison on LoCoMo (gpt-4.1-              rated questions embedded in chat histories of approx-\nmini).                                                           imately 115k tokens each. We ingest the benchmark’s\n                                                                 chat histories session-by-session, then answer each ques-\n    System           Input Tokens      Output Tokens             tion using MemMachine’s memory search API. Evalua-\n    MemMachine                4.20M              43,169          tion uses the question-specific judge prompts provided\n    v0.2    (mem-                                                by the LongMemEval framework. We conduct a system-\n    ory)                                                         atic ablation study across 12 configurations varying six\n    MemMachine                8.57M              93,210         "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "10\n\f  run with gpt-4.1-mini for fair comparison.                    8.3     Efficiency Analysis\n• Zep [5]: Results sourced from Zep’s published evalu-\n                                                                Beyond accuracy, MemMachine demonstrates substan-\n  ation.\n                                                                tial efficiency advantages:\n• Memobase: Results sourced from Memobase’s pub-\n  lished benchmark.                                              • Token Reduction: ∼80% fewer input tokens than\n• LangMem: Results from Mem0’s comparative eval-                   Mem0, directly reducing API costs.\n  uation.                                                        • Memory Add Speed: ∼75% faster than previous\n• OpenAI baseline: ChatGPT’s native memory.                        versions, enabling real-time ingestion.\n                                                    "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "All benchmark scripts, configuration files, and run in-         8.4     LongMemEvalS Ablation Study\nstructions are available in the MemMachine repository\nunder evaluation/.6 For reproducible reporting, we              We evaluate MemMachine on the full LongMemEvalS\nrecommend pinning a repository tag or commit hash,              benchmark (n = 500 questions) through a systematic\nrecording model versions and API provider settings, and         ablation study across six optimization dimensions: sen-\nsaving raw per-question outputs used for score aggrega-         tence chunking, user-query bias correction, context for-\ntion. Researchers can reproduce our results with their          matting, retrieval depth (k), search prompt design, and\nown hardware and API keys.                                      answer-model selection. Each dimension is evaluated by\n                                       "
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "8.1    LoCoMo Benchmark Results                                 8.4.1   Retrieval Depth (k)"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Table 10 presents the comprehensive LoCoMo results for          The most impactful single parameter is the number of\nMemMachine v0.2 across both LLM configurations and              retrieved episodes. Increasing k from 20 to 30 yields\nboth operating modes.                                           the largest improvement: +4.2 percentage points (C6:\n                                                                0.870 → C7: 0.912). However, further increases show\n                                                                diminishing or negative returns: k = 50 drops to 0.890,\n8.2    Comparative Analysis\n                                                                worse than k = 30.\nTable 11 compares MemMachine against competing sys-                This non-monotonic behavior reflects a tension be-\ntems on LoCoMo.                                                 tween recall and no"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "11\n\f                   Table 10: MemMachine v0.2 LoCoMo results by category (LLM Judge Score).\n\nEval-LLM       Mode       Multi-hop     Temporal        Open-domain        Single-hop      Overall\n             gpt-4.1-mini   Agent        0.8830        0.9159             0.7188           0.9512       0.9169\n             gpt-4.1-mini   Memory       0.8972        0.8910             0.7500           0.9441       0.9123\n             gpt-4o-mini    Agent        0.8404        0.8069             0.7396           0.9394       0.8812\n             gpt-4o-mini    Memory       0.8759        0.7352             0.7083           0.9465       0.8747\n\nTable 11: LoCoMo benchmark comparison across AI agent memory systems (LLM Judge Score). MemMachine\nresults are with gpt-4o-mini for fair comparison with published baselines; gpt-4.1-mini results shown separately in\nTable 10."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "System                  Single-hop    Temporal         Multi-hop      Open-domain       Overall\n              MemMachine v0.2           0.9465        0.7352           0.8759           0.7083         0.8747\n              Memobase (v0.0.37)        0.7092        0.8505           0.4688           0.7717         0.7578\n              Zep                       0.7411        0.7979           0.6604           0.6771         0.7514\n              Mem0                      0.6713        0.5551           0.5115           0.7293         0.6688\n              LangMem                   0.6223        0.2343           0.4792           0.7112         0.5810\n              OpenAI                    0.6379        0.2171           0.4292           0.6229         0.5290"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "yielding +1.4% (C5: 0.855 → C6: 0.870).                           attribute this to the interaction between prompt de-\n                                                                  sign and model architecture. The Edwin3 prompt is\n8.4.3   Context Formatting                                        a direct, concise instruction without chain-of-thought\nThe format in which retrieved messages are presented              scaffolding, which aligns with GPT-5-mini’s stream-\nto the answer LLM significantly affects comprehension.            lined instruction-following. Conversely, GPT-5’s built-\nA naive approach concatenating all messages with car-             in reasoning may interfere when given explicit reason-\nriage returns produces a wall of text. Using \\n as line           ing instructions. Since GPT-5-mini is also substantially\nterminators within a message while using actual carriage    "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "12\n\fTable 12: LongMemEvalS configuration matrix (n = 500 questions per run). “Chunk” = sentence-level chunking\nenabled; “User-Q” = user-role query prefix; “JSON-str” = structured message formatting; “Edwin{1,3}” = search\nprompt variants of increasing refinement."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "ID     Answer LLM      Chunk      User-Q     JSON-str      Prompt      top_k    LLM Score\n              C5     GPT-5             —          —             ✓         Edwin1       20             0.855\n              C6     GPT-5             —          ✓             ✓         Edwin1       20             0.870\n              C7     GPT-5             —          ✓             ✓         Edwin1       30             0.912\n              C8     GPT-5             —          ✓             ✓         Edwin1       50             0.890\n              C9     GPT-5             ✓          ✓             ✓         Edwin1       20             0.878\n              C11    GPT-5             ✓          ✓             ✓         Edwin3       20             0.896\n              C12    GPT-5-mini        ✓          ✓             ✓         Edwin3       20             0.922\n              C13    GPT-5-mini        ✓          ✓   "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "Table 13: LongMemEvalS ablation: contribution of each             This has architectural implications: systems that in-\noptimization to overall LLM score, measured by compar-          vest heavily in LLM-based ingestion (extracting facts,\ning configuration pairs that differ in one variable.            building knowledge graphs) may be over-optimizing the\n                                                                wrong stage. MemMachine’s approach of storing raw\nOptimization                      Comparison     ∆ Score        data with lightweight indexing and investing in retrieval\nRetrieval-stage optimizations                                   quality appears to be more effective per unit of engi-\nRetrieval depth (k: 20→30)         C6 vs. C7      +4.2%         neering effort.\nContext formatting (JSON-str)      C4 vs. C5      +2.0%\nSearch prompt (Edwin1→3)           C9 vs. C11     +1"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "13\n\fTable 14: LongMemEvalS per-category LLM scores for selected configurations (n = 500). SSU = single-session-user,\nSSP = single-session-preference, SSA = single-session-assistant, TR = temporal reasoning, KU = knowledge update,\nMS = multi-session."
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Config              LLM           SSU       SSP        SSA    TR      KU      MS     Total\n                C5 (baseline)       GPT-5         0.986     0.700    1.000   0.798   0.925   0.797   0.855\n                C6 (user-q)         GPT-5         0.957     0.667    0.982   0.850   0.885   0.835   0.870\n                C7 (k=30)           GPT-5         0.986     0.800    1.000   0.917   0.923   0.850   0.912\n                C12 (mini,k=20)     GPT-5-mini    0.986     0.933    1.000   0.902   0.962   0.850   0.922\n                C14 (mini,k=50)     GPT-5-mini    1.000     0.933    1.000   0.932   0.949   0.842   0.928\n                C15 (mini,k=100)    GPT-5-mini    1.000     0.933    0.982   0.917   0.949   0.872   0.930"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Table 15: LongMemEvalS token consumption per 500-                    while achieving 3–40× compression. This enables\nquestion run. Input tokens scale with k; output tokens               prompt caching and stable context windows but sac-\nremain approximately constant.                                       rifices the ability to retrieve original episodes on de-\n                                                                     mand.\n      Config (LLM)        k    Input (M)      Score               • MemMachine’s approach—STM summary plus\n      C6 (GPT-5)         20            2.94   0.870                  selectively retrieved raw episodes—provides a differ-\n      C7 (GPT-5)         30            4.03   0.912                  ent tradeoff: the summary gives high-level context,\n      C8 (GPT-5)         50            6.47   0.890                  while retrieved episodes supply uncompress"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "14\n\f9.6    Privacy and Data Sovereignty                                    Retrieval vs. stable context. Retrieval-based sys-\n                                                                    tems (MemMachine, Mem0, Zep) search for relevant\nMemory systems for AI agents raise important privacy\n                                                                    memories each turn, which enables access to arbitrar-\nconsiderations. When user conversations are stored and\n                                                                    ily large memory stores but invalidates prompt caches\nindexed, the data sovereignty question becomes critical:\n                                                                    and adds latency. Stable-context systems (Mastra’s ob-\n • Local LLMs: Running embedding models and                         servational memory) keep a compressed log always in\n   LL"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "15\n\f                 Table 16: Architectural design space comparison across agent memory systems."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "Property                        MemMachine        Mem0             Zep      Mastra OM      MemOS       Full Context\n Memory approach                    Retrieval     Retrieval      Retrieval    In-context     Hybrid       In-context\n Ground truth preserved                ✓           Partial        Partial         ×          Partial          ✓\n Prompt cacheable                    Partial         ×              ×             ✓            ×              ✓\n Scales beyond context window          ✓             ✓              ✓             ×            ✓              ×\n LLM calls per message                Low           High         Moderate     Moderate        High           None\n Specialized DB required              Yes           Yes            Yes            No          Yes             No\n Parametric/KV-cache memory            ×             ×              ×             ×            ✓        "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "• Single-turn, stateless queries (search, translation,         • Adaptive retrieval budgets: Dynamically adjust-\n  simple QA).                                                    ing per-sub-query retrieval limits based on query\n• High-volume, low-personalization tasks (batch pro-             complexity estimates and accumulated evidence, re-\n  cessing, data extraction).                                     ducing redundant episode retrieval in fan-out and\n• Scenarios where privacy constraints prohibit storing           chain-of-query strategies.\n  interaction history.                                         • Function-calling code mode:              Investigating\n                                                                 function-calling architectures where agents emit\n                                                                 structured executable code (for example, Python or"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "16\n\fbilities to multi-hop queries, achieving 93.2% on Hot-              Benchmark for Large Language Models. In Inter-\npotQA hard and 92.6% on WikiMultiHop with random-                   national Conference on Learning Representations\nized noise—demonstrating that MemMachine’s ground-                  (ICLR), 2025.\ntruth-preserving architecture is composable: intelligent\nretrieval strategies can be layered on top without mod-          [9] Yuyang Hu, Shichun Liu, Yue Yue, et al. Memory\nifying the underlying storage model.                                 in the Age of AI Agents: A Survey. arXiv preprint\n                                                                     arXiv:2512.13564, 2025.\n   As AI agents transition from experimental technol-\nogy to production infrastructure, the quality of their          [10] Endel Tulving. Episodic and Semantic Memory. In\nmemory systems will determi"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "17\n\f[20] Cloudflare. Introducing Code Mode for MCP\n     servers. Cloudflare blog, 2025. https://blog.\n     cloudflare.com/code-mode-mcp/.\n[21] Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua\n     Bengio, William W. Cohen, Ruslan Salakhutdi-\n     nov, and Christopher D. Manning. HotpotQA: A\n     Dataset for Diverse, Explainable Multi-hop Ques-\n     tion Answering. In Proceedings of EMNLP, 2018.\n\n18"
+    }
+  ]
+}
