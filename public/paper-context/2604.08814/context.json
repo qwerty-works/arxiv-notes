@@ -1,0 +1,597 @@
+{
+  "arxivId": "2604.08814",
+  "paperTitle": "New Deep Learning Data Analysis Method for PROSPECT using GAPE: Genetic Algorithm Powered Evolution",
+  "abstract": "We propose a genetic algorithm powered evolution (GAPE) method to create deep learning solutions for energy and position estimation for reactor antineutrino interactions in the Precision Reactor Oscillation and Spectrum Experiment (PROSPECT) at the highly enriched High Flux Isotope Reactor (HFIR) at Oak Ridge National Laboratory. We also apply GAPE to create classification models to distinguish signatures of inverse beta decay (IBD) interactions of reactor antineutrinos from common background types. The GAPE method can also be adopted for optimization of other types of problems that utilize machine learning (ML) models for particle physics applications. When applied in the PROSPECT context, we find that the models selected by GAPE can, in some cases, outperform the traditional models previously used for PROSPECT data analysis. In particular, when benchmarked against conventional PROSPECT neutrino identification pathways using the same underlying information, the classifier offers the promise of improving the signal-to-background ratio by nearly 2.8 times. Performance biases uncovered during initial IBD classifier validation were primarily caused by differences in time-dependent response between background and signal training datasets. Biases were effectively mitigated through a data-period-specific training regimen, offering a pathway towards realizing an unbiased IBD signal classifier for future reactor neutrino datasets.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "We propose a genetic algorithm powered evolution (GAPE) method to create deep learning solutions for energy and position estimation for reactor antineutrino interactions in the Precision Reactor Oscillation and Spectrum Experiment (PROSPECT) at the highly enriched High Flux Isotope Reactor (HFIR) at Oak Ridge National Laboratory. We also apply GAPE to create classification models to distinguish signatures of inverse beta decay (IBD) interactions of reactor antineutrinos from common background types. The GAPE method can also be adopted for optimization of other types of problems that utilize machine learning (ML) models for particle physics applications. When applied in the PROSPECT context, we find that the models selected by GAPE can, in some cases, outperform the traditional models previously used for PROSPECT data analysis. In particular, when benchmarked against conventional PROSPECT neutrino identification pathways using the same underlying information, the classifier offers the promise of improving the signal-to-background ratio by nearly 2.8 times. Performance biases uncovered during initial IBD classifier validation were primarily caused by differences in time-dependent response between background and signal training datasets. Biases were effectively mitigated through a data-period-specific training regimen, offering a pathway towards realizing an unbiased IBD signal classifier for future reactor neutrino datasets."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: (top) Diagram Ashenfelter et al. (2019) of the layout for the experiment. Detector"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Conceptual diagram showing the genesis of neural network construction based on"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: Plot showing the rate of solution convergence for a classifier using the GAPE"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Table 1: A MC study measuring accuracy. We see the deep learning model performs better"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 4: Shown is the relative performance of the ML and traditional models on the test"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 2: A MC study comparing R2 scores. We see the deep learning model performs"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 5: Performance comparison for antineutrino energy estimation. Results are dis-"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 3: Performance metrics for IBD Classifiers 1 and 2. Metrics for most rows refer to"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 6: Plots of the mixed bag ML IBD signal distributions and the real-word ML IBD"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 4: Optimization functions available within gene pool along with the allowed ranges"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Table 5: Table of loss functions available within gene pool divided by target type. (S)"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 6: Activation functions available within gene pool along with the allowed ranges for"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 7: Additional genes available within the pool along with the allowed ranges for pa-"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 8: Scaling options for the features. The options are: the standard scaler which follows"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Journal of Machine Learning Research 23 (2026) 1-38            Submitted TBA; Revised TBA; Published TBA\n\nNew Deep Learning Data Analysis Method for PROSPECT\n                                                      using GAPE: Genetic Algorithm Powered Evolution\n\nM. Adriamirado and O. Benevides Rodrigues and A. Irani and\n                                                  B. R. Littlejohn and F. Machado\n                                                  Illinois Institute of Technology, Chicago, IL 60616, USA\narXiv:2604.08814v1 [physics.data-an] 9 Apr 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "A. B. Balantekin\n                                                  University of Wisconsin, Madison, WI 53706, USA\n                                                  C. Bass\n                                                  Le Moyne College, Syracuse, NY 13214, USA\n                                                  E. P. Bernard and N. S. Bowden and T. Classen and S. Ghosh and M. P. Menden-\n                                                  hall and C. Roca and X. Zhang\n                                                  Nuclear and Chemical Sciences Division, Lawrence Livermore National Laboratory, Livermore, CA\n                                                  94550, USA\n                                                  C. D. Bryan and A. J. Conant and G. Deichert and M. Fuller\n                                                  High Flux Isotope Reactor, Oak Ridge National Laboratory, Oak Ri"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Correspondence: prospect.collaboration@gmail.com\n\n©2026 Prospect Collaboration.\n                                                  License: CC-BY 4.0, see https://creativecommons.org/licenses/by/4.0/. Attribution requirements are provided\n                                                  at http://jmlr.org/papers/v23/21-0000.html.\n\f                                     Adriamirado et al."
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Abstract\n    We propose a genetic algorithm powered evolution (GAPE) method to create deep learn-\n    ing solutions for energy and position estimation for reactor antineutrino interactions in\n    the Precision Reactor Oscillation and Spectrum Experiment (PROSPECT) at the highly\n    enriched High Flux Isotope Reactor (HFIR) at Oak Ridge National Laboratory. We also\n    apply GAPE to create classification models to distinguish signatures of inverse beta decay\n    (IBD) interactions of reactor antineutrinos from common background types. The GAPE\n    method can also be adopted for optimization of other types of problems that utilize machine\n    learning (ML) models for particle physics applications. When applied in the PROSPECT\n    context, we find that the models selected by GAPE can, in some cases, outperform the\n    traditional models previously used for PROSPECT data analysis. In particu"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1 Introduction"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Machine learning techniques are now widely used in the particle physics community for\na variety of purposes, from particle tracking and reconstruction Newby et al. (2018) to\nfull waveform analysis in Time of Flight (TOF) experiments Jocher et al. (2018). Re-\ncent neutrino experiments that have utilized ML methods include DUNE Abi et al. (2020),\nMicroBoone Acciarri et al. (2017), IceCube Abbasi et al. (2021), and PROSPECT Andri-\namirado et al. (2025). A 2022 survey of ML methods in particle physics experiments was\npublished by Nature Radovic et al. (2022).\n    Our paper introduces a genetically enhanced deep learning approach for reconstruct-\ning the physical attributes of MeV-energy neutrinos produced inside the High Flux Iso-\ntope Reactor (HFIR) at Oak Ridge National Laboratory (ORNL) and detected inside the\nPROSPECT (Precision Reactor Oscillation and SPECTrum) particle physics detector"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2\n\f                                            GAPE"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "enne et al. (2019). These discrepancies report excesses of detected interactions of neutrinos\nin the region between 5-7 MeV.\n    PROSPECT was designed to make precision measurements of the antineutrino spec-\ntrum and probe eV scale massive sterile neutrinos by searching for neutrino oscillations\nover meter-long baselines from a highly-enriched uranium reactor Ashenfelter et al. (2019).\nThe 4-ton antineutrino detector target, shown in Figure 1, consists of a 14 by 11 grid of\nlong, rectangular segments, filled with a 6 Li-doped liquid scintillator to detect antineutrinos\nthrough inverse beta decay (IBD) while eﬀiciently rejecting backgrounds. Each segment is\n1.176 m in length and has a square cross-sectional area of 0.145 m × 0.145 m, with a photo-\nmultiplier tube (PMT) in an acrylic housing on both ends of each segment. 240 Hamamatsu\nR6594 PMTs and 68 ET 9372KB PMTs were used in the exper"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3\n\f                                   Adriamirado et al.\n\nFigure 1: (top) Diagram Ashenfelter et al. (2019) of the layout for the experiment. Detector\n          center to the reactor core center 4is approximately 7.84m. (Bottom) Diagram\n          Ashenfelter et al. (2019) showing cross-section of the PROSPECT detector.\n\f                                           GAPE\n\nThe PSD is distinctly different for neutron captures as it is for electromagnetic signatures.\nA more detailed discussion of the IBD selection cuts is outlined in section 3."
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "The application of these IBD signal analysis cuts to PROSPECT data during reactor-\non periods will result in selection of a combination of true neutrino interactions as well\nas backgrounds from two primary categories. First, random yet spatially and temporally\ncoincident events from physically independent interactions, such as a reactor gamma scat-\nter and a cosmic neutron capture, can mimic a truly correlated prompt and delayed IBD\nsignatures. This background category greatly increases during reactor-on periods due to\nthe high reactor gamma fields surrounding PROSPECT. The second dominant background\ntype arises from truly time-correlated signatures of cosmic neutrons, such as a prompt neu-\ntron inelastic scatter followed by a delayed capture of the same neutron. This background\ncategory remains largely unchanged between reactor-on and reactor-off periods."
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "Position reconstruction in the context of IBD selection refers to the determination of\nthe initial segment of interaction (SOI) for a particular event. The method for determining\nprimary segment number used in the traditional analysis relies on selecting the segment with\nthe highest-energy contained pulse of photon arrivals Andriamirado et al. (2021). For energy\nreconstruction, the traditional method employed by PROSPECT fits a maximum-likelihood\nfunction of the total photoelectrons collected (PEs) and the reconstructed position along\nthe length of the segment to calculate the energy deposited during the event."
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "A fraction of PMTs malfunctioned due to current instabilities during the detector run.\nAdditionally, a gradual decay in scintillation was observed due to interactions between the\nscintillator and detector materials and a slow precipitation of lithium from the scintilla-\ntor reduced the neutron capture eﬀiciency with time. The approach in this work mirrors\nthe previous PROSPECT analysis Andriamirado et al. (2021) in which a single detector\nconfiguration was used in the final analysis, which excluded information from any ’dead’\nsegments where one or both PMTs failed at any time during the detector operation. A recent\nPROSPECT effort to measure the antineutrino spectrumAdriamirado et al. (2023) yielded\na dataset with greater statistical power and utilized several different detector configurations\nto more optimally combat changing detector conditions.\n\n2 GAPE Method"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Genetic algorithms (GA) Holland (1975a) are useful for finding high-grade solutions to\nproblems where gradient descent is not a viable option. They provide a flexible and auto-\nmated framework for jointly optimizing model architecture, hyper-parameters, and feature\nselection in a high-dimensional space. Deep learning problems fall into this category, as\noften alterations in the optimum of one parameter may change the optimum of the others.\n\nIn this section, we discuss how GAPE was used in selecting the solutions to three vital\nproblems, antineutrino energy estimation, the SOI classification, and the IBD classification\nproblem. We begin by discussing the general GA method as it is applied to this problem,\nand then we examine our feature selections and models.\n\n5\n\f                                 Adriamirado et al."
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Figure 2: Conceptual diagram showing the genesis of neural network construction based on\n          a series of genetic blueprints. The genes will evolve based on a combination of\n          competition and chance.\n\n6\n\f                                            GAPE\n\n2.1 Genetic Algorithm"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "The heart of the analysis chain begins with a custom genetic algorithm, which holds the\ngenetic blueprints for a variety of deep learning models. These models will compete with\neach other in a ’survival of the fittest’ competition.\n    Figure 2 illustrates the general concept. We begin with a randomized population of\n’genes’ and each gene carries its own selection of chromosomes which hold specific instruc-\ntions on how to build particular parts of a neural net. These instructions not only govern\nthe selection of activation functions, learning rates, kernel constraints, the type of feature\nscaling employed, etc, but also form the neural net structure itself, such as the number\nof layers and neurons within each layer. For a full list of the available parameters, see\nAppendix A. Moreover, the process is completely automated, as the genes also contain in-\nstructions regarding the selection "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "7\n\f                                   Adriamirado et al.\n\nof chromosomes, not to be confused with training epochs). Further details on the GAPE\nstrategy are provided in the following subsection.\n\nSegment Classifier\n           1.0\n\n0.8\n\n0.6\nAccuracy\n\n0.4\n\n0.2\n\n0.0\n                 0   1       2       3       4     5         6       7       8       9\n                                              Epochs\n\nFigure 3: Plot showing the rate of solution convergence for a classifier using the GAPE\n          method. Here the classification task is to identify the correct segment where an\n          IBD interaction occurred (referred to in this paper as the SOI classifier). The\n          plot is associated with nine generational epochs and took a total runtime of ap-\n          proximately 33 hours where a population size of 1000 chromosomal arrangements\n          competed."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "2.2 Feature Selection\nDefining a relationship between the total deposited antineutrino energy and the recon-\nstructed energy clusters in the detector is the crux of the higher level analysis done by\nPROSPECT collaboration’s analysis tool (referred to as P2X). A variety of issues make\nthis a diﬀicult problem, including that some of the events are not fully contained in the\nactive materials, the significant amount of passive material in the detector (including non-\nfunctional or partially-functional segments), and the time-dependent nature of some de-\n\n8\n\f                                            GAPE"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "tector response parameters, such as scintillation light collection. PG4, a Geant4 based\nAgostinelli et al. (2003) Monte Carlo (MC) simulation of the detector, was developed by\nthe PROSPECT collaboration to model the detector’s energy and timing response. A va-\nriety of radioactive calibration sources and backgrounds were used to periodically calibrate\nthe detector response. IBD MC events are initially generated within PG4 and are then\nfurther processed through the P2X analysis chain. IBD events were generated assuming\na background-free Huber 235 U model Huber (2011b). Only events that survive the initial\nP2X cuts that use the same selection criteria and calibration configuration that was used\nin Andriamirado et al. (2021) are included for use in this study.\n     A list of some of the important features that are part of the output in a typical low level\nevent reconstruction are: the recon"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "9\n\f                                    Adriamirado et al."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "epochs. The models compete for a total of 4 generational epochs. After the fourth and\nfinal generational epoch, the best performing model of all is selected along with the features\nassociated with that model. In stage 2, the genes for selecting features are turned off, and\nall future candidate models inherit the fixed features from the winner from stage 1. We\nchoose 500 candidate models for the first generational epoch of the new stage, and 200 for\nthe remaining generational epochs. We also include the winning model’s architecture into\na fresh population set but we do not mate it with the other candidates at the start of stage\n2.\n     In stage 2, each candidate model is trained three times per generational epoch with\nrandomized batch shuffling, totaling six training epochs, and the average score across these\ntrials is computed. The same was done for the IBD classifier (except here we use"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "2.3 Machine Learning\nWe use a multi-layer function-fitting feed-forward network constructed via the GAPE\nmethod, as seen in Figure 1. We construct our models using both PyTorch 0.4.0 Paszke\net al. (2019) and Tensorflow 2.6.0 Abadi et al. (2015) with equivalent performance. The\nfull parameter space explored by GAPE is provided in the Appendix A.\n    For the energy estimator, the GAPE settled on a 6 layer feed-forward neural net: A\n616-length input layer containing the four selected features for each segment is connected\nto 4 hidden layers of size 900, 700, 350, and 250, and one linear output. The respective\nactivation functions selected by the GAPE on the hidden layers are the rectified linear unit\nfunction (relu) Glorot et al. (2010), exponential linear unit function (elu) Clevert et al.\n(2016), relu function, and scaled exponential linear unit (selu) Klambauer et al. (2017)\nfunction res"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "10\n\f                                            GAPE"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Bengio (2010). A mean squared error loss function and a batch size of 16 were selected.\nFinally, the GAPE method selected a solution that involved no scaling of features.\n    The SOI classifier required a less complicated structure. The GAPE method settled\non a 4-layer feed-forward neural net: A 616-length input layer containing the four selected\nfeatures for each segment is connected to 2 hidden layers of size 475 and 450, and a softmax\noutput of size 154. The hidden layer activations selected were the rectified relu function, and\nthe hyperbolic tangent function (tanh) Steeb (2005) respectively. A learning rate of .0001,\na categorical cross-entropy loss function Cybenko et al. (1998), the Adam optimizer Kingma\nand Ba (2017) (exponential decay rates for the first and second momentum of 0.9 and 0.999\nrespectively, ϵ = 10−6 ), and a batch size of 64 were selected. Glorot Uniform initializa"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "1. Train (80%). Used during training to update network parameters (weights and\n     biases).\n\n2. Validate (20%). Used to stop training to prevent overtraining and is not used to\n     update network parameters.\n\n11\n\f                                   Adriamirado et al.\n\nOnce GAPE selects the best model architecture, we train the very final models, used\nfor evaluation, on a larger dataset comprised of approximately 5.5 million simulated IBD\ncandidates. This larger dataset was split into three groups:\n\n1. Train (70%). Used during training to update network parameters (weights and\n     biases).\n\n2. Validate (10%). Used to stop training to prevent overtraining and is not used to\n     update network parameters.\n\n3. Test (20%). Used to evaluate performance and left completely separate. This set is\n     not used during training at all."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "The dataset for the IBD classifiers was handled differently and will be described in 4.\n    Supervised learning was performed on the Lawrence Livermore National Laboratory\nComputer Cluster (Lassen) and on a Google Cloud Platform (GCP) virtual machine utiliz-\ning a Nvidia Tesla V100 GPU."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "3 Energy and Position Estimator Results and Performance\nIn this section, we explore the GAPE-selected machine learning (ML) models performance\nusing simulated IBD MC events and compare them with previous models when possible.\nAll events analyzed in this section are considered IBD candidates as selected by P2X using\nthe same selection criteria and calibration configuration used in Andriamirado et al. (2021).\n    The positron from an IBD interaction in the detector typically deposits up to 8 MeV\nacross a number of segments (1-3 usually). For the prompt event, IBD selection requires\na total reconstructed visible energy between 0.8 and 7.2 MeV and individual reconstructed\npulse PSD values that are all all within ±2σ of the PSD mean of the calibrated electron-like\nparticles. As the IBD neutron thermalizes it produces negligible scintillation, and within\napproximately a 50 µs time constant and"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "3.1 SOI Classifier\nThe SOI classifier attempts to identify and label events that occur in dead segments as well\nas live segments. The GAPE selected model was frozen after training for 16 epochs and\ninference on the test set produced the results in this section. We found improvements in\naccuracy under 3 different scenarios. When only the initial P2X analysis cuts are applied,\n\n12\n\f                                           GAPE"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "we refer to this as the no additional cuts scenario. All events are subject to the P2X initial\nanalysis cuts. We define the additional removal of events in which IBD interactions occur\nin dead material or dead segments as DS cuts. Low energy cuts are defined as the removal\nof events in which the total visible energy in the detector is less than 0.8 MeV. For the no\nadditional cuts, low energy cuts, and the low energy plus DS cuts scenarios, respectively\nwe obtained (95.4, 98.0, 98.7)% accuracies for the ML SOI classifier and (92.4, 97.2, 97.9)%\naccuracies for the traditional method to determine the SOI. A k-fold crossing analysis was\ndone using the entire train and validation sets and k=10 and the results are tabulated in\ntable 1.\n    The ML model yields modest gains in SOI reconstruction relative to an already well-\nperforming traditional reconstruction technique when low energy cuts are"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "method    No Cuts       Low Energy Cuts    Low Energy\n                                                              and DS cuts\n                   P2X       92.4 ± 0.5    97.2 ± 0.3         97.9 ± 0.2\n                   ML        95.4 ± 0.3    98.0 ± 0.2         98.7 ± 0.1\n\nTable 1: A MC study measuring accuracy. We see the deep learning model performs better\n         than the traditional model for SOI reconstruction. This table summarizes im-\n         provements as they relate to no cuts ( beyond primary P2X candidate cuts), low\n         energy cuts, and both low energy and DS cuts.\n\n3.2 Energy Estimation"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Figure 5 shows the reconstructed antineutrino energy versus the truth as reported in PG4.\nModel performance is evaluated using the R2 score, which measures the fraction of variance\nin the dependent variable explained by the true energy. Low energy cuts are applied in both\nanalyses. In the top-left plot, we minimized the R2 score by adding a best-fit constant to all\nthe prompt energy values. It is important to note that P2X makes no effort to attempt any\ncorrections for missing energy - those corrections are done statistically using an unfolding\nprocess and are beyond the scope of this paper. Additionally, while the ML energy estimator\ndoes the unique workload of predicting the true antineutrino energy, no further efforts are\nmade to statistically unfold the distribution the model yields. Thus one-to-one comparisons\nare somewhat grainy, but by shifting the reconstructed P2X-outputted reco"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "13\n\f                                              Adriamirado et al.\n\nSOI Accuracy by Segment (ML           P2X)\n  140   141   142     143    144   145   146     147   148   149     150     151   152   153\n\n126   127   128     129    130   131   132     133   134   135     136     137   138   139\n                                                                                               0.010\n  112   113   114     115    116   117   118     119   120   121     122     123   124   125\n\n98    99    100     101    102   103   104     105   106   107     108     109   110   111\n                                                                                               0.005\n  84    85    86      87      88   89    90      91    92    93      94      95    96    97\n\n70    71    72      73      74   75    76      77    78    79      80      81    82    83"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "56    57    58      59      60   61    62      63    64    65      66      67    68    69    0.000\n  42    43    44      45      46   47    48      49    50    51      52      53    54    55\n\n28    29    30      31      32   33    34      35    36    37      38      39    40    41     0.005\n  14    15    16      17      18   19    20      21    22    23      24      25    26    27\n\n0     1     2       3      4     5     6       7     8     9      10      11    12    13\n                                                                                                0.010\n\nReconstructed Energy R² by Segment (ML                P2X)\n  140   141   142     143    144   145   146     147   148   149     150     151   152   153"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "126   127   128     129    130   131   132     133   134   135     136     137   138   139\n                                                                                               0.045\n\n112   113   114     115    116   117   118     119   120   121     122     123   124   125   0.040\n  98    99    100     101    102   103   104     105   106   107     108     109   110   111\n\n84    85    86      87      88   89    90      91    92    93      94      95    96    97\n                                                                                               0.035"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "70    71    72      73      74   75    76      77    78    79      80      81    82    83    0.030\n  56    57    58      59      60   61    62      63    64    65      66      67    68    69\n                                                                                               0.025\n  42    43    44      45      46   47    48      49    50    51      52      53    54    55\n\n28    29    30      31      32   33    34      35    36    37      38      39    40    41    0.020\n  14    15    16      17      18   19    20      21    22    23      24      25    26    27\n                                                                                               0.015\n   0     1     2       3      4     5     6       7     8     9      10      11    12    13"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Figure 4: Shown is the relative performance of the ML and traditional models on the test\n          set by segment. Integer values in the grid represent segment numbers. While the\n          overall performance is better with the ML model, we see in the top plot that the\n          SOI ML classifier does best in segments with more active neighbors, while the P2X\n          method does better in the more isolated segments. For the reconstructed energy,\n          in the bottom plot we observe similar performance gains across all segments with\n          the greatest gains seen in the more isolated segments.\n\n14\n\f                                            GAPE"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "For this particular test set, the traditional model had an overall R2 score of 0.856. (0.874\nwith DS cuts). The top-right plot shows the performance of the GAPE-selected ML model\n(described in the previous section) in estimating the true energy. The same test set was used\nfor both plots. The ML model outputs an overall R2 score of 0.876 (0.891 with DS cuts).\nWe qualitatively see that the ML model proves to be an overall better estimator of the true\nenergy than the traditional model by how tightly the estimator follows the true value. To\nmake this comparison more explicit, the bottom left plot compares the standard error of\nthe estimate for each method. In this comparison we see that the ML method provides\nsuperior reconstructed energy resolution across the energy spectrum above approximately\n3 MeV. Both plots exhibit peak performance at approximately 3.5 MeV. The bottom right\nplot displa"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "method    No Cuts      Low Energy Cuts    Low Energy\n                                                             and ML cuts\n                   P2X       0.63 ± .04   0.853 ± 0.003      0.873 ± 0.002\n                   ML        0.81 ± .3    0.877 ± .002       0.892 ± 0.001\n\nTable 2: A MC study comparing R2 scores. We see the deep learning model performs\n         better than the traditional model for energy estimation. This table summarizes\n         improvements as they relate to no cuts ( beyond primary P2X candidate cuts),\n         low energy cuts, and both low energy and DS cuts."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "4 IBD Classifier\n4.1 Introduction\nThe GAPE method was used to select a classifier for the identification of IBD interac-\ntions from backgrounds, in contrast to a typical background subtraction. For an input\nPROSPECT prompt-delayed event pair, the classifier outputs a single score on a contin-\nuous scale between 1 (more IBD-like) and 0 (less IBD-like). To make a final selection,\nevent pairs with a score greater than 0.5 are classified as signal events, while events with\nscores below that are classified as background. This classifier is meant to be implemented\non event pairs that have successfully passed the traditional selection as applied through\n\n15\n\f                                   Adriamirado et al."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "Figure 5: Performance comparison for antineutrino energy estimation. Results are dis-\n          played for traditional model (top-left) and the ML energy estimator (top-right).\n          Low E cuts are applied. We see the fitted values match the underlying truth\n          better overall using the ML model. The bottom left plot shows the standard\n          error of the estimate where we see that the the predicted values in the ML model\n          differ less from the actual values except for energies less than 3 MeV. The bottom\n          right plot shows the average bias (reconstructed minus truth) and the standard\n          deviation across the energy spectrum where we generally see a tighter bias range\n          for the ML model.\n\n16\n\f                                           GAPE"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "the P2X analysis chain. We take a unique approach here by using real backgrounds for\ntraining. Because the decision process is opaque in ML models, it becomes challenging to\nidentify or mitigate errors and biases that may be present. These errors can be introduced\nin the training process itself through errors in background modeling. The motivation for\nour unique approach is to remove these errors in the training data and thereby help mitigate\nthis aspect of the black-box problem.\n     In order to approximate the proportions of backgrounds and the estimated number of\nantineutrinos in our training and validation sets, we carefully select a mixture of real-world\nreactor-off correlated cosmic backgrounds and reactor-on accidental backgrounds in such\na way that the proportions match the measured final IBD candidate set composition in\nAndriamirado et al. (2021). The reactor-off correlated cosm"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "4.2 Initial Results\nWhen Classifier 1 is applied to the mixed bag validation dataset, this dataset’s true IBD\nsignal and true IBD background components are classified as signal-like (a ‘positive’ desig-\nnation) and background-like (a ‘negative’ designation) categories. The signal-like classified\nsamples consist of true simulated IBD events (TP) and true backgrounds (FP); false nega-\ntives (FN) and true negatives (TN) are likewise sub-components within the background-like\nclassified samples. Applying k-fold crossing (k=5) with Classifier 1 on the different folds of\nthe validation set produces an average recall, (more colloquially referred in particle physics\n\n17\n\f                                    Adriamirado et al."
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "as signal selection eﬀiciency), TP/(TP+FN) of 78.5 ± 3%. This 21.5% reduction in IBD\nsignal statistics is smaller than the 60-70% reduction introduced in the preceding conven-\ntional IBD pre-selection cut stage. We define the Predictive Positive Rate (PPR), i.e., the\nselected fraction, as T P +FT PP +T N +F N and find an average of 47 ± 3%. Meanwhile, for the\n                                 +F P\n\nsame k-fold crossing, the average precision, T PT+F    P , is 73 ± 1%, and the ratio of true IBD\n                                                     P"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "events to backgrounds in the signal-like classified sample, TP/FP (also referred to as signal-\nto-background ratio, or SBR), is 2.76±0.23. This is a substantial improvement (≈ 3.6×)\nover the 0.77 ratio achieved by the IBD pre-selection cuts. Both of these outcomes are\npromising first indications of IBD classifier performance. Additionally, we see an improve-\n                                                                                    S2\nment of 32 ± 2% in the effective statistics Cowan et al. (2011), defined as S+B          where S\nand B are the total number of TPs and FPs in the set, over the original IBD pre-selection\nset. Performance results are also summarized in Table 3."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "Metric                                   Classifier 1      Classifier 2\n          Precision                                73 ± 1%           70.5 ± 0.8%\n          Recall                                   78.5 ± 3%         71 ± 3%\n          F1                                       75.8 ± 0.5%       70 ± 1%\n          Accuracy                                 78.1 ± 0.4%       72.5 ± 0.7%\n          Balanced Accuracy                        78.1 ± 0.3%       72.4 ± 0.8%\n          Signal-to-Background                     2.8 ± 0.2         2.4 ± 0.1\n          Effective Statistics Improvement         32 ± 2%           7 ± 4%\n          Selected Fraction (Mixed Bag)            47 ± 3%           46 ± 3%\n          Selected Fraction (Data)                 31 ± 2%           40 ± 2%"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Table 3: Performance metrics for IBD Classifiers 1 and 2. Metrics for most rows refer to\n         performance of the classifier on its relevant mixed bag validation sample, while for\n         the last row performance on the relevant PROSPECT dataset is specified."
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "Figure 6 depicts the energy spectrum of the signal-like classified sample within the mixed\nbag using either the conventional IBD prompt energy estimator or the ML-derived neutrino\nenergy estimator presented in Section 3.2. We again emphasize that the comparison between\nenergy metrics is not strictly one-to-one: the ML model predicts true antineutrino energy,\nwhile the traditional method reconstructs visible energy without unfolding corrections. The\ncomparison is therefore intended as a qualitative indicator of performance rather than a\ndirect equivalence. In either of these spaces, we see the energy distribution of the signal-\nlike classified sample as the indigo data points. The solid blue bars represent the expected\nenergy spectrum of a pure sample of true IBD signal events, which is generated by plotting\nthe energy value of true IBD events from a large IBD MC simulation sample using t"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "18\n\f                                             GAPE\n\nresidual backgrounds. In particular, the mixed bag’s signal-like energy spectrum is higher\nthan that of a pure IBD sample in the 4-5 MeV prompt energy regime due to the presence\nof a peak in the correlated background sample arising from fast neutron inelastic scatters\non 12 C nuclei Andriamirado et al. (2021). In addition, the mixed bag’s signal-like energy\nspectrum (which we refer to as the ML IDB signature distribution) contains an excess at low\nprompt energies, since residual accidental backgrounds are expected to inhabit this energy\nrange. As expected, similar features are also seen on when comparing in ML energy space."
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "Beyond demonstrating the eﬀicacy of Classifier 1 in improving PROSPECT’s IBD selec-\ntion, we must also probe classifier performance on real PROSPECT datasets containing a\nmixture of IBD signals and backgrounds. The value of this demonstration for the IBD classi-\nfier is distinct from a potential data-based demonstration for the SOI and energy estimators\ndescribed in Section 3. In these cases, performance of the ML estimator can be compared\ndirectly to its conventional estimator counterpart, whose performance has already been val-\nidated on real data in past PROSPECT publications. Since the IBD classifier is designed\nto be applied to the output of the conventional IBD selection, such a direct performance\ncomparison is not possible."
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "The presence of bias in the IBD classifier can be easily conveyed by comparing the\nselected fraction of events that are classified as signal-like in the mixed bag validation sample\nand in the full PROSPECT reactor-on dataset. From the same k-fold crossing described\nabove, average fractions are 47% and 31%, respectively, indicating that a substantial bias\nis indeed present in Classifier 1. In comparing the normalized energy spectra between the\nmixed bag and true PROSPECT reactor-on datasets in Figure 6, however, one does not see\na large energy-dependent deviation between the two datasets. This suggests a bias origin\nthat is not primarily related to the IBD positron signal that forms the basis of the neutrino\nenergy estimate."
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "A variety of factors could potentially explain the observed bias in signal-like classification\nbetween validation datasets and real reactor-on datasets. Some possibilities, such as the\npresence of previously-unaccounted-for correlated reactor-on backgrounds, seem unlikely\nbased on prior PROSPECT studies Andriamirado et al. (2021). Another potential cause\ncould be the training of a rigorous classifier with an emphasis on being precise, albeit\nselective: this would result in a model that could reject any edge-case events that diverged\nfrom expectations. This effect would result in a higher FN count than what is observed in\nthe mixed bag. A plausible final possibility stems from the use of MC simulated IBD events\nin place of real IBD events in the mixed bag training dataset. A lack of fine details in the\nsimulation (e.g. non-precise neutron transport and capture inputs, incomplete simulatio"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "19\n\f                                 Adriamirado et al.\n\nideal distr. (n FPs)\n          0.30                                                     classifier (mixed bag)\n                                                                   classifier (real_data)\n          0.25\n          0.20\nDensity\n\n0.15\n          0.10\n          0.05\n          0.00\n                 1       2         3      4          5     6           7        8           9\n                                         Visible E (MeV)\n\nideal distr. (n FPs)\n          0.35                                                     classifier (mixed bag)\n                                                                   classifier (real data)\n          0.30\n          0.25\nDensity"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "0.20\n          0.15\n          0.10\n          0.05\n          0.00\n                 2             4                6              8                10\n                                               E (MeV)\n\nFigure 6: Plots of the mixed bag ML IBD signal distributions and the real-word ML IBD\n          signature distributions in both the prompt energy space (leftside) and the ML\n          energy space (rightside).\n\n20\n\f                                            GAPE\n\n4.3 Classifier Adjustments and Follow-Up Investigations"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "One well-established attribute of real PROSPECT data that is not included by default in\nPROSPECT’s MC simulations is the presence of varying response throughout the detector’s\nlifetime. In particular, it was observed the total light collection and effective attenuation\nlength of its active detector volume slowly decreased over the course of PROPSECT running,\nwith the former decreasing to roughly 60% of its initial value from the start to end of\ndata-taking Andriamirado et al. (2021). Time-dependent changes in light production or\npropagation had downstream effects on other important physics features, such as PSD\nparameter central values and band widths, segment hit time offset dt distributions, and\nreconstructed longitudinal positions z. Various strategies were implemented to calibrate\ntime-dependent response attributes, such that primary physics features or IBD selection\ncut values could"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "To investigate this potential source of bias, we selected a smaller subset of reactor-on/off\ndata to train an IBD classifier model termed Classifier 2. We select data from ’period 2’ as\ndefined in Adriamirado et al. (2023), which constitutes a time interval of 22.8 (15.7) days of\nreactor-on (-off) data recorded during the first half of PROSPECT data-taking Andriami-\nrado et al. (2023). Since detector response variations in PROSPECT occurred gradually\nover time, the use of a more abbreviated data period for classifier training should reduce\nbiases related to time-dependence. This period was selected because PROSPECT’s default\nsimulated detector response utilizes calibration data relevant to the calendar range that de-\nfined period 2. This period-specific approach to training should not to be confused with the\nrecent PROSPECT spectral and sterile analyses based on a multi-period, configura"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "The P2X analysis chain and conventional IBD selection for this period yields a total\nof 27163 events. The same analysis of the reactor-off set yields a total of 6519 correlated\ncosmogenic backgrounds. After live-time scaling, we estimate a mixture distribution of\napproximately 46% antineutrinos, 35% cosmogenic backgrounds, and 19% reactor-on acci-\ndentals from the period 2 reactor-on set. To compose the mixed bag sample for Classifier\n2, we select 8695 simulated neutrinos, 3473 augmented reactor-on accidentals (identical to\nthe augmentation in the Classifier 1 mixed bag), and a full set of 6519 correlated reactor-off\nevents. The signal-to-background ratio (SBR) delivered by the conventional IBD selection\n\n21\n\f                                    Adriamirado et al."
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "8695±70\nfor this period is thus 3473±4+6519±30   = 0.870 ± .008. Errors represent statistical uncertain-\nties in the relevant signal and background datasets.\n    Performance metrics for Classifier 2 are listed in table 3. Using the same k-fold crossing\napproach as Classifier 1, Classifier 2 delivers an average precision (IBD detection eﬀiciency)\nof 70.8±0.8%, slightly worse than that delivered by Classifier 1. The improvement in ef-\nfective statistics over the IBD pre-selection set now stands at a lower 7±4%. Meanwhile,\nClassifier 2 achieves a SBR of 2.4±0.1. Although this represents less of an improvement\nwith respect to Classifier 1 on its relevant dataset – Classifier 1 improves this ratio from\n0.77 to 2.8 for the full PROSPECT dataset while Classifier 2 improves it from 0.87 to 2.4\nfor period 2 – apparent gains in background reduction are still clear and substantial. The\nsignificant "
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "5 Conclusion\nWe have developed and demonstrated a novel approach called GAPE which utilizes a ge-\nnetic algorithm to perform feature selection for and seed and evolve deep learning solutions\nto physics metric reconstruction and signal selection in a reactor neutrino dataset. This\nmethod can be generalized to a wide range of problems in the analysis of nuclear and parti-\ncle physics experimental datasets and other fields. Using GAPE to guide the construction\nof optimized deep learning models, we obtain an energy and position estimator, as well as\nan antineutrino classifier for the PROSPECT detector. When contrasted with prior efforts\nreported in the 2021 PROSPECT analysis Andriamirado et al. (2021), which employ tradi-\ntional statistical approaches and use the same underlying dataset, our results show several\nnotable improvements. We observe modest improvements in the accuracy of position"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "22\n\f                                          GAPE\n\nreal-world reactor neutrino data will require increased reactor-off training dataset volumes,\nimproved period-specific IBD MC training dataset preparation, and a more detailed exam-\nination of the classifier’s eﬀiciency and bias as a function of energy. Future work could\nalso be directed towards extending the usage of GAPE AI/ML techniques to PROSPECT\nphysics analysis processes downstream from IBD selection, such as the comparisons between\nmeasured and predicted neutrino energy spectra.\n\nAcknowledgments and Disclosure of Funding"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "“This material is based upon work supported by the following sources: US Department\nof Energy (DOE) Oﬀice of Science, Oﬀice of High Energy Physics under Award No. DE-\nSC0016357 and DE-SC0017660 to Yale University, under Award No. DE-SC0017815 to\nDrexel University, under Award No. DE-SC0008347 to Illinois Institute of Technology, un-\nder Award No. DE-SC0016060 to Temple University, under Award No. DE-SC0010504 to\nUniversity of Hawaii, under Contract No. DE-SC0012704 to Brookhaven National Labora-\ntory, and under Work Proposal Number SCW1504 to Lawrence Livermore National Lab-\noratory. This work was performed under the auspices of the U.S. Department of Energy\nby Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344 and by\nOak Ridge National Laboratory under Contract DE-AC05-00OR22725. Additional fund-\ning for the experiment was provided by the Heising-Simons Foundation u"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "Appendix A. Full Parameter Space For Gape\nThe tables below summarize the genetic blueprints that were available to construct a deep\nlearning network designed to make predictions for energy and position for antineutrinos\ninteracting in the detector. References for the various functions and their application pro-\ngramming specifics are available in Paszke et al. (2019) and Abadi et al. (2015). The\nsimulated IBD signal samples correspond to the detector configuration, light yield, and cal-\nibration constants associated with the PROSPECT 2020 operational period Andriamirado\net al. (2021). Segment failures are included but detector response aging is not included.\nSelected random seed was 11 at the beginning of all runs, including the final training of the\nGAPE-selected models.\n\n23\n\f                                  Adriamirado et al."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Optimizers              Value\n                  RMSprop                 momentum=0.0 to .9 (incre-\n                                          ments of .1)\n                                          epsilon= 1e-4 to 1e-8 (incre-\n                                          ments of factor 10)\n                                          centered=False\n                  Adam (ref included)     beta 1=.80 to .99 (increments\n                                          of .01)\n                                          beta 2=.99 to .999 (incre-\n                                          ments of .001)\n                                          epsilon= 1e-4 to 1e-8 (incre-\n                                          ments of factor 10)\n                  Adadelta                rho = .89 to .99 (increments\n                                          of .02)\n                                          epsilon = "
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "Table 4: Optimization functions available within gene pool along with the allowed ranges\n         for parameters specific to each optimizer. These optimizers were selected for the\n         gene pool based on their popularity amongst the machine learning community at\n         the time of this writing. Epsilon is a small number that is used to avoid dividing\n         by zero and thereby helping to maintain numerical stability. A number too small\n         can lead to excessively large weights but a number too large can prevent eﬀicient\n         weight updates. Beta 1 and Beta 2 refer to the exponential decay rates for the\n         1st and 2nd momenta estimates. Note however that a Beta 1 or Beta 2 that is\n         too large tends too make the learning slower. For the Adadelta and the RMSprop\n                                             24\n         optimizer, the rho is a decay rate which is"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "Loss Functions: Regression\n                           MeanAbsoluteError\n                           MeanAbsolutePercentageError\n                           MeanSquaredError\n                           CosineSimilarity\n                           Huber\n                           logcosh\n                           Loss Functions: Classification\n                           (S)\n                           Binary Cross-entropy\n                           Poisson\n                           Hinge Loss\n                           Squared Hinge Loss\n                           Loss Functions: Classification\n                           (M)\n                           Cross-Entropy\n                           Kullback Leibler Divergence Loss\n\nTable 5: Table of loss functions available within gene pool divided by target type. (S)\n         stands for single target and (M) stands for multi-target."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "Activation Functions       Alpha\n                 relu                      0.0 - 2.0 (.25 increments)\n                elu                        0.0 - 2.0 (.25 increments)\n                selu                       alpha=1.67326324 (default)\n                tanh                       None\n                prelu                      alpha=0.0 (default)\n                leaky-relu                 0.0 - 2.0 (.25 increments)\n                exponential                None\n\nTable 6: Activation functions available within gene pool along with the allowed ranges for\n         the alpha value which provides the slope for evaluations below threshold. The GA\n         allows each layer to have a unique parameter for choosing an activation function.\n\n25\n\f                                   Adriamirado et al."
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Additional Instructions                       Value\n           Number of Hidden Layers                       0-5\n           For SOI Classifier and Energy Estimator:\n           Neurons per Hidden Layer                      25 - 2000 (increments of\n                                                         25)\n           For IBD Classifier:\n           Neurons per Hidden Layer                      80 - 1440 (increments of\n                                                         16)\n           Dropout Rate                                  0 to 10 (increments of\n                                                         1)%\n           Learning Rate                                 .0001 to .1 (increments\n                                                         of 10)\n           Batch Size                                    16, 32, 64, 100\n           Kernel Constraints                            No"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "Table 7: Additional genes available within the pool along with the allowed ranges for pa-\n         rameters specific to each item. It was found that increments of less than approxi-\n         mately 20 neurons did not create statistically different predictions. Neurons were\n         randomly removed at rates ranging between between 0 and 10 percent in order\n         to better generalize the model. Note that each layer has its own unique dropout\n         rate parameter that is provided by the GA. Initializers are chosen to initialize the\n         weights in distinct variations that precede training and are chosen individually\n         for each layer. Kernel constraint is another regularization technique that checks\n         the size of the weights and rescales 26\n                                               them if they surpass a certain threshold (con-\n         straints were not used on"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Regularization of Features\n                            None\n                            Standard Scaler\n                            Min Max Scaler\n\nTable 8: Scaling options for the features. The options are: the standard scaler which follows\n         a standard normal distribution (µ=0, and unit variance), a min max scaler which\n         scales each feature individually to a given range (0 to 1 for positive values and\n         -1 to 1 for features that contain negative values), and no feature scaling. In rare\n         cases no feature scaling yields the best result which was the case for the energy\n         estimator."
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "References\nMartín Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen, Craig Citro,\n Greg S. Corrado, Andy Davis, Jeffrey Dean, Matthieu Devin, Sanjay Ghemawat, Ian\n Goodfellow, Andrew Harp, Geoffrey Irving, Michael Isard, Yangqing Jia, Rafal Joze-\n fowicz, Lukasz Kaiser, Manjunath Kudlur, Josh Levenberg, Dandelion Mané, Rajat\n Monga, Sherry Moore, Derek Murray, Chris Olah, Mike Schuster, Jonathon Shlens,\n Benoit Steiner, Ilya Sutskever, Kunal Talwar, Paul Tucker, Vincent Vanhoucke, Vijay\n Vasudevan, Fernanda Viégas, Oriol Vinyals, Pete Warden, Martin Wattenberg, Martin\n Wicke, Yuan Yu, and Xiaoqiang Zheng. TensorFlow: Large-scale machine learning on\n heterogeneous systems, 2015. URL https://www.tensorflow.org/. Software available\n from tensorflow.org."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "R. Abbasi, M. Ackermann, J. Adams, J.A. Aguilar, M. Ahlers, M. Ahrens, C. Alispach, A.A.\n  Alves, N.M. Amin, R. An, K. Andeen, T. Anderson, I. Ansseau, G. Anton, C. Argüelles,\n  S. Axani, X. Bai, A. Balagopal V., A. Barbano, S.W. Barwick, B. Bastian, V. Basu,\n  V. Baum, S. Baur, R. Bay, J.J. Beatty, K.-H. Becker, J. Becker Tjus, C. Bellenghi,\n  S. BenZvi, D. Berley, E. Bernardini, D.Z. Besson, G. Binder, D. Bindig, E. Blaufuss,\n  S. Blot, S. Böser, O. Botner, J. Böttcher, E. Bourbeau, J. Bourbeau, F. Bradascio,\n  J. Braun, S. Bron, J. Brostean-Kaiser, A. Burgman, R.S. Busse, M.A. Campana, C. Chen,\n  D. Chirkin, S. Choi, B.A. Clark, K. Clark, L. Classen, A. Coleman, G.H. Collin, J.M. Con-\n  rad, P. Coppin, P. Correa, D.F. Cowen, R. Cross, P. Dave, C.D. Clercq, J.J. DeLaunay,\n  H. Dembinski, K. Deoskar, S.D. Ridder, A. Desai, P. Desiati, K.D. de Vries, G. de Was-\n  seige, M. de With, T. De"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "27\n\f                                   Adriamirado et al."
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "night, C. Hill, G.C. Hill, K.D. Hoffman, R. Hoffmann, T. Hoinka, B. Hokanson-Fasig,\n  K. Hoshina, F. Huang, M. Huber, T. Huber, K. Hultqvist, M. Hünnefeld, R. Hus-\n  sain, S. In, N. Iovine, A. Ishihara, M. Jansson, G.S. Japaridze, M. Jeong, B.J.P. Jones,\n  R. Joppe, D. Kang, W. Kang, X. Kang, A. Kappes, D. Kappesser, T. Karg, M. Karl,\n  A. Karle, U. Katz, M. Kauer, M. Kellermann, J.L. Kelley, A. Kheirandish, J. Kim,\n  K. Kin, T. Kintscher, J. Kiryluk, S.R. Klein, R. Koirala, H. Kolanoski, L. Köpke, C. Kop-\n  per, S. Kopper, D.J. Koskinen, P. Koundal, M. Kovacevich, M. Kowalski, K. Krings,\n  G. Krückl, N. Kurahashi, A. Kyriacou, C. Lagunas Gualda, J.L. Lanfranchi, M.J. Lar-\n  son, F. Lauber, J.P. Lazar, K. Leonard, A. Leszczyńska, Y. Li, Q.R. Liu, E. Lohfink,\n  C.J. Lozano Mariscal, L. Lu, F. Lucarelli, A. Ludwig, W. Luszczak, Y. Lyu, W.Y. Ma,\n  J. Madsen, K.B. M. Mahn, Y. Makino, P. Mall"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "Y. Abe, C. Aberle, T. Akiri, J. C. dos Anjos, F. Ardellier, A. F. Barbosa, A. Baxter,\n  M. Bergevin, A. Bernstein, T. J. C. Bezerra, L. Bezrukhov, E. Blucher, M. Bongrand,\n  N. S. Bowden, C. Buck, J. Busenitz, A. Cabrera, E. Caden, L. Camilleri, R. Carr, M. Cer-\n  rada, P.-J. Chang, P. Chimenti, T. Classen, A. P. Collin, E. Conover, J. M. Conrad,\n  S. Cormon, J. I. Crespo-Anadón, M. Cribier, K. Crum, A. Cucoanes, M. V. D’Agostino,\n\n28\n\f                                           GAPE"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "E. Damon, J. V. Dawson, S. Dazeley, M. Dierckxsens, D. Dietrich, Z. Djurcic, M. Dracos,\n  V. Durand, Y. Efremenko, M. Elnimr, Y. Endo, A. Etenko, E. Falk, M. Fallot, M. Fech-\n  ner, F. von Feilitzsch, J. Felde, S. M. Fernandes, D. Franco, A. J. Franke, M. Franke,\n  H. Furuta, R. Gama, I. Gil-Botella, L. Giot, M. Göger-Neff, L. F. G. Gonzalez, M. C.\n  Goodman, J. TM. Goon, D. Greiner, B. Guillon, N. Haag, C. Hagner, T. Hara, F. X.\n  Hartmann, J. Hartnell, T. Haruna, J. Haser, A. Hatzikoutelis, T. Hayakawa, M. Hof-\n  mann, G. A. Horton-Smith, M. Ishitsuka, J. Jochum, C. Jollet, C. L. Jones, F. Kaether,\n  L. Kalousis, Y. Kamyshkov, D. M. Kaplan, T. Kawasaki, G. Keefer, E. Kemp, H. de Ker-\n  ret, Y. Kibe, T. Konno, D. Kryn, M. Kuze, T. Lachenmaier, C. E. Lane, C. Langbrandt-\n  ner, T. Lasserre, A. Letourneau, D. Lhuillier, H. P. Lima, M. Lindner, Y. Liu, J. M.\n  López-Castanõ, J. M. LoSecco,"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "B. Abi, R. Acciarri, M. A. Acero, G. Adamov, D. Adams, M. Adinolfi, Z. Ahmad, J. Ahmed,\n  T. Alion, S. Alonso Monsalve, C. Alt, J. Anderson, C. Andreopoulos, M. P. An-\n  drews, F. Andrianala, S. Andringa, A. Ankowski, M. Antonova, S. Antusch, A. Aranda-\n  Fernandez, A. Ariga, L. O. Arnold, M. A. Arroyave, J. Asaadi, A. Aurisano, V. Aushev,\n  D. Autiero, F. Azfar, H. Back, J. J. Back, C. Backhouse, P. Baesso, L. Bagby, R. Ba-\n  jou, S. Balasubramanian, P. Baldi, B. Bambah, F. Barao, G. Barenboim, G. J. Barker,\n  W. Barkhouse, C. Barnes, G. Barr, J. Barranco Monarca, N. Barros, J. L. Barrow,\n  A. Bashyal, V. Basque, F. Bay, J. L. Bazo Alba, J. F. Beacom, E. Bechetoille, B. Be-\n  hera, L. Bellantoni, G. Bellettini, V. Bellini, O. Beltramello, D. Belver, N. Benekos,\n  F. Bento Neves, J. Berger, S. Berkman, P. Bernardini, R. M. Berner, H. Berns,\n  S. Bertolucci, M. Betancourt, Y. Bezawada, M."
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "29\n\f                                  Adriamirado et al."
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "ranza, A. Castillo, C. Castromonte, C. Cattadori, F. Cavalier, F. Cavanna, S. Centro,\nG. Cerati, A. Cervelli, A. Cervera Villanueva, M. Chalifour, C. Chang, E. Chardonnet,\nA. Chatterjee, S. Chattopadhyay, J. Chaves, H. Chen, M. Chen, Y. Chen, D. Cherdack,\nC. Chi, S. Childress, A. Chiriacescu, K. Cho, S. Choubey, A. Christensen, D. Christian,\nG. Christodoulou, E. Church, P. Clarke, T. E. Coan, A. G. Cocco, J. A. B. Coelho,\nE. Conley, J. M. Conrad, M. Convery, L. Corwin, P. Cotte, L. Cremaldi, L. Cre-\nmonesi, J. I. Crespo-Anadon, E. Cristaldo, R. Cross, C. Cuesta, Y. Cui, D. Cussans,\nM. Dabrowski, H. da Motta, L. Da Silva Peres, C. David, Q. David, G. S. Davies,\nS. Davini, J. Dawson, K. De, R. M. De Almeida, P. Debbins, I. De Bonis, M. P. Decowski,\nA. de Gouvea, P. C. De Holanda, I. L. De Icaza Astiz, A. Deisting, P. De Jong, A. Delbart,\nD. Delepine, M. Delgado, A. Dell’Acqua, P. De Lurgio"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "30\n\f                                       GAPE"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "nrich, I. Kreslo, Y. Kudenko, V. A. Kudryavtsev, S. Kulagin, J. Kumar, R. Kumar,\nC. Kuruppu, V. Kus, T. Kutter, A. Lambert, K. Lande, C. E. Lane, K. Lang, T. Lang-\nford, P. Lasorak, D. Last, C. Lastoria, A. Laundrie, A. Lawrence, I. Lazanu, R. LaZur,\nT. Le, J. Learned, P. LeBrun, G. Lehmann Miotto, R. Lehnert, M. A. Leigui de Oliveira,\nM. Leitner, M. Leyton, L. Li, S. Li, S. W. Li, T. Li, Y. Li, H. Liao, C. S. Lin, S. Lin,\nA. Lister, B. R. Littlejohn, J. Liu, S. Lockwitz, T. Loew, M. Lokajicek, I. Lomidze,\nK. Long, K. Loo, D. Lorca, T. Lord, J. M. LoSecco, W. C. Louis, K. B. Luk, X. Luo,\nN. Lurkin, T. Lux, V. P. Luzio, D. MacFarland, A. A. Machado, P. Machado, C. T.\nMacias, J. R. Macier, A. Maddalena, P. Madigan, S. Magill, K. Mahn, A. Maio, J. A.\nMaloney, G. Mandrioli, J. Maneira, L. Manenti, S. Manly, A. Mann, K. Manolopoulos,\nM. Manrique Plata, A. Marchionni, W. Marciano, D. Marfatia,"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "31\n\f                                   Adriamirado et al."
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "J. Rodriguez Rondon, A. J. Roeth, H. Rogers, S. Rosauro-Alcaraz, M. Rossella, J. Rout,\n  S. Roy, A. Rubbia, C. Rubbia, B. Russell, J. Russell, D. Ruterbories, R. Saakyan, S. Sacer-\n  doti, T. Safford, N. Sahu, P. Sala, N. Samios, M. C. Sanchez, D. A. Sanders, D. Sankey,\n  S. Santana, M. Santos-Maldonado, N. Saoulidou, P. Sapienza, C. Sarasty, I. Sarcevic,\n  G. Savage, V. Savinov, A. Scaramelli, A. Scarff, A. Scarpelli, T. Schaffer, H. Schellman,\n  P. Schlabach, D. Schmitz, K. Scholberg, A. Schukraft, E. Segreto, J. Sensenig, I. Seong,\n  A. Sergi, F. Sergiampietri, D. Sgalaberna, M. H. Shaevitz, S. Shafaq, M. Shamma,\n  H. R. Sharma, R. Sharma, T. Shaw, C. Shepherd-Themistocleous, S. Shin, D. Shooltz,\n  R. Shrock, L. Simard, N. Simos, J. Sinclair, G. Sinev, J. Singh, J. Singh, V. Singh,\n  R. Sipos, F. W. Sippach, G. Sirri, A. Sitraka, K. Siyeon, D. Smargianaki, A. Smith,\n  A. Smith, E. Smi"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "R. Acciarri, C. Adams, R. An, J. Asaadi, M. Auger, L. Bagby, B. Baller, G. Barr, M. Bass,\n  F. Bay, M. Bishai, A. Blake, T. Bolton, L. Bugel, L. Camilleri, D. Caratelli, B. Carls,\n  R. Castillo Fernandez, F. Cavanna, H. Chen, E. Church, D. Cianci, G.H. Collin, J.M.\n  Conrad, M. Convery, J.I. Crespo-Anadón, M. Del Tutto, D. Devitt, S. Dytman, B. Eberly,\n  A. Ereditato, L. Escudero Sanchez, J. Esquivel, B.T. Fleming, W. Foreman, A.P. Fur-\n  manski, G.T. Garvey, V. Genty, D. Goeldi, S. Gollapinni, N. Graf, E. Gramellini,\n\n32\n\f                                         GAPE"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "H. Greenlee, R. Grosso, R. Guenette, A. Hackenburg, P. Hamilton, O. Hen, J. Hewes,\n  C. Hill, J. Ho, G. Horton-Smith, C. James, J. Jan de Vries, C.-M. Jen, L. Jiang, R.A.\n  Johnson, B.J.P. Jones, J. Joshi, H. Jostlein, D. Kaleko, G. Karagiorgi, W. Ketchum,\n  B. Kirby, M. Kirby, T. Kobilarcik, I. Kreslo, A. Laube, Y. Li, A. Lister, B.R. Little-\n  john, S. Lockwitz, D. Lorca, W.C. Louis, M. Luethi, B. Lundberg, X. Luo, A. Mar-\n  chionni, C. Mariani, J. Marshall, D.A. Martinez Caicedo, V. Meddage, T. Miceli, G.B.\n  Mills, J. Moon, M. Mooney, C.D. Moore, J. Mousseau, R. Murrells, D. Naples, P. Nien-\n  aber, J. Nowak, O. Palamara, V. Paolone, V. Papavassiliou, S.F. Pate, Z. Pavlovic,\n  D. Porzio, G. Pulliam, X. Qian, J.L. Raaf, A. Rafique, L. Rochester, C. Rudolf von\n  Rohr, B. Russell, D.W. Schmitz, A. Schukraft, W. Seligman, M.H. Shaevitz, J. Sinclair,\n  E.L. Snider, M. Soderberg, S. Söldne"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "M. Adriamirado, A. B. Balantekin, C. D. Bass, D. E. Bergeron, E. P. Bernard, N. S.\n Bowden, C. D. Bryan, R. Carr, T. Classen, A. J. Conant, G. Deichert, A. Delgado,\n M. V. Diwan, M. J. Dolinski, A. Erickson, B. T. Foust, J. K. Gaison, A. Galindo-Uribari,\n C. E. Gilbert, S. Gokhale, C. Grant, S. Hans, A. B. Hansell, K. M. Heeger, B. Heffron,\n D. E. Jaffe, S. Jayakumar, X. Ji, D. C. Jones, J. Koblanski, P. Kunkle, O. Kyzylova,\n D. LaBelle, C. E. Lane, T. J. Langford, J. LaRosa, B. R. Littlejohn, X. Lu, J. Maricic,\n M. P. Mendenhall, A. M. Meyer, R. Milincic, P. E. Mueller, H. P. Mumm, J. Napolitano,\n R. Neilson, J. A. Nikkel, S. Nour, J. L. Palomino Gallo, D. A. Pushin, X. Qian, C. Roca,\n R. Rosero, M. Searles, P. T. Surukuchi, F. Sutanto, M. A. Tyra, D. Venegas-Vargas,\n P. B. Weatherly, J. Wilhelmi, A. Woolverton, M. Yeh, C. Zhang, and X. Zhang. Final\n measurement of the u235 antineutrino"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "S. Agostinelli, J. Allison, K. Amako, J. Apostolakis, H. Araujo, P. Arce, M. Asai, D. Axen,\n   S. Banerjee, G. Barrand, F. Behner, L. Bellagamba, J. Boudreau, L. Broglia, A. Brunengo,\n   H. Burkhardt, S. Chauvie, J. Chuma, R. Chytracek, G. Cooperman, G. Cosmo, P. Degt-\n   yarenko, A. Dell’Acqua, G. Depaola, D. Dietrich, R. Enami, A. Feliciello, C. Fergu-\n   son, H. Fesefeldt, G. Folger, F. Foppiano, A. Forti, S. Garelli, S. Giani, R. Gian-\n   nitrapani, D. Gibin, J.J. Gómez Cadenas, I. González, G. Gracia Abril, G. Greeni-\n   aus, W. Greiner, V. Grichine, A. Grossheim, S. Guatelli, P. Gumplinger, R. Hamatsu,\n   K. Hashimoto, H. Hasui, A. Heikkinen, A. Howard, V. Ivanchenko, A. Johnson, F.W.\n   Jones, J. Kallenbach, N. Kanaya, M. Kawabata, Y. Kawabata, M. Kawaguti, S. Kelner,\n   P. Kent, A. Kimura, T. Kodama, R. Kokoulin, M. Kossov, H. Kurashige, E. Lamanna,\n   T. Lampén, V. Lara, V. Lefe"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "33\n\f                                     Adriamirado et al.\n\nbin, S. Sadilov, E. Di Salvo, G. Santin, T. Sasaki, N. Savvas, Y. Sawada, S. Scherer,\n  S. Sei, V. Sirotenko, D. Smith, N. Starkov, H. Stoecker, J. Sulkimo, M. Takahata,\n  S. Tanaka, E. Tcherniaev, E. Safai Tehrani, M. Tropeano, P. Truscott, H. Uno, L. Ur-\n  ban, P. Urban, M. Verderi, A. Walkden, W. Wander, H. Weber, J.P. Wellisch, T. We-\n  naus, D.C. Williams, D. Wright, T. Yamada, H. Yoshida, and D. Zschiesche. Geant4—\n  a simulation toolkit. Nuclear Instruments and Methods in Physics Research Section\n  A: Accelerators, Spectrometers, Detectors and Associated Equipment, 506(3):250–303,\n  2003. ISSN 0168-9002. doi: https://doi.org/10.1016/S0168-9002(03)01368-8. URL\n  https://www.sciencedirect.com/science/article/pii/S0168900203013688."
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "J. K. Ahn, S. Chebotaryov, J. H. Choi, S. Choi, W. Choi, Y. Choi, H. I. Jang, J. S. Jang, E. J.\n   Jeon, I. S. Jeong, K. K. Joo, B. R. Kim, B. C. Kim, H. S. Kim, J. Y. Kim, S. B. Kim, S. H.\n   Kim, S. Y. Kim, W. Kim, Y. D. Kim, J. Lee, J. K. Lee, I. T. Lim, K. J. Ma, M. Y. Pac,\n   I. G. Park, J. S. Park, K. S. Park, J. W. Shin, K. Siyeon, B. S. Yang, I. S. Yeo, S. H. Yi, and\n   I. Yu. Observation of reactor electron antineutrinos disappearance in the reno experiment.\n   Phys. Rev. Lett., 108:191802, May 2012. doi: 10.1103/PhysRevLett.108.191802. URL\n   https://link.aps.org/doi/10.1103/PhysRevLett.108.191802."
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "H. Almazá n, L. Bernard, A. Blanchet, A. Bonhomme, C. Buck, P. del Amo Sanchez, I. El\n  Atmani, J. Haser, F. Kandzia, S. Kox, L. Labit, J. Lamblin, A. Letourneau, D. Lhuillier,\n  M. Licciardi, M. Lindner, T. Materna, A. Minotti, H. Pessard, J.-S. Réal, C. Roca,\n  R. Rogly, T. Salagnac, V. Savu, S. Schoppmann, V. Sergeyeva, T. Soldner, A. Stutz, and\n  M. Vialat and. Improved sterile neutrino constraints from the STEREO experiment with\n  179 days of reactor-on data. Physical Review D, 102(5), sep 2020. doi: 10.1103/physrevd.\n  102.052002. URL https://doi.org/10.1103%2Fphysrevd.102.052002."
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "F. P. An, J. Z. Bai, A. B. Balantekin, H. R. Band, D. Beavis, W. Beriguete, M. Bishai,\n  S. Blyth, K. Boddy, R. L. Brown, B. Cai, G. F. Cao, J. Cao, R. Carr, W. T. Chan,\n  J. F. Chang, Y. Chang, C. Chasman, H. S. Chen, H. Y. Chen, S. J. Chen, S. M. Chen,\n  X. C. Chen, X. H. Chen, X. S. Chen, Y. Chen, Y. X. Chen, J. J. Cherwinka, M. C.\n  Chu, J. P. Cummings, Z. Y. Deng, Y. Y. Ding, M. V. Diwan, L. Dong, E. Draeger, X. F.\n  Du, D. A. Dwyer, W. R. Edwards, S. R. Ely, S. D. Fang, J. Y. Fu, Z. W. Fu, L. Q.\n  Ge, V. Ghazikhanian, R. L. Gill, J. Goett, M. Gonchar, G. H. Gong, H. Gong, Y. A.\n  Gornushkin, L. S. Greenler, W. Q. Gu, M. Y. Guan, X. H. Guo, R. W. Hackenburg,\n  R. L. Hahn, S. Hans, M. He, Q. He, W. S. He, K. M. Heeger, Y. K. Heng, P. Hinrichs,\n  T. H. Ho, Y. K. Hor, Y. B. Hsiung, B. Z. Hu, T. Hu, T. Hu, H. X. Huang, H. Z. Huang,\n  P. W. Huang, X. Huang, X. T. Huang, P. Huber, Z. Isva"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "34\n\f                                         GAPE"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "J. E. Morgan, Y. Nakajima, J. Napolitano, D. Naumov, I. Nemchenok, C. Newsom, H. Y.\n  Ngai, W. K. Ngai, Y. B. Nie, Z. Ning, J. P. Ochoa-Ricoux, D. Oh, A. Olshevski, A. Pagac,\n  S. Patton, C. Pearson, V. Pec, J. C. Peng, L. E. Piilonen, L. Pinsky, C. S. J. Pun, F. Z.\n  Qi, M. Qi, X. Qian, N. Raper, R. Rosero, B. Roskovec, X. C. Ruan, B. Seilhan, B. B.\n  Shao, K. Shih, H. Steiner, P. Stoler, G. X. Sun, J. L. Sun, Y. H. Tam, H. K. Tanaka,\n  X. Tang, H. Themann, Y. Torun, S. Trentalange, O. Tsai, K. V. Tsang, R. H. M. Tsang,\n  C. Tull, B. Viren, S. Virostek, V. Vorobel, C. H. Wang, L. S. Wang, L. Y. Wang, L. Z.\n  Wang, M. Wang, N. Y. Wang, R. G. Wang, T. Wang, W. Wang, X. Wang, X. Wang,\n  Y. F. Wang, Z. Wang, Z. Wang, Z. M. Wang, D. M. Webber, Y. D. Wei, L. J. Wen,\n  D. L. Wenman, K. Whisnant, C. G. White, L. Whitehead, C. A. Whitten, J. Wilhelmi,\n  T. Wise, H. C. Wong, H. L. H. Wong, J. Won"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "M. Andriamirado, A. B. Balantekin, H. R. Band, C. D. Bass, D. E. Bergeron, D. Berish,\n N. S. Bowden, J. P. Brodsky, C. D. Bryan, T. Classen, and et al. Improved short-\n baseline neutrino oscillation search and energy spectrum measurement with the prospect\n experiment at hfir. Physical Review D, 103(3), Feb 2021. ISSN 2470-0029. doi: 10.1103/\n physrevd.103.032001. URL http://dx.doi.org/10.1103/PhysRevD.103.032001."
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "M. Andriamirado, A. B. Balantekin, C. D. Bass, O. Benevides Rodrigues, E. P. Bernard,\n N. S. Bowden, C. D. Bryan, R. Carr, T. Classen, A. J. Conant, G. Deichert, A. Del-\n gado, M. J. Dolinski, A. Erickson, M. Fuller, A. Galindo-Uribarri, S. Gokhale, C. Grant,\n S. Hans, A. B. Hansell, T. E. Haugen, K. M. Heeger, B. Heffron, D. E. Jaffe, S. Jayaku-\n mar, J. Koblanski, P. Kunkle, C. E. Lane, B. R. Littlejohn, A. Lozano Sanchez, X. Lu,\n F. Machado, J. Maricic, M. P. Mendenhall, A. M. Meyer, R. Milincic, P. E. Mueller,\n H. P. Mumm, R. Neilson, C. Roca, R. Rosero, D. Venegas-Vargas, J. Wilhelmi, M. Yeh,\n C. Zhang, and X. Zhang. Machine learning for single-ended event reconstruction in\n prospect experiment, 2025. URL https://arxiv.org/abs/2503.06727."
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "M. Andriamirado et al. Final Measurement of the U235 Antineutrino Energy Spectrum\n with the PROSPECT-I Detector at HFIR. Phys. Rev. Lett., 131(2):021802, 2023. doi:\n 10.1103/PhysRevLett.131.021802.\n\nJ. Ashenfelter, A.B. Balantekin, C. Baldenegro, H.R. Band, C.D. Bass, D.E. Bergeron,\n  D. Berish, L.J. Bignell, N.S. Bowden, J. Boyle, and et al. The prospect reactor an-\n  tineutrino experiment. Nuclear Instruments and Methods in Physics Research Section\n  A: Accelerators, Spectrometers, Detectors and Associated Equipment, 922:287–309, Apr\n  2019. ISSN 0168-9002. doi: 10.1016/j.nima.2018.12.079. URL http://dx.doi.org/10.\n  1016/j.nima.2018.12.079.\n\n35\n\f                                   Adriamirado et al.\n\nJ. Ashenfelter et al. First search for short-baseline neutrino oscillations at HFIR with\n  PROSPECT. Phys. Rev. Lett., 121(25):251802, 2018. doi: 10.1103/PhysRevLett.121.\n  251802."
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "Anke Biekötter, Parisa Gregg, Frank Krauss, and Marek Schönherr. Constraining cp vio-\n lating operators in charged and neutral triple gauge couplings. Physics Letters B, 817:\n 136311, 2021. ISSN 0370-2693. doi: https://doi.org/10.1016/j.physletb.2021.136311.\n URL https://www.sciencedirect.com/science/article/pii/S0370269321002513.\n\nDjork-Arné Clevert, Thomas Unterthiner, and Sepp Hochreiter. Fast and accurate deep\n  network learning by exponential linear units (elus), 2016.\n\nGlen Cowan, Kyle Cranmer, Eilam Gross, and Ofer Vitells. Asymptotic formulae for\n  likelihood-based tests of new physics. The European Physical Journal C, 71(2), February\n  2011. ISSN 1434-6052. doi: 10.1140/epjc/s10052-011-1554-0. URL http://dx.doi.org/\n  10.1140/epjc/s10052-011-1554-0."
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "G. Cybenko, D.P. O’Leary, and J. Rissanen. The Mathematics of Information Coding,\n  Extraction and Distribution. The IMA Volumes in Mathematics and its Applications.\n  Springer New York, 1998. ISBN 9780387986654. URL https://books.google.ca/\n  books?id=jDrp4QEGioMC.\n\nLee R. Dice. Measures of the amount of ecologic association between species. Ecology, 26\n  (3):297–302, 1945. doi: https://doi.org/10.2307/1932409. URL https://esajournals.\n  onlinelibrary.wiley.com/doi/abs/10.2307/1932409.\n\nTimothy Dozat. Incorporating nesterov momentum into adam. 2016.\n\nJohn Duchi, Elad Hazan, and Yoram Singer. Adaptive subgradient methods for online\n  learning and stochastic optimization. Journal of Machine Learning Research, 12:2121–\n  2159, 07 2011."
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "M. Estienne, M. Fallot, A. Algora, J. Briz-Monago, V. M. Bui, S. Cormon, W. Gelletly,\n L. Giot, V. Guadilla, D. Jordan, L. Le Meur, A. Porta, S. Rice, B. Rubio, J. L. Taín,\n E. Valencia, and A.-A. Zakari-Issoufou. Updated summation model: An improved agree-\n ment with the daya bay antineutrino fluxes. Physical Review Letters, 123(2), jul 2019.\n doi: 10.1103/physrevlett.123.022502. URL https://doi.org/10.1103%2Fphysrevlett.\n 123.022502.\n\nXavier Glorot and Yoshua Bengio. Understanding the diﬀiculty of training deep feedforward\n  neural networks. In Yee Whye Teh and Mike Titterington, editors, Proceedings of the\n  Thirteenth International Conference on Artificial Intelligence and Statistics, volume 9 of\n  Proceedings of Machine Learning Research, pages 249–256, Chia Laguna Resort, Sardinia,\n  Italy, 13–15 May 2010. PMLR. URL https://proceedings.mlr.press/v9/glorot10a.\n  html."
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "Xavier Glorot, Antoine Bordes, and Y. Bengio. Deep sparse rectifier neural networks.\n  volume 15, 01 2010.\n\n36\n\f                                           GAPE\n\nL. Hayen, J. Kostensalo, N. Severijns, and J. Suhonen. First-forbidden transitions in the\n  reactor anomaly. Physical Review C, 100(5), nov 2019. doi: 10.1103/physrevc.100.054323.\n  URL https://doi.org/10.1103%2Fphysrevc.100.054323.\n\nKaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Delving deep into rectifiers:\n Surpassing human-level performance on imagenet classification, 2015."
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "O. Heinisch. Steel, r. g. d., and j. h. torrie: Principles and procedures of statistics. (with\n  special reference to the biological sciences.) mcgraw-hill book company, new york, toronto,\n  london 1960, 481 s., 15 abb.; 81 s 6 d. Biometrische Zeitschrift, 4(3):207–208, 1962. doi:\n  https://doi.org/10.1002/bimj.19620040313. URL https://onlinelibrary.wiley.com/\n  doi/abs/10.1002/bimj.19620040313.\n\nMilan Holický. Introduction to Probability and Statistics for Engineers. Springer-Verlag\n Berlin Heidelberg, 2013.\n\nJ. H. Holland. Adaptation in natural and artificial systems. holland, j. h. (1992), 1975a.\n\nJohn Holland. Adaptation in Natural and Artificial Systems. University of Michigan Press,\n  Ann Arbor, Michigan, 1975b."
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "Patrick Huber. Determination of antineutrino spectra from nuclear reactors. Physical\n  Review C, 84(2), aug 2011a. doi: 10.1103/physrevc.84.024617. URL https://doi.org/\n  10.1103%2Fphysrevc.84.024617.\n\nPatrick Huber. Determination of antineutrino spectra from nuclear reactors. Phys. Rev.\n  C, 84:024617, Aug 2011b. doi: 10.1103/PhysRevC.84.024617. URL https://link.aps.\n  org/doi/10.1103/PhysRevC.84.024617.\n\nGlenn R. Jocher, Kurtis Nishimura, John Koblanski, and Viacheslav A. Li. Wave: Machine\n  learning for full-waveform time-of-flight detectors, 2018.\n\nDiederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization, 2017.\n\nGünter Klambauer, Thomas Unterthiner, Andreas Mayr, and Sepp Hochreiter.                 Self-\n normalizing neural networks, 2017.\n\nRon Kohavi. A study of cross-validation and bootstrap for accuracy estimation and model\n  selection. 14, 03 2001."
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Yann Lecun, Leon Bottou, Genevieve Orr, and Klaus-Robert Müller. Eﬀicient backprop.\n  08 2000.\n\nJay M. Newby, Alison M. Schaefer, Phoebe T. Lee, M. Gregory Forest, and Samuel K.\n  Lai. Convolutional neural networks automate detection for tracking of submicron-scale\n  particles in 2d and 3d. Proceedings of the National Academy of Sciences, 115(36):9026–\n  9031, 2018. ISSN 0027-8424. doi: 10.1073/pnas.1804420115. URL https://www.pnas.\n  org/content/115/36/9026.\n\n37\n\f                                 Adriamirado et al."
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory\n Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, Alban Desmaison,\n Andreas Kopf, Edward Yang, Zachary DeVito, Martin Raison, Alykhan Tejani, Sasank\n Chilamkurthy, Benoit Steiner, Lu Fang, Junjie Bai, and Soumith Chintala. Pytorch: An\n imperative style, high-performance deep learning library. In Advances in Neural Infor-\n mation Processing Systems 32, pages 8024–8035. Curran Associates, Inc., 2019.\n\nF. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blon-\n  del, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau,\n  M. Brucher, M. Perrot, and E. Duchesnay. Scikit-learn: Machine learning in Python.\n  Journal of Machine Learning Research, 12:2825–2830, 2011."
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "Aleksander Radovic et al. Machine learning in the search for new fundamental physics.\n  Nature Reviews Physics, 2022. doi: 10.1038/s42254-022-00455-1.\n\nT. Sørenson. A Method of Establishing Groups of Equal Amplitude in Plant Sociology Based\n  on Similarity of Species Content and Its Application to Analyses of the Vegetation on\n  Danish Commons. Biologiske skrifter. I kommission hos E. Munksgaard, 1948. URL\n  https://books.google.ca/books?id=rpS8GAAACAAJ."
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "W. Steeb. Nonlinear Workbook, The: Chaos, Fractals, Cellular Automata, Neural Net-\n works, Genetic Algorithms, Gene Expression Programming, Support Vector Machine,\n Wavelets, Hidden Markov Models, Fuzzy Logic With C++, Java And Symbolicc++ Pro-\n grams (3rd Edition). The Nonlinear Workbook: Chaos, Fractals, Cellular Automata,\n Neural Networks, Genetic Algorithms, Gene Expression Programming, Support Vector\n Machine, Wavelets, Hidden Markov Models, Fuzzy Logic with C++, Java and Symbol-\n icC++ Programs. World Scientific Publishing Company, 2005. ISBN 9789813106482.\n URL https://books.google.no/books?id=-Qo8DQAAQBAJ.\n\n38"
+    }
+  ]
+}
