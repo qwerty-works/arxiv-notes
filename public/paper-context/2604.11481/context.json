@@ -1,0 +1,627 @@
+{
+  "arxivId": "2604.11481",
+  "paperTitle": "Emergence of Complex Structures",
+  "abstract": "Complex structures often emerge from initially homogeneous or weakly correlated states. We address the apparent tension between this ordering and entropy growth through a unified framework combining semi-microscopic phase-space dynamics, transport geometry, information theory, and coarse-grained effective modeling. The key point is that entropy depends on the level of description: a coarse-grained spatial field may become more ordered as structure forms, even while the full phase-space description becomes more complex through shell crossing, multistreaming, and the activation of velocity degrees of freedom. Using a Lagrangian--Eulerian transport map, we show how density amplification is governed by the Jacobian of the deformation and how anisotropic collapse arises from the eigenvalues of a hierarchy of deformation tensors. Long-range interaction or information flow is encoded in the displacement field, so that nonlocality enters directly through transport. We connect this geometric description to a maximum-entropy Gaussian baseline and show how nonlinear transport and nonlocal coupling generate scale coupling, higher-order correlations, and non-Gaussianity. We then formulate a Landau--Ginzburg description in which the growth of seed anisotropies is interpreted as the activation of lower effective free-energy branches, providing a coarse-grained realization of self-organization. Applied to generated cosmological fields, this framework indicates that the nonlocal tidal level becomes relevant already at moderate overdensity. Although cosmological structure formation is the main realization considered here, the framework is intended more broadly as a mesoscopic language for systems in which transport, anisotropy, nonlocality, and self-organization are central.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Complex structures often emerge from initially homogeneous or weakly correlated states. We address the apparent tension between this ordering and entropy growth through a unified framework combining semi-microscopic phase-space dynamics, transport geometry, information theory, and coarse-grained effective modeling. The key point is that entropy depends on the level of description: a coarse-grained spatial field may become more ordered as structure forms, even while the full phase-space description becomes more complex through shell crossing, multistreaming, and the activation of velocity degrees of freedom. Using a Lagrangian--Eulerian transport map, we show how density amplification is governed by the Jacobian of the deformation and how anisotropic collapse arises from the eigenvalues of a hierarchy of deformation tensors. Long-range interaction or information flow is encoded in the displacement field, so that nonlocality enters directly through transport. We connect this geometric description to a maximum-entropy Gaussian baseline and show how nonlinear transport and nonlocal coupling generate scale coupling, higher-order correlations, and non-Gaussianity. We then formulate a Landau--Ginzburg description in which the growth of seed anisotropies is interpreted as the activation of lower effective free-energy branches, providing a coarse-grained realization of self-organization. Applied to generated cosmological fields, this framework indicates that the nonlocal tidal level becomes relevant already at moderate overdensity. Although cosmological structure formation is the main realization considered here, the framework is intended more broadly as a mesoscopic language for systems in which transport, anisotropy, nonlocality, and self-organization are central."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Emergence of Complex Structures\n                                                                       Francisco-Shu Kitaura1,2,3*\n                                               1 Cosmological Large Scale Structure Group, Institute for Astrophysics\n\nin the Canary Islands, Vı́a Láctea s/n, La Laguna, E-38205, Spain.\n                                                 2 Astrophysics Department, Faculty of Physics and Mathematics,\narXiv:2604.11481v1 [astro-ph.CO] 13 Apr 2026\n\nUniversity of La Laguna, E-38206, Spain.\n                                                  3 Medical Technology Division, IACTEC, Parque Tecnológico y\n\nCientı́fico de las Mantecas, La Laguna, E-38320, Spain.\n\nCorresponding author(s). E-mail(s): fkitaura@ull.edu.es;"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract\n                                                Complex structures often emerge from initially homogeneous or weakly corre-\n                                                lated states. We address the apparent tension between this ordering and entropy\n                                                growth through a unified framework combining semi-microscopic phase-space\n                                                dynamics, transport geometry, information theory, and coarse-grained effective\n                                                modeling. The key point is that entropy depends on the level of description: a\n                                                coarse-grained spatial field may become more ordered as structure forms, even\n                                                while the full phase-space description becomes more complex through shell cross-\n        "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1\n\f     Keywords: complex systems, maximum entropy, coarse-graining, non-Gaussianity,\n     anisotropy, effective free energy, cosmological structure formation"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1 Introduction\nIn the quest for a unified theory of physics, several important lines of research have\nsuggested that gravity might admit an emergent interpretation, arising from a deeper\nquantum, statistical, or information-theoretic substrate [1–7]. These directions are\npartly inspired by earlier insights into the relation between gravity, black holes, and\nentropy [8–11].\n    At the same time, nature repeatedly generates complex web-like patterns across a\nvast range of scales, from the microscale to the largest structures in the Universe. This\nraises a more general question: what common principles underlie the emergence of\nsuch diverse structures as evaporation patterns in sessile droplets [12, 13], the human\nbrain [14–19], the spatial distribution of trees [20, 21], the cosmic web [22–29] or even\nartificial neural networks [30–32]?\n    Complex structures often emerge from states that a"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "2\n\fspatial entropy and the growing complexity of the full phase-space state [49–54].\nFourth, a coarse-grained effective description leads naturally to a Landau–Ginzburg-\ntype functional [55–62] in which anisotropy appears as an order parameter and web-like\nmorphology can be interpreted as the activation of anisotropic branches (see Appendix\nH).\n    Cosmological structure formation provides the most developed realization of this\nlogic. The primordial density field is very close to Gaussian, the linear regime admits a\ncompact description in terms of a scalar potential, and anisotropic collapse naturally\nproduces sheets, filaments, and knots [63–65]. Yet the purpose of the present work is\nbroader than cosmology itself. The aim is not to claim identical microscopic dynam-\nics across different systems, but rather to identify a common mesoscopic language\nin which transport, anisotropy, multist"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "2 Semi-microscopic and coarse-grained descriptions\nA natural semi-microscopic description of a many-particle or many-element system\nis formulated in phase-space through an effective one-particle distribution function\nf (t, x, v), such that\n                                 f (t, x, v) dn x dn v                           (1)\ngives the amount of mass, tracer weight, or coarse-grained intensity contained in\nthe infinitesimal phase-space element around (x, v). This should be understood as\nsemi-microscopic rather than fully microscopic: it resolves positions and velocities in\n\n3\n\f                                  Complex Structure Formation\n\nsystem with long-range                                     primordial fluctuating field\n                                           Initial ingredients\n       interaction or information flow                                    seed of anisotropy\n\nnonlocality"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Statistical cascade\n\ncoupling of                  emergence of higher-order             deviation from\n           different scales                     correlations                     Gaussianity\n\nEffective coarse-grained ordering\n                                                                     favoured in an effective\n            growth of seed anisotropies\n                                                                  Landau–Ginzburg free energy\n\nSelf-organization\n\nentropy increase in the                                 entropy decrease in the\n             microscopic description                            mesoscopic / projected description"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Fig. 1 Summary of the conceptual chain proposed in this work. A system with long-range inter-\naction or information flow, together with a primordial fluctuating field that seeds anisotropy, leads\nnaturally to nonlocality. Nonlocality couples different scales, producing higher-order correlations and\na departure from Gaussianity. In the coarse-grained description, these dynamics amplify the initial\nanisotropic seeds, which can be interpreted as being favoured within an effective Landau–Ginzburg\nfree-energy framework. The lower panel highlights the self-organization aspect: entropy can increase in\nthe semi-microscopic phase-space description while decreasing in the mesoscopic or projected descrip-\ntion."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "phase-space, but not the complete set of underlying constituent degrees of freedom or\ntheir exact many-body correlations. In cosmology this is the usual one-particle distri-\nbution function of collisionless matter [63–66], while in more general settings it may\nbe interpreted more broadly as an effective state-space density over positions and\nvelocities, or positions and flows.\n    The familiar density and velocity fields are reduced moments of this more complete\ndescription. In particular, the density field is obtained by integrating over velocity\nspace, and the continuity equation follows as the zeroth-moment consequence of phase-\nspace dynamics (see Appendix A), in the presence of source or sink terms,\n\n∂t ρ + ∇x · (ρu) = σ.                                      (2)"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "4\n\fThe crucial point is that a density-only description is incomplete: it is valid only as\nlong as the local velocity distribution remains effectively single-stream [63, 67].\n    This distinction is essential for the entropy discussion. A coarse-grained spatial\nfield may develop visible order as clustering proceeds, so that entropy measures based\nonly on the spatial occupancy field can decrease. For example, an initially almost\nhomogeneous density field maximizes the spatial Shannon entropy associated with a\nvoxelized mass distribution, while the emergence of clustering redistributes probability\ntoward many low-density cells and a smaller number of highly occupied ones, thereby\nreducing that particular entropy [51, 54, 68, 69] (see Appendix B). In this projected\nsense, structure formation can indeed look like an entropy decrease.\n    However, this does not exhaust the information content"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "3 Transport, shell crossing and web formation\nA general way to describe structure formation is through a map between an initial\nconfiguration and an evolved one. We therefore introduce Lagrangian coordinates q,\nwhich label the initial state, and Eulerian coordinates x, which describe the evolved\nstate. The transport is encoded in the map\n\nx(q, t) = q + Ψ(q, t),                               (4)\n\n5\n\f              max                                                         min\n ρ(q) = ρ̄ → Sspatial                                 ρ(x) = ρ(q + DΨ) → Sspatial\n\nmin                                                max\n f (t, x, v)|initial → Sphase-space                   f (t, x, v)|final → Sphase-space"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Fig. 2 Sketch illustrating the distinction between projected spatial order and microscopic phase-\nspace complexity. Top left: initially homogeneous configuration, with one tracer per cell on a regular\nLagrangian mesh, representing a nearly uniform density field and high coarse-grained spatial entropy.\nTop right: the corresponding evolved spatial distribution after the Zel’dovich mapping x = q +\nDΨ(q), shown as the occupancy of a fixed Eulerian grid; large empty regions and concentrated mass in\nfewer cells make the projected spatial distribution appear more ordered and reduce the coarse-grained\nspatial entropy. Bottom row: the same initial Gaussian field and the same set of Lagrangian tracers,\nnow placed at random positions within each cell, shown for two stages of the evolution. Bottom\nleft: microscopic phase-space representation of the initial state, with tracer positions and associated"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "6\n\fwhere Ψ is the displacement field [39–42, 63]. This transport picture also admits a vari-\national interpretation. In the single-stream regime, where the map remains one-to-one,\nthe displacement can be related to least-action and optimal-transport formulations of\nstructure formation, in which the evolved mass distribution is connected to the initial\none by a map that extremizes an action or, equivalently in suitable approximations,\nminimizes a quadratic transport cost [73–77]. This variational viewpoint is most natu-\nral in the single-stream regime, before shell crossing destroys the one-to-one character\nof the map.\n    If the transported quantity is conserved, density amplification follows directly from\nthe Jacobian of this map:\n                                                                  \u0012       \u0013\n                                              −1                     ∂x\n          "
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "In this framework, long-range interaction or information flow is encoded in the dis-\nplacement field Ψ(q, t), and therefore enters the density amplification through the\nJacobian of the transport map. For radially symmetric conservative interactions with\nconserved flux through (n − 1)-dimensional spheres in n spatial dimensions, the force\nscales as |F(r)| ∝ r−(n−1) [see, e.g., ? ? ]. An initially homogeneous field becomes inho-\nmogeneous whenever the map produces nontrivial local volume deformations. More\ngenerally, source or sink terms modify this relation by an additional multiplicative\nfactor, but the Jacobian remains the geometric core of the amplification process (see\nAppendix D).\n    The Jacobian also signals the onset of shell crossing. As long as J > 0, the map\nremains locally one-to-one and the flow is single-stream. When\n\nJ(q, t) = 0,                                   (6)"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "the projection onto configuration space becomes singular: several Lagrangian tra-\njectories may then reach the same Eulerian location, and multistreaming begins\n[65, 67, 70–72, 78]. This is the precise point at which the density-only description\nceases to be sufficient.\n    A particularly transparent approximation is obtained when the displacement is\npotential,\n                                 Ψ(q, t) ≃ ∇ϕ(q, t).                             (7)\nIn that case the local deformation is described by the Hessian of the potential,\n\nEij ≡ ∇i ∇j ϕ,                                   (8)"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "whose eigenvalues determine the principal directions of local compression or expansion.\nIf λa denote those eigenvalues, then the Jacobian factorizes as\n                                         Y\n                                    J=    (1 + λa ).                                  (9)\n                                          a"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "7\n\fThis immediately explains the sequence of anisotropic collapse. Collapse along one\nprincipal direction produces a sheet, collapse along two directions produces a filament,\nand collapse along three directions in three dimensions produces a knot [39, 43, 45, 46].\nIn this way, the eigenvalue structure of the Hessian provides a natural geometric origin\nfor web-like morphology.\n    In cosmology, this is the familiar Zel’dovich picture [39, 63, 64]. The key point for\nthe present work is broader: web formation does not require isotropy to be broken by\nhand. Exact local isotropy would correspond to degenerate eigenvalues and therefore\nrepresents a special rather than a generic case. Starting from a noisy weakly structured\nfield, anisotropic collapse is statistically natural, and web-like structures emerge as\nthe generic imprint of the deformation tensor [43, 45, 46].\n    This geometric viewpo"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "4 Maximum entropy, nonlocality, and higher-order\n  structure\nThe previous section explained how transport and anisotropic deformation generate\nweb-like morphology geometrically. We now turn to the statistical side of the problem.\nThe relevant question is not whether the field is structured, but relative to what\nbaseline that structure should be measured.\n    A natural inference principle is provided by the maximum-entropy approach of\nJaynes: when only incomplete information is available, the least biased probability\ndistribution is the one that maximizes entropy subject to the known constraints [49,\n50]. Applied to field configurations, this implies that if only the mean and two-point\n\n8\n\fcorrelation function are fixed, the maximum-entropy ensemble is Gaussian,\n\nP [φ] ∝ exp[−S[φ]] ,                              (11)"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "with a quadratic statistical action S[φ]. In this sense, a Gaussian random field is the\nleast biased ensemble consistent with a prescribed covariance structure [51, 86] (see\nAppendix E).\n    This Gaussian baseline is especially natural in cosmology, where the primordial field\nis very close to Gaussian and linear evolution preserves that property to good approx-\nimation [63, 64, 87]. More generally, it provides a low-order reference state against\nwhich nonlinear organization can be assessed. Its limitation is equally clear: a Gaus-\nsian field contains no connected correlations beyond second order and therefore cannot\nencode the higher-order spatial dependence associated with complex morphology.\n    The departure from Gaussianity is driven by nonlocal interaction and nonlinear\ntransport. A generic transport potential may be written as a nonlocal response of the\nfield,                      "
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "5 Coarse-grained effective theory of anisotropy\nThe previous sections motivate a mesoscopic description in which the relevant variables\nare no longer the microscopic degrees of freedom themselves, but coarse-grained fields\nand the local invariants that can be constructed from them. In this regime, the natural\nlanguage is that of effective free-energy functionals [55] (see Appendix G)."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "9\n\f    The conceptual step is that coarse-graining changes the natural variational lan-\nguage. At the semi-microscopic level one describes the system in terms of entropy over\naccessible states, but after integrating out unresolved degrees of freedom the remain-\ning mesoscopic fields are governed by an effective functional that combines energetic\nand entropic contributions. In equilibrium language this is naturally written as an\neffective free energy (relating internal energy U , temperature T and entropy S),\n\nF = U − T S,                                    (14)"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "or, more generally, as a coarse-grained functional summarizing the competition\nbetween ordering tendencies and unresolved microscopic complexity.\n    In this sense, the relevant variational principle changes from maximizing entropy\nat the microscopic level to minimizing an effective free-energy functional at the\nmesoscopic level.\n    A natural coarse-grained description is then of Landau–Ginzburg type. Rather than\nfollowing all microscopic degrees of freedom individually, one writes the most general\nlocal functional consistent with the relevant symmetries and scales, constructed from\ndensity-like amplitudes, gradients, and anisotropy-sensitive operators [55, 100–106]. In\nthe present context, a minimal functional depends on the density contrast δ together\n                                            (ℓ)\nwith a hierarchy of Hessian-like tensors Eij , which encode anisotropy across different"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "(ℓ)    (ℓ)\n                                Q(ℓ) (x) ≡ Eij Eji ≥ 0,                               (15)\n\nwhich measures the amplitude of local anisotropy. By construction, Q(ℓ) vanishes only\nfor locally isotropic configurations and grows as the eigenvalues of the deformation\ntensor split. In this sense, Q(ℓ) plays the role of an anisotropy order parameter.\n    An interesting connection with standard cosmological bias expansions is that the\nlowest-level anisotropy invariant Q(1) is directly related to the familiar long-range tidal\n                 (1)\noperator. For Eij ∝ ∂i ∂j ∇−2 δ, one has\n\n(1)   (1)\n                                    Q(1) = Eij Eji ,"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "while the usual traceless tidal tensor is\n                                    \u0012             \u0013\n                                           −2 1 K\n                              sij = ∂i ∂j ∇ − δij δ.\n                                              3\n\nHence\n                                                   1\n                             s2 = sij sij = Q(1) − δ 2 ,\n                                                   3\nup to normalization conventions. In this sense, the first anisotropy level used here\ncoincides, modulo the isotropic trace contribution, with the standard nonlocal long-\nrange bias of cosmological perturbation theory. The activation of the Q(1) branch"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "10\n\fcan therefore be viewed as the effective-theory counterpart of the well-known tidal\nresponse of tracers to their large-scale environment.\n   A minimal local coarse-grained functional may then be written schematically as\n                                            Xh                          \u00012 i\n             floc (δ, {Q(ℓ) }) = fδ (δ) +       αℓ (δ) Q(ℓ) + βℓ Q(ℓ)          + ··· ,   (16)\n                                            ℓ"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "with βℓ > 0 for stability. The coefficient αℓ (δ) acts as an effective density-dependent\ncontrol parameter for anisotropy. Minimizing the local free-energy density with respect\nto Q(ℓ) gives the stationary branch\n                                                 \u0014               \u0015\n                                (ℓ)                       αℓ (δ)\n                               Q⋆ (δ) = max          0, −          .                     (17)\n                                                           2βℓ"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "This has the standard Landau interpretation: for αℓ (δ) > 0, the isotropic branch\nQ(ℓ) = 0 is preferred; when αℓ (δ) changes sign and becomes negative, an anisotropic\n                (ℓ)\nbranch with Q⋆ > 0 becomes energetically favored, while βℓ > 0 ensures stability\n[55]. A schematic representation is presented in Figure 3.\n    This effective sign change is physically motivated by the growth dynamics itself:\nin the separable growing-mode regime, the same growth factor amplifies the pre-\nexisting eigenvalue splitting of the deformation tensor, so anisotropic collapse is the\ngeneric route to structure formation; see also the classic analysis of Gaussian initial\ndeformation fields by Doroshkevich [107] (Appendix I).\n    The significance of this construction is not that all structure-forming systems lit-\nerally thermalize to a common equilibrium free energy. Rather, the Landau–Ginzburg\nfunc"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "6 Quantitative tests on generated fields\nThe effective framework developed above leads to several qualitative expectations.\nFirst, anisotropy should become activated above a characteristic density scale. Second,\nthis activation should depend on web environment, so that different morphological\nclasses populate different anisotropic branches. Third, the onset of anisotropy should\n\n11\n\f ρ(q) = ρ̄, Q⋆ = 0, fiso < faniso                        ρ(x) = ρ(q + DΨ), Q⋆ > 0, faniso < fiso"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Fig. 3 Sketch illustrating a two-dimensional proxy for anisotropic web classification and its Landau–\nGinzburg interpretation. Left: homogeneous reference state on a regular Lagrangian mesh, with\nisotropic coarse-grained minimum Q = 0. Right: evolved state after the mapping x = q + DΨ, where\nanisotropic structures are activated and an anisotropic branch with Q > 0 becomes preferred. In two\ndimensions the Hessian ∂i ∂j Φ has only two eigenvalues, so the standard three-dimensional cosmic-\nweb rule cannot be applied unchanged. We retain the void signature –empty circles– (both eigenvalues\nnegative) and identify sheets with saddle points –thin lines– (λ1 > 0, λ2 < 0), which are the natural\ntwo-dimensional analogue of collapse along one preferred direction. Regions with both eigenvalues\npositive are then split schematically by anisotropy: nearly isotropic positive curvature is represented\nas "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "admit an interpretation in terms of an effective coarse-grained free-energy functional.\nThese expectations follow from the theoretical framework itself; the role of the numer-\nical analysis in this section is to illustrate them in a controlled cosmological realization\nand to assess to what extent the simplest truncations capture the observed trends.\n    To this end, we consider fields generated with ridged Augmented Lagrangian Per-\nturbation Theory (RLPT) [79, 80, 122]. The simulation volume is a cube of side length\nL = 100 h−1 Mpc, sampled with 4003 particles, corresponding to a spatial resolution\ndL = 0.25 h−1 Mpc, for a cosmology consistent with Planck 2018 [123]. Although the"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "12\n\fnumerical example is cosmological, the logic of the diagnostics is more general: the\nrelevant ingredients are a coarse-grained density field, anisotropy-sensitive operators,\nand a hierarchy of web environments.\n    Figure 4 illustrates the basic sequence from an initially weakly structured field\nto an evolved nonlinear field, together with the associated potential representation.\nFigure 5 shows the corresponding spectral hierarchy of Hessian-based web contrasts.\nThese provide the geometric and multiscale backbone for the diagnostics that follow\n[48, 104, 105]."
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "6.1 Density-dependent activation of anisotropy\nA first quantitative illustration is provided by the conditional relation between density\nand anisotropy. The effective theory predicts that the anisotropy order parameter\nshould remain small below a characteristic density threshold and become activated\nabove it. In the minimal local picture this is expressed by the stationary branch\n\na2,ℓ + cℓ δ (ℓ)\n                        D                    E        \u0014                     \u0015\n                            (ℓ)        (ℓ)\n                         Q        |δ             ≃ max 0, −                   ,              (18)\n                                                                 2βℓ"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "or by an empirical generalization thereof.\n    For this diagnostic we choose z = 1, which in cosmological terms corresponds to\na stage where nonlinear clustering and web anisotropy are already clearly developed,\nbut where the dynamics is still less dominated by the deepest multistreaming regime\nthan at the present epoch, z = 0. This makes z = 1 a useful testing ground for the\ncoarse-grained onset of anisotropic growth.\n    To connect the measured density–anisotropy relation with the effective free-energy\npicture, we fit the conditional mean anisotropy with the stationary Landau branch\n\nQ⋆ (δ) = max[0, s(δ − δc )] ,                              (19)"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "where δc is the activation threshold and s > 0 is the growth slope of the anisotropic\nbranch. Since the full measured ⟨Q | δ⟩ relation is not described equally well by this\nminimal form over the entire density range, we determine δc and s from a restricted fit\nover moderate overdensities, where the thresholded linear branch provides a physically\nmeaningful approximation. This yields δc ≃ 0.2 and s ≃ 13, indicating that anisotropic\nclustering is activated already at moderate overdensity.\n    This parametrization is equivalent to the minimal quadratic Landau form\n\nfloc (δ, Q) = fiso (δ) + αQ (δ) Q + βQ Q2 ,                αQ (δ) = a2Q + cQ δ,   (20)"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "with βQ > 0, after identifying\n                                                        \u0014  \u0015\n                                                    αQ (δ)\n                                  Q⋆ (δ) = max 0, −          .                               (21)\n                                                     2βQ\n\n13\n\fδ(q)                                              exp(δ(q) − ⟨δ(q)2 ⟩/2) − 1\n\nδ(x)                                              Φ(x) = ∇−2 δ(x)"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Fig. 4 Top left: Two-dimensional slice through a three-dimensional cubic mesh containing a Gaus-\nsian random realization with a power spectrum that decays as a power law towards small scales. The\nbox side length is 100 h−1 Mpc and the cell size is dL ≃ 0.25 h−1 Mpc, with h = 0.677. Top right:\nCorresponding lognormal field constructed from the Gaussian realization shown in the top-left panel\n[47, 124]. Bottom left: Field evolved dynamically with ridged augmented Lagrangian perturbation\ntheory to redshift z = 1. Bottom right: Potential associated with the evolved field in the bottom-\nleft panel, obtained by applying the inverse Laplacian operator. The top-right panel shows that a\nlocal nonlinear mapping can alter the one-point distribution of the field, but does not reproduce\nthe filamentary connectivity and anisotropic morphology generated by nonlocal transformations or\ntransport."
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "For fixed βQ , the fitted branch parameters determine the effective coefficients through\n\na2Q = 2βQ s δc ,        cQ = −2βQ s.                            (22)\n\nThe corresponding minimized free-energy branch is\n\nfmin (δ) = fiso (δ) + αQ (δ) Q⋆ (δ) + βQ Q⋆ (δ)2 ,                     (23)\n\n14\n\f   (1)                                                (2)\nEij = ∇ij ∇−2 δ(x)                                  Eij = ∇ij δ(x)\n\n(3)                                                (4)\nEij = ∇ij ∇2 δ(x)                                   Eij = ∇ij ∇4 δ(x)"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "Fig. 5 Web contrasts derived from the Hessian-like tensors corresponding to the spectral hierarchy\n∇ij ∇−2 δ(x), ∇ij δ(x), ∇ij ∇2 δ(x), and ∇ij ∇4 δ(x). The displayed values are discrete web labels,\nwith 4 = knots, 3 = filaments, 2 = sheets, and 1 = voids. The sequence shows how the inferred\nmorphology changes from large-scale tidal structure to progressively more local curvature-sensitive\nweb contrasts: ∇ij ∇−2 δ highlights the large-scale tidal or potential-like structure, ∇ij δ gives the\nstandard density-Hessian contrast, and the operators ∇ij ∇2 δ and ∇ij ∇4 δ progressively emphasize\nsharper and more local curvature features. Together, they provide a multiscale characterization of\nanisotropic web structure, in agreement with the spectral hierarchical web classification introduced\nby Kitaura and Sinigaglia [48].\n\nand the free-energy gain relative to the isotropic solution is"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "∆f (δ) ≡ fmin (δ) − fiso (δ).                                 (24)\n\nBy construction, ∆f (δ) = 0 where the isotropic branch remains preferred, while\n∆f (δ) < 0 marks the density range in which anisotropy lowers the effective coarse-\ngrained free-energy cost. In this sense, the fitted threshold δc identifies the onset of\n\n15\n\f      102                                                                                          103\n\n100\n      101\nhQ | δi                                                                                       10−3\n\nhQ | δi\n      100                                                                                     10−6"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Q?(δ) = max[0, s(δ − δc)]                          10−9                          Q?(δ) = max[0, s(δ − δc)]\n    10−1                                   δc = 0.20, s = 13.08, R2 = 0.855                                                 δc = 10.41, s = 32.76, R2 = 0.838\n                                                                                                   −12\n                                           measured hQ | δi                                 10                              measured hQ | δi\n                                            0                                  1\n                                       10                                 10                             101                                               102\n                                                δ                                                                                δ"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "0                                                                                          ×106\n                                                                                                   0\n      −2000\n                                                                                             −1\n      −4000\n                                                                                             −2\nhf | δi"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "hf | δi\n      −6000\n                                                                                             −3\n      −8000\n                                                                                             −4\n    −10000\n                       hfiso | δi                                                            −5                hfiso | δi\n    −12000             hfmin | δi                                                                              hfmin | δi\n                                                                                             −6\n                10−2                10−1                100              101                           10−2          10−1       100           101           102\n                                                1+δ                                                                            1+δ"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Fig. 6 Comparison between the fitted anisotropy activation and the corresponding effective free-\n  energy branches for two levels of the Hessian hierarchy. Top left: conditional mean anisotropy ⟨Q | δ⟩\n  for the k−2 level, corresponding to the tidal-field contraction built from ∇ij ∇−2 δ, together with\n  the restricted Landau-branch fit Q⋆ (δ) = max[0, s(δ − δc )], yielding δc ≃ 0.20 and s ≃ 13.08. Top\n  right: the same for the k0 level, corresponding to the local curvature contraction built from ∇ij δ,\n  with δc ≃ 10.41 and s ≃ 32.76. Bottom left: comparison between the isotropic branch ⟨fiso | δ⟩\n  and the minimized anisotropic branch ⟨fmin | δ⟩ derived from the k−2 fit. The two branches are\n  nearly degenerate at low density, while the anisotropic branch becomes progressively favored beyond\n  1 + δ ∼ 2–3. Bottom right: the corresponding branch comparison for the k0 level, showing that"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "anisotropic activation, whereas the later and more visible separation between fmin and\n  fiso reflects the increasing magnitude of the free-energy advantage at higher density.\n      The restricted fits shown in Figure 6 indicate that the onset of anisotropic acti-\n  vation depends on the operator used to define the coarse-grained anisotropy. For the\n  k −2 level, associated with the tidal-field contraction ∇ij ∇−2 δ, the fitted threshold is\n  δc ≃ 0.2, implying that anisotropic clustering becomes relevant already at moderate\n  overdensity and is clearly established by 1 + δ ∼ 2–3. For the k 0 level, associated with\n  the curvature contraction ∇ij δ, the threshold shifts to δc ≃ 10.4, so that a strong\n  anisotropic preference appears only later, around 1 + δ ∼ 10. In this sense, the tidal\n  field detects the onset of anisotropic organization earlier than the local curvature of\n  the densi"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "16\n\fSince the k −2 operator probes a broader nonlocal environment, it is expected to regis-\nter coherent anisotropic forcing earlier than the more local curvature operator, which\nresponds most strongly only once collapse has become sharper and more nonlinear.\nThis hierarchy is intuitively consistent with the physical roles of the two operators. The\ntidal field is nonlocal and encodes anisotropic environmental forcing over larger scales,\nso it registers the departure from isotropic clustering earlier. The density-curvature\nfield is more local and therefore reacts more strongly only once collapse has progressed\nfar enough to generate sharper, high-density structures.\n    A more detailed web-environment decomposition of the conditional anisotropy\ncurves is presented in Appendix J. These results show that the density–anisotropy\nrelation is strongly environment dependent: the clearest and mos"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "7 Discussion and conclusions\nThe main conceptual result of this work is that the apparent opposition between\nentropy growth and structure formation is largely an artifact of reduced descriptions.\nA coarse-grained spatial field may become more ordered as sheets, filaments, and knots\nemerge, and the corresponding spatial entropy may decrease. At the same time, the\nfull phase-space state becomes more complex, because nonlinear evolution activates\nmultistreaming, velocity dispersion, and higher-order structure that are invisible in\na density-only description. The formation of complex morphology is therefore not\nin conflict with entropy growth, but instead reflects the fact that projected spatial\nobservables capture only part of the richer dynamical information carried by phase-\nspace.\n    Within this perspective, shell crossing plays a special role. It is not only the\ngeometric condition und"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "17\n\fto be imposed externally. It is already encoded in the geometry of the transport map\nand in the generic presence of local anisotropy in weakly structured initial fields. In\ncosmology, this preference is ultimately seeded by primordial fluctuations themselves:\na Gaussian random field is statistically almost never perfectly isotropic point by point,\nso gravitational amplification acts on an initially irregular Hessian landscape rather\nthan on an exactly homogeneous background.\n    The statistical side of the framework complements this geometric picture. A Gaus-\nsian random field provides the maximum-entropy baseline consistent with prescribed\ntwo-point statistics, but nonlinear transport and nonlocal interaction drive the system\naway from this simple description. Mode coupling then generates higher-order cor-\nrelations, such as skewness, kurtosis, bispectra, and trispectra, which const"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "18\n\fwas extraordinarily smooth in its matter distribution and yet could not be regarded\nas a state of maximal physical entropy, precisely because gravity changes the mean-\ning of what counts as equilibrium [68]. Our results support this basic intuition in a\ncoarse-grained dynamical setting. If one restricts attention to the projected one-point\ndensity field, the entropy associated with spatial occupancy can indeed decrease as\nclustering develops. But this decrease reflects only the growing inhomogeneity of a\nreduced description. Once the phase-space structure is included, shell crossing and\nmultistreaming activate additional velocity-space complexity, so that the effective\ninformation required to characterize the macroscopic state increases. In this sense, the\napparent ordering of the density field does not signal a fundamental entropy reduc-\ntion or an intrinsic compression of informati"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "19\n\fA From phase-space dynamics to the continuity\n  equation\nIn the collisionless case, the microscopic state of the system is described by the phase-\nspace distribution function f (t, x, v) [63, 65, 66]. Its evolution is governed by the\nVlasov equation,\n                               ∂t f + v · ∇x f + g · ∇v f = 0,                       (25)\nwhere g(x, t) is the acceleration field. The mass density and mean velocity are the\nlowest moments of f ,\n                   Z                                           Z\n      ρ(x, t) = m dn v f (t, x, v),        ρ(x, t) u(x, t) = m dn v f (t, x, v) v.   (26)\n\nIntegrating Eq. (25) over velocity space gives\n                  Z                 Z                        Z\n                      ∂t f dn v +        v · ∇ x f dn v +         g · ∇v f dn v = 0.   (27)"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "The first term yields ∂t ρ, and the second yields ∇x ·(ρu). For the third term, assuming\nsufficiently rapid decay of f as |v| → ∞, the boundary contribution in velocity space\nvanishes. One therefore obtains\n\n∂t ρ + ∇x · (ρu) = 0.                          (28)\n\nThis is the continuity equation quoted in the main text.\n   If local production or loss is present, the same balance-law logic leads to\n\n∂t ρ + ∇x · (ρu) = σ,                          (29)\n\nwith σ(x, t) a source or sink term.\n\nB Projected spatial entropy and its decrease under\n  clustering\nTo make explicit the entropy decrease of a coarse-grained spatial field, consider a\npartition of the domain into Nc cells of equal volume, and let ρi be the coarse-grained\ndensity in cell i. Define the normalized spatial probabilities"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Nc\n                                   ρi                       X\n                             pi = PNc              ,              pi = 1.              (30)\n                                          j=1 ρj            i=1\n\nThe corresponding spatial Shannon entropy is\n\nNc\n                                                   X\n                                        Sx = −           pi ln pi .                    (31)\n                                                   i=1\n\n20\n\fFor a perfectly homogeneous state, pi = 1/Nc , and therefore\n\nSxmax = ln Nc .                              (32)\n\nNow consider small deviations from homogeneity,\n\n1                X\n                             pi =      + ϵi ,             ϵi = 0.                  (33)\n                                    Nc                i\n\nExpanding Eq. (31) to second order gives"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "c N\n                                           Nc X\n                           Sx = ln Nc −          ϵ2 + O(ϵ3 ).                      (34)\n                                           2 i=1 i\n\nThus any departure from homogeneity lowers the coarse-grained spatial entropy [51,\n54].\n    If one writes the density as ρ(x) = ρ̄ [1 + δ(x)] with |δ| ≪ 1, then\n\n1 X 2\n                               Sx ≈ ln Nc −            δ ,                         (35)\n                                                 2Nc i i\n\nshowing explicitly that the spatial entropy decreases as the variance of the coarse-\ngrained density field increases.\n   This is the precise sense in which an initially homogeneous noisy field can evolve\ntoward a more ordered spatial morphology while the associated projected spatial\nentropy decreases."
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "C Phase-space entropy decomposition and\n  multistreaming\nThe decrease of the projected spatial entropy does not capture the full information\ncontent of the evolving system. To see this, partition phase-space into Nx spatial cells\nand Nv velocity cells, and let miα be the mass in spatial cell i and velocity cell α.\nDefine the normalized phase-space probabilities\n                                     miα             X\n                          πiα = P            ,              πiα = 1.               (36)\n                                     j,β mjβ          i,α\n\nThe corresponding coarse-grained phase-space entropy is\n                                           X\n                                Sps = −          πiα ln πiα .                      (37)\n                                           i,α"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "21\n\f   The spatial probabilities are the marginals\n                                X                                 X\n                         pi =       πiα ,        Sx = −                   pi ln pi .   (38)\n                                α                                 i\n\nThe conditional velocity probabilities are\n                                       πiα           X\n                            wα|i =         ,                 wα|i = 1.                 (39)\n                                        pi               α\n\nUsing πiα = pi wα|i , one finds the exact decomposition\n\nSps = Sx + Sv|x ,                                (40)"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "where                                   X            X\n                            Sv|x = −            pi       wα|i ln wα|i                  (41)\n                                            i        α\nis the conditional entropy of velocities given position.\n    In the single-stream regime, each spatial cell carries effectively a unique coarse-\ngrained velocity state,\n                                               K\n                                      wα|i = δα,αi\n                                                   ,                               (42)\nand therefore\n                                 Sv|x = 0,           Sps = Sx .                        (43)\nAfter shell crossing, several streams with distinct velocities may coexist at the same\nspatial location, so wα|i has support on multiple velocity bins and\n\nSv|x > 0.                                  (44)"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Hence\n                                            Sps > Sx .                                 (45)\n    This decomposition makes explicit the central distinction used throughout the\npaper: the projected spatial entropy may decrease as clustering develops, while the full\ncoarse-grained phase-space entropy grows because multistreaming activates additional\nvelocity-space complexity [67, 70, 71].\n\nD Jacobian amplification with source or sink terms\nLet the transport map be written as x = x(q, t), with Jacobian\n                                                     \u0012            \u0013\n                                                             ∂x\n                                    J(q, t) = det                     .                (46)\n                                                             ∂q\n\nFor conserved transport, mass conservation gives"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "ρ(x, t) dn x = ρ(q, t0 ) dn q,                         (47)\n\n22\n\fhence\n                               ρ(x(q, t), t) = ρ0 (q) J(q, t)−1 .                       (48)\n   More generally, let the continuity equation include a source or sink term,\n\n∂t ρ + ∇x · (ρu) = σ.                               (49)\n\nUsing Jacobi’s formula, one finds along a trajectory\n\ndJ\n                                           = J ∇x · u.                                  (50)\n                                        dt\n\nCombining this with Eq. (49) gives\n\nd\n                                            (ρJ) = J σ.                                 (51)\n                                         dt\n   A particularly simple case is a sink proportional to the density,\n\nσ(x, t) = −γ(x, t) ρ(x, t),           γ ≥ 0.                   (52)\n\nThen Eq. (51) integrates to"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "ρ(x(q, t), t) = ρ0 (q) J(q, t)−1 e−η(q,t) ,                     (53)\n\nwith                                       Z t\n                               η(q, t) =         γ(x(q, s), s) ds.                      (54)\n                                            t0\nThus source and sink terms modify the purely Jacobian amplification by an additional\ncumulative exponential factor.\n\nE Maximum-entropy Gaussian fields and\n  higher-order generalization\nThe Shannon entropy of a probability density p(x) is\n                                           Z\n                                S[p] = −         dx p(x) ln p(x).                       (55)\n\nMaximizing S[p] subject to normalization and fixed first and second moments,\n            Z                       Z                         Z\n                dx p(x) = 1,            dx x p(x) = µ,              dx x2 p(x) = m2 ,   (56)"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "gives, by the method of Lagrange multipliers,\n\np(x) ∝ exp −λ1 x − λ2 x2 .\n                                                        \u0001\n                                                                                        (57)\n\n23\n\fCompleting the square yields the Gaussian form\n\n(x − µ)2\n                                              \u0014           \u0015\n                                            1\n                            p(x) = √       exp −            .                                       (58)\n                                     2πσ 2         2σ 2\n\nFor a field φ(x), the corresponding maximum-entropy ensemble with fixed mean\nand covariance is the Gaussian functional\n                    \u0014    Z                                                   \u0015\n                       1\n        P [φ] ∝ exp −       dn x dn y (φ(x) − µ(x)) C −1 (x, y) (φ(y) − µ(y)) . (59)\n                       2"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "This is the statistical baseline used in the main text [49, 51, 86].\n   Once higher-order moments are also constrained, the exponent is generalized from\na quadratic to a higher-order polynomial. If one fixes normalization and the first few\nmoments up to fourth order, the maximum-entropy solution takes the schematic form\n\np(x) ∝ exp −λ1 x − λ2 x2 − λ3 x3 − λ4 x4 − · · · .\n                                                                   \u0001\n                                                                                                    (60)"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Thus nonzero higher cumulants correspond formally to higher-order corrections to\nthe Gaussian exponent. In particular, a nonzero third moment or bispectrum induces\na cubic correction, while a nonzero fourth moment or trispectrum induces a quartic\ncorrection. In practice, stabilizing even-order terms are required for normalizability on\nunbounded support [49, 51].\n\nF Second-order mode coupling and non-Gaussianity\nThe key statistical consequence of nonlinear transport is that Fourier modes cease to\nevolve independently. In standard perturbative language, the field may be expanded as\n\nδ(k) = δ (1) (k) + δ (2) (k) + · · · .                             (61)\n\nAt second order, one obtains the generic convolution structure"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "dn p\n                                 Z\n                  δ (2) (k) =              F2 (p, k − p) δ (1) (p)δ (1) (k − p),                    (62)\n                                     (2π)n\n\nwhere F2 is the second-order mode-coupling kernel [63].\n   In the standard pressureless cosmological case, the Einstein–de Sitter kernel is\n                                                  \u0012             \u0013           \u0012              \u00132\n                                 5 1 k1 · k 2         k1   k2           2       k1 · k 2\n               F2 (k1 , k2 ) =    +                      +          +                           .   (63)\n                                 7 2 k1 k2            k2   k1           7        k1 k2"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "The exact coefficients are model dependent, but the convolution structure itself is\ngeneric: the second-order field at k is sourced by pairs of lower-order modes, and\ntherefore the evolved field is no longer characterized by the power spectrum alone.\n\n24\n\f   This is the origin of connected higher-order correlators. In Fourier space,\n\n⟨δ(k1 )δ(k2 )⟩ = (2π)n δD (k1 + k2 ) P (k1 ),                 (64)\n\n⟨δ(k1 )δ(k2 )δ(k3 )⟩c = (2π)n δD (k1 + k2 + k3 ) B(k1 , k2 , k3 ), (65)\nand similarly for the trispectrum and higher connected correlators. Thus mode cou-\npling provides the direct statistical bridge from Gaussian baselines to non-Gaussian\nstructure [63, 88–92]."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "G Why coarse-graining leads to a free-energy\n  functional\nThe Landau–Ginzburg viewpoint used in the main text is motivated by coarse-\ngraining. At the semi-microscopic level, one may define a constrained partition function\nfor a coarse-grained field ϕ(x),\n                                 Z\n                          Z[ϕ] = Dσ δD ϕ − ϕℓ [σ] e−βH[σ] ,\n                                                    \u0001\n                                                                                    (66)\n\nwhere σ denotes the microscopic degrees of freedom and ϕℓ [σ] the corresponding\ncoarse-grained field at resolution ℓ. The associated coarse-grained free energy is\n\nFcg [ϕ] = −kB T ln Z[ϕ].                             (67)"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "The key point is that integrating over unresolved microscopic degrees of freedom\nnaturally combines energetic and entropic contributions into a mesoscopic functional\n[55]. If the coarse-grained field varies slowly in space, that functional can be expanded\nin the most general local scalar operators compatible with the symmetries of the\nproblem. In its simplest form this gives a Landau–Ginzburg-type expression,\n                              Z\n                    FLG [ϕ] = dn x a + b ϕ2 + c ϕ4 + d |∇ϕ|2 + · · · .\n                                      \u0002                                \u0003\n                                                                                      (68)"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "In the present work the role of the coarse-grained variables is played not by a\nsingle scalar field alone, but by the density contrast δ together with a hierarchy of\n                        (ℓ)\nHessian-like tensors Eij . The effective functional is therefore written in terms of\ndensity amplitudes, gradients, and anisotropy-sensitive invariants. Its purpose is not\nto claim a unique microscopic Hamiltonian for all systems of interest, but to provide\na systematic operator expansion for morphology after coarse-graining [55].\n\nH Anisotropy order parameter and stationary\n  branch\nFor each hierarchy level ℓ [48], define the quadratic anisotropy invariant\n                                              (ℓ)   (ℓ)\n                                Q(ℓ) (x) = Eij Eji ≥ 0.                              (69)"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "25\n\fThe different operators associated with the hierarchy levels ℓ are indicated in Figure 5.\nBy construction, Q(ℓ) = 0 only for locally isotropic configurations and becomes positive\n                          (ℓ)\nas the eigenvalues of Eij split.\n    A minimal local effective density may then be written as\n                                       Xh                       \u00012 i\n          floc (δ, {Q(ℓ) }) = fδ (δ) +    αℓ (δ) Q(ℓ) + βℓ Q(ℓ)      , βℓ > 0.      (70)\n                                     ℓ\n\nMinimizing floc with respect to Q(ℓ) gives\n\n∂floc\n                                   = αℓ (δ) + 2βℓ Q(ℓ) = 0,                         (71)\n                             ∂Q(ℓ)\n\nso the formal stationary branch is\n\n(ℓ)                αℓ (δ)\n                                  Q⋆ (δ) = −                   .                    (72)\n                                                         2βℓ"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "Since Q(ℓ) ≥ 0, the physical branch is\n                                                     \u0014            \u0015\n                              (ℓ)                          αℓ (δ)\n                             Q⋆ (δ) = max             0, −          .               (73)\n                                                            2βℓ\n\nThe usual Landau interpretation follows immediately. If αℓ (δ) > 0, the isotropic\nbranch Q(ℓ) = 0 is locally preferred. If αℓ (δ) < 0, the isotropic branch ceases to\n                                                                            (ℓ)\nminimize the local free-energy density and an anisotropic branch with Q⋆ > 0 is\nactivated. This is the basis of the density-dependent anisotropic activation discussed\nin the main text [55].\n\nH.1 Eigenvalue interpretation\n   (ℓ)   (ℓ)   (ℓ)                             (ℓ)\nIf µ1 , µ2 , µ3 are the eigenvalues of Eij , and"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "(ℓ)         (ℓ)     (ℓ)\n                                         µ1 + µ2 + µ3\n                               µ̄(ℓ) =                ,                             (74)\n                                               3\nthen\n                                         3 \u0010           \u00112\n                                              (ℓ)\n                                         X\n                              Q(ℓ) =         µi − µ̄(ℓ) .                           (75)\n                                         i=1\nThus Q(ℓ) is precisely a scalar measure of eigenvalue splitting, and therefore of\nanisotropy [100, 101, 104–106, 110, 111].\n\nI Why anisotropy is expected to become favored\nThe appearance of an anisotropic branch in the effective coarse-grained description is\nnot introduced here as a purely phenomenological fitting ansatz. It is already suggested"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "26\n\fby the structure of the growth equations and by the geometry of transport in the\ngrowing-mode regime.\n    Rather than committing to a specific closure from the outset, it is useful to adopt\nthe standard effective-theory viewpoint in which the large-scale dynamics is writ-\nten as the continuity–Euler–Poisson system supplemented by an effective stress or\nacceleration term that admits a symmetry-based derivative expansion [63, 66]. In\nthis formulation, the additional contribution is organized as an isotropic series in\nincreasingly higher spatial derivatives of the density field. The particular hierarchy of\nHessian-like operators used in the present work may then be viewed as a concrete real-\nization of this general expansion, reordered according to the spectral operator levels\nintroduced by Kitaura and Sinigaglia [48].\n    In the growing-mode regime, the Zel’dovich approximation provide"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "Ψ(q, t) = D(t) ∇ϕ(q),                                (76)\n\nso that the deformation tensor becomes\n\nDij (q, t) = D(t) ϕ,ij (q).                           (77)\n\nIf µ1 ≤ µ2 ≤ µ3 are the eigenvalues of ϕ,ij , then\n\n3                                          3\n                 Y                   \u0001                      Y                   \u0001−1\n     J(q, t) =         1 + D(t)µa (q) ,     1 + δ(q, t) =         1 + D(t)µa (q)    .   (78)\n                 a=1                                        a=1\n\nThe key point is that the growing mode amplifies the initial deformation tensor mul-\ntiplicatively, so any primordial eigenvalue splitting is carried forward and sharpened\nrather than averaged away. Collapse occurs first along the most compressive direction,\nnamely the eigenvalue that reaches\n\n1 + D(t)µa (q) = 0                                 (79)"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "first. This yields the familiar sequence sheet → filament → knot. Exact isotropic col-\nlapse would require degenerate eigenvalues and is therefore non-generic. In a Gaussian\ninitial field, such degeneracy has vanishing probability; already the classic analysis of\nDoroshkevich [107] showed that the initial deformation field of a Gaussian random\nrealization is generically triaxial.\n    From the coarse-grained point of view, this means that the growth dynamics\nnaturally drives the system away from the isotropic branch Q = 0 and toward con-\nfigurations with nonzero eigenvalue splitting, Q > 0. The anisotropic branch should\ntherefore be interpreted as the effective continuation of the physically realized grow-\ning solution once the system leaves the weakly structured regime. In this sense, the\nsign change of the coefficient multiplying Q in the Landau–Ginzburg functional is not\narbitrary: it "
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "27\n\f                             1015\n\n1013\n\nknots ∪ filaments ∪ sheets ∪ voids\n                             1011\n\n109\n\nhQ(i) | δi\n                               107\n\n105\n\n103\n\n101\n\n100              101            102          103\n                                                                         δ\n\nFig. 7 Conditional mean tidal anisotropy ⟨Q(i) | δ⟩ for the four hierarchical levels i = 1, . . . , 4,\nmeasured from the generated fields. Binning is performed uniformly in log(1 + δ). Symbols denote the\nmeasured averages and lines the best-fitting shifted power laws Ci (δ − δc,i )pi . In all cases, anisotropy\nis negligible below a characteristic density threshold and rises rapidly above it, consistent with the\nactivation of anisotropic branches in the coarse-grained description."
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "The quantitative measurements presented in the main text should therefore be\nunderstood only as an illustration of this more general logic. They verify, in a concrete\ncosmological realization, that the nonlocal tidal level becomes relevant earlier and that\nmore local curvature-sensitive levels become important later, in agreement with the\ngeneral hierarchy of growth and with the geometric sequence of anisotropic collapse."
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "J Fitting procedure for the anisotropy curves\nThe shifted power-law fits presented in this appendix serve as empirical summaries\nof the full conditional anisotropy curves over broad density ranges. They are distinct\nfrom the restricted thresholded-linear fits used in the main text to connect the onset\nof anisotropy with the minimal Landau branch. The conditional anisotropy curves\nshown in the main text are measured by binning the field uniformly in log(1 + δ). If\nBn denotes the set of cells in the n-th bin, the measured conditional mean is\n\n1 X (i)\n                                                   Q̄(i)\n                                                     n =         Q (x),                                    (80)\n                                                             Nn\n                                                                    x∈Bn"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "with standard error\n                                                   \"                                            #1/2\n                                1                        1    X \u0010                  \u00112\n                      σn(i) = √                                   Q(i) (x) − Q̄(i)\n                                                                               n                       .   (81)\n                                           Nn          Nn − 1\n                                                              x∈Bn\n\nTo characterize the activated branch, we fit a shifted power-law model,\n                                     D           E\n                                         Q(i) | δ = Ci (δ − δc,i )pi ,             δ > δc,i .              (82)"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "28\n\f                                                                     1016\n          1012\n                             knots                                   1013                           filaments\nhQ(`) | δiweb=1\n\nhQ(`) | δiweb=2\n          1010\n                                                                             10\n                                                                     10\n            108\n                                                                       107\n            106\n                                                                       104\n            104\n\n100      101          102        103                            10−1        100   101         102     103\n                                  δ                                                                   δ"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "1012\n          1015\n                             sheets                                                                 voids\nhQ(`) | δiweb=3\n\nhQ(`) | δiweb=4\n          1012                                                          109\n\n109\n                                                                        106\n            106\n                                                                        103\n            103\n\n100     101        102       103                                     10−2         100             102\n                                  δ                                                                   δ"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "Fig. 8 Same as Figure 7 but shown separately for knots, filaments, sheets, and voids. The figure\n    does not support a single universal hierarchy among web types. Instead, the anisotropic activation is\n    strongly environment dependent. Sheets and filaments often display the clearest and most extended\n    activated branches, while knots are more affected by strong nonlinearity and possible saturation\n    effects. Voids are not simply featureless: for the lowest hierarchical levels they show some of the clean-\n    est and most nearly linear trends, consistent with the idea that in regions with weaker multistreaming\n    the minimal coarse-grained description can remain accurate over a broader density range.\n\nFor a fixed trial value of δc,i , taking logarithms gives a linear relation,"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "ynlog = log Q̄(i)\n                                               n = log Ci + pi log(δn − δc,i ),                                             (83)\n\nwhere δn is the representative density of the bin.\n       The best-fitting threshold δc,i is selected by scanning trial values and minimizing\n    the residual sum of squares in log-space,\n                                                   X                                     \u00012\n                                        SSElog =              ynlog − ŷnlog                  .                             (84)\n                                                       n"
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "A useful goodness-of-fit measure is the coefficient of determination in log-space,\n                                                                     \u00012\n                                                      y log − ŷnlog\n                                                  P\n                                        2\n                                       Rlog = 1 − P n\u0010 n             \u00112 ,                                                   (85)\n                                                        log\n                                                   n yn − ȳ\n                                                                 log\n\n29\n\f    Table 1 Best-fitting shifted power-law parameters for ⟨Q(ℓ) | δ⟩α ."
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "ℓ=1                         ℓ=2                            ℓ=3                    ℓ=4\n                               2                              2                         2                       2\n               p      δc      Rlog      p         δc         Rlog        p       δc    Rlog     p        δc    Rlog\nAll          1.53    0.00    0.987    1.98        0.00       0.994      0.76    0.00   0.909   0.55     0.00   0.847\nKnots        1.36    0.00    0.962    1.77       55.95       0.999      -1.04   0.00   0.966   -0.61    0.00   0.573\nFilaments    1.43    0.00    0.963    1.91        0.00       0.993       1.10   0.00   0.957   0.85     0.00   0.964\nSheets       1.56    0.00    0.998    1.42        0.00       0.964       1.31   0.00   0.982   1.03     0.00   0.938\nVoids        0.88    0.29    0.993    0.98        0.00       0.830      0.34    0.00   0.994   0.03     0.23   0.111"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "with\n                                                        1 X log\n                                            ȳ log =          y .                                      (86)\n                                                       Nfit n n\n    When binned standard errors are available, one may also compute a chi-square in\n    log-space through the propagated uncertainties\n\n(i)\n                                                 (i)         σn\n                                               σn,log ≃       (i)\n                                                                    ,                                  (87)\n                                                             Q̄n"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "leading to\n                                                 X ynlog − ŷnlog 2\n                                                                 \u0001\n                                       χ2log =      \u0010         \u00112 .                                     (88)\n                                                        (i)\n                                                 n     σn,log\n        The fitted parameters Ci , pi , and δc,i therefore provide, respectively, the amplitude,\n    the growth slope, and the effective activation threshold of the anisotropic branch. For\n    completeness, we also examine the conditional anisotropy curves separately in different\n    web environments. This decomposition is not central to the main free-energy argument,\n    but it is useful for showing that the density–anisotropy relation is not universal across\n    morphology classes. Instead, the activation pattern dep"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "30\n\fand Innovation for financing the Big Data of the Cosmic Web project PID2020-\n120612GB-I00 (PI:FSK); and the FIRE (Field-level bayesian Inference to Reconstruct\nthe univErse) project PID2024-160504NB-I00 (co-PI:FSK).\n\nReferences\n  [1] Padmanabhan, T.: Thermodynamical aspects of gravity: new insights. Reports\n      on Progress in Physics 73(4), 046901 (2010) https://doi.org/10.1088/0034-4885/\n      73/4/046901 arXiv:0911.5004 [gr-qc]\n\n[2] Susskind, L.: The world as a hologram. Journal of Mathematical Physics 36(11),\n      6377–6396 (1995) https://doi.org/10.1063/1.531249 arXiv:hep-th/9409089 [hep-\n      th]\n\n[3] Jacobson, T.: Thermodynamics of Spacetime: The Einstein Equation of State.\n      Physical Review Letters 75(7), 1260–1263 (1995) https://doi.org/10.1103/\n      PhysRevLett.75.1260 arXiv:gr-qc/9504004 [gr-qc]"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "[4] Verlinde, E.: On the origin of gravity and the laws of Newton. Journal of High\n      Energy Physics 2011, 29 (2011) https://doi.org/10.1007/JHEP04(2011)029\n      arXiv:1001.0785 [hep-th]\n\n[5] Bianconi, G.: Gravity from entropy. Physical Review D 111(6), 066001 (2025)\n      https://doi.org/10.1103/PhysRevD.111.066001 arXiv:2408.14391 [gr-qc]\n\n[6] Bianconi, G.: The Thermodynamics of the Gravity from Entropy Theory.\n      arXiv e-prints, 2510–22545 (2025) https://doi.org/10.48550/arXiv.2510.22545\n      arXiv:2510.22545 [gr-qc]\n\n[7] Carroll, S.M., Remmen, G.N.: What is the entropy in entropic gravity? Physical\n      Review D 93(12), 124052 (2016) https://doi.org/10.1103/PhysRevD.93.124052\n      arXiv:1601.07558 [hep-th]\n\n[8] Bekenstein, J.D.: Black Holes and Entropy. Physical Review D 7(8), 2333–2346\n      (1973) https://doi.org/10.1103/PhysRevD.7.2333"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "[9] Hawking, S.W.: Black holes and thermodynamics. Physical Review D 13(2),\n      191–197 (1976) https://doi.org/10.1103/PhysRevD.13.191\n\n[10] Gibbons, G.W., Hawking, S.W.: Cosmological event horizons, thermodynamics,\n      and particle creation. Physical Review D 15(10), 2738–2751 (1977) https://doi.\n      org/10.1103/PhysRevD.15.2738\n\n[11] Bardeen, J.M., Carter, B., Hawking, S.W.: The four laws of black hole mechanics.\n      Communications in Mathematical Physics 31(2), 161–170 (1973) https://doi.\n      org/10.1007/BF01645742\n\n31\n\f[12] Carrithers, A.D., Brown, M.J.V., Rashed, M.Z., Islam, S., Velev, O.D., Williams,\n     S.J.: Multiscale self-assembly of distinctive weblike structures from evaporated\n     drops of dilute american whiskeys. ACS Nano 14(5), 5417–5425 (2020) https:\n     //doi.org/10.1021/acsnano.9b08984"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "[13] Bennacer, R., Sefiane, K.: Vortices, dissipation and flow transition in volatile\n     binary drops. Journal of Fluid Mechanics 749, 649–665 (2014) https://doi.org/\n     10.1017/jfm.2014.220\n\n[14] Papo, D., Buldú, J.M.: Does the brain behave like a (complex) network? I.\n     Dynamics. Physics of Life Reviews 48, 47–98 (2024) https://doi.org/10.1016/j.\n     plrev.2023.12.006 arXiv:2412.15711 [q-bio.NC]\n\n[15] Warren, D.E., Power, J.D., Bruss, J., Denburg, N.L., Waldron, E.J., Sun,\n     H., Petersen, S.E., Tranel, D.: Network measures predict neuropsychological\n     outcome after brain injury. Proceedings of the National Academy of Science\n     111(39), 14247–14252 (2014) https://doi.org/10.1073/pnas.1322173111"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "[16] Giusti, C., Pastalkova, E., Curto, C., Itskov, V.: Clique topology reveals intrin-\n     sic geometric structure in neural correlations. Proceedings of the National\n     Academy of Science 112(44), 13455–13460 (2015) https://doi.org/10.1073/pnas.\n     1506407112 arXiv:1502.06172 [q-bio.NC]\n\n[17] Vazza, F., Feletti, A.: The quantitative comparison between the neuronal net-\n     work and the cosmic web. Frontiers in Physics 8 (2020) https://doi.org/10.3389/\n     fphy.2020.525731\n\n[18] Rosell, A.C., Janssen, N., Maselli, A., Pereda, E., Huertas-Company, M.,\n     Kitaura, F.-S.: Scale-dependent brain age with cosmological higher-order statis-\n     tics from structural magnetic resonance imaging. NeuroImage 321, 121500\n     (2025) https://doi.org/10.1016/j.neuroimage.2025.121500"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "[19] Kitaura, F.-S., Kitaura, E.-P., Janssen, N., Maselli, A., Pereda, E., Carnero\n     Rosell, A.: Higher-order sonification of the human brain. Scientific Reports\n     15(1), 42309 (2025) https://doi.org/10.1038/s41598-025-26438-7\n\n[20] Xin, H., Jackson, T., Cao, Y., Zhang, H., Lin, Y., Shenkin, A.: Spatial pattern\n     analysis of forest trees based on the vectorial mark. Journal of Forestry Research\n     33(4), 1301–1315 (2022) https://doi.org/10.1007/s11676-021-01417-6\n\n[21] Abellanas, B., Abellanas, M., Pommerening, A., Lodares, D., Cuadros, S.: A\n     forest simulation approach using weighted voronoi diagrams. an application to\n     mediterranean fir abies pinsapo boiss stands. Forest Systems 25(2), 062 (2016)\n     https://doi.org/10.5424/fs/2016252-08021\n\n[22] Kitaura, F.-S., Ata, M., Rodrı́guez-Torres, S.A., Hernández-Sánchez, M.,"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "32\n\f    Balaguera-Antolı́nez, A., Yepes, G.: COSMIC BIRTH: efficient Bayesian infer-\n    ence of the evolving cosmic web from galaxy surveys. MNRAS 502(3),\n    3456–3475 (2021) https://doi.org/10.1093/mnras/staa3774 arXiv:1911.00284\n    [astro-ph.CO]\n\n[23] Jasche, J., Lavaux, G.: Physical Bayesian modelling of the non-linear matter\n     distribution: New insights into the nearby universe. Astronomy & Astrophysics\n     625, 64 (2019) https://doi.org/10.1051/0004-6361/201833710 arXiv:1806.11117\n     [astro-ph.CO]"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "[24] Libeskind, N.I., Van de Weygaert, R., Cautun, M., Falck, B., Tempel, E.,\n     Abel, T., Alpaslan, M., Aragón-Calvo, M.A., Forero-Romero, J.E., Gonzalez, R.,\n     Gottlöber, S., Hahn, O., Hellwing, W.A., Hoffman, Y., Jones, B.J.T., Kitaura,\n     F.-S., Knebe, A., Manti, S., Neyrinck, M., Nuza, S.E., Padilla, N., Platen, E.,\n     Ramachandra, N., Robotham, A., Saar, E., Shand arin, S., Steinmetz, M., Stoica,\n     R.S., Sousbie, T., Yepes, G.: Tracing the cosmic web. MNRAS 473(1), 1195–1217\n     (2018) https://doi.org/10.1093/mnras/stx1976 arXiv:1705.03021 [astro-ph.CO]\n\n[25] Cautun, M., Weygaert, R., Jones, B.J.T., Frenk, C.S.: Evolution of\n     the cosmic web. Monthly Notices of the Royal Astronomical Soci-\n     ety 441(4), 2923–2973 (2014) https://doi.org/10.1093/mnras/stu768\n     https://academic.oup.com/mnras/article-pdf/441/4/2923/4046922/stu768.pdf"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "[26] Kitaura, F.-S., Erdoǧdu, P., Nuza, S.E., Khalatyan, A., Angulo, R.E., Hoff-\n     man, Y., Gottlöber, S.: Cosmic structure and dynamics of the local Universe.\n     MNRAS: Letters 427, 35–39 (2012) https://doi.org/10.1111/j.1745-3933.2012.\n     01340.x arXiv:1205.5560 [astro-ph.CO]\n\n[27] Nuza, S.E., Kitaura, F.-S., Heß, S., Libeskind, N.I., Müller, V.: The cosmic web\n     of the Local Universe: cosmic variance, matter content and its relation to galaxy\n     morphology. MNRAS 445(1), 988–1001 (2014) https://doi.org/10.1093/mnras/\n     stu1746 arXiv:1406.1004 [astro-ph.CO]\n\n[28] Jasche, J., Leclercq, F., Wandelt, B.D.: Past and present cosmic structure in\n     the SDSS DR7 main sample 2015(01), 036 (2015) https://doi.org/10.1088/\n     1475-7516/2015/01/036 . Accessed 2025-05-17"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "[29] Aragón-Calvo, M.A., Platen, E., Van de Weygaert, R., Szalay, A.S.: The Spine\n     of the Cosmic Web. Astrophysical Journal 723(1), 364–382 (2010) https://doi.\n     org/10.1088/0004-637X/723/1/364 arXiv:0809.5104 [astro-ph]\n\n[30] Ermentrout, B.: Neural networks as spatio-temporal pattern-forming systems.\n     Reports on Progress in Physics 61(4), 353–430 (1998) https://doi.org/10.1088/\n     0034-4885/61/4/002\n\n[31] Montbrió, E., Pazó, D., Roxin, A.: Macroscopic Description for Networks of\n     Spiking Neurons. Physical Review X 5(2), 021028 (2015) https://doi.org/10.\n\n33\n\f    1103/PhysRevX.5.021028 arXiv:1506.06581 [q-bio.NC]\n\n[32] Bressloff, P.C.: Spatiotemporal dynamics of continuum neural fields. Journal of\n     Physics A Mathematical General 45(3), 033001 (2012) https://doi.org/10.1088/\n     1751-8113/45/3/033001"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "[33] Yoshikawa, K., Yoshida, N., Umemura, M.: Direct Integration of the Collisionless\n     Boltzmann Equation in Six-dimensional Phase Space: Self-gravitating Systems.\n     Astrophysical Journal 762(2), 116 (2013) https://doi.org/10.1088/0004-637X/\n     762/2/116 arXiv:1206.6152 [astro-ph.IM]\n\n[34] Sousbie, T., Colombi, S.: ColDICE: A parallel Vlasov-Poisson solver using mov-\n     ing adaptive simplicial tessellation. Journal of Computational Physics 321,\n     644–697 (2016) https://doi.org/10.1016/j.jcp.2016.05.048 arXiv:1509.07720\n     [physics.comp-ph]\n\n[35] Hahn, O., Angulo, R.E.: An adaptively refined phase-space element method\n     for cosmological simulations and collisionless dynamics. Monthly Notices of the\n     Royal Astronomical Society 455(1), 1115–1133 (2016) https://doi.org/10.1093/\n     mnras/stv2304 arXiv:1501.01959 [astro-ph.CO]"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "[36] Sugiura, H., Nishimichi, T., Rasera, Y., Taruya, A.: Phase-space structure of\n     cold dark matter haloes inside splashback: multistream flows and self-similar\n     solution. Monthly Notices of the Royal Astronomical Society 493(2), 2765–2781\n     (2020) https://doi.org/10.1093/mnras/staa413 arXiv:1911.05394 [astro-ph.CO]\n\n[37] Colombi, S.: Phase-space structure of protohalos: Vlasov versus particle-mesh.\n     Astronomy & Astrophysics 647, 66 (2021) https://doi.org/10.1051/0004-6361/\n     202039719 arXiv:2012.04409 [astro-ph.CO]"
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "[38] Ondaro-Mallea, L., Angulo, R.E., Stücker, J., Hahn, O., White, S.D.M.: Phase-\n     space simulations of prompt cusps: simulating the formation of the first haloes\n     without artificial fragmentation. Monthly Notices of the Royal Astronomical\n     Society 527(4), 10802–10821 (2024) https://doi.org/10.1093/mnras/stad3949\n     arXiv:2309.05707 [astro-ph.GA]\n\n[39] Zel’dovich, Y.B.: Gravitational instability: An approximate theory for large\n     density perturbations. Astronomy & Astrophysics 5, 84–89 (1970)\n\n[40] Buchert, T.: Lagrangian Theory of Gravitational Instability of Friedman-\n     Lemaitre Cosmologies - a Generic Third-Order Model for Nonlinear Clustering.\n     MNRAS 267, 811 (1994) https://doi.org/10.1093/mnras/267.4.811 arXiv:astro-\n     ph/9309055 [astro-ph]"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "[41] Bouchet, F.R., Colombi, S., Hivon, E., Juszkiewicz, R.: Perturbative\n     Lagrangian approach to gravitational instability. Astronomy & Astrophysics\n\n34\n\f    296, 575 (1995) https://doi.org/10.48550/arXiv.astro-ph/9406013 arXiv:astro-\n    ph/9406013 [astro-ph]\n\n[42] Catelan, P.: Lagrangian dynamics in non-flat universes and non-linear grav-\n     itational evolution. MNRAS 276(1), 115–124 (1995) https://doi.org/10.1093/\n     mnras/276.1.115 arXiv:astro-ph/9406016 [astro-ph]\n\n[43] Bond, J.R., Kofman, L., Pogosyan, D.: How filaments of galaxies are woven into\n     the cosmic web. Nature 380(6575), 603–606 (1996) https://doi.org/10.1038/\n     380603a0\n\n[44] Monaco, P., Efstathiou, G.: Reconstruction of cosmological initial conditions\n     from galaxy redshift catalogues. MNRAS 308, 763–779 (1999) https://doi.org/\n     10.1046/j.1365-8711.1999.02747.x astro-ph/9902119"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "[45] Hahn, O., Porciani, C., Carollo, C.M., Dekel, A.: Properties of dark\n     matter haloes in clusters, filaments, sheets and voids. MNRAS 375(2),\n     489–499 (2007) https://doi.org/10.1111/j.1365-2966.2006.11318.x arXiv:astro-\n     ph/0610280 [astro-ph]\n\n[46] Forero–Romero, J.E., Hoffman, Y., Gottlöber, S., Klypin, A.,\n     Yepes,   G.:    A    dynamical  classification of    the   cosmic    web.\n     MNRAS        396(3),    1815–1824      (2009)   https://doi.org/10.1111/j.\n     1365-2966.2009.14885.x            https://academic.oup.com/mnras/article-\n     pdf/396/3/1815/5804803/mnras0396-1815.pdf\n\n[47] Kitaura, F.-S., Angulo, R.E.: Linearization with cosmological perturbation the-\n     ory. MNRAS 425(4), 2443–2454 (2012) https://doi.org/10.1111/j.1365-2966.\n     2012.21614.x arXiv:1111.6617 [astro-ph.CO]"
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "[48] Kitaura, F.-S., Sinigaglia, F.: Spectral Hierarchy of the Cosmic Web.\n     arXiv e-prints, 2603–15834 (2026) https://doi.org/10.48550/arXiv.2603.15834\n     arXiv:2603.15834 [astro-ph.CO]\n\n[49] Jaynes, E.T.: Information Theory and Statistical Mechanics. Physical Review\n     106(4), 620–630 (1957) https://doi.org/10.1103/PhysRev.106.620\n\n[50] Jaynes, E.T.: Information Theory and Statistical Mechanics. II. Physical Review\n     108(2), 171–190 (1957) https://doi.org/10.1103/PhysRev.108.171\n\n[51] Cover, T.M., Thomas, J.A.: Elements of Information Theory. Wiley, ??? (2012).\n     https://books.google.es/books?id=VWq5GG6ycxMC\n\n[52] Kardar, M.: Statistical Physics of Particles. Cambridge University Press, Cam-\n     bridge (2007)\n\n[53] Chandler, D.: Introduction to Modern Statistical Mechanics. Oxford University\n\n35\n\f    Press, Oxford (1987)"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "[54] Shannon, C.E.: A mathematical theory of communication. Bell System Tech-\n     nical Journal 27(3), 379–423 (1948) https://doi.org/10.1002/j.1538-7305.\n     1948.tb01338.x       https://onlinelibrary.wiley.com/doi/pdf/10.1002/j.1538-\n     7305.1948.tb01338.x\n\n[55] Landau, L.D.: Collected Papers of LD Landau. Pergamon, Oxford (1965)\n\n[56] Wagner, D., Wohlfarth, E.P.: Theory and applications of the landau-ginzburg\n     theory of amorphous ferromagnetism. Journal of Magnetism and Magnetic Mate-\n     rials 15-18, 1345–1346 (1980) https://doi.org/10.1016/0304-8853(80)90315-7\n\n[57] Sprekels, J., Zheng, S.: Global solutions to the equations of a ginzburg-landau\n     theory for structural phase transitions in shape memory alloys. Physica D: Non-\n     linear Phenomena 39(1), 59–76 (1989) https://doi.org/10.1016/0167-2789(89)\n     90039-0"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "[58] Iida, K., Baym, G.: The Superfluid phases of quark matter: Ginzburg-Landau\n     theory and color neutrality. Phys. Rev. D 63, 074018 (2001) https://doi.org/\n     10.1103/PhysRevD.63.074018 arXiv:hep-ph/0011229. [Erratum: Phys.Rev.D 66,\n     059903 (2002)]\n\n[59] Schofield, S.A., Oxtoby, D.W.: Diffusion disallowed crystal growth. I. Landau-\n     Ginzburg model. The Journal of Chemical Physics 94(3), 2176–2186 (1991)\n     https://doi.org/10.1063/1.459889\n\n[60] Bagdassarian, C.K., Oxtoby, D.W.: Crystal nucleation and growth from the\n     undercooled liquid: A nonclassical piecewise parabolic free-energy model. The\n     Journal of Chemical Physics 100(3), 2139–2148 (1994) https://doi.org/10.1063/\n     1.466510"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "[61] Aastuen, D.J.W., Clark, N.A., Cotter, L.K., Ackerson, B.J.: Nucleation and\n     growth of colloidal crystals. Physical Review Letters 57(14), 1733–1736 (1986)\n     https://doi.org/10.1103/PhysRevLett.57.1733\n\n[62] Williams, J.J., Nicolaou, Z.G., Kutz, J.N., Brunton, S.L.: Data-driven discovery\n     of a new Ginzburg-Landau reduced-order model for vortex shedding. Phys-\n     ical Review Fluids 11(3), 034401 (2026) https://doi.org/10.1103/169b-7qpd\n     arXiv:2411.08277 [physics.flu-dyn]\n\n[63] Bernardeau, F., Colombi, S., Gaztañaga, E., Scoccimarro, R.: Large-scale struc-\n     ture of the universe and cosmological perturbation theory. Physics Reports\n     367(1-3), 1–248 (2002) https://doi.org/10.1016/s0370-1573(02)00135-7\n\n[64] Peebles, P.J.E.: The Large-scale Structure of the Universe. Princeton University\n     Press, Princeton (1980)"
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "36\n\f[65] Angulo, R.E., Hahn, O.: Large-scale dark matter simulations. LRCA 8(1),\n     1 (2022) https://doi.org/10.1007/s41115-021-00013-z arXiv:2112.05165 [astro-\n     ph.CO]\n\n[66] Mo, H., Van den Bosch, F.C., White, S.: Galaxy Formation and Evolution,\n     (2010)\n\n[67] Shandarin, S.F.: The multi-stream flows and the dynamics of the cosmic web.\n     Journal of Cosmology and Astroparticle Physics 2011(5), 015 (2011) https://\n     doi.org/10.1088/1475-7516/2011/05/015 arXiv:1011.1924 [astro-ph.CO]\n\n[68] Penrose, R.: On the second law of thermodynamics. Journal of Statistical Physics\n     77(1-2), 217–221 (1994) https://doi.org/10.1007/BF02186840\n\n[69] Vopson, M.M.: Is gravity evidence of a computational universe? AIP Advances\n     15(4), 045035 (2025) https://doi.org/10.1063/5.0264945"
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "[70] Abel, T., Hahn, O., Kaehler, R.: Tracing the dark matter sheet in phase space.\n     MNRAS 427, 61–76 (2012) https://doi.org/10.1111/j.1365-2966.2012.21754.x\n     arXiv:1111.3944\n\n[71] Hidding, J., Shandarin, S.F., Van de Weygaert, R.: The Zel’dovich approxima-\n     tion: key to understanding cosmic web complexity. MNRAS 437(4), 3442–3472\n     (2014) https://doi.org/10.1093/mnras/stt2142 arXiv:1311.7134 [astro-ph.CO]\n\n[72] Arnold, V.I., Shandarin, S.F., Zeldovich, I.B.: The large scale structure of the\n     universe I. General properties. One-and two-dimensional models. Geophysical\n     and Astrophysical Fluid Dynamics 20(1), 111–130 (1982) https://doi.org/10.\n     1080/03091928208209001\n\n[73] Peebles, P.J.E.: Tracing Galaxy Orbits Back in Time. Astrophysical Journal\n     Letters 344, 53 (1989) https://doi.org/10.1086/185529"
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "[74] Nusser, A., Branchini, E.: On the least action principle in cosmology.\n     MNRAS 313(3), 587–595 (2000) https://doi.org/10.1046/j.1365-8711.2000.\n     03261.x arXiv:astro-ph/9908167 [astro-ph]\n\n[75] Branchini, E., Eldar, A., Nusser, A.: Peculiar velocity reconstruction with the\n     fast action method: tests on mock redshift surveys. Monthly Notices of the\n     Royal Astronomical Society 335(1), 53–72 (2002) https://doi.org/10.1046/j.\n     1365-8711.2002.05611.x arXiv:astro-ph/0110618 [astro-ph]\n\n[76] Brenier, Y., Frisch, U., Hénon, M., Loeper, G., Matarrese, S., Mohayaee, R.,\n     Sobolevskiĭ, A.: Reconstruction of the early Universe as a convex optimiza-\n     tion problem. Monthly Notices of the Royal Astronomical Society 346(2),\n     501–524 (2003) https://doi.org/10.1046/j.1365-2966.2003.07106.x arXiv:astro-\n     ph/0304214 [astro-ph]"
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "37\n\f[77] Mohayaee, R., Frisch, U., Matarrese, S., Sobolevskii, A.: Back to the primordial\n     Universe by a Monge-Ampère-Kantorovich optimization scheme. Astronomy &\n     Astrophysics 406, 393–401 (2003) https://doi.org/10.1051/0004-6361:20030719\n     arXiv:astro-ph/0301641 [astro-ph]\n\n[78] Monaco, P., Theuns, T., Taffoni, G., Governato, F., Quinn, T., Stadel, J.:\n     Predicting the number, spatial distribution, and merging history of dark mat-\n     ter halos. The Astrophysical Journal 564(1), 8 (2002) https://doi.org/10.1086/\n     324182\n\n[79] Kitaura, F.-S., Sinigaglia, F.: Ridged Lagrangian Perturbation Theory (RLPT).\n     arXiv e-prints, 2603–13106 (2026) https://doi.org/10.48550/arXiv.2603.13106\n     arXiv:2603.13106 [astro-ph.CO]"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "[80] Kitaura, F.-S., Sinigaglia, F., Balaguera-Antolı́nez, A., Favole, G.: The cosmic\n     web from perturbation theory. Astronomy & Astrophysics 683, 215 (2024) https:\n     //doi.org/10.1051/0004-6361/202345876 arXiv:2301.03648 [astro-ph.CO]\n\n[81] McDonald, P.: How to generate a significant effective temperature for cold\n     dark matter, from first principles. Journal of Cosmology and Astroparticle\n     Physics 2011(4), 032 (2011) https://doi.org/10.1088/1475-7516/2011/04/032\n     arXiv:0910.1002 [astro-ph.CO]\n\n[82] Pietroni, M., Mangano, G., Saviano, N., Viel, M.: Coarse-grained cosmological\n     perturbation theory. Journal of Cosmology and Astroparticle Physics 2012(1),\n     019 (2012) https://doi.org/10.1088/1475-7516/2012/01/019 arXiv:1108.5203\n     [astro-ph.CO]"
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "[83] Rampf, C.: The recursion relation in lagrangian perturbation theory. Journal\n     of Cosmology and Astroparticle Physics 2012(12), 004–004 (2012) https://doi.\n     org/10.1088/1475-7516/2012/12/004\n\n[84] Cusin, G., Tansella, V., Durrer, R.: Vorticity generation in the Universe: A\n     perturbative approach. Physical Review D 95(6), 063527 (2017) https://doi.\n     org/10.1103/PhysRevD.95.063527 arXiv:1612.00783 [astro-ph.CO]\n\n[85] Buchert, T., Domı́nguez, A.: Adhesive gravitational clustering. Astronomy\n     & Astrophysics 438(2), 443–460 (2005) https://doi.org/10.1051/0004-6361:\n     20052885 arXiv:astro-ph/0502318 [astro-ph]\n\n[86] Adler, R.J.: The Geometry of Random Fields. Probability and Statistics Series.\n     J. Wiley, Hoboken, New Jersey (1981)"
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "[87] Bardeen, J.M., Bond, J.R., Kaiser, N., Szalay, A.S.: The Statistics of Peaks of\n     Gaussian Random Fields. Astrophysical Journal 304, 15 (1986) https://doi.org/\n     10.1086/164143\n\n38\n\f[88] Groth, E.J., Peebles, P.J.E.: Statistical analysis of catalogs of extragalactic\n     objects. VII. Two- and three-point correlation functions for the high-resolution\n     Shane-Wirtanen catalog of galaxies. Astrophysical Journal 217, 385–405 (1977)\n     https://doi.org/10.1086/155588\n\n[89] Baumgart, D.J., Fry, J.N.: Fourier Spectra of Three-dimensional Data. Astro-\n     physical Journal 375, 25 (1991) https://doi.org/10.1086/170166\n\n[90] Frieman, J.A., Gaztanaga, E.: The Three-Point Function as a Probe of Models\n     for Large-Scale Structure. Astrophysical Journal 425, 392 (1994) https://doi.\n     org/10.1086/173995 arXiv:astro-ph/9306018 [astro-ph]"
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "[91] Matarrese, S., Verde, L., Heavens, A.F.: Large-scale bias in the Universe: bispec-\n     trum method. Monthly Notices of the Royal Astronomical Society 290(4), 651–\n     662 (1997) https://doi.org/10.1093/mnras/290.4.651 arXiv:astro-ph/9706059\n     [astro-ph]\n\n[92] Verde, L., Heavens, A.F., Matarrese, S., Moscardini, L.: Large-scale bias in the\n     Universe - II. Redshift-space bispectrum. Monthly Notices of the Royal Astro-\n     nomical Society 300(3), 747–756 (1998) https://doi.org/10.1046/j.1365-8711.\n     1998.01937.x arXiv:astro-ph/9806028 [astro-ph]\n\n[93] Gualdi, D., Novell, S., Gil-Marı́n, H., Verde, L.: Matter trispectrum: theoretical\n     modelling and comparison to N-body simulations. Journal of Cosmology and\n     Astroparticle Physics 2021(1), 015 (2021) https://doi.org/10.1088/1475-7516/\n     2021/01/015 arXiv:2009.02290 [astro-ph.CO]"
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "[94] Gualdi, D., Gil-Marı́n, H., Verde, L.: Joint analysis of anisotropic power spec-\n     trum, bispectrum and trispectrum: application to N-body simulations. Journal\n     of Cosmology and Astroparticle Physics 2021(7), 008 (2021) https://doi.org/\n     10.1088/1475-7516/2021/07/008 arXiv:2104.03976 [astro-ph.CO]\n\n[95] Bertolini, D., Schutz, K., Solon, M.P., Zurek, K.M.: The trispectrum in the\n     Effective Field Theory of Large Scale Structure. Journal of Cosmology and\n     Astroparticle Physics 2016(6), 052 (2016) https://doi.org/10.1088/1475-7516/\n     2016/06/052 arXiv:1604.01770 [astro-ph.CO]\n\n[96] Verde, L., Heavens, A.F.: On the Trispectrum as a Gaussian Test for Cosmology.\n     Astrophysical Journal 553(1), 14–24 (2001) https://doi.org/10.1086/320656\n     arXiv:astro-ph/0101143 [astro-ph]"
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "[97] Steele, T., Baldauf, T.: Precise calibration of the one-loop trispectrum in the\n     effective field theory of large scale structure. Physical Review D 103(10), 103518\n     (2021) https://doi.org/10.1103/PhysRevD.103.103518 arXiv:2101.10289 [astro-\n     ph.CO]\n\n[98] Kitaura, F.-S.: Non-Gaussian gravitational clustering field statistics. Monthly\n\n39\n\f     Notices of the Royal Astronomical Society 420(4), 2737–2755 (2012) https://\n     doi.org/10.1111/j.1365-2966.2011.19680.x arXiv:1012.3168 [astro-ph.CO]\n\n[99] Kitaura, F.-S., Gil-Marı́n, H., Scóccola, C.G., Chuang, C.-H., Müller, V., Yepes,\n      G., Prada, F.: Constraining the halo bispectrum in real and redshift space from\n      perturbation theory and non-linear stochastic bias. MNRAS 450(2), 1836–1845\n      (2015) https://doi.org/10.1093/mnras/stv645 arXiv:1407.1236 [astro-ph.CO]"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "[100] Desjacques, V., Jeong, D., Schmidt, F.: Large-scale galaxy bias. Physics\n      Reports 733, 1–193 (2018) https://doi.org/10.1016/j.physrep.2017.12.002\n      arXiv:1611.09787 [astro-ph.CO]\n\n[101] McDonald, P., Roy, A.: Clustering of dark matter tracers: generalizing bias for\n      the coming era of precision LSS. JCAP 2009(08), 020–020 (2009) https://doi.\n      org/10.1088/1475-7516/2009/08/020\n\n[102] Schmittfull, M., Simonović, M., Assassi, V., Zaldarriaga, M.: Modeling biased\n      tracers at the field level. Physical Review D 100(4), 043514 (2019) https://doi.\n      org/10.1103/PhysRevD.100.043514 arXiv:1811.10640 [astro-ph.CO]"
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "[103] Pellejero-Ibañez, M., Balaguera-Antolı́nez, A., Kitaura, F.-S., Angulo,\n      R.E., Yepes, G., Chuang, C.-H., Reyes-Peraza, G., Autefage, M., Vakili,\n      M., Zhao, C.: The bias of dark matter tracers: assessing the accu-\n      racy of mapping techniques. MNRAS 493(1), 586–593 (2020) https:\n      //doi.org/10.1093/mnras/staa270    https://academic.oup.com/mnras/article-\n      pdf/493/1/586/32513186/staa270.pdf\n\n[104] Kitaura, F.-S., Balaguera-Antolı́nez, A., Sinigaglia, F., Pellejero-Ibáñez, M.:\n      The cosmic web connection to the dark matter halo distribution through grav-\n      ity. MNRAS 512(2), 2245–2265 (2022) https://doi.org/10.1093/mnras/stac671\n      arXiv:2005.11598 [astro-ph.CO]"
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "[105] Coloma-Nadal, J.M., Kitaura, F.-S., Garcı́a-Farieta, J.E., Sinigaglia, F., Fav-\n      ole, G., Forero Sánchez, D.: The hierarchical cosmic web and assembly bias.\n      JCAP 2024(7), 083 (2024) https://doi.org/10.1088/1475-7516/2024/07/083\n      arXiv:2403.19337 [astro-ph.CO]\n\n[106] Sinigaglia, F., Kitaura, F.-S., Nagamine, K., Oku, Y., Balaguera-Antolı́nez, A.:\n      Field-level Lyman-α forest modeling in redshift space via augmented nonlocal\n      Fluctuating Gunn-Peterson Approximation. Astronomy & Astrophysics 682, 21\n      (2024) https://doi.org/10.1051/0004-6361/202346931 arXiv:2305.10428 [astro-\n      ph.CO]\n\n[107] Doroshkevich, A.G.: The space structure of perturbations and the origin of\n      rotation of galaxies in the theory of fluctuation. Astrofizika 6, 581–600 (1970)\n\n[108] Fry, J.N., Gaztanaga, E.: Biasing and Hierarchical Statistics in Large-Scale"
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "40\n\f      Structure. Astrophysical Journal 413, 447 (1993) https://doi.org/10.1086/\n      173015 arXiv:astro-ph/9302009 [astro-ph]\n\n[109] Kitaura, F.-S., Yepes, G., Prada, F.: Modelling baryon acoustic oscil-\n      lations with perturbation theory and stochastic halo biasing. MNRAS:\n      Letters   439(1),   21–25   (2014)    https://doi.org/10.1093/mnrasl/slt172\n      https://academic.oup.com/mnrasl/article-pdf/439/1/L21/3421996/slt172.pdf\n\n[110] Chan, K.C., Scoccimarro, R., Sheth, R.K.: Gravity and large-scale nonlocal bias.\n      Physical Review D 85(8), 083509 (2012) https://doi.org/10.1103/PhysRevD.85.\n      083509 arXiv:1201.3614 [astro-ph.CO]"
+    },
+    {
+      "id": "b-117",
+      "type": "body",
+      "text": "[111] Paranjape, A., Hahn, O., Sheth, R.K.: Halo assembly bias and the tidal\n      anisotropy of the local halo environment. Monthly Notices of the Royal\n      Astronomical Society 476(3), 3631–3647 (2018) https://doi.org/10.1093/mnras/\n      sty496 arXiv:1706.09906 [astro-ph.CO]\n\n[112] Munshi, D.: Symmetries, invariants and generating functions: higher-\n      order statistics of biased tracers. Journal of Cosmology and Astroparticle\n      Physics 2018(1), 053 (2018) https://doi.org/10.1088/1475-7516/2018/01/053\n      arXiv:1708.00258 [astro-ph.CO]\n\n[113] Carrasco, J.J.M., Hertzberg, M.P., Senatore, L.: The effective field theory of cos-\n      mological large scale structures. Journal of High Energy Physics 2012, 82 (2012)\n      https://doi.org/10.1007/JHEP09(2012)082 arXiv:1206.2926 [astro-ph.CO]"
+    },
+    {
+      "id": "b-118",
+      "type": "body",
+      "text": "[114] Baumann, D., Nicolis, A., Senatore, L., Zaldarriaga, M.: Cosmological non-\n      linearities as an effective fluid. Journal of Cosmology and Astroparticle\n      Physics 2012(7), 051 (2012) https://doi.org/10.1088/1475-7516/2012/07/051\n      arXiv:1004.2488 [astro-ph.CO]\n\n[115] Pajer, E., Zaldarriaga, M.: On the renormalization of the effective field theory of\n      large scale structures. Journal of Cosmology and Astroparticle Physics 2013(8),\n      037 (2013) https://doi.org/10.1088/1475-7516/2013/08/037 arXiv:1301.7182\n      [astro-ph.CO]\n\n[116] Porto, R.A., Senatore, L., Zaldarriaga, M.: The Lagrangian-space Effective\n      Field Theory of large scale structures. Journal of Cosmology and Astroparticle\n      Physics 2014(5), 022 (2014) https://doi.org/10.1088/1475-7516/2014/05/022\n      arXiv:1311.2168 [astro-ph.CO]"
+    },
+    {
+      "id": "b-119",
+      "type": "body",
+      "text": "[117] Mercolli, L., Pajer, E.: On the velocity in the Effective Field Theory of Large\n      Scale Structures. Journal of Cosmology and Astroparticle Physics 2014(3), 006\n      (2014) https://doi.org/10.1088/1475-7516/2014/03/006 arXiv:1307.3220 [astro-\n      ph.CO]\n\n[118] Angulo, R.E., Foreman, S., Schmittfull, M., Senatore, L.: The one-loop matter\n\n41\n\f      bispectrum in the Effective Field Theory of Large Scale Structures. Journal of\n      Cosmology and Astroparticle Physics 2015(10), 039 (2015) https://doi.org/10.\n      1088/1475-7516/2015/10/039 arXiv:1406.4143 [astro-ph.CO]\n\n[119] Baldauf, T., Mercolli, L., Zaldarriaga, M.: Effective field theory of large scale\n      structure at two loops: The apparent scale dependence of the speed of sound.\n      Physical Review D 92(12), 123007 (2015) https://doi.org/10.1103/PhysRevD.\n      92.123007 arXiv:1507.02256 [astro-ph.CO]"
+    },
+    {
+      "id": "b-120",
+      "type": "body",
+      "text": "[120] Baldauf, T., Schaan, E., Zaldarriaga, M.: On the reach of perturbative descrip-\n      tions for dark matter displacement fields. Journal of Cosmology and Astropar-\n      ticle Physics 2016(3), 017 (2016) https://doi.org/10.1088/1475-7516/2016/03/\n      017 arXiv:1505.07098 [astro-ph.CO]\n\n[121] Foreman, S., Perrier, H., Senatore, L.: Precision comparison of the power spec-\n      trum in the EFTofLSS with simulations. Journal of Cosmology and Astroparticle\n      Physics 2016(5), 027 (2016) https://doi.org/10.1088/1475-7516/2016/05/027\n      arXiv:1507.05326 [astro-ph.CO]\n\n[122] Kitaura, F.-S., Heß, S.: Cosmological structure formation with augmented\n      lagrangian perturbation theory. MNRAS: Letters 435(1), 78–82 (2013) https:\n      //doi.org/10.1093/mnrasl/slt101"
+    },
+    {
+      "id": "b-121",
+      "type": "body",
+      "text": "[123] Planck Collaboration, Aghanim, N., Akrami, Y., Ashdown, M., Aumont, J.,\n      Baccigalupi, C., Ballardini, M., Banday, A.J., Barreiro, R.B., et al.: Planck 2018\n      results. VI. Cosmological parameters. Astronomy & Astrophysics 641, 6 (2020)\n      https://doi.org/10.1051/0004-6361/201833910 arXiv:1807.06209 [astro-ph.CO]\n\n[124] Coles, P., Jones, B.: A lognormal model for the cosmological mass distribution.\n      MNRAS 248, 1–13 (1991) https://doi.org/10.1093/mnras/248.1.1\n\n[125] Libeskind, N.I., Hoffman, Y., Knebe, A., Steinmetz, M., Gottlöber, S., Metuki,\n      O., Yepes, G.: The cosmic web and the orientation of angular momenta.\n      MNRAS 421(1), 137–141 (2012) https://doi.org/10.1111/j.1745-3933.2012.\n      01222.x arXiv:1201.3365 [astro-ph.CO]"
+    },
+    {
+      "id": "b-122",
+      "type": "body",
+      "text": "[126] Carney, D., Karydas, M., Scharnhorst, T., Singh, R., Taylor, J.M.: On the Quan-\n      tum Mechanics of Entropic Forces. Physical Review X 15(3), 031038 (2025)\n      https://doi.org/10.1103/y7sy-3by1 arXiv:2502.17575 [hep-th]\n\n42"
+    }
+  ]
+}
