@@ -1,0 +1,262 @@
+{
+  "arxivId": "2604.12364",
+  "paperTitle": "Cross-Domain Transfer with Particle Physics Foundation Models: From Jets to Neutrino Interactions",
+  "abstract": "Future AI-based studies in particle physics will likely start from a foundation model to accelerate training and enhance sensitivity. As a step towards a general-purpose foundation model for particle physics, we investigate whether the OmniLearned foundation model pre-trained on diverse high-$Q^2$ simulated and real $pp$ and $ep$ collisions can be effectively transferred to a few-GeV fixed-target neutrino experiment. We process MINERvA neutrino--nucleus scattering events and evaluate pre-trained models on two types of tasks: regression of available energy and binary classification of charged-current pion final states ($\\mathrm{CC1\\pi^{\\pm}}$, $\\mathrm{CCN\\pi^{\\pm}}$, and $\\mathrm{CC1\\pi^{0}}$). Pre-trained OmniLearned models consistently outperform similarly sized models trained from scratch, achieving better overall performance at the same compute budget, as well as achieving better performance at the same number of training steps. These results suggest that particle-level foundation models acquire inductive biases that generalize across large differences in energy scale, detector technology, and underlying physics processes, pointing toward a paradigm of detector-agnostic inference in particle physics.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Future AI-based studies in particle physics will likely start from a foundation model to accelerate training and enhance sensitivity. As a step towards a general-purpose foundation model for particle physics, we investigate whether the OmniLearned foundation model pre-trained on diverse high-$Q^2$ simulated and real $pp$ and $ep$ collisions can be effectively transferred to a few-GeV fixed-target neutrino experiment. We process MINERvA neutrino--nucleus scattering events and evaluate pre-trained models on two types of tasks: regression of available energy and binary classification of charged-current pion final states ($\\mathrm{CC1\\pi^{\\pm}}$, $\\mathrm{CCN\\pi^{\\pm}}$, and $\\mathrm{CC1\\pi^{0}}$). Pre-trained OmniLearned models consistently outperform similarly sized models trained from scratch, achieving better overall performance at the same compute budget, as well as achieving better performance at the same number of training steps. These results suggest that particle-level foundation models acquire inductive biases that generalize across large differences in energy scale, detector technology, and underlying physics processes, pointing toward a paradigm of detector-agnostic inference in particle physics."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Cross-Domain Transfer with Particle Physics Foundation Models:\n                                                                      From Jets to Neutrino Interactions\n                                                        Gregor Krzmanc,1, ∗ Vinicius Mikuni,2 Benjamin Nachman,1, 3, † and Callum Wilkinson4\n                                                                   1\n                                                                   Department of Physics, Stanford University, Stanford, CA 94305, USA\n                                                                   2\n                                                                   Nagoya University, Kobayashi-Maskawa Institute, Aichi 464-8602, Japan\n                                                    3\n                                                      Fundamental Physics Directorate, SLAC National Accelerator Laboratory, Me"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "consistently outperform similarly sized models trained from scratch, achieving better overall perfor-\n                                                       mance at the same compute budget, as well as achieving better performance at the same number of\n                                                       training steps. These results suggest that particle-level foundation models acquire inductive biases\n                                                       that generalize across large differences in energy scale, detector technology, and underlying physics\n                                                       processes, pointing toward a paradigm of detector-agnostic inference in particle physics."
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "I.   INTRODUCTION                               transfer from the high-energy collider regime (TeV-scale\n                                                                                                           jets, O(102 ) particles per event, hermetic (4π) detectors)\n                                             Foundation models for language are revolutionizing the        to a few-GeV fixed-target neutrino experiment (few-GeV\n                                          way we do particle physics, especially for software de-          neutrino interactions, O(1–10) reconstructed objects per\n                                          velopment. A growing number of models are being pro-             event, asymmetric detector geometry). These regimes\n                                          posed to directly operate on particle physics data and not       differ not just in detector technolo"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "measure neutrino–nucleus scattering cross sections by                      positive classes consist of, respectively, charged-\nsampling accelerator neutrino beams close to the source,                   current (CC) events with exactly one charged pion\nwhere oscillation effects can be neglected, both as part of                (π ± ), N ≥ 1 charged pions, and exactly one neutral\noscillation experiments, and with dedicated experiments.                   pion (π 0 ) with no charged pions. The negative class\nThe MINERvA experiment at Fermilab was specifically                        for each task consists of all events not in the posi-\ndesigned to address this challenge [35, 36], using a finely                tive class. The three classification tasks are derived\nsegmented scintillator tracking calorimeter and a vari-                    from a single multi-class model.\nety of nuclear targets ("
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "c. Models. Particle tokens (and global event-level         validation loss at a given FLOP budget. More broadly,\nfeature vectors) are processed with a transformer en-         OmniLearned-small also outperforms the Transformer\ncoder. We compare the following model families:               baseline of similar size (Transformer-small) trained from\n                                                              scratch at the same FLOP budget.\n   • MLP (global features): A lightweight baseline               These patterns are consistent across both tasks, sug-\n     (∼284k parameters) with hidden width 128, 4 resid-       gesting that pre-training provides a genuinely useful ini-\n     ual blocks, and sigmoid linear unit activation, op-      tialization rather than merely a larger-capacity model.\n     erating only on the 15 global event-level features.      See also Appendix D for the correspondi"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Classification                                                             Regression\n                                                                               0.060\n                  1.24\n                  1.22                                                         0.055\n                  1.20\n                                                                               0.050\nValidation loss"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "1.18\n                  1.16                                                         0.045\n                  1.14                                                         0.040\n                  1.12\n                  1.10                                                         0.035\n                  1.08                                                         0.030\n                         13        14         15         16        17                          13           14           15      16   17\n                                    log10(Training FLOPs)                                                    log10(Training FLOPs)\n                                              MLP                       OmniLearned-small           Transformer-small\n                                              OmniLearned-medium        OmniLearned-small-rw        Transformer-xsmall"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "FIG. 1. Validation loss vs. number of cumulative training FLOPs for classification tasks (left) and the regression task (right),\n using the MINERvA Open Data playlist 1A. Pre-trained OmniLearned models (OmniLearned-small) achieve lower loss at\n equivalent compute budgets compared to other models of similar size (Transformer-small, OmniLearned-small-rw). Validation\n loss is reported every 1000 steps."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "models produce narrower, more symmetric residual dis-                          tal settings, which could be particularly valuable dur-\n tributions, particularly in the lowest q3 bin, where nu-                       ing detector commissioning or rapid hypothesis testing.\n clear effects are largest and the reconstruction is most                       More broadly, we view this as a step toward detector-\n challenging.                                                                   agnostic inference: a regime where a single foundation\n                                                                                model can be adapted to new experiments with minimal\n                                                                                retraining. Concretely, pre-trained models could enable\n                              V.   CONCLUSIONS                                  (i) rapid o"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "0.40                                                                                                                                          0.35\n                                                                       0.74\n        0.35                                                                                                                                          0.30\n                                                                       0.72\n        0.30                                                                                                                                          0.25\n\nEfficiency (TPR)\n                                                                       0.70\n\nAUROC\nAUPRC"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "0.25                                                                                                                                          0.20\n        0.20                                                           0.68                                                                           0.15\n        0.15                                                           0.66                                                                           0.10\n        0.10                                                                                                                                          0.05\n                                                                       0.64\n                           100                     101                                     100                         101                                               100                     101\n               "
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Efficiency (TPR)\n                                                                       0.70\n                                                               AUROC\nAUPRC\n\n0.20                                                           0.68                                                                           0.15"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "0.15                                                           0.66\n                                                                                                                                                      0.10\n                                                                       0.64\n        0.10                                                                                                                                          0.05\n                                                                       0.62\n               0.8   1.0   1.2      1.4      1.6         1.8                  0.8   1.0     1.2      1.4         1.6         1.8                             0.8   1.0   1.2      1.4      1.6         1.8\n                             True    [rad]                                                    True    [rad]                                                            "
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "FIG. 2. Discrimination metrics for the CC1π ± tagging task as a function of true pion kinematics: area under the precision–\nrecall curve (AUPRC, left column), area under the ROC curve (AUROC, center), and true positive rate at a fixed false positive\nrate (right column). The top row uses bins in true pion energy; the bottom row uses bins in true pion polar angle. In each bin,\npositives are true signal events falling in that bin, while the negative sample is the full background, held fixed across bins so\nthat only the in-bin signal population changes. TPR is computed at the false positive rate of the baseline."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "ing with the dataset. Specifically, we thank MINERvA\ncollaborators Oscar Moreno-Palacios, David Last, and\nRik Gran for their technical assistance and discussion.\nWe also thank Sam Young and Jan-Lucas Uslu for help-\nful discussions. BN is supported by the U.S. Department\nof Energy (DOE), Office of Science under contract DE-\nAC02-76SF00515. VM is supported by JST EXPERT-J,\nJapan Grant Number JPMJEX2509. CW is supported\nby the U.S. Department of Energy (DOE), Office of Sci-\nence under contract DE-AC02-05CH11231. This research\nused resources of the National Energy Research Scientific\nComputing Center, a DOE Office of Science User Facility\nsupported by the Office of Science of the U.S. Department\nof Energy under Contract No. DE-AC02-05CH11231 us-\ning NERSC awards HEP-ERCAP0035546.\n\f                                                                                                                "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "0.14                                                                             0.82\n                                                                                                                                                                                0.25\n        0.12                                                                             0.80\n                                                                                         0.78                                                                                   0.20\n\nEfficiency (TPR)\n        0.10\n                                                                                         0.76\n\nAUROC\nAUPRC"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "0.08                                                                             0.74                                                                                   0.15\n        0.06                                                                             0.72\n                                                                                                                                                                                0.10\n        0.04                                                                             0.70\n                                                                                         0.68                                                                                   0.05\n        0.02\n                                                                                         0.66\n                                   100                              10"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Efficiency (TPR)\n        0.10                                                                                                                                                                    0.20\n                                                                                         0.76\n                                                                                 AUROC\nAUPRC"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "0.08                                                                                                                                                                    0.15\n                                                                                         0.74\n        0.06\n                                                                                         0.72                                                                                   0.10\n        0.04\n                                                                                         0.70\n        0.02                                                                                                                                                                    0.05\n                                                                                         0.68\n               0.8         1.0      1.2         1.4      "
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "FIG. 3. Discrimination metrics for the CC1π 0 tagging task as a function of true pion kinematics: area under the precision–recall\ncurve (AUPRC, left column), area under the ROC curve (AUROC, center), and true positive rate at a fixed false positive rate\n(right column). The top row uses bins in true pion energy; the bottom row uses bins in true pion polar angle. In each bin,\npositives are true signal events falling in that bin, while the negative sample is the full background, held fixed across bins so\nthat only the in-bin signal population changes. TPR is computed at the false positive rate of the baseline."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "0.90                                                                            0.825                                                                                  0.225\n        0.85                                                                            0.800                                                                                  0.200\n                                                                                                                                                                               0.175\n        0.80                                                                            0.775\n                                                                                                                                                                               0.150\n                                                                                          "
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "0.75                                                                            0.750\n                                                                                AUROC\n\n0.125\nAUPRC"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "0.70                                                                            0.725                                                                                  0.100\n        0.65                                                                                                                                                                   0.075\n                                                                                        0.700\n        0.60                                                                                                                                                                   0.050\n                                                                                        0.675\n        0.55                                                                                                                                                                   0."
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "FIG. 4. Discrimination metrics for the CCNπ ± tagging task as a function of invariant mass of the hadronic system W : area\nunder the precision–recall curve (AUPRC, left column), area under the ROC curve (AUROC, center), and true positive rate\nat a fixed false positive rate (right column). Efficiency is computed using the baseline’s false positive rate.\n\f                                                                                                                                                                                                                            7"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "\u0000\u0014\u0000\u0011\u0000\u0013                                                                        \u00000\u0000/\u00003\n                                                                                                                                                                          \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\n                                                                                                                                                                          \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000P\u0000H\u0000G\u0000L\u0000X\u0000P\n                                                                                            \u0000\u0013\u0000\u0011\u0000\u001c                                                                        \u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\n                                                                                available"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "\u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000[\u0000V\u0000P\u0000D\u0000O\u0000O\n                                                                      reco /E true\n\n\u0000%\u0000D\u0000V\u0000H\u0000O\u0000L\u0000Q\u0000H\n                                                                                            \u0000\u0013\u0000\u0011\u0000\u001b\n                                           \u0000,\u00004\u00005\u0000\u0003\u0000\u0012\u0000\u0003\u00000\u00003\u00009\u0000\u0003\u0000R\u0000I\u0000\u0003Eavailable\n\n\u0000\u0013\u0000\u0011\u0000\u001a\n\n\u0000\u0013\u0000\u0011\u0000\u0019\n\n\u0000\u0013\u0000\u0011\u0000\u0018\n\n\u0000\u0013\u0000\u0011\u0000\u0017\n                                                                                                                \u0000\u0013\u0000\u0011\u0000\u0018           \u0000\u0014\u0000\u0011\u0000\u0013                 \u0000\u0014\u0000\u0011\u0000\u0018             \u0000\u0015\u0000\u0011\u0000\u0013                 \u0000\u0015\u0000\u0011\u0000\u0018\n                                                                                                                                          \u00000\u0000&\u0000\u0003\u0000W\u0000U\u0000X\u0000W\u0000K\u0000\u0003q3\u0000\u0003\u0000>\u0000*\u0000H\u00009\u0000@\n                                                                    available\n\n\u0000\u0014\u0000\u0011\u0000\u0014\n                                                          reco /E true"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "\u0000\u0014\u0000\u0011\u0000\u0013\n                                           \u00000\u00003\u00009\u0000\u0003\u0000R\u0000I\u0000\u0003Eavailable\n\n\u0000\u0013\u0000\u0011\u0000\n\n\u0000\u0013\u0000\u0011\u0000\u001b\n                                                                                                                \u0000\u0013\u0000\u0011\u0000\u0018           \u0000\u0014\u0000\u0011\u0000\u0013                 \u0000\u0014\u0000\u0011\u0000\u0018             \u0000\u0015\u0000\u0011\u0000\u0013                 \u0000\u0015\u0000\u0011\u0000\u0018\n                                                                                                                                          \u00000\u0000&\u0000\u0003\u0000W\u0000U\u0000X\u0000W\u0000K\u0000\u0003q3\u0000\u0003\u0000>\u0000*\u0000H\u00009\u0000@\n\nFIG. 5. Interquartile range (top) and most probable value\n(bottom) of the available hadronic energy residual distribu-\ntion vs. q3 , for playlist 1A. Smaller IQR indicates better en-\nergy resolution; MPV near unity indicates no systematic bias."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "\u0000\u0014\u0000\u0011\u0000\u0019                                                                                                                    \u00000\u0000/\u00003\u0000\u0003\u0000\u000b\u0000\u0014\u0000$\u0000\f\n                                                                                                                                                                           \u00000\u0000/\u00003\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n                                                                                                                                                                           \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000$\u0000\f\n                                                 \u0000\u0014\u0000\u0011\u0000\u0017                                                                                                                    \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n                                                                                                                                             "
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "\u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000P\u0000H\u0000G\u0000L\u0000X\u0000P\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n                                                 \u0000\u0014\u0000\u0011\u0000\u0015                                                                                                                    \u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000$\u0000\f\n                           reco /E true\n\n\u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n\u0000\u0015\u0000\u0018\u0000\u0010\u0000\u001a\u0000\u0018\u0000\u0003\u0000,\u00004\u00005\u0000\u0003\u0000R\u0000I\u0000\u0003Eavailable"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "\u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000[\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000$\u0000\f\n                                                 \u0000\u0014\u0000\u0011\u0000\u0013                                                                                                                    \u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000[\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n                                                                                                                                                                           \u0000%\u0000D\u0000V\u0000H\u0000O\u0000L\u0000Q\u0000H\u0000\u0003\u0000\u000b\u0000\u0014\u0000$\u0000\f\n                                                                                                                                                                           \u0000%\u0000D\u0000V\u0000H\u0000O\u0000L\u0000Q\u0000H\u0000\u0003\u0000\u000b\u0000\u0014\u0000%\u0000\f\n                                                 \u0000\u0013\u0000\u0011\u0000\u001b\n\n\u0000\u0013\u0000\u0011\u0000\u0019"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "\u0000\u0013\u0000\u0011\u0000\u0017\n                                                                                                     \u0000\u0013\u0000\u0011\u0000\u0015\u0000\u0018       \u0000\u0013\u0000\u0011\u0000\u0018\u0000\u0013   \u0000\u0013\u0000\u0011\u0000\u001a\u0000\u0018      \u0000\u0014\u0000\u0011\u0000\u0013\u0000\u0013 \u0000\u0014\u0000\u0011\u0000\u0015\u0000\u0018 \u0000\u0014\u0000\u0011\u0000\u0018\u0000\u0013                   \u0000\u0014\u0000\u0011\u0000\u001a\u0000\u0018         \u0000\u0015\u0000\u0011\u0000\u0013\u0000\u0013\n                                                                                                                                          \u00000\u0000&\u0000\u0003\u0000W\u0000U\u0000X\u0000W\u0000K\u0000\u0003q3\u0000\u0003\u0000>\u0000*\u0000H\u00009\u0000@"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "FIG. 6. Available hadronic energy resolution summary for\nplaylists 1A and 1B. The relative ordering of models is con-\nsistent with the single-playlist result in Fig. 5, with pre-\ntrained models maintaining their resolution advantage across\nthe larger dataset.\n\f                                                                                                                                                                                                                                                                                                                                                                                                       8"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "q3 [0, 0.6] GeV                                                                  q3 [0.6, 1.2] GeV                                                                                                    q3 [1.2, 1.8] GeV                                                                                              q3 [1.8, 2.4] GeV\n                                                                                                  \u0000\u0018\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                    \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                                  \u0000\u001b\u0000\u0013\u0000\u0013\n               \u0000\u0016\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                  \u0000\u0017\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                    \u0000\u0014\u0000\u0018\u0000\u0013\u0000\u0013"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V\n\n\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V\n               \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013                                                                           \u0000\u0016\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                                                                                                                              \u0000\u0014\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                                  \u0000\u0017\u0000\u0013\u0000\u0013\n                                                                                                  \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013\n               \u0000\u0014\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                                                                                                        \u0000\u0018\u0000\u0013\u0000\u0013                                                                                                                   \u0000\u0015\u0000\u0013\u0000\u0013\n   "
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "\u0000\u0016\u0000\u0013\u0000\u0013\u0000\u0013\n               \u0000\u0014\u0000\u0018\u0000\u0013\u0000\u0013                                                                           \u0000\u0018\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                    \u0000\u0017\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                  \u0000\u0017\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                                                                                                                              \u0000\u0016\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                              \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013\n               \u0000\u0014\u0000\u0013\u0000\u0013\u0000\u0013\n\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V\n\n\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V\n\n\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "\u0000&\u0000R\u0000X\u0000Q\u0000W\u0000V\n                                                                                                  \u0000\u0016\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                                                                                                                              \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013\n                                                                                                  \u0000\u0015\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                                                                                                                                          \u0000\u0014\u0000\u0013\u0000\u0013\u0000\u0013\n                \u0000\u0018\u0000\u0013\u0000\u0013\n                                                                                                  \u0000\u0014\u0000\u0013\u0000\u0013\u0000\u0013                                                                                                    \u0000\u0014\u0000"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "\u0000\u0013                                                                                  \u0000\u0013                                                                                                         \u0000\u0013                                                                                                                      \u0000\u0013\n                            \u0000\u0013\u0000\u0011\u0000\u0013     \u0000\u0013\u0000\u0011\u0000\u0018      \u0000\u0014\u0000\u0011\u0000\u0013    \u0000\u0014\u0000\u0011\u0000\u0018    \u0000\u0015\u0000\u0011\u0000\u0013                                  \u0000\u0013\u0000\u0011\u0000\u0013     \u0000\u0013\u0000\u0011\u0000\u0018            \u0000\u0014\u0000\u0011\u0000\u0013              \u0000\u0014\u0000\u0011\u0000\u0018            \u0000\u0015\u0000\u0011\u0000\u0013                                   \u0000\u0013\u0000\u0011\u0000\u0013              \u0000\u0013\u0000\u0011\u0000\u0018               \u0000\u0014\u0000\u0011\u0000\u0013         \u0000\u0014\u0000\u0011\u0000\u0018               \u0000\u0015\u0000\u0011\u0000\u0013                                     \u0000\u0013\u0000\u0011\u0000\u0013     \u0000\u0013\u0000\u0011\u0000\u0018      \u0000\u0014\u0000\u0011\u0000\u0013    \u0000\u0014\u0000\u0011\u0000\u0018    \u0000\u0015\u0000\u0011\u0000\u0013\n                                           Eavailable\n                                            reco /E true\n                                                      available                       "
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "\u0000%\u0000D\u0000V\u0000H\u0000O\u0000L\u0000Q\u0000H    \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000P\u0000H\u0000G\u0000L\u0000X\u0000P             \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O\u0000\u0010\u0000U\u0000Z                  \u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O       \u00007\u0000U\u0000D\u0000Q\u0000V\u0000I\u0000R\u0000U\u0000P\u0000H\u0000U\u0000\u0010\u0000[\u0000V\u0000P\u0000D\u0000O\u0000O\n                                                                                                     \u00000\u0000/\u00003              \u00002\u0000P\u0000Q\u0000L\u0000/\u0000H\u0000D\u0000U\u0000Q\u0000H\u0000G\u0000\u0010\u0000V\u0000P\u0000D\u0000O\u0000O"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "FIG. 7. Available hadronic energy residual distributions in four bins of q3 for muon-selected events (top row: signed residual\n  reco\nEavailable    true\n           − Eavailable ; bottom row: ratio Eavailable\n                                             reco        true\n                                                       /Eavailable ). Pre-trained models produce narrower, more symmetric distribu-\ntions, especially at low q3 .\n\f                                                                                                                             9"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "[1] M. Feickert and B. Nachman, “A Living Review of                 sections at intermediate energies”, New J. Phys. 16\n     Machine Learning for Particle Physics”,                         (2014) 075015, doi:10.1088/1367-2630/16/7/075015,\n     arXiv:2102.02770.                                               arXiv:1403.2673.\n [2] J. Birk, A. Hallin, and G. Kasieczka, “OmniJet-α: The      [19] U. Mosel, “Neutrino Interactions with Nucleons and\n     first cross-task foundation model for particle physics”,        Nuclei: Importance for Long-Baseline Experiments”,\n     arXiv:2403.05618.                                               Ann. Rev. Nucl. Part. Sci. 66 (2016) 171–195,\n [3] V. Mikuni and B. Nachman, “Solving key challenges in            doi:10.1146/annurev-nucl-102115-044720,\n     collider physics with foundation models”, Phys. Rev. D          arXiv:1602.00696.\n     111 (2025), no. 5, "
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Report, Volume I Introduction to DUNE”, JINST 15               arXiv:2301.02272.\n     (2020), no. 08, T08008,                                   [47] MINERvA Collaboration, “Measurement of the\n     doi:10.1088/1748-0221/15/08/T08008,                            multineutron ν¯µ charged current differential cross\n     arXiv:2002.02967.                                              section at low available energy on hydrocarbon”, Phys.\n[34] Hyper-Kamiokande Collaboration, “Hyper-Kamiokande              Rev. D 108 (2023), no. 11, 112010,\n     Design Report”, arXiv:1805.04163.                              doi:10.1103/PhysRevD.108.112010, arXiv:2310.17014.\n[35] K. McFarland, “Minerva: a dedicated neutrino              [48] MINERvA Collaboration, “Measurement of electron\n     scattering experiment at numi”, Nuclear Physics B -            neutrino and antineutrino cross sections at low\n     Procee"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "of reconstructed muons, diphoton invariant mass mγγ           from scratch, consistent with the FLOP-efficiency results\nwhen there are two reconstructed photons, charged-pion        in Fig. 1.\nprong count). The remaining entries are log-scaled\ntotals of reconstructed energy summed over different\nnode types.                                                                Appendix E: Evaluation baselines\n  A complete description of the feature set\nused for MINERvA event representation is pro-                                  1.   Regression: Eavailable\nvided     at     https://github.com/gregorkrz/minerva-\nml/blob/master/DATASET.md.                                      The black curves labeled baseline in the q3 -binned re-\n  The models’ performance is evaluated in bins of truth       gression figures are not a learned model: they use an es-\nquantities derived from the final-state particle "
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "2.    Classification: interaction tagging\n         q                                 \u0001\n  q3 =                  pµ | cos θµ ) − m2µ + (Eν − Eµ )2 .\n             2Eν (Eµ − |⃗\n                                                       (A1)\n                                                                 The classification figures show two distinct reference\nThree-momentum transfer from A1 is defined only for\n                                                              quantities.\nevents with a muon in the final state.\n                                                                 a. Random (signal-fraction) baseline. The baseline\n   The single-pion final states (CC1π ± , CC1π 0 ) are        is not physically meaningful; it represents the AUPRC\nbinned in terms of the true angle and energy of the pion      score of a random model for each bin (which coincides\n(π ± or π 0 ).                    "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "The models are trained on a single NVIDIA A100                • CC1π ± : one reconstructed muon, exactly one\nGPU. Training of the classification models takes approx-           charged prong, and exactly one Michel electron\nimately 6 hours for OmniLearned-small, approx. 1.5                 candidate.\nhours for Transformer-small, and approximately 1 hour\nfor Transformer-xsmall. Training of the regression mod-          • CCN π ± , N ≥ 1: one reconstructed muon, at least\nels takes approximately 8 hours for OmniLearned-small,             one charged prong, and at least one Michel candi-\napprox. 1.5 hours for Transformer-small, and approxi-              date.\nmately 1 hour for Transformer-xsmall.                            • CC1π 0 : one reconstructed muon; a π 0 candidate\n                                                                   with two-photon invariant mass (mγγ ) within ∆m\n       "
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "TABLE I. Model configurations used in the experiments.\n                  Model                                             # params Architecture summary\n                  Transformer-xsmall                                800k      Point–global mixed ViT encoder with width 128,\n                                                                              4 transformer layers, 8 attention heads;\n                                                                              MLP expansion ratio four; CLS token readout.\n\nTransformer-small                                 3M        Point–global mixed ViT encoder with width 184,\n                                                                              7 transformer layers, 8 attention heads;\n                                                                              MLP expansion ratio four; CLS token readout."
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "OmniLearned-small / OmniLearned-small-rw 3M                 Particle-encoder transformer (PET2), small preset:\n                                                                              8 trunk blocks, 2 head blocks, 4 tokens/particle,\n                                                                              width 128, 8 heads, MLP ratio two.\n                                                                              OLS: pre-trained init; OLS_RW: trained from scratch.\n\nOmniLearned-medium                                53M       PET2 medium preset: 12 trunk blocks, 2 head blocks,\n                                                                              4 tokens/particle, width 512, 16 heads, MLP ratio two.\n                                                                              Backbone frozen; only classification/regression heads trained."
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "MLP (global features)                             284k      Hidden width 128, 4 residual blocks,\n                                                                              sigmoid linear unit activation.\n\nClassification                                                      Regression\n                                                                                  0.060\n                  1.24\n                  1.22                                                            0.055\n                  1.20\n                                                                                  0.050\nValidation loss"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "1.18\n                  1.16                                                            0.045\n                  1.14                                                            0.040\n                  1.12\n                  1.10                                                            0.035\n                  1.08                                                            0.030\n                         3.0   3.5     4.0         4.5        5.0   5.5     6.0            3.0    3.5      4.0         4.5    5.0   5.5   6.0\n                                          log10(Training steps)                                             log10(Training steps)\n                                                    MLP                    OmniLearned-small      Transformer-small\n                                                    OmniLearned-medium     OmniLearned-small-rw   Transformer-xsmall"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "FIG. 8. Validation loss vs. training step for classification tasks (left) and regression tasks (right). The pretrained model\n OmniLearned-small reaches the smallest validation loss of the Transformer-small model in approx. 45% fewer steps for classi-\n fication and 50% fewer steps for regression."
+    }
+  ]
+}

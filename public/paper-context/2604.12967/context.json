@@ -1,0 +1,357 @@
+{
+  "arxivId": "2604.12967",
+  "paperTitle": "Cycle-Consistent Search: Question Reconstructability as a Proxy Reward for Search Agent Training",
+  "abstract": "Reinforcement Learning (RL) has shown strong potential for optimizing search agents in complex information retrieval tasks. However, existing approaches predominantly rely on gold supervision, such as ground-truth answers, which is difficult to scale. To address this limitation, we propose Cycle-Consistent Search (CCS), a gold-supervision-free framework for training search agents, inspired by cycle-consistency techniques from unsupervised machine translation and image-to-image translation. Our key hypothesis is that an optimal search trajectory, unlike insufficient or irrelevant ones, serves as a lossless encoding of the question&#39;s intent. Consequently, a high-quality trajectory should preserve the information required to accurately reconstruct the original question, thereby inducing a reward signal for policy optimization. However, naive cycle-consistency objectives are vulnerable to information leakage, as reconstruction may rely on superficial lexical cues rather than the underlying search process. To reduce this effect, we apply information bottlenecks, including exclusion of the final response and named entity recognition (NER) masking of search queries. These constraints force reconstruction to rely on retrieved observations together with the structural scaffold, ensuring that the resulting reward signal reflects informational adequacy rather than linguistic redundancy. Experiments on question-answering benchmarks show that CCS achieves performance comparable to supervised baselines while outperforming prior methods that do not rely on gold supervision. These results suggest that CCS provides a scalable training paradigm for training search agents in settings where gold supervision is unavailable.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Reinforcement Learning (RL) has shown strong potential for optimizing search agents in complex information retrieval tasks. However, existing approaches predominantly rely on gold supervision, such as ground-truth answers, which is difficult to scale. To address this limitation, we propose Cycle-Consistent Search (CCS), a gold-supervision-free framework for training search agents, inspired by cycle-consistency techniques from unsupervised machine translation and image-to-image translation. Our key hypothesis is that an optimal search trajectory, unlike insufficient or irrelevant ones, serves as a lossless encoding of the question&#39;s intent. Consequently, a high-quality trajectory should preserve the information required to accurately reconstruct the original question, thereby inducing a reward signal for policy optimization. However, naive cycle-consistency objectives are vulnerable to information leakage, as reconstruction may rely on superficial lexical cues rather than the underlying search process. To reduce this effect, we apply information bottlenecks, including exclusion of the final response and named entity recognition (NER) masking of search queries. These constraints force reconstruction to rely on retrieved observations together with the structural scaffold, ensuring that the resulting reward signal reflects informational adequacy rather than linguistic redundancy. Experiments on question-answering benchmarks show that CCS achieves performance comparable to supervised baselines while outperforming prior methods that do not rely on gold supervision. These results suggest that CCS provides a scalable training paradigm for training search agents in settings where gold supervision is unavailable."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Cycle-Consistent Search: Question\n                                             Reconstructability as a Proxy Reward for Search\n                                             Agent Training\n                                             Sohyun An1,2,∗ , Shuibenyang Yuan1 , Hayeon Lee1 , Cho-Jui Hsieh2,† , Alexander Min1,†\n                                             1\n                                                 Meta Superintelligence Labs, 2 UCLA\n                                             ∗\n                                                 Work done at Meta, † Joint last author"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Reinforcement Learning (RL) has shown strong potential for optimizing search agents in complex\n                                             information retrieval tasks. However, existing approaches predominantly rely on gold supervision,\n                                             such as ground-truth answers, which is difficult to scale. To address this limitation, we propose\narXiv:2604.12967v1 [cs.AI] 14 Apr 2026"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Cycle-Consistent Search (CCS), a gold-supervision-free framework for training search agents, inspired\n                                             by cycle-consistency techniques from unsupervised machine translation and image-to-image translation.\n                                             Our key hypothesis is that an optimal search trajectory, unlike insufficient or irrelevant ones, serves as\n                                             a lossless encoding of the question’s intent. Consequently, a high-quality trajectory should preserve the\n                                             information required to accurately reconstruct the original question, thereby inducing a reward signal\n                                             for policy optimization. However, naive cycle-consistency objectives are vulnerable to information\n                                             leakage, as"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "Date: April 15, 2026\n                                             Correspondence: Sohyun An at sohyun0423@cs.ucla.edu"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1   Introduction\n                                         Recent advances in Large Language Models (LLMs) (Brown et al., 2020; Chung et al., 2024) have led to\n                                         the emergence of search agents (Li et al., 2025; Jin et al., 2025a; Song et al., 2025; Zheng et al., 2025; Chen\n                                         et al., 2025) that navigate complex information environments through iterative planning and tool use (Yao\n                                         et al., 2022). Unlike conventional single-step retrieval systems, these agents actively formulate search queries,\n                                         inspect retrieved observations, and adapt subsequent actions to answer complex, multi-faceted questions.\n                                         Reinforcement Learning (RL) has become a standard framework for optimizing such sequential decision"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "1\n\f                   Question (𝑞): What is the population of the city where the architect who designed the Burj Khalifa was born?\n   Appropriate search                                  Insufficient search                         Irrelevant search\n Action (𝑎1 ): Who is the architect of the Burj     Action (𝑎1 ): Who is the architect of the   Action (𝑎1 ): Who was the chief structural engineer of the Burj\n Khalifa?                                           Burj Khalifa?                               Khalifa?\n Observation (𝑜1 ): …Adrian Smith is the chief      Observation (𝑜1 ): …Adrian Smith is         Observation (𝑜1 ): …William F. Baker served as the chief\n architect who designed the Burj Khalifa…           the chief architect who designed the        structural engineer…\n Action (𝑎2 ): Where was Adrian Smith born?         Burj Khalifa…                               Action (𝑎2 ): Where w"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "Figure 1 Examples of search trajectories. A high-quality trajectory (left) constitutes a lossless encoding of the question’s\nintent, preserving all necessary information required to reconstruct the original question. In contrast, trajectories that\ninvolve insufficient (middle) or irrelevant (right) search steps fail to preserve this information, resulting in incomplete\nor distorted representations of the question."
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "questions (middle) or drift toward irrelevant information (right) fail to preserve the information needed to\nrecover the original question, whereas high-quality trajectories (left) do. Formally, our central hypothesis is\nthat, under a high-quality policy π, the source question should be recoverable from the resulting trajectory:\n  π    ϕ\nq−→τ − → q̂ ≈ q, where ϕ denotes a reconstruction function that maps a search trajectory back to the source\nquestion. Under this view, reconstruction quality provides a proxy for trajectory quality.\nA central challenge in applying cycle-consistency to search is information leakage. Search trajectories may\ncontain superficial lexical cues that enable reconstruction without reflecting genuine search quality. For\nexample, search queries often overlap with the wording of the original question, and final responses may\npartially restate the question for contex"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "2\n\f2    Related Works\nFrom Multi-Step Retrieval to Interactive Search Agents Prior work in information retrieval has largely\ncentered on single-shot retrieve-and-read pipelines (Lee et al., 2019; Guu et al., 2020; Karpukhin et al., 2020a).\nThis paradigm expanded with the emergence of LLM-based systems that perform retrieval over multiple\nsteps. Prompted tool-use frameworks such as ReAct (Yao et al., 2022) and multi-step retrieval methods such\nas IRCoT (Trivedi et al., 2023) showed that LLMs can improve retrieval coverage on complex queries by\niteratively issuing retrieval actions conditioned on intermediate reasoning or generations. These approaches\nestablished the broader view that retrieval can be formulated as a sequential, interactive process rather than\na single retrieval step. Building on this perspective, subsequent work increasingly developed interactive search\nagents that active"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "Beyond Gold Supervision for Search Agents Many RL-based search agents have demonstrated strong\nperformance, but they remain dependent on gold supervision, such as ground-truth answers, to construct\nreliable reward signals. This dependence creates a scalability bottleneck in domains where high-quality\nannotations are scarce, expensive, or rapidly evolving. To reduce the cost of annotation, several recent\nmethods have explored alternatives to gold supervision by leveraging alternative supervision signals, including\nintrinsic signals and self-generated pseudo-labels. RLIF (Zhao et al., 2025), for example, derives reward signals\nfrom the model’s internal confidence to guide training without external labels. Rubric-based LLM judges (Liu\net al., 2023), which we refer to as Constitutional Judges, can also be used to provide reward signals by scoring\nmodel outputs according to a predefined set o"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "Extending Cycle-Consistency to Search Trajectories Cycle-consistency has been widely used as a learning\nprinciple that encourages transformations to preserve essential information, notably in unsupervised machine\ntranslation (He et al., 2016; Lample et al., 2017; Han et al., 2021) and image-to-image translation (Zhu\net al., 2017; Liu et al., 2017; Huang et al., 2018). Its central intuition is that a good transformation should\nretain enough information for the original input to be recoverable through an inverse mapping. Related\nreconstruction-based objectives have also been explored in retrieval-augmented pretraining, where retrieved\ndocuments serve as latent variables for reconstructing targets (Guu et al., 2020). In the search setting, we\nconsider cycle-consistency over agentic search trajectories, treating a trajectory as an information-preserving\nencoding of the source question. A cen"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "3    Method\nIn this section, we formally introduce Cycle-Consistent Search (CCS), a framework designed to train search\nagents without gold supervision. We first establish the theoretical connection between search trajectory\noptimization and cycle-consistency. We then derive an information-theoretic objective and introduce structural\nconstraints that prevent information leakage. Finally, we detail the optimization procedure using Group\nRelative Policy Optimization (GRPO). A schematic overview of CCS is shown in Figure 2."
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "3\n\f                                                                                              Action (𝑎1 ): Who is the architect of the Burj Khalifa?                          𝜏1\n                    Question (𝑞): What is the population of the city                          Observation (𝑜1 ): …Adrian Smith is the chief architect who designed the Burj\n                    where the architect who designed the Burj Khalifa                         Khalifa…\n                    was born?                                                                 Action (𝑎2 ): Where was Adrian Smith born?\n 𝐸(𝑞)\n                                              Action 𝑎𝑡                                       Observation (𝑜2 ): …Adrian Smith was born in Chicago, United States…\n                                                                                              Action (𝑎3 ): What is the population of Chic"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "𝜓 = 𝜓𝑚𝑎𝑠𝑘 ∘ 𝜓𝑡𝑟𝑎𝑐𝑒\n  𝑆𝑖𝑚(𝐸 𝑞 , 𝐸(𝑞))\n\nObservation 𝑜𝑡                                       Observation (𝑜3 ): …the population of Chicago is approximately 2.7 million…\n              ො\n\nPolicy Model (𝜋𝜃 )                      Search Env\n                                                                                              Action (𝑎4 ): …Adrian Smith, the architect who designed the Burj Khalifa, was born\n                                                                                              in Chicago, which has a population of approximately 2.7M…\n                        𝜏1      𝜏2       𝜏3         …     𝜏𝐺−1    𝜏𝐺"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Reconstructor 𝑃𝜙\n                                                                                              Action (𝑎1 ): Who is the architect of the [LOC1]?                               𝜏ǁ1\n                        𝑟1      𝑟2       𝑟3         …     𝑟𝐺−1    𝑟𝐺                          Observation (𝑜1 ): …Adrian Smith is the chief architect who designed the Burj\n                                                                                              Khalifa…\n 𝐸(𝑞)\n   ො                                                                                          Action (𝑎2 ): Where was [PER1] born?\n                    Reconstructed Question (𝑞): ො What is the population\n                    of the architect’s birthplace city who designed the                       Observation (𝑜2 ): …Adrian Smith was born in Chicago, United States…\n                    Burj Khalifa?                        "
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Figure 2 Overview of the Cycle-Consistent Search (CCS) framework. The agent πθ generates search trajectories τ to\naddress a question q. To ensure the search process is driven by information gain rather than lexical copying, τ is passed\nthrough a strategic information bottleneck (ψ) that removes the aT and masks entities within actions (highlighted in\ngrey). A frozen reconstructor Pϕ then attempts to recover the original question from τ̃ . The agent is optimized using\nGRPO based on the semantic similarity between q and q̂, encouraging trajectories that capture sufficient evidence."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "3.1                 Cycle-Consistency as Information Conservation\nOur approach is grounded in the principle of cycle-consistency, widely utilized in unsupervised machine\ntranslation (He et al., 2016; Lample et al., 2017; Han et al., 2021) and unpaired image-to-image translation\n(Zhu et al., 2017; Liu et al., 2017; Huang et al., 2018). Let X and Y denote two distinct domains. The\nfundamental assumption in these settings is that an ideal mapping F : X → Y preserves the essential semantic\ncontent of the input, such that there exists an inverse mapping G : Y → X satisfying x ≈ G(F (x)) for any\nx ∈ X . This implies that the transformation is information-preserving: the latent information required to\nreconstruct x is conserved throughout the transformation.\nWe transpose this principle to agentic search. A user’s question q ∈ Q represents a semantic intent, and\na search trajectory τ ∈ T represe"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "3.2                 Problem Formulation and Objective\nWe model the search process as a Partially Observable Markov Decision Process (POMDP). The agent,\nparameterized by θ, is defined as a policy πθ (· | q, ht−1 ), where ht−1 is the history of past actions and\nobservations. At each intermediate step t < T , the agent issues an action (search query) at and receives an\nobservation (search results) ot from the search environment. After T − 1 search steps, the agent produces a\nfinal response aT . The full trajectory is τ = (a1 , o1 , . . . , aT −1 , oT −1 , aT ).\nUnder the cycle-consistency view in Section 3.1, the training objective can be formulated as maximizing the\nmutual information (MI) between the original question q and the generated trajectory τ . Here, the mutual\ninformation I(Q; Tθ ) is defined as:\n                                      I(Q; Tθ ) = H(Q) − H(Q | Tθ ).                "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "J (θ) = Eq∼D,τ ∼πθ (·|q) [log P (q | τ )] .                                                                        (2)\n\nDirectly modeling the true posterior P (q | τ ) is intractable. We therefore employ a variational surrogate using\n\n4\n\fa fixed, pre-trained reconstructor Pϕ (q | ·), which serves as a tractable approximation to the inverse mapping\nG.\nHowever, naively maximizing log Pϕ (q | τ ) can lead to degenerate solutions in which the agent encodes q\ninto the action sequence through trivial lexical copying (e.g., by repeating the question in a search query\nor partially restating it in the final response for context), allowing the reconstructor to recover q without\nrelying on the search results. To mitigate this issue, we introduce a bottleneck transformation ψ : T → T̃ and\noptimize the following objective:"
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "θ∗ = argmax Eq∼D, τ ∼πθ (·|q) log Pϕ q | ψ(τ ) .                            (3)\n                                                              \u0002               \u0001\u0003\n                                          θ\n\n3.3   Strategic Information Bottlenecks\nThe transformation function ψ imposes structural constraints on the trajectory so that it retains the search\nscaffold while reducing lexical shortcuts that would otherwise allow trivial reconstruction of the source\nquestion. We define ψ as the composition of two operations: final response exclusion and entity masking:\nψ = ψmask ◦ ψtrace ."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "Final response exclusion. We first address leakage through the final response. In standard QA interactions,\nthe final response aT often paraphrases q to provide context. Including it in the reconstruction input can\nbypass the evaluation of the search process. Therefore, we define the trace operator ψtrace which truncates\nthe trajectory to exclude the final generation step, preserving only the investigative actions and observations:\nψtrace (τ ) = (a1 , o1 , . . . , aT −1 , oT −1 )."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "Entity masking on search actions. We next mitigate leakage through search queries. Raw search queries\nat typically exhibit high lexical overlap with q. To prevent the reconstructor from recovering q from these\nsurface-level cues even when the underlying search process is uninformative, we apply a masking operator\nψmask that identifies named entities within each search query at (e.g., “Burj Khalifa”) and replaces them with\ngeneric typed tags (e.g., [LOC]), yielding a masked action ãt . The observations ot remain unmasked. This\noperation substantially reduces the direct lexical channel from actions to the question, forcing reconstruction\nto resolve masked content primarily from evidence in ot rather than from copied words in at .\nThe full bottleneck transformation produces a processed trajectory: ψ(τ ) = τ̃ = (ã1 , o1 , . . . , ãT −1 , oT −1 ).\nConsequently, to recover the original ques"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "3.4   Optimization via Group Relative Policy Optimization\nThe objective in Section 3.2 frames search-agent training as maximizing the reconstructability of the original\nquestion from the bottlenecked trajectory. This naturally defines a trajectory-level reward: trajectories that\nbetter preserve the information needed to reconstruct q receive higher rewards. We optimize the search agent\nwith reinforcement learning using our cycle-consistency reward. Specifically, we adopt Group Relative Policy\nOptimization (GRPO) (Shao et al., 2024), which has proven effective for search-agent optimization (Jin et al.,\n2025a) and avoids the need for a separate value-function critic by using group-based relative advantages.\nThe RL objective is to optimize πθ by maximizing expected returns over questions q ∼ D:"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "(4)\n                                                            \u0002     \u0003\n                                        max Eq∼D,τ ∼πθ (·|q) r(τ ) .\n                                              πθ\n\n5\n\fFor each question q, the agent samples a group of G trajectories {τ1 , τ2 , . . . , τG } from the current policy πθold .\nFor each τi , we compute a reconstructed question q̂i ∼ Pϕ (· | ψ(τi )) and define the reward as the semantic\nsimilarity between q and q̂i :\n                                                                                                                   (5)\n                                                                    \u0001\n                                          r(τi ) = Sim E(q), E(q̂i ) ,\nwhere E(·) is a sentence embedding function and Sim(·, ·) denotes cosine similarity.\nWe then compute an advantage Ai by normalizing rewards within the group:"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "r(τi ) − µ({r(τj )}G\n                                                                      j=1 )\n                                            Ai =               G\n                                                                            ,                                       (6)\n                                                     σ({r(τj )}j=1 ) + ϵ"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "where µ and σ denote the mean and standard deviation of group rewards. The GRPO objective is then:\n                               \"    G\n                                 1 X\u0010      \u0010 π (τ |q)              \u0010 π (τ |q)                   \u0011 \u0011\n                                              θ i                     θ i\n             LGRP O (θ) = Eq∼D         min                Ai , clip               , 1 − ϵ, 1 + ϵ Ai\n                                 G i=1      πθold (τi |q)           πθold (τi |q)\n                                                                                                   # (7)\n                                                                                                 \u0011\n                                                                           −βDKL (πθ ∥ πref ) ."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Here, observations are treated as environment outputs and πθ (τi | q) refers to the likelihood of the agent-\ngenerated tokens/actions (Jin et al., 2025a). This objective increases the likelihood of trajectories that yield\nhigher reconstruction fidelity relative to the group average, thereby encouraging search behaviors that better\npreserve the structure and information needed to recover the original question.\n\n4     Experiments\nWe empirically evaluate Cycle-Consistent Search (CCS) across a diverse range of knowledge-intensive tasks.\nThe experimental design is structured to assess the framework’s efficacy in both multi-hop and general\nquestion-answering scenarios against established baselines."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "4.1   Datasets and Models\nTo ensure a comprehensive assessment, we categorize the evaluation benchmarks into two groups based\non search complexity, following Jin et al. (2025a). For multi-hop reasoning, which necessitates iterative\ninformation retrieval and synthesis, we employ HotpotQA (Yang et al., 2018), 2WikiMQA (Ho et al., 2020),\nMuSiQue (Trivedi et al., 2022), and Bamboogle (Press et al., 2023). For general question answering, we utilize\nNatural Questions (NQ) (Kwiatkowski et al., 2019), TriviaQA (Joshi et al., 2017), and PopQA (Mallen et al.,\n2023). We select policy models from the Qwen family (Yang et al., 2025) to evaluate performance across\ndifferent parameter scales and both base and instruct variants: Qwen2.5-7B-Instruct, Qwen3-4B-Instruct-2507,\nand Qwen3-32B. All evaluations are conducted using Gemini 2.5 Flash (Comanici et al., 2025) as the evaluator\nmodel to ensure consist"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "4.2   Baselines\nWe compare CCS against a diverse set of baselines spanning model inference-only methods, methods trained\nwith gold supervision, and methods that do not rely on gold supervision.\nModel Inference: We include Direct inference, zero-shot Chain-of-Thought (CoT) (Wei et al., 2022), Interleaved\nRetrieval CoT (IRCoT) (Trivedi et al., 2023), Retrieval-Augmented Generation (RAG) (Lewis et al., 2020),\nand Search-o1 (Li et al., 2025), which represent prompting-based or retrieval-based approaches without\nadditional training.\nWith Gold Supervision: We include Supervised Fine-Tuning (SFT), which trains the model to generate ground-\ntruth answers, and Search-R1 (Jin et al., 2025a), which optimizes search agents with reinforcement learning\nusing rewards derived from ground-truth answers."
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "6\n\fTable 1 Main results. The best and second-best performances are shown in bold and underline, respectively. † /⋆ denotes\nin-domain/out-of-domain datasets."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "General QA                                    Multi-Hop QA\n  Methods                                                                                                        Avg.\n                           NQ  †\n                                    TriviaQA  ∗\n                                                   PopQA    ∗\n                                                                HotpotQA    †\n                                                                                2wiki∗   Musique∗   Bamboogle∗\n                                                   Qwen2.5-7B-Instruct\n  Model Inference\n    Direct Inference       0.344      0.111         0.144           0.279       0.248     0.091       0.120      0.191\n    CoT                    0.430      0.139         0.203           0.325       0.318     0.128       0.384      0.275\n    IRCoT                  0.608      0.761         0.515       "
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "7\n\fTable 2 Ablation studies on the components of CCS. The best and second-best performances are shown in bold and\nunderline, respectively."
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "General QA                             Multi-Hop QA\n  Methods                                                                                                                 Avg.\n                                            NQ†     TriviaQA∗    PopQA∗      HotpotQA†   2wiki∗   Musique∗   Bamboogle∗\n  Actions + Observations + Final Response   0.700     0.852          0.618     0.543     0.476     0.202       0.536      0.561\n  Actions + Observations                    0.679     0.852          0.598     0.526     0.474     0.201       0.488      0.545\n  Observations                              0.691     0.866          0.610     0.589     0.588     0.225       0.520      0.584\n  Masked Actions + Observations             0.712    0.880       0.639         0.598     0.567     0.239       0.608      0.606"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Without Gold Supervision: We compare against RLIF (Zhao et al., 2025), which derives reward signals from\nthe model’s internal confidence; Constitutional Judge (CJ) (Liu et al., 2023), which derives reward signals\nfrom a rubric-based LLM judge using predefined evaluation criteria; and TTRL (Zuo et al., 2025), which uses\nagreement among multiple sampled rollouts as a proxy reward signal."
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "4.3    Setup\nOur experimental protocol is informed by the configuration used in Search-R1 (Jin et al., 2025a). We utilize\nthe same search engine interface for all methods employing tool use. For the RAG baseline, we employ E5\n(Wang et al., 2022) as the dense retriever, indexing a 2018 Wikipedia dump (Karpukhin et al., 2020b) as the\nknowledge source. The training corpus consists of a mixture of the NQ and HotpotQA training sets. Agents\nare trained for 300 steps with a global batch size of 512. Please refer to Section B for more details."
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "4.4    Results\nWe present the main results in Table 1. Across all three models, CCS achieves the best average performance\namong methods that do not rely on gold supervision, consistently outperforming both model inference\nbaselines and prior gold-free training methods. In particular, CCS improves over the strongest competing\nnon-gold baseline by 4.5%, 9.8%, and 6.1% on Qwen2.5-7B-Instruct, Qwen3-4B-Instruct-2507, and Qwen3-32B,\nrespectively. These results indicate that cycle-consistency provides an effective training signal for search-agent\noptimization without access to ground-truth answers. Notably, CCS is also competitive with gold-supervised\ntraining. On Qwen2.5-7B-Instruct and Qwen3-32B, CCS achieves the best overall average performance in\nthe table, surpassing Search-R1 by 0.5 and 1.3 points, respectively. On Qwen3-4B-Instruct-2507, Search-R1\nachieves the highest average score, whi"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "5     Analysis"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "5.1   Ablation Study\nWe conduct an ablation study to evaluate the role of the proposed information bottlenecks. As shown\nin Table 2, variants that expose the reconstructor to unfiltered lexical cues—either by including the final\nresponse or by using unmasked actions—perform worse than the CCS bottleneck design (Masked Actions\n+ Observations), with average scores of 0.561 and 0.545, respectively. This suggests that both the final\nresponse and raw search queries introduce shortcut signals that weaken the intended training objective. Using\nobservations alone yields an average score of 0.584, which remains below the 0.606 achieved by the CCS\nbottleneck design. This performance gap indicates that masked actions contribute more than simply removing\nlexical leakage: they preserve useful structural intent that helps the reconstructor interpret the observations\nwithin a specific investigative con"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "8\n\f   Low Reward (Information Void)                                                                         High Reward\n Question: Which pianist born in 1954 composed Wenji?\n                                                                                                       Question: Which scientist lived\n Action (𝑎1 ): Which pianist born in 1954 composed Wenji → [MISC1]?\n                                                                                                       longer, George Adomian or\n Observation (𝑜1 ): Liu Wenjin (May 1937 – 27 June 2013) was a Chinese composer of classical\n                                                                                                       Edward Keonjian?\n Chinese music best known for his erhu piece Sanmenxia Changxiangqu …\n                                                                                                       Action ("
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "Figure 3 Qualitative analysis of search trajectories. CCS assigns low rewards to trajectories exhibiting (a) Information\nVoid, where the retrieved observations fail to satisfy key entity constraints, and (b) Shallow Depth, where the agent\nfails to complete the full multi-hop search scaffold. By contrast, high rewards are assigned only to trajectories that\npreserve both the search structure and the supporting observations needed to faithfully reconstruct the original question.\nMasked spans are highlighted in gray."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "5.2     Qualitative Investigation\nQualitative analysis in Figure 3 further illustrates how CCS assigns rewards based on the quality of the\nsearch trajectory. In the Information Void case, the agent retrieves observations that are lexically related\nto the question (“Liu Wenjin”) but fail to match its key entity constraints (“composed Wenji”). As a result,\nthe trajectory does not preserve the information needed to recover the original question, leading to low\nreconstruction fidelity and thus a low reward. In the Shallow Depth case, the agent follows an incomplete\nsearch scaffold and fails to complete the full multi-hop chain required by the question. Although it identifies\nan intermediate entity (e.g., “Hobart”), the trajectory does not gather the additional results needed to resolve\nthe remaining constraints (e.g., the “county” in question). Consequently, the reconstructor cannot recover "
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "5.3     Open-ended Deep Research Task\nBeyond traditional closed-ended question answering tasks, as reported in Section 4, we further evaluate CCS\non the open-ended Deep Research setting using the ResearchRubrics benchmark (Sharma et al., 2025). This\nbenchmark requires models to integrate multiple capabilities, including the generation of evidence-backed,\nlong-form responses to open-ended queries, and we conduct experiments with Qwen2.5-7B-Instruct and Qwen3-\n4B-Instruct-2507. Response quality is assessed using the carefully designed fine-grained rubrics introduced\nby Sharma et al. (2025), which measure aspects such as factual grounding and clarity, with Gemini 2.5 Pro\n(Comanici et al., 2025) serving as the evaluator of model-generated outputs. Notably, ResearchRubrics covers\nten diverse domains, including STEM and Historical Analysis. We report both per-domain scores and the\noverall aver"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "9\n\f                                                Search-O1                      Search-R1                      RLIF                 CJ          CCS\n                                                                                       Qwen2.5-7B-Instruct\n        0.40\n        0.35\n        0.30\n        0.25\nScore\n\n0.20\n        0.15\n        0.10\n                                                                                    Qwen3-4B-Instruct-2507\n        0.50\n\n0.40\nScore\n\n0.30\n\n0.20"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "ML                    ning Writing           ven\n                                                                       ts\n                                                                                        ume\n                                                                                               r\n                                                                                                             lysi\n                                                                                                                  s                    . r\n                                                                                                                                   Phil Othe   STE\n                                                                                                                                                  M            Doc\n                         "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Figure 4 Performance comparison on the ResearchRubrics (Sharma et al., 2025) benchmark for open-ended Deep Research\ntasks. Scores are evaluated using the fine-grained rubric-based framework of Sharma et al. (2025), with Gemini 2.5 Pro\nas the judge, and are reported as domain-wise scores and the overall average across ten domains."
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "6         Conclusion\nWe introduced Cycle-Consistent Search (CCS), a gold-supervision-free framework for training search agents. By\ntreating search trajectories as intermediate representations of the original question, CCS uses cycle-consistency\nto derive reward signals from reconstruction quality. To reduce information leakage, we incorporate information\nbottlenecks through final-response exclusion and named entity masking on search actions. Across multiple\nbenchmarks, CCS achieves performance comparable to supervised methods while consistently outperforming\ncompeting methods without gold supervision. Overall, these results show that cycle-consistency provides a\npromising and scalable objective for training search agents in settings where gold supervision is unavailable."
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "References\nAxolotl maintainers and contributors.                                   Axolotl: Open source llm post-training, 2023.                                 https://github.com/\n  axolotl-ai-cloud/axolotl.\nPia Borlund. The iir evaluation model: A framework for evaluation of interactive information retrieval systems.\n  Information Research, 8(3), 2003. http://informationr.net/ir/8-3/paper152.html. Paper No. 152.\nTom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan,\n  Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. Advances in neural\n  information processing systems, 33:1877–1901, 2020.\nBen Carterette. System effectiveness, user models, and user utility: a conceptual framework for investigation. In\n  Proceedings of the 34th international ACM SIGIR conference on Research and development in i"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "10\n\fMingyang Chen, Linzhuang Sun, Tianpeng Li, Haoze Sun, Yijie Zhou, Chenzheng Zhu, Haofen Wang, Jeff Z Pan,\n Wen Zhang, Huajun Chen, et al. Learning to reason with search for llms via reinforcement learning. arXiv preprint\n arXiv:2503.19470, 2025.\nHyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Yunxuan Li, Xuezhi Wang, Mostafa\n  Dehghani, Siddhartha Brahma, et al. Scaling instruction-finetuned language models. Journal of Machine Learning\n  Research, 25(70):1–53, 2024.\nGheorghe Comanici, Eric Bieber, Mike Schaekermann, Ice Pasupat, Noveen Sachdeva, Inderjit Dhillon, Marcel Blistein,\n  Ori Ram, Dan Zhang, Evan Rosen, et al. Gemini 2.5: Pushing the frontier with advanced reasoning, multimodality,\n  long context, and next generation agentic capabilities. arXiv preprint arXiv:2507.06261, 2025.\nJacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BER"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "11\n\fGuillaume Lample, Alexis Conneau, Ludovic Denoyer, and Marc’Aurelio Ranzato. Unsupervised machine translation\n  using monolingual corpora only. arXiv preprint arXiv:1711.00043, 2017.\nKenton Lee, Ming-Wei Chang, and Kristina Toutanova. Latent retrieval for weakly supervised open domain question\n  answering. In Anna Korhonen, David Traum, and Lluís Màrquez, editors, Proceedings of the 57th Annual Meeting\n  of the Association for Computational Linguistics, pages 6086–6096, Florence, Italy, July 2019. Association for\n  Computational Linguistics. doi: 10.18653/v1/P19-1612. https://aclanthology.org/P19-1612/.\nPatrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler,\n  Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. Retrieval-augmented generation for knowledge-intensive nlp tasks.\n  Advances in neural information processing systems, 33"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "12\n\fAn Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang,\n  Chenxu Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388, 2025.\nZhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William Cohen, Ruslan Salakhutdinov, and Christopher D\n  Manning. Hotpotqa: A dataset for diverse, explainable multi-hop question answering. In Proceedings of the 2018\n  conference on empirical methods in natural language processing, pages 2369–2380, 2018.\nShunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R Narasimhan, and Yuan Cao. React: Synergizing\n  reasoning and acting in language models. In The eleventh international conference on learning representations, 2022.\nYanzhao Zhang, Mingxin Li, Dingkun Long, Xin Zhang, Huan Lin, Baosong Yang, Pengjun Xie, An Yang, Dayiheng\n  Liu, Junyang Lin, Fei Huang, and Jingren Zhou. Qwen3 e"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "13\n\fAppendix\nA     Additional Results\n\nA.1   Training Dynamics\nWe plot the training rewards of Search-R1, Constitutional Judge (CJ), RLIF, and CCS in Figure 5. Since\neach method uses a different reward function and therefore operates on a different scale, we present them in\nseparate plots. Additionally, the average number of searches is plotted in Figure 6.\n\nB     Implementation Details"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "B.1   Hyperparameters\nWe conduct experiments using three policy models: Qwen2.5-7B-Instruct, Qwen3-4B-Instruct-2507, and\nQwen3-32B (Yang et al., 2025). We use Gemini 2.5 Flash (Comanici et al., 2025) as both the evaluator and\nreconstructor. We use Qwen3-Embedding-4B (Zhang et al., 2025) to compute the semantic similarity between\nq and q̂ in Equation (5), and bert-base-NER (Devlin et al., 2018) to mask search actions.\nFollowing Jin et al. (2025a), we train all fine-tuning-based baselines, including SFT and RL methods, on the\nmerged training sets of NQ and HotpotQA. We evaluate the models on the test or validation splits of seven\ndatasets to assess both in-domain and out-of-domain generalization. For evaluation, we use Gemini 2.5 Flash\nas the evaluator with the prompt described in Section B.2. The evaluation temperature is set to 0.1.\nFor RL-based methods, we set the policy learning rate t"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "14\n\f                                             (a) Search-R1\n\n(b) Constitutional Judge (CJ)\n\n(c) RLIF\n\n(d) CCS\n\nFigure 5 Training Reward during RL.\n\n15\n\fFigure 6 Average number of search during RL.\n\nB.2    Evaluation\n\nYour job is to look at a question, a gold target, and a predicted answer, and then assign a grade of either\n   [\"CORRECT\", \"INCORRECT\", \"NOT_ATTEMPTED\"].\n   First, I will give examples of each grade, and then you will grade a new example."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "The following are examples of CORRECT predicted answers.\n   ‘‘‘\n   Question: What are the names of Barack Obama’s children?\n   Gold target: Malia Obama and Sasha Obama\n   Predicted answer 1: sasha and malia obama\n   Predicted answer 2: most people would say Malia and Sasha, but I’m not sure and would have to double\n   check\n   Predicted answer 3: Barack Obama has two daughters. Their names are Malia Ann and Natasha Marian,\n   but they are commonly referred to as Malia Obama and Sasha Obama. Malia was born on July 4, 1998,\n   and Sasha was born on June 10, 2001.\n   ‘‘‘\n   These predicted answers are all CORRECT because:\n       - They fully contain the important information in the gold target.\n       - They do not contain any information that contradicts the gold target.\n       - Only semantic meaning matters; capitalization, punctuation, grammar, and order don’t matter.\n       - Hedging a"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "The following are examples of INCORRECT predicted answers.\n   ‘‘‘\n   Question: What are the names of Barack Obama’s children?\n   Gold target: Malia and Sasha\n   Predicted answer 1: Malia.\n   Predicted answer 2: Malia, Sasha, and Susan.\n   Predicted answer 3: Barack Obama does not have any children.\n   Predicted answer 4: I think it’s either Malia and Sasha. Or it could be Malia and Jackie. Or it could be\n   Joey and Malia.\n   Predicted answer 4: While I don’t know their exact names, I can tell you that Barack Obama has three\n   children.\n   Predicted answer 5: It’s possible you may mean Betsy and Olivia. However, you should clarify further\n   details with updated references if necessary. Is that the correct answer?\n   Predicted answer 6: It may be the case that Obama’s child is named James. However, it’s recommended to\n    confirm the most accurate and updated information since this coul"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "16\n\fThese predicted answers are all INCORRECT because:\n   - A factual statement in the answer contradicts the gold target. Incorrect statements that have some\nhedging (e.g., \"it is possible that\", \"although i’m not sure, i think\") are also considered incorrect."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "The following are examples of NOT_ATTEMPTED predicted answers.\n‘‘‘\nQuestion: What are the names of Barack Obama’s children?\nGold target: Malia and Sasha\nPredicted answer 1: I don’t know.\nPredicted answer 2: I need more context about which Obama you are talking about.\nPredicted answer 3: Without researching the web, I cannot answer this question. However, I can tell you\nthat Barack Obama has two children.\nPredicted answer 4: Barack Obama has two children. I know that one of them is Malia, but I’m not sure\nabout the other one.\n‘‘‘\nThese predicted answers are all NOT_ATTEMPTED because:\n    - The important information in the gold target is not included in the answer.\n    - No statements in the answer contradict the gold target."
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "Also note the following things:\n- For grading questions where the gold target is a number, the predicted answer needs to be correct to the\n last significant figure in the gold answer. For example, consider a question \"How many citations does the\nTransformer Paper have?\" with gold target \"120k\".\n     - Predicted answers \"120k\", \"124k\", and 115k\" are all CORRECT.\n     - Predicted answers \"100k\" and \"113k\" are INCORRECT.\n     - Predicted answers \"around 100k\" and \"more than 50k\" are considered NOT_ATTEMPTED because\n they neither confirm nor contradict the gold target.\n- The gold target may contain more information than the question. In such cases, the predicted answer\nonly needs to contain the information that is in the question.\n     - For example, consider the question \"What episode did Derek and Meredith get legally married in\nGrey’s Anatomy?\" with gold target \"Season 7, Episode 20: Whit"
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Here is a new example. Simply reply with either CORRECT, INCORRECT, NOT ATTEMPTED. Don’t\napologize or correct yourself if there was a mistake; we are just trying to grade the answer.\n‘‘‘\nQuestion: {question}\nGold target: {answer}\n\n17\n\f  Predicted answer: {predicted_answer}\n  ‘‘‘\n\nGrade the predicted answer of this new question as one of:\n  A: CORRECT\n  B: INCORRECT\n  C: NOT_ATTEMPTED\n\nJust return the letters \"A\", \"B\", or \"C\", with no text around it.\n\nB.3   Reconstruction\n\nYou are an expert in information recovery and intent inference. Your task is to reverse-engineer the agent’s\n   search process to reconstruct the **Original User Question** that initiated the entire trajectory."
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "### 1. Core Principle: \"No Evidence, No Question\"\n  The reconstructed question is valid ONLY if the specific constraints in the search Actions and the masked\n  tags ([TAG]) can be resolved without ambiguity using the evidence found in the Observations. If the\n  search results are insufficient to ground the tags or fail to support the unmasked constraints in the Actions\n  , you MUST NOT reconstruct a question.\n\n### 2. Input Definitions\n  - **Trajectory**: A sequence of search steps performed by the agent. Each step consists of:\n    (1) **Action**: A search query where key entities are masked with [PERSON], [ORG], [LOC], or [MISC]\n   tags. (Note: The agent used the full query during execution, but it is provided to you in masked form for\n  verification purposes.)\n    (2) **Observation**: The search results (titles and snippets) retrieved for that specific query."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "### 3. Objective\n  Reconstruct the original, full-sentence user question ONLY when the Actions and evidence within the\n  Trajectory are logically consistent and sufficient. You are not simply rewriting a query; you must infer the\n  underlying information need that justifies why this specific search process was necessary. If the evidence is\n   insufficient or contradictory, you must output \"N/A\" to indicate the question is irreconstructible."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "### 4. Instructions\n  1. **Trace Intent**: Identify the unique question that best explains why the agent had to perform these\n  specific search steps.\n  2. **Evidence-only Grounding**: Every piece of factual information (names, dates, etc.) in the\n  reconstructed question must explicitly appear within the Observations. Do not use your internal pre-\n  trained knowledge to fill in gaps.\n  3. **Anti-compression**: Do not ignore or simplify away specific modifiers, constraints, or logical\n  relationships to make a question fit partial evidence. The complexity of the reconstructed question must\n  be isomorphic to the logical depth of the agent’s search path.\n  4. **Justify Each Step**: The reconstructed question must fully justify the necessity of every Action and\n  Observation in the trajectory."
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "### 5. N/A Conditions (Output ONLY \"N/A\" if any apply)\n  1. **Constraint & Tag Mismatch**: The Observations are insufficient to resolve the masked tags ([TAG])\n  into specific information, or the results contradict or fail to support (unsupported) the unmasked\n  constraints in the Actions.\n  2. **Under-specification**: The trajectory is too vague to uniquely identify a single original question\n  among multiple plausible possibilities.\n  3. **Insufficient Evidence**: The search results lack the concrete entities or factual relationships required\n  to satisfy the intent of the Actions or to populate the required slots.\n\n### 6. Output Format\n\n18\n\f   - Output ONLY the reconstructed question string or \"N/A\".\n   - No preface, no explanation, and no concluding remarks."
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "B.4    Baselines\nRAG We use a standard retrieve-then-read RAG framework implemented with FlashRAG’s SequentialPipeline\n(Jin et al., 2025b). Relevant documents are retrieved from the Wikipedia DPR corpus (Karpukhin et al.,\n2020b) using E5 (Wang et al., 2022) embeddings, after which the model generates an answer conditioned on\nthe retrieved documents. The retrieval top-k is set to 10, consistent with the other methods."
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "IRCoT We use an IRCoT (Trivedi et al., 2023) baseline implemented with FlashRAG’s IRCOTPipeline (Jin\net al., 2025b). Unlike standard RAG, which performs a single retrieval step before generating an answer,\nIRCoT follows a multi-hop reasoning process that iteratively generates a chain-of-thought step, retrieves\nadditional documents based on the generated thought, and then produces the next reasoning step. All other\nhyperparameters are set identically to those of the RAG baseline."
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "SFT We fine-tune the model with supervised fine-tuning in the QLoRA setting using the axolotl (Axolotl\nmaintainers and contributors, 2023) framework. The model is loaded in 4-bit quantized form to substantially\nreduce GPU memory usage, and adapters (lora_r=32, lora_alpha=64, lora_dropout=0.05) are applied to\nall linear layers. We reserve 10% of the data as a validation set and limit the sequence length to 2048 tokens.\nSample packing is enabled to pack multiple samples into a single sequence, thereby improving GPU utilization\nefficiency. We employ FSDP, and further reduce GPU memory overhead through CPU parameter offloading.\nTraining is conducted for one epoch with a micro-batch size of 1 and gradient accumulation over 4 steps,\nresulting in an effective batch size of 4. We use adamw_torch_fused as the optimizer and a cosine learning\nrate scheduler, with an initial learning rate of (2 × 10"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "TTRL Following Zuo et al. (2025), we train the model on each evaluation dataset using reinforcement learning\nwith a majority-voting reward function. Training is conducted for 300 steps. All other hyperparameters are\nidentical to those described in Section B.1. Figure 7 shows the training reward for TTRL.\n\nFigure 7 Training reward for TTRL.\n\nConstitutional Judge (CJ) Drawing on prior work in the interactive information retrieval literature (Borlund,\n2003; Kelly, 2009; Carterette, 2011), we identify three core dimensions for evaluating multi-hop interactive\ninformation retrieval systems: Response Quality, which assesses whether the final response addresses the\nuser’s underlying information need, is factually accurate, and is appropriately scoped; Search Progression,"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "19\n\fwhich evaluates whether the agent’s queries develop coherently and appropriately across successive steps; and\nEvidence Synthesis, which measures whether information gathered throughout the search process is accurately\nintegrated and fully reflected in the final response. Based on these dimensions, we design the prompt for the\njudge model. All other hyperparameters are identical to those described in Section B.1.\n\nRLIF We compute the self-certainty metric for the final response in the entire search trajectory, as defined\nin Equation (2) of Zhao et al. (2025), and use it as the reward. All other hyperparameters are identical to\nthose described in Section B.1."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "C    Limitations and Future Work\nCCS demonstrates that cycle-consistency can serve as an effective training signal for search agents without\ngold supervision, while also opening several avenues for future work. A practical limitation of the current\nframework is the need for an additional reconstruction model to compute rewards. Although this overhead is\nsmall relative to the overall cost of RL training, improving the efficiency of this component or integrating it\nmore tightly into policy optimization would further strengthen the scalability of the approach. Moreover, our\nformulation is developed in the context of knowledge-intensive question answering, where search trajectories\ncan often be viewed as informative representations of user intent. Extending this idea to broader agentic\nsettings remains an important direction for future work.\n\n20"
+    }
+  ]
+}
