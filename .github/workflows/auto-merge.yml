@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          # --delete-branch makes gh create a local 'main' from origin/main and
+          # delete it. A shallow clone has no origin/main ref, so that fails.
+          fetch-depth: 0
       - name: Enable auto-merge (squash)
         env:
           # Use a repo PAT, NOT secrets.GITHUB_TOKEN. GitHub suppresses push
