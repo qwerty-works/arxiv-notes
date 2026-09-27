@@ -1,0 +1,812 @@
+{
+  "arxivId": "2609.30196",
+  "paperTitle": "Simulation-Based Inference and Unbinned Asimov Construction with Hybrid Neural Density Estimation",
+  "abstract": "High-dimensional, unbinned neural simulation-based inference often relies on neural ratio estimation, which uses expressive supervised models to estimate density ratios, but a learned ratio by itself provides neither an explicit normalized density nor a generative model. Flow-based surrogate models instead enable tractable density evaluation and efficient sampling, but residual density-estimation errors can limit precision for complex implicit distributions.\nWe propose \\textit{hybrid neural density estimation}, which uses a flow to define a parameter-independent reference distribution, and classifiers to estimate target-to-reference density ratios. Multiplying a learned ratio by the reference density gives an evaluable target density surrogate. The ratio also provides importance weights for integration and resampling. We show how this representation defines an exact Asimov dataset, whose maximum likelihood fit returns the generating parameters. We also show how the tractable reference supplies renewable samples for pseudo-experiments and how it enables methods to reduce the Monte Carlo variance of expected test statistic calculations.\nWe demonstrate the construction in a toy statistical model motivated by high-energy physics measurements, but for which the exact densities are known analytically.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "High-dimensional, unbinned neural simulation-based inference often relies on neural ratio estimation, which uses expressive supervised models to estimate density ratios, but a learned ratio by itself provides neither an explicit normalized density nor a generative model. Flow-based surrogate models instead enable tractable density evaluation and efficient sampling, but residual density-estimation errors can limit precision for complex implicit distributions.\nWe propose \\textit{hybrid neural density estimation}, which uses a flow to define a parameter-independent reference distribution, and classifiers to estimate target-to-reference density ratios. Multiplying a learned ratio by the reference density gives an evaluable target density surrogate. The ratio also provides importance weights for integration and resampling. We show how this representation defines an exact Asimov dataset, whose maximum likelihood fit returns the generating parameters. We also show how the tractable reference supplies renewable samples for pseudo-experiments and how it enables methods to reduce the Monte Carlo variance of expected test statistic calculations.\nWe demonstrate the construction in a toy statistical model motivated by high-energy physics measurements, but for which the exact densities are known analytically."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: Signal-density validation against analytic truth after preselection. Events are grouped"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Likelihood validation and numerical benchmark. Panel (a) compares the hNDE and"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: Combined Asimov and simulator validation at µtrue = 1, with 100,000 pseudo-"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: Comparison of sampling from the reference flow and NIS at equal Asimov sample sizes,"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Asimov closure and NP profiling after complete shape-ratio normalization. Panel (a)"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 6: Background reweighting validation after preselection. The diagonal panels compare"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 7: Proposal training diagnostic. The centered learned log density ratio log(gη /qϕ ) is"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 8: Likelihood ratio scans using hNDE, analytic densities, and flow-only density estimation"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 9: Controlled model misspecification with a 5% ratio deformation. Panels (a) and (b)"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Figure 10: Overview of the hNDE workflow for expected HEP inference. Top: samples from"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Simulation-Based Inference and Unbinned Asimov Construction\n                                                              with Hybrid Neural Density Estimation\n                                                                           Rafael Coelho Lopes de Sá        ∗1 and Jay Sandesara      †2\n\n1\n                                                                       Department of Physics, University of Massachusetts Amherst, MA, USA\n                                                                        2\n                                                                          Data Science Institute, University of Wisconsin–Madison, WI, USA\narXiv:2609.30196v1 [physics.data-an] 24 Sep 2026\n\nSeptember 25, 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Abstract\n                                                              High-dimensional, unbinned neural simulation-based inference often relies on neural\n                                                          ratio estimation, which uses expressive supervised models to estimate density ratios, but\n                                                          a learned ratio by itself provides neither an explicit normalized density nor a generative\n                                                          model. Flow-based surrogate models instead enable tractable density evaluation and efficient\n                                                          sampling, but residual density-estimation errors can limit precision for complex implicit\n                                                          distributions.\n                                                              We propose hyb"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Keywords: simulation-based inference, neural density estimation, neural ratio estimation,\n                                                          Asimov datasets, neural importance sampling\n\n∗\n                                                        Email: rclsa@umass.edu\n                                                    †\n                                                        Email: jsandesara@wisc.edu\n\n1\n\fContents\n1 Introduction                                                                                       3\n\n2 Neural ratio estimation for simulation-based inference                                             4\n  2.1   Classifiers as density-ratio estimators . . . . . . . . . . . . . . . . . . . . . . . . .    5\n\n3 Hybrid neural density estimation                                                                   5"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "4 Application to frequentist analyses                                                                6\n  4.1   Extended likelihoods . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     6\n  4.2 Weighted unbinned Asimov inference . . . . . . . . . . . . . . . . . . . . . . . . .           9\n  4.3   Efficient Asimov samples . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "5 Demonstration using toy model                                                                     18\n  5.1   Statistical model and training samples . . . . . . . . . . . . . . . . . . . . . . . . 18\n  5.2 Accuracy of the hybrid model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18\n  5.3 Asimov closure and expected sensitivity . . . . . . . . . . . . . . . . . . . . . . . 19\n  5.4   Integration precision with neural importance sampling . . . . . . . . . . . . . . . 20\n  5.5   Closure with a shape systematic uncertainty . . . . . . . . . . . . . . . . . . . . . 22\n\n6 Discussion and outlook                                                                            24\n  6.1   Simulator validation of expected sensitivity . . . . . . . . . . . . . . . . . . . . . 25\n  6.2   Related work . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "7 Conclusion                                                                                        26\n\nA Mathematical details of importance sampling                                                       30\n  A.1 Statistical properties under importance sampling . . . . . . . . . . . . . . . . . . 30\n  A.2 Optimal proposals and weighted likelihood training . . . . . . . . . . . . . . . . . 31\n  A.3 Application to a normalized NDE model . . . . . . . . . . . . . . . . . . . . . . . 31"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "B Additional details of the demonstration                                                           31\n  B.1 Network architectures and training . . . . . . . . . . . . . . . . . . . . . . . . . . 31\n  B.2 Background reweighting checks . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33\n  B.3 Proposal-fit diagnostics      . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33\n  B.4 Performance comparison with flow-only estimation . . . . . . . . . . . . . . . . . 33\n  B.5 Effect of model misspecification . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34\n\nC Supplemental material                                                                             35"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "2\n\f1    Introduction\nNeural simulation-based inference (NSBI) enables likelihood-based analyses of models specified\nthrough simulators, for which observations can be generated but the likelihood is intractable\nor expensive to evaluate [1]. Neural networks learn inference-relevant quantities, including\nconditional densities and density ratios [2–5]. In this work, we propose hybrid neural density\nestimation (hNDE), which combines a flow-based generative reference with classifier-based\ndensity-ratio estimation. The hNDE approach provides an evaluable density representation,\ngeneration of pseudo-experiments, and computationally efficient expected sensitivity calculations.\nNeural ratio estimation (NRE) and neural density estimation (NDE) offer complementary\ncapabilities for these tasks. Ratios to a parameter-independent reference are sufficient for\nfrequentist likelihood ratio-based inference"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "3\n\fconstructions [10].\nWe apply hNDE to construct weighted unbinned Asimov datasets for expected sensitivity\ncalculations [11]. Fresh events drawn from the learned reference are weighted to represent the\nexpected event measure at a generating parameter point. The complete parameter-dependent\nratios are normalized on this same weighted sample, and auxiliary observations are chosen so\nthat their likelihood is maximized at the generating NPs. These conditions make the generating\npoint a global maximizer of the finite weighted likelihood. The resulting construction provides\nexact internal closure while leaving the accuracy of the expected likelihood ratio scan to be\ncontrolled through numerical integration and model validation.\nThe explicit reference density also enables task-specific importance sampling. Additional inde-\npendent reference events can be generated on demand, so numerical inte"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "2    Neural ratio estimation for simulation-based inference\nIn simulation-based inference (SBI), a simulator generates observations x ∼ p(·; θ), while the\ndensity itself is intractable or expensive to evaluate. Neural models trained on simulated\nobservations can approximate densities or density ratios directly in the observable space.\nWe will denote θ = (µ, α), where µ denotes the POIs and α the NPs. For the observed data, we\ndenote the likelihood by L(θ). The frequentist objective considered here is the profile likelihood\nratio statistic\n                                                L(µ, αb µ)\n                                                      b\n                                    tµ = −2 log            ,                                  (2.1)\n                                                 L(µ,\n                                                    b α)\n                             "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "(µ, b = argmax L(µ, α),\n                       b α)                           b µ = argmax L(µ, α).\n                                                      α\n                                                      b                                        (2.2)\n                                  µ,α                           α"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "4\n\fTwo common surrogate targets are the density and a density ratio,\n                                                                               p(x; θ)\n                            qψ (x; θ) ≃ p(x; θ),               rψ (x; θ) ≃              ,        (2.3)\n                                                                               pref (x)\nwhere pref is a parameter-independent reference density whose support covers the target family.\nLearning the conditional density uses NDE, also called neural likelihood estimation in this\nsetting. Learning the ratio uses NRE.\nBoth NDE and NRE can estimate a density or density ratio for the complete dataset. For a fixed\nnumber n of independent and identically distributed (iid) events, either method can instead\nlearn the corresponding quantity for an individual event. The dataset density and its ratio to\nthe product reference density are then approx"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "i=1                        i=1\n\nrespectively. This reduces the dimensionality of the learning problem for both approaches. The\nHEP application in Sec. 4.1 exploits this structure, with event counts and auxiliary measurements\nincluded in the extended likelihood.\n\n2.1    Classifiers as density-ratio estimators"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "A classifier cψ (x; θ) is trained to distinguish target observations drawn from p(·; θ) from reference\nobservations drawn from pref . For a parameterized classifier, the parameters are sampled from\nthe same distribution in both classes. With balanced training classes, the population optimum\nof the binary cross-entropy loss is\n                                                          p(x; θ)\n                                     c⋆ (x; θ) =                        .                        (2.5)\n                                                     p(x; θ) + pref (x)\nThe trained classifier therefore provides the ratio estimate [2]\n                                                   cψ (x; θ)     p(x; θ)\n                                rψ (x; θ) ∝                    ≃          .                      (2.6)\n                                                 1 − cψ (x; θ)   pref (x)\nThe overall scal"
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "3     Hybrid neural density estimation\nA normalized flow density trained on a representative distribution pref (x) is denoted by qϕ (x).\nOnce trained, the flow itself defines the reference hypothesis. A balanced parameterized classifier\nis then trained to distinguish target events from fresh samples drawn from qϕ , using the same\nparameter distribution for both classes. For a target family p(x; θ), the classifier estimates a\ntarget-to-reference density ratio and defines a hybrid density surrogate,\n                                    p(x; θ)\n                      rψ (x; θ) ≃           ,            pbhNDE (x; θ) = qϕ (x)rψ (x; θ).        (3.1)\n                                     qϕ (x)\n\nFor an exact ratio, this product recovers the target even when qϕ ̸= pref . The flow need\nnot independently provide a precise model of each target. The reference must be evaluable,"
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "5\n\finexpensive to sample, and nonzero wherever a target density is nonzero. Regions where the\ntarget is appreciable but the reference is very small can produce large ratios, making classifier\ntraining and subsequent importance sampling less efficient.\nThroughout, rψ denotes the population-normalized learned ratio, with its overall scale absorbed\nin the definition:\n                             Eqϕ [rψ (·; θ)] = 1  for every θ.                             (3.2)\nThus Eq. (3.1) defines a normalized continuous surrogate. Any overall scale of the classifier odds\ncancels from the finite-sample normalized ratio below, so it need not be evaluated separately.\nIn practice, expectations under qϕ are approximated using a fixed weighted reference sample\nXM = {xm , ωm }Mm=1 , with ωm ≥ 0 and   m ωm = 1. For independent draws from qϕ , ωm = 1/M .\n                                      P\n\nWe define"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "M\n                                                                       rψ (x; θ)\n                      Z(θ) =         ωm rψ (xm ; θ),    reψ (x; θ) =                         (3.3)\n                               X\n                                                                                 ,\n                               m=1\n                                                                        Z(θ)\nwhere Z > 0 is required. This ratio depends on the chosen sample and satisfies m ωm reψ (xm ; θ) =\n                                                                                     P"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "1 exactly. The identity normalizes the finite sample, while Z converges to one as the reference\nquadrature converges. This procedure removes a finite-sample normalization offset, but does not\nrepair local classifier bias. Calibration, ensemble stability, multidimensional reweighting, and\ninference-level closure against independent simulator samples remain necessary. On this sample,\nthe learned target is represented by the probabilities\n\nwm (θ) = ωm reψ (xm ; θ),            wm (θ) = 1.                  (3.4)\n                                                          X\n\nm"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Weighted averages approximate expectations under the continuous surrogate, while resampling\nindices with probabilities wm generates events from its finite empirical approximation. Additional\nindependent reference points can be generated from the flow to improve this approximation.\nThe training procedure is summarized in Algorithm 1."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "4     Application to frequentist analyses\nIn this section, we discuss the application of hNDE to frequentist statistical data analyses.\nIn Sec. 4.1, we consider the case of datasets with a Poisson-distributed event count and condi-\ntionally iid event observables. This extended likelihood setting is common in experimental HEP\nanalyses and allows the neural models to be trained at the event level. This formalism will be\nused for the numerical demonstration in Sec. 5.\nAfter considering this specific case, we discuss general applications of the hNDE approach to the\nconstruction of Asimov datasets. We extend the results from Ref. [12] by studying the statistical\nproperties of the unbinned Asimov likelihood and show how the hNDE approach allows for more\nefficient constructions of the Asimov dataset.\n\n4.1   Extended likelihoods"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "For a detector reconstructed iid event observable x ∈ Rd and parameters θ = (µ, α), comprising\nPOIs and NPs, the event intensity is\n                                                                Z\n                        ν(x; θ) = λ(θ)p(x; θ),         λ(θ) =       ν(x; θ) dx.              (4.1)\n\nHere p is normalized to unity and λ is the expected event yield. The observed count follows\nn ∼ Pois(λ(θ)). Conditional on n, the events are independent draws from p(·; θ)."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "6\n\fAlgorithm 1 hybrid Neural Density Estimation (hNDE)\nRequire: Simulator x ∼ p(·; θ); training proposal ρtrain (θ); reference sampler x ∼ pref ; reference-\n flow sample size Nflow ; ratio-training sample size Nratio\nOutput: Frozen model {qϕ , rψ } and evaluable normalized surrogate pbhNDE (x; θ)\n  Phase 1: reference flow\n  Draw xiref ∼ pref , i = 1, . . . , Nflow\n  Train qϕ by maximizing\n                                                  NX\n                                                   flow\n                                                          log qϕ (xiref )\n                                                  i=1\n  Freeze the flow parameters; qϕ defines the reference used below\n  Phase 2: target-to-reference ratios\n  Draw matched training pairs, for i = 1, . . . , Nratio ,\n\nθi ∼ ρtrain ,        xi+ ∼ p(·; θi ),          xi− ∼ qϕ"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Train a balanced classifier cψ (x; θ) to distinguish (xi+ , θi ) from (xi− , θi )\n  Freeze the classifier parameters and define the population-normalized ratio\n                                                cψ (x; θ)\n                              rψ (x; θ) ∝                   ,           Eqϕ [rψ (·; θ)] = 1\n                                              1 − cψ (x; θ)\n  Phase 3: hybrid density surrogate\n  Form\n                                  pbhNDE (x; θ) = qϕ (x)rψ (x; θ)\n  return {qϕ , rψ } and pbhNDE ; finite sample normalization is defined in Eqs. (3.3) and (3.4)\n\nWhen the model is a nonnegative mixture of physics processes indexed by s,\n\nν(x; θ) =         λs (θ)ps (x; θ),           λ(θ) =        λs (θ),   (4.2)\n                                       X                                         X\n\ns                                         s"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "where each ps is normalized and λs ≥ 0 is its expected yield. The extended likelihood also\napplies to a total intensity specified without this decomposition.\nIn HEP applications, the index s commonly labels distinct simulated physics samples that\ncontribute to the observed event population. Their expected yields and density ratios can\ntherefore be supplied and combined process by process.\nUp to parameter-independent factors, the likelihood can be written as\n                                                          n\n                                    L(θ) = e−λ(θ)               ν(xi ; θ) f (a; α),             (4.3)\n                                                          Y\n\ni=1"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "where f is the likelihood of auxiliary observations a, assumed independent of the event sample\nconditional on the parameters. For independent constraints on individual NPs, f (a; α) =\n  k fk (ak ; αk ); correlated auxiliary measurements can instead be described by a joint f . The\nQ"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "profile likelihood-ratio statistic is defined in Eq. (2.1) with the estimators defined in Eq. (2.2),\nusing the full extended likelihood.\nThe auxiliary observables a are often called global observables in HEP likelihood implementations.\nTheir constraint likelihood encodes the information supplied by auxiliary measurements that\nconstrain the NPs.\nIn frequentist applications of NRE, the event density can be represented by a ratio to an implicit,\nparameter-independent reference pref , either for the complete process mixture or separately for\neach simulated sample. The contribution i log pref (xi ) cancels from profile log-likelihood ratios,\n                                          P"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "7\n\fso the reference density need not be evaluated for inference. This ratio representation is sufficient\nfor likelihood-based inference, but does not by itself provide an evaluable normalized density or\na direct sampler. Two operational consequences are particularly relevant to HEP analyses.\nFirst, expected sensitivity is conventionally evaluated using an Asimov dataset, a representative\ndataset whose fit returns the generating parameters and which encodes the median expected\nsensitivity under the usual asymptotic assumptions [11]. In an unbinned NRE analysis, a large\nweighted MC sample approximates this dataset. Obtaining sufficient integration precision can\nrequire repeated evaluations of the neural networks on millions of events during profile scans\nand NP impact decompositions. Likelihood maximizations requiring hundreds of gigabytes of\nmemory and hours of wall-clock time have been r"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "h(x; θ) =       λs (θ)rs,ψ (x; θ),        ν(x; θ) = qϕ (x)h(x; θ).                (4.5)\n                                  X\n\ns"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "The factor qϕ cancels from profile likelihood ratios. The function h(x, θ) is used to convert\nbetween the reference density and the intensity ν(x, θ). The yields and parameter-dependent\nratios remain part of the likelihood.\nConsequently, the common flow factor need not be evaluated in each profile likelihood calculation,\nwhile it remains available for absolute density evaluation and sample generation. A single reference\nmust cover every physics sample and parameter point used for inference. In a HEP analysis,\nefficient ratio estimation is aided by a reference that reproduces the resonant structure, tails,\nand detector effects present in the physical samples.\nThe ratios can be parameterized directly or assembled from nominal process-to-reference ratios\nand ratios for systematic shape variations, together with analytic yield and shape interpolation\nfunctions. The latter approach follows th"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "8\n\frs,ψ /M . For nonnegative component yields, draw independent counts ns ∼ Pois(λs (θ)) and, for\neach process, resample ns reference indices independently with replacement using the probabilities\n  (s)\nwm (θ). Each selected occurrence enters the pseudo-experiment with unit weight, including\nrepetitions. In practice, the number of events sampled from qϕ should be large enough to make\nrepetitions of events very rare. Combining the process samples gives the full event dataset.\nEquivalently, one may draw a total count n ∼ Pois(λ(θ)) and resample n reference indices\nindependently with replacement using the mixture probabilities\n                                        (s)\n                               s λs (θ)wm (θ)\n                             P\n                 wm (θ) =                                    wm (θ) = 1,         λ(θ) > 0.     (4.6)\n                                              "
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "For cases with signed component coefficients, as in processes representing quantum interferences\nand higher-order perturbative corrections, the componentwise Poisson construction is unavailable.\nThe total count construction remains applicable provided the mixture probabilities in Eq. (4.6)\nare nonnegative. The trained model and reference pool remain fixed across the ensemble.\nThese are unweighted pseudo-experiments from the finite empirical hNDE model; increasing the\nreference-pool size improves its approximation to the continuous surrogate.\nAuxiliary observations are drawn from f (·; α) unless the construction explicitly conditions on\nthem. Repeated likelihood fits then give the sampling distribution of tµ under the empirical\nhNDE model for use in a Neyman construction [10]. These sampling capabilities address practical\nchallenges encountered in the ATLAS NSBI measurement of off-shell H"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "4.2     Weighted unbinned Asimov inference\n\nAn unbinned Asimov dataset is a numerical quadrature for the expected event measure. It is\nused extensively to study the expected power of the statistical analyses and their asymptotic\nbehavior [11]. In this subsection, we apply the finite weighted Asimov construction of Ref. [12]\nto hNDE. We then study the expectation and variance of the log likelihood ratio and profiled\ntest statistic, comparing fixed component normalizations with normalizations estimated on the\nsame sample.\n\n4.2.1    Finite Asimov construction for hNDE"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "At a generating point θA = (µA , αA ), write hA = h(·; θA ) and λA = λ(θA ). The population\nevent measure is\n                          dNA (x) = νA (x) dx = qϕ (x)hA (x) dx.                       (4.7)\nHere h uses the population-normalized ratios rs,ψ ; below, h\n                                                           e uses their finite-sample normalized\ncounterparts.\nKeep the trained model fixed and choose reference points {xm , ωm }M        m=1 with ωm > 0 and\n        = 1. For independent draws   from      ,     = 1/M  . Using the  normalization of Eq. (3.3),\nP\n  m  ωm                                    q ϕ   ω m\ndefine\n                                                                        rs,ψ (x; θ)\n                 Zs (θ) =   ωm rs,ψ (xm ; θ),            θ) =    λs (θ)                        (4.8)\n                          X                                   X\n                  "
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "Here h\n     e approximates the population-normalized h in Eq. (4.5). For numerical integration and\nresampling, the component probabilities on this fixed weighted reference sample are\n                                                               rs,ψ\n                      (θ) = ωm res,ψ (xm ; θ),       res,ψ =                        (θ) = 1.   (4.9)\n                                                                        X\n                  (s)                                                           (s)\n                 wm                                                 ,          wm\n                                                                Zs         m"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "9\n\fFor independent direct-flow draws, ωm = 1/M . These probabilities are exactly normalized on\nthe finite sample.\nOn this sample, the intensity-to-reference ratio h\n                                                 e satisfies the exact identity\n\ne m ; θ) = λ(θ).                                              (4.10)\n                                          X\n                                                 ωm h(x\n                                             m\n\nAssigning the Asimov weights therefore gives"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "= ωm h(x\n                                         e m ; θA ),                            = λ(θA ).                         (4.11)\n                                                                     X\n                                  A                                           A\n                                 wm                                          wm\n                                                                         m"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "The number of integration points M controls the numerical approximation. Their total weight\nis the expected event yield. The extended count term is therefore represented independently of\nM . For an integrable function g0 , the weighted events give the quadrature\n                                    Z\n                                        g0 (x) dNA (x) ≃                    g0 (xm ).                             (4.12)\n                                                                     X\n                                                                          A\n                                                                         wm\n                                                                     m"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "Now choose auxiliary observations aA such that f (aA ; α) has a positive, finite global maximum\nat αA . The finite weighted log likelihood is, up to parameter-independent terms,\n                                                            h                       i\n                  ℓbA (θ) = −λ(θ) +              log qϕ (xm )h(x\n                                                             e m ; θ) + log f (aA ; α).                           (4.13)\n                                         X\n                                               A\n                                              wm\n                                          m"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "The hat distinguishes this finite-sample objective from its population counterpart. In a HEP\nlikelihood, this is the direct unbinned analogue of filling each histogram bin with its expected\ncount and setting the auxiliary global observables to their Asimov values.\nThe global-maximum property follows directly from Eq. (4.10). As shown in Ref. [12], assuming\nthat the normalizers and total intensities at the reference points are finite and positive throughout\nthe parameter domain and writing um (θ) = h(x   e m ; θ)/h(x\n                                                          e m ; θA ) gives"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "f (aA ; α)\n   ∆ℓ(θ) = ℓbA (θ) − ℓbA (θA ) = −               um (θ) − 1 − log um (θ) + log                             ≤ 0.   (4.14)\n                                        X\n                                               A     \u0002                                  \u0003\n   c                                          wm\n                                         m                                                    f (aA ; αA )\n\nEach bracket is nonnegative and the auxiliary term is nonpositive. Thus θA is a global maximizer,\nthough the maximum need not be unique.\nFor differentiable models at an interior generating point, the exact score cancellation follows by\ndifferentiating Eq. (4.10):\n                e m ; θ) = ∂a λ(θ),\n      X\n          ωm ∂a h(x\n      m"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "= − ∂a λ|θA +                    e m ; θ)           + ∂a log f (aA ; α)|θA = 0.     (4.15)\n                                              X\n                ∂a ℓbA                                   ωm ∂a h(x\n                         θA\n                                                 m                           θA"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Here ∂a denotes differentiation with respect to θa . The global-maximum argument is stronger\nthan this local score identity.\nThis result requires normalizing the complete parameter-dependent ratios, including systematic\nshape factors, at every point evaluated during profiling. The reference points and weights remain\nfixed within a scan. When gradients are used, they must include the parameter dependence of Zs .\nNormalizing only nominal ratios generally does not ensure closure in shape-dependent directions.\nThis distinction matters in HEP fits: signal strengths and pure normalization systematics can\nuse fixed component shapes, whereas detector or theory shape variations require the complete\ninterpolated ratios to be renormalized throughout profiling. If only the nominal shapes are\nnormalized, the exact guarantee remains limited to yield-only directions."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "10\n\fAlgorithm 2 hNDE Asimov construction\nRequire: Frozen hNDE model {qϕ , rs,ψ , λs }; generating point θA ; auxiliary likelihood f ; sample\n size M\nOutput: Weighted Asimov sample A, auxiliary observations aA , and log-likelihood evaluator\n ℓbA\n  Draw xm ∼ qϕ independently, set ωm = 1/M , and keep these points and weights fixed\n  function h(x\n           e m , θ)\n     Evaluate the complete component ratios and compute, for every s,\n\nZs (θ) =           ωm rs,ψ (xm ; θ)\n                                                   X\n\nm\n\nreturn the vector with entries\n\ne m , θ) =                        rs,ψ (xm ; θ)\n                                                           λs (θ)\n                                                   X\n                                  h(x\n                                                      s                Zs (θ)"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "end function\n  Set wm P mA m , θA ) and A = {(xm , wm )}m=1\n        A = ω h(x\n              e                         A M\n\nVerify m wm = λ(θA )\n  Choose aA such that αA ∈ arg maxα f (aA ; α)\n  return A, aA , and the function\n                                                      h                       i\n                    ℓbA (θ) = −λ(θ) +           log qϕ (xm )h(x\n                                                            e m , θ) + log f (aA ; α),\n                                        X\n                                              A\n                                             wm\n                                         m\n\ncalling h\n          e at every scan or profiling point"
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Algorithm 2 summarizes the construction. The resulting profile statistic can use the generating\npoint directly as its unconditional maximum:\n                                              h                                     i\n                              tbA (µ) = −2 max ℓbA (µ, α) − ℓbA (θA ) .                      (4.16)\n                                                  α"
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "It is nonnegative and vanishes at µA . For a nonnegative scalar signal strength and µA > 0,\nthe one-sided discovery statistic is q0,A = tbA (0). Under the usual large-sample and Wald\napproximations [11],\n                                        µA             √\n                                σA ≃ √        ,    ZA ≃ q0,A ,                        (4.17)\n                                         q0,A\nwhere σA estimates the uncertainty on the signal strength and ZA the median discovery signifi-\ncance.\nExact closure fixes the location of a likelihood maximum but the convergence of the scan\nshape and sensitivity still requires sufficient integration accuracy. Increasing M and comparing\nindependent reference samples assess this numerical error, while independent simulator-based\nvalidation tests the learned model. Note that a flow is not required for finite-sample closure, but\nprovides inexpensiv"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "4.2.2     Population log likelihood and expected test statistic\n\nThe population expectation and the expectation over numerical samples are different operations.\nThe former averages the event data generated at θA , while keeping the auxiliary observations at\naA . The latter describes repeated numerical integrations of that fixed learned model.\n\n11\n\fUsing the same convention as Eq. (4.13), the expected extended log likelihood is\n\nℓA (θ) = −λ(θ) + Eqϕ [hA (x) log (qϕ (x)h(x; θ))] + log f (aA ; α).                       (4.18)\n\nFor positive intensities and finite expectations, let uθ = h(·; θ)/hA = ν(·; θ)/νA . Then\n\nf (aA ; α)\n                                           Z\n        ∆ℓ(θ) ≡ ℓA (θ) − ℓA (θA ) = −          νA (x)[uθ − 1 − log uθ ] dx + log                      ≤ 0.   (4.19)\n                                                                                         f (aA ; αA )"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "The event term is the negative generalized Kullback–Leibler (KL) divergence between the\nintensities. As in the finite sample case above, since the auxiliary likelihood is maximized at αA ,\nthe generating point globally maximizes the full population objective. The event-level integrand\nand reference expectation for −2∆ℓ(θ) are"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "hA (x)\n                               Yθ (x) = hA (x) log           ,      Iθ = Eqϕ [Yθ ].                          (4.20)\n                                                     h(x; θ)\nThus\n                                                                         f (aA ; α)\n                          −2∆ℓ(θ) = 2[λ(θ) − λA + Iθ ] − 2 log                       .                       (4.21)\n                                                                        f (aA ; αA )\nThe common reference cancels inside the logarithm. Each reference event contributes its log\nintensity ratio weighted by the generating intensity relative to qϕ . The integrand Yθ can have\neither sign even though −2∆ℓ(θ) ≥ 0. The yield and auxiliary terms are evaluated directly and\ncontribute no direct quadrature error at fixed parameters.\nThe population Asimov test statistic is"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "tA (µ) = min [−2∆ℓ(µ, α)] .                                        (4.22)\n                                                     α\n\nHere the data expectation is taken before profiling. Consequently, tA is generally not the mean\nof the profile statistic over pseudo-experiments but its use for median expected sensitivity retains\nthe asymptotic assumptions in Eq. (4.17).\n\n4.2.3     Expectation and variance with fixed and with same-sample normalization\n\nWe first consider the case where the population-normalized ratios are used directly. For\nindependent integration events xm ∼ qϕ , replacing the population expectation by its sample\nmean gives"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "1 X                   f (aA ; α)\n                                      \"                                 #\n                       fixed\n                 −2∆ℓ\n                   c           (θ) = 2 λ(θ) − λA +     Yθ (xm ) − 2 log              .                       (4.23)\n                                                   M m                  f (aA ; αA )"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "At a fixed tested point, these estimators are exactly unbiased over numerical samples. When the\nsecond moments are finite,\n                          fixed                                             fixed        4\n              EMC [−2∆ℓ\n                     c            ] = −2∆ℓ,                   VarMC [−2∆ℓ\n                                                                       c            ]=     Varqϕ [Yθ ].      (4.24)\n                                                                                         M\nAll functions are evaluated at the same fixed θ. The two log likelihoods in their difference use\n                                                                                                             fixed\nthe same events, so their covariance must be retained. Because of that the variance of ∆ℓ\n                                                                               "
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "12\n\fneed not equal the population objective in Eq. (4.18). Increasing only the integration sample\nsize does not remove this fixed normalization error. Also, fixed-normalization quadrature does\nnot generally place the finite-sample likelihood maximum exactly at the generating point.\nIn the finite construction, changing the integration sample changes both the average and the\nnormalizers inside its integrand. The additional fluctuations are correlated with the direct\nsampling error. To propagate them together, we use Eqϕ [rs,ψ ] = 1 and the finite-sample\nnormalized ratios res,ψ = rs,ψ /Zs . The trained functions, generating point, tested point, and\nauxiliary observations are fixed throughout this calculation.\nLet δYθ (x) denote the first-order absolute change in the integrand Yθ (x) caused by estimating\nthe component normalizers from this finite sample. Since Iθ = Eqϕ [Yθ ], the additional "
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "The finite-sample normalized ratio is rs,v /(1 + δZs,v ). Expanding 1/(1 + δZ) ≃ 1 − δZ therefore\ngives\n                                   δhv = −\n                                              X\n                                                  λs,v rs,v δZs,v .\n                                                   s\nSubstituting these intensity changes into δYθ and averaging over qϕ gives\n\nEqϕ [δYθ ] = −        s,θ δZs,A +\n                                              X                     X\n                                                  bA                      bTs,θ δZs,θ ,\n                                              s                       s"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "where\n                                                                     hA\n                                                      \u0014         \u0012              \u0013\u0015\n                                s,θ = λs (θA )Eqϕ rs,A log\n                               bA                                       +1          ,\n                                                                     hθ\n                                                            hA\n                                                  \u0014             \u0015\n                               bTs,θ = λs (θ)Eqϕ rs,θ          .                                           (4.25)\n                                                            hθ\nHere the expectation is over x, with the normalizer errors from the given sample held fixed.\nThe coefficients quantify the sensitivity of the integral to those errors (A and T refer to the\ngenerating and tested intens"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "Uθ (x) = Yθ (x) − Iθ −         s,θ [rs,A (x) − 1] +         bTs,θ [rs,θ (x) − 1],     Eqϕ [Uθ ] = 0.   (4.26)\n                             X                            X\n                                  bA\n                              s                             s\n\nThe difference Yθ − Iθ accounts for ordinary sampling fluctuations, while the two sums account\nfor the normalization changes. Combining them in Uθ retains the correlations caused by using\nthe same events for both calculations.\nWe assume positive finite sample normalizers and finite second moments for Yθ and rs,v . The\ndelta method then gives\n                                                   2 X\n                        −2∆ℓ(θ)\n                          c     + 2∆ℓ(θ) =             Uθ (xm ) + op (M −1/2 ).                            (4.27)\n                                                   M m"
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "13\n\fHere op (M −1/2 ) is negligible in probability at that scale. To infer variances, the remainders must\nalso be negligible at that scale in mean square. For the bias orders below, assume an integrable\nsecond-order Taylor remainder with expectation of order M −1 , then"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "EMC [−2∆ℓ(θ)]\n                                    c      = −2∆ℓ(θ) + O(M −1 ),                                  (4.28)\n                                              4\n                           VarMC [−2∆ℓ(θ)]\n                                    c      =    Varqϕ [Uθ ] + o(M −1 ).                           (4.29)\n                                             M\nUnlike fixed-normalization sample means, the same-sample estimators are nonlinear functions of\nempirical averages and need not be exactly unbiased. The additional terms in U change the\nleading variance coefficient. Their covariances can increase or decrease it, so normalization is\nnot simply an independent positive variance contribution. At θ = θA , U = 0 identically and\n−2∆ℓ\n   c = 0 exactly for every sample."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "For HEP signal-strength measurements with fixed component shapes, including pure yield\nsystematics, rs,A = rs,θ = rs . The leading difference fluctuation simplifies to\n\nUθ = Yθ − Iθ −            (bA\n                                                          s,θ − bs,θ )(rs − 1).                   (4.30)\n                                                   X\n                                                                 T\n                                                    s"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "The normalizers remain random across independently drawn samples even though they do not\nvary along yield-only parameter directions. Detector and theory shape systematics require the\nfull generating- and tested-point terms in Eq. (4.26).\nFor comparison, suppose a separate, independent sample of size N is used to estimate all\nnormalizers, while M events estimate the likelihood integral. Define the normalization-only\ncontribution Dθ = Uθ − (Yθ − Iθ ). For independent direct-flow samples and the same moment\ncontrols,\n                                               Varqϕ [Yθ ] Varqϕ [Dθ ]\n                                           (                             )\n             VarMC      c separate ] = 4\n                     [−2∆ℓ                                +                  + o(M −1 + N −1 ).   (4.31)\n                                                  M           N"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Its pointwise bias is O(N −1 ) under a second-order expansion. These independent-sample\nvariances add because the two samples are independent. Using the same sample instead requires\ntheir covariance and gives Eq. (4.29).\n\n4.2.4   Expectation and variance after profiling\n\nFor a fixed POI value, define the population conditional optimum by\n\nα∗µ = arg min [−2∆ℓ(µ, α)] ,             θµ∗ = (µ, α∗µ ),               (4.32)\n                                     α"
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "so that tA (µ) = −2∆ℓ(θµ∗ ). Suppose this minimizer is unique and interior, its NP Hessian Hµ is\npositive definite, and the finite-sample conditional minimizer α\n                                                               b µ,A is consistent. Assume uniform\n                                                               b\nsmooth stochastic expansions for the objective and its gradient near this optimum. Writing\ngM = −2∇α (∆ℓ  c − ∆ℓ)(θ ∗ ) = O (M −1/2 ), the sample-average optimization expansion [13] gives\n                           µ       p\n\nb µ,A − α∗µ = −Hµ−1 gM + op (M −1/2 ),\n                       α\n                       b\n                                         c ∗ ) − 1 g T H −1 g + o (M −1 ).\n                             tbA (µ) = −2∆ℓ(θ                                                     (4.33)\n                                             µ   2 M µ M         p"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "The fitted NPs move at order M −1/2 , but their extra effect on the objective is second order\nbecause the population gradient vanishes. For same-sample normalization, the unconditional\nmaximum is already fixed at the generating point by exact closure. Consequently,\n                                                 2 X\n                          tbA (µ) − tA (µ) =         Uθµ∗ (xm ) + op (M −1/2 ).                   (4.34)\n                                                 M m\n\n14\n\fWith the expectation and mean-square controls stated above,"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "EMC [tbA (µ)] = tA (µ) + O(M −1 ),\n                                             4\n                           VarMC [tbA (µ)] =    Varqϕ [Uθµ∗ ] + o(M −1 ).                    (4.35)\n                                             M\nThus profiling contributes only o(M −1 ) to the variance relative to evaluation at the population\nconditional optimum. It can contribute an O(M −1 ) bias in addition to the normalization bias.\nWithout finite-sample renormalization, the same leading results hold with U replaced by Y −\nI. The finite-sample unconditional maximum may also move. Its optimization contributes\nanother Op (M −1 ) term under the corresponding regularity conditions. Pointwise unbiasedness\nin Eq. (4.24) therefore does not imply an exactly unbiased profiled statistic.\n\n4.3     Efficient Asimov samples"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "The role of the reference flow extends beyond generating an arbitrarily large independent sample.\nIt also supplies an explicit map from a simple latent distribution to the event observables. For a\nstandard Gaussian base,\n                                 x = Tϕ (z),    z ∼ p0 = N (0, I),                           (4.36)\nwhere transporting p0 through Tϕ gives qϕ . The integral entering the Asimov likelihood ratio\ncan therefore be written\n                            Iθ = Eqϕ [Yθ (x)] = Ep0 [Yθ (Tϕ (z))] .                    (4.37)\nKnowing this map allows us to choose how the latent space is sampled. Two complementary\nimprovements are possible: latent points can cover the base distribution more uniformly, or the\nsampling density can concentrate evaluations where they most reduce the integration error.\nRandomized quasi-Monte Carlo (RQMC) is a natural option for the first approach. A scrambled"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "4.3.1    Neural importance sampling\n\nThe statistical analysis in Sec. 4.2 identifies the event contribution Uθ , including same-sample\nnormalization, to the variance of the Asimov test statistic. As demonstrated in App. A.1, for an\nalternative proposal density g(x) whose support covers qϕ , the same Asimov integral is\n\nqϕ (x)\n                                               \u0014               \u0015\n                                     Iθ = Eg              Yθ (x) .                           (4.39)\n                                                    g(x)\n\nFor the same-sample normalization, the leading event fluctuation under importance sampling is\n(qϕ /g)Uθ . Its expectation is zero, including when the reference weights are self-normalized as in"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "15\n\fEq. (4.47). Thus the leading variance of the finite Asimov statistic is 4/M times\n                                                      2          Z q 2 (x)U 2 (x)\n                                        qϕ (x)\n                                   \"\u0012                  \u0013 #\n                                                                    ϕ      θ\n                              Eg               Uθ (x)   =                           dx.            (4.40)\n                                         g(x)                            g(x)"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "As demonstrated in App. A.2, for a single tested point, minimizing the variance under the\nalternative reference density g gives the formal optimum\n                                                        qϕ (x)|Uθ (x)|\n                                         gθ⋆ (x) = R                          ,                    (4.41)\n                                                       qϕ (x′ )|Uθ (x′ )| dx′\nprovided the denominator is finite and nonzero. Relative to sampling from qϕ , this proposal\nincreases the sampling frequency where the absolute error contribution is large.\nFor a complete scan, one proposal must provide useful precision at several parameter points.\nDiscovery studies may emphasize the null hypothesis, usually µ = 0, while exclusion studies\nmay prioritize larger signal strengths. Confidence-interval calculations require accuracy over the\nrange containing the interval crossings."
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "The same minimization gives\n                                                                                       #1/2\n                                qϕ (x)A(x)\n                                                                       \"\n                      g ⋆ (x) =                               A(x) =         ak Uθ2k (x)           (4.43)\n                                                                        X\n                                           ,                                                   ,\n                                  Eqϕ [A]                                k"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "provided 0 < Eqϕ [A] < ∞. The function A combines the size of an event’s error contributions\nacross the chosen scan points. The weights ak specify their relative priority, allowing the proposal\nto emphasize particular hypotheses or anticipated confidence-interval crossings. The simpler\ntarget A = |Yθ |, or its root-mean-square (RMS) counterpart across a scan, avoids estimating the\nnormalization sensitivities. We also find this choice effective empirically, although it does not\naccount for the full normalization contribution to the integration error.\nFollowing the NIS approach [17], we approximate the proposal with a second flow model. A\nseparate pilot sample first identifies which regions contribute most to the error. We draw P\nevents xppilot ∼ qϕ and evaluate U\n                                 bpk := U\n                                        bθ (xpilot ) at each point. Equation 4.43 the"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "p=1\n\nAfter training, the proposal is held fixed and a fresh Asimov sample, independent of the pilot,\nis drawn for integration. The resulting sample can be reused throughout the likelihood scan,\nwith the component normalizers recomputed at every evaluated parameter point. The gain in\nprecision comes from allocating events more efficiently while preserving the integral of the frozen\nhNDE model. The NIS construction presented here generalizes to any normalized NDE model,\nas demonstrated in App. A.3.\n\n4.3.2   Defensive importance sampling\n\nThe formal proposal in Eq. (4.43) can vanish where A vanishes, and the learned proposal can\nunderestimate relevant tails. To retain the full reference support, we use a defensive mixture [18],\n                             gϵ (x) = (1 − ϵ)gη (x) + ϵqϕ (x),                0 < ϵ < 1.           (4.45)"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "16\n\fAlgorithm 3 hNDE Asimov construction with NIS\nRequire: Frozen hNDE model {qϕ , rs,ψ , λs }; generating point θA ; auxiliary likelihood f ; scan\n design {θk , ak }K\n                  k=1 ; pilot size P ; integration sample size M ; defensive fraction 0 < ϵ < 1\nOutput: Weighted Asimov sample A, auxiliary observations aA , and log-likelihood evaluator\n ℓbA\n  Phase 1: proposal training\n  Draw xppilot ∼ qϕ , p = 1, . . . , P , independently\n  Estimate U bpk = Ubθ (xpilot ) on the pilot sample using Eq. (4.26)\n                       k  p\n  Set the training weights\n                                                        \"K             #1/2\n                                                Abp =\n                                                         X\n                                                                  b2\n                                                               ak U\n     "
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "Fit gη with training weights Abp using Eq. (4.44)\n  Phase 2: importance sampling\n  Form and freeze the proposal\n                                       gϵ = (1 − ϵ)gη + ϵqϕ\n  Draw M fresh, independent events xm ∼ gϵ\n  Compute the reference weights\n                                            qϕ (xm )                  ρm\n                                   ρm =              ,          ωm = PM\n                                            gϵ (xm )                          ℓ=1 ρℓ\n\nPhase 3: Asimov construction\n  Use the fixed sample {xm , ωm } in Algorithm 2, starting from its normalization step\n  return A, aA , and ℓbA\n\nEach event is drawn from qϕ with probability ϵ and from gη otherwise. The importance weight\nuses the full mixture density, regardless of which component generated the event"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "qϕ (x)  1\n                                                ρ(x) =          ≤ .                                              (4.46)\n                                                         gϵ (x)  ϵ\n\nThus ϵ controls the fraction of events drawn from the reference and sets an upper bound on the\nraw importance weight. To create sample events for an Asimov sample, we hold the trained\nproposal, including ϵ, fixed and draw a fresh sample of M independent events xm ∼ gϵ . The\nself-normalized reference weights are\n                             ρm\n                       ωm = PM                      ρm = ρ(xm ),                   ωm = 1.                       (4.47)\n                                                                               X\n                                            ,\n                                   ℓ=1 ρℓ                                      m"
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "Weighted averages with these weights approximate expectations under qϕ . Use the same weights\nthroughout the Asimov construction. In particular, the finite-sample normalization becomes\n\nrs,ψ (x; θ)\n                    Zs (θ) =       ωm rs,ψ (xm ; θ),             res,ψ (x; θ) =                                  (4.48)\n                               X\n                                                                                               .\n                               m                                                     Zs (θ)"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "The resulting Asimov weights are wm\n                                  A = ω h(x\n                                         e m ; θA ), with h\n                                                          e =                                     es,ψ .   They satisfy\n                                                                                         P\n                                       m                                                     s λs r\n m wm = λ(θA ) exactly.\nP    A\n\nAlgorithm 3 summarizes the procedure. The final weighted reference sample replaces the events\ndrawn from the reference flow in Algorithm 2; the remaining Asimov construction is unchanged.\nThe design points guide proposal training, while the resulting likelihood can be evaluated and\nprofiled throughout the parameter region of interest."
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "17\n\f5     Demonstration using toy model\nWe use an example where the statistical model consists of a signal and a background, with\neach observation spanning five dimensions, to test the three algorithms. The example is\ninspired by several features of experimental HEP inference: a rare signal within a much larger\nbackground, correlated observables affected by detector response, classifier preselection, and\nan extended likelihood with a signal strength and a shape NP. The methods, however, are of\nbroad application. Analytic reconstructed densities in this toy example provide a benchmark\nfor the learned model. The tests address four questions: whether hNDE reproduces the target\ndistributions and likelihood, whether the finite Asimov sample returns its generating point, how\nmuch NIS improves integration precision, and whether closure is retained when an NP modifying\nthe high-dimensional distr"
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "5.1   Statistical model and training samples\n\nSignal and background each follow a correlated Gaussian mixture in five latent variables, with two\nprocess-specific modes and a common broad component. Gaussian detector smearing produces\nthe reconstructed observables x = (x1 , . . . , x5 ). This construction provides overlapping signal\nand background distributions and analytically evaluable reconstructed densities.\nThe inclusive expected yields are λincl\n                                   B = 10 and λS = 1.1 × 10 . A classifier preselection is\n                                            6       incl         3"
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "chosen to give an expected background-to-signal ratio of approximately 250. The selected yields\nare\n                              λS = 611.60,     λB = 152,822.48.                           (5.1)\nThe yields emulate rare-signal searches in HEP. Preselection enriches the signal while keeping a\nbackground-dominated region manageable for this study.\nAll densities below refer to the selected region and are normalized within it. For the nominal\nmeasurement, the signal strength µ ≥ 0 is the only parameter. The statistical model is\n      ν(x; µ) =       λs (µ)ps (x) = µ λS pS (x) + λB pB (x),        λ(µ) = µλS + λB .        (5.2)\n                  X\n\ns"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "Here λS denotes the signal yield at µ = 1 and the background yield is fixed. Inference uses the\nextended likelihood of Eq. (4.3). The final test adds a shape NP to the component densities.\nFollowing Algorithm 1, we train the reference flow on 50,000 selected signal events and 50,000\nselected background events with equal component normalization. Separate classifier ensembles\nthen estimate pS /qϕ and pB /qϕ , using five million events per class: selected target events\nand fresh flow-generated reference events. Each ratio is the arithmetic mean of four network\nestimates. The baseline calculations use a fixed five-million-event reference sample for empirical\nnormalization. In the sample-size comparisons below, the ratios are normalized again on each\nintegration sample, as required by the Asimov construction. Network architectures and training\nsettings are given in App. B.1."
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "5.2   Accuracy of the hybrid model\n\nThis test evaluates the density and likelihood accuracy of Algorithm 1. On a held-out validation\npartition, we check classifier calibration, reweighting of the reference to each process, and\nagreement of the reconstructed densities with analytic truth. Before empirical normalization, the\nmean signal and background ratios on the reference sample are 0.9992 and 0.9998, respectively.\nThe background projections and pairwise correlations are shown in Fig. 6 in the appendix.\nFigure 1 compares the reconstructed signal log density with analytic truth. Across the full\nvalidation sample, the correlations between reconstructed and analytic log densities are 0.981 for"
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "18\n\fsignal and 0.985 for background. These checks test the absolute densities obtained by multiplying\nthe learned ratios by the reference density. Their adequacy for inference is assessed directly with\na likelihood comparison.\n\nBin mean\n                                   −5.5            Perfect calibration\n\n®\n                                   −6.0\n\nlog pbref + log rb S\n                                   −6.5\n\n−7.0\n                         ­\n\n−7.5\n\n−8.0\n                                    0.1\n                               ®\n                         ¢log p\n\n0.0\n                         ­\n\n−0.1\n                                      −8.0        −7.5    −7.0       −6.5     −6.0   −5.5\n                                                                 log ps (x)"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "Figure 1: Signal-density validation against analytic truth after preselection. Events are grouped\ninto equal-population bins of log pS (x). The upper panel compares the mean reconstructed log\ndensity, log qϕ + log reS,ψ , with the identity line. The lower panel shows the mean difference\nbetween reconstructed and analytic log densities. Vertical bars give the standard error of each\nbin mean."
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "We fit the hNDE and analytic models to the same independent finite weighted validation sample.\nThe fitted signal strengths are µ b = 1.24 and 1.19, respectively. Their difference of 0.05 is small\ncompared with the expected statistical uncertainty of approximately 0.56. The corresponding\nscans are shown in Fig. 2a. This comparison isolates the effect of the learned model on inference\nfor that validation sample. For precision analyses, agreement of the learned densities must\ntranslate into sufficiently small shifts of fitted parameters and likelihood-ratio scans. The small\nshift here illustrates the relevant validation criterion.\nFor comparison, Fig. 8 in the appendix shows the likelihood scan obtained by modeling the\nsignal and background densities directly with separate ensembles of normalizing flows. These\nmodels use the same training data as the hNDE classifiers. Their scan reaches its"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "5.3   Asimov closure and expected sensitivity\n\nThis test checks the finite sample closure of Algorithm 2 and the sensitivity predictions obtained\nfrom the resulting likelihood. We construct the Asimov sample at µA = 1 from the five-million-\nevent reference sample. Its total weight is λS + λB , or approximately 153,434. The likelihood\nscore at the generating point is 6.8 × 10−13 and the fit returns µ   bA = 1.00, confirming the\nexpected internal closure. The five-million-event integration sample is of the same order as the\nmillion-event samples discussed for the ATLAS NSBI implementation [8].\nThe discovery statistic, expected significance, and Asimov uncertainty are\n\nq0,A = 3.230,                   ZA = 1.797,            σA = 0.556.   (5.3)"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "19\n\f           14                                                                  14\n                                         hNDE\n           12                            Analytic density                      12\n\n10                                                                  10\n\n8                                                                   8\n\nt¹; A\n      t¹\n\n6                                                                   6\n\n4                                                                   4\n\n2                                                                   2\n\n0                                                                   0\n             0.0   0.5   1.0    1.5    2.0     2.5          3.0                  0.0    0.5   1.0   1.5   2.0   2.5   3.0\n                                 ¹                                                                  ¹"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "(a) Validation against analytic truth                                       (b) Asimov benchmark\n\nFigure 2: Likelihood validation and numerical benchmark. Panel (a) compares the hNDE and\nanalytic likelihood ratio scans on the same finite weighted simulation sample. Panel (b) shows\nthe independent one million event direct-reference Asimov scan used to benchmark NIS. The\nvertical lines mark the generating signal strength µ = 1."
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "The uncertainty estimated from the local likelihood curvature is 0.558. An independent Asimov\ncalculation using one million events drawn from the reference flow gives q0,A = 3.227 ± 0.003,\nwith the uncertainty estimated using ten blocks. This agrees with the larger-sample result and\nsupplies the numerical benchmark for the NIS comparison in Sec. 5.4 and Fig. 2b.\nWe also compare the Asimov predictions with 100,000 pseudo-experiments generated from the\nfrozen hNDE model at µ = 1 after preselection. The fitted signal strength has mean 1.000 and\nstandard deviation 0.54, compared with the Asimov uncertainty 0.56. The fraction of fits at the\nphysical boundary is 3.64%, compared with the Asimov prediction of 3.62%. Figure 3 shows\nthe estimator and discovery statistic distributions. The filled blue histograms, labelled “Toys”,\nshow the hNDE pseudo-experiments. The black markers, labelled “Simula"
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "5.4        Integration precision with neural importance sampling"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "This test measures the integration gain from Algorithm 3. We compare direct sampling from qϕ\nwith NIS at equal sample sizes, using the same frozen hNDE model and the same finite sample\nnormalization procedure.\nThe proposal is trained on two million pilot points from qϕ . The scan amplitude in Eq. (4.43) is\nevaluated at 13 equally spaced values over 0 ≤ µ ≤ 3, with equal weights ak . These weights are\nchosen before proposal training and specify the relative priority of the design points. With this\nchoice, the formal proposal minimizes the leading contribution to the mean variance of the test\nstatistic across these points. Other objectives can be encoded in the same weights: larger values\ncan emphasize the null hypothesis or anticipated confidence-interval crossings, while weighting\nby the inverse square of a desired positive error tolerance measures precision relative to that\ntolerance."
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "20\n\f                        0.08\n                                                         Toys                                                                                     Toys\n                        0.07                             Asimov/Wald (¾A = 0:556)                                  10−1                           Boundary-aware Cowan prediction\n                                                         Simulator toys                                                                           Â12 (¤ A ), ¤ A = 3:23\n                        0.06\n  Probability per bin"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "Probability per bin\n                                                                                                                                                  Simulator toys\n                                                                                                                   10−2\n                        0.05\n\n0.04                                                                                       10−3\n                        0.03\n\n0.02                                                                                       10−4"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "0.01\n                                                                                                                   10−5\n                        0.00\n                               0           1         2              3               4                                     0         10       20               30           40\n                                                     ¹\n                                                     c                                                                                            q0\n\n(a) Signal-strength estimator.                                                             (b) Discovery test statistic."
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "Figure 3: Combined Asimov and simulator validation at µtrue = 1, with 100,000 pseudo-\nexperiments in each ensemble. The filled blue histograms (“Toys”) show hNDE-generated\npseudo-experiments; the black markers (“Simulator toys”) show simulator-generated pseudo-\nexperiments with Poisson statistical error bars. Both ensembles are analyzed with the same\nfrozen hybrid likelihood. Panel (a) compares the maximum-likelihood estimator distribution\nwith the Wald prediction based on σA = 0.556. Panel (b) compares the discovery statistic q0 on\na logarithmic vertical scale with the boundary-aware Asimov prediction and the noncentral-χ2\napproximation."
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "In the implementation, each Uµk is divided by the total Asimov yield λ(θA ). This yield is fixed\nat the generating point and is common to all scan points. The division therefore multiplies A by\na single constant, which cancels in the normalized proposal g ⋆ and only rescales the weighted\ntraining objective. It leaves the relative priorities unchanged and gives the same formal proposal\nas using unscaled Uµk with ak = 1. Weighted maximum likelihood is used to train the proposal\nflow. The final defensive mixture uses ϵ = 0.10. Architecture details and proposal-fit diagnostics\nare given in App. B.1 and B.3.\nFor each of the six sample sizes M = 29 , . . . , 214 , we perform 128 independent repetitions and\nevaluate a 61-point scan over 0 ≤ µ ≤ 3. Both component ratios are normalized on each\nintegration sample according to Eq. (4.48). The maximum absolute score at µA is 1.9 × 10−12 ,\nincluding "
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "21\n\frelative to order-one test-statistic values. The RMS is expressed in test-statistic units; pointwise\nrelative precision depends on the scan position. The sample contains more than three orders of\nmagnitude fewer integration points than the five-million-event reference used above.\nFor HEP signal regions containing a few thousand selected collision events, an integration sample\nof this size would also be comparable in event count to the data entering the observed likelihood.\nThat comparison depends on the analysis selection; the expected selected yield in this toy model\nis approximately 153,434. Reducing the integration sample can lower the cost of every expected\nlikelihood scan, NP profile, and impact calculation. These repeated operations are a substantial\ncomputational burden in the ATLAS NSBI implementation [8]."
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "Direct reference                                                         Direct reference\n                                          Neural importance                                                        Neural importance         10\n                                                                RMS error over tA (¹)\n               10−1                                                                     10−1\n                                                                                                                                             8\nIQR of q0; A\n\n6\n\nG\n                                                                                                                                             4"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "2\n               10−2                                                                     10−2\n                                                                                                                                             0\n                      29    2 10   2 11   2 12   2 13    2 14                                  29    2 10   2 11   2 12   2 13    2 14            29    2 10   2 11   2 12   2 13     2 14\n                           Number of Asimov points                                                  Number of Asimov points                            Number of Asimov points\n\n(a) Discovery statistic.                                  (b) Complete likelihood scan.                                      (c) Squared IQR gain."
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "Figure 4: Comparison of sampling from the reference flow and NIS at equal Asimov sample sizes,\nwith 128 repetitions per size. Panel (a) shows the IQR of q0,A ; panel (b) shows the RMS error\nover the full scan relative to the Asimov benchmark constructed from one million events drawn\nfrom the reference flow; and panel (c) shows G. At M = 4,096, the IQR decreases from 0.049 to\n0.015 and the scan RMS error from 0.055 to 0.020.\n\n5.5                    Closure with a shape systematic uncertainty"
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "The final part of this demonstration checks the requirement to normalize the complete parameter-\ndependent ratios when profiling a shape NP. We introduce a detector-response parameter αscale ,\nabbreviated as α below. The latent distributions are unchanged, while the response means at\nthe two variation points are shifted coherently by ±10%:\n                                                                                                      \u0010                                  \u0011\n                                                    x | z, α = ±1 ∼ N (1 ± 0.1) z ⊙ s, diag(σ 2 ) .                                                                                 (5.5)"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "Here s contains the nominal response scales, σ the smearing widths, and ⊙ denotes component-\nwise multiplication. A unit Gaussian constraint centered at α = 0 is included in the likelihood.\nThe varied samples are normalized to the nominal selected yields, so this NP changes only the\nshapes.\nThis differs from the signal strength µ, which multiplies the complete signal intensity and\nfactorizes from the conditional process density. When only normalization-varying parameters\nare present, the finite-sample normalization can be fixed as the parameters vary. Shape factors,\nwhether POIs or NPs, depend on both the event and α, so the finite-sample normalization\nmust be controlled throughout the NP scan. Shape factors are ubiquitous when describing\nexperimental response and theoretical modeling uncertainties.\nFor each process, classifiers estimate the variation-to-nominal density ratios\n          "
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "22\n\f           0.03                                                                  14\n                                                                                            ®scale = 0\n\n0.02                                                                  12         ®scale profiled\n\n99%                                                     10\n           0.01                                    95%\n                                                                                  8\n ®scale\n\nt¹; A\n           0.00\n                                68%                                               6\n                          95%\n          −0.01\n                                                   99%                            4\n\n−0.02                                                                   2"
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "−0.03                                                                   0\n               0.0        0.5         1.0           1.5       2.0                  0.0      0.5          1.0   1.5   2.0   2.5      3.0\n                                       ¹                                                                        ¹\n\n(a) Two-dimensional likelihood.                                        (b) signal strength profile.\n\nFigure 5: Asimov closure and NP profiling after complete shape-ratio normalization. Panel (a)\nshows the likelihood ratio statistic in the (µ, αscale ) plane. The contours use the 68%, 95%, and\n99% two-parameter asymptotic thresholds; the star marks the coincident generating point and\nbest fit. Panel (b) compares the signal strength scan with the NP fixed and profiled."
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "input points does not generally preserve normalization between them. Let rs,ψ (x; 0) be the\npopulation-normalized nominal sample-to-reference ratio of Eq. (4.4). Preserving the component\nnormalization requires\n                                 Eqϕ [rs,ψ (x; 0)vs (x; α)] = 1.                          (5.7)\nThe smooth polynomial–exponential interpolation reproduces the input anchors, but is nonlinear\npoint by point and need not preserve the integral of a normalized shape. For comparison,\npiecewise-linear interpolation between normalized density anchors preserves the integral within\nthe anchor interval:\n                                        (1 − α) + αvs+ (x), 0 ≤ α ≤ 1,\n                                      (\n                          vs (x; α) =                                                     (5.8)\n                                       (1 + α) − αvs− (x), −1 ≤ α < 0.\nsince each bran"
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "This is the normalization of Eq. (4.8) applied to the complete shape-dependent ratio. It gives\nM −1 m res,ψ (xm ; α) = 1 at every evaluated NP value. The process sum entering the finite\n     P\n\nAsimov likelihood is consequently\n\nrS,ψ (x; α)      rB,ψ (x; α)\n                             µ, α) =            λs (µ)res,ψ (x; α) = µλS               + λB                                      (5.10)\n                                           X\n                        h(x;\n                        e                                                                               .\n                                            s                                ZS (α)           ZB (α)"
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "Without this parameter-dependent normalization, the best fit is displaced from the generating\npoint (µA , αA ) = (1, 0) to approximately (0.635, 0.0106). Complete normalization restores the\nbest fit to (1, 0). Profiling the NP then reduces the expected discovery statistic from 3.230 to\n3.029 while retaining the Asimov minimum at the generating point, as shown in Fig. 5."
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "23\n\fThis example demonstrates finite sample closure for a shape-dependent likelihood as well as for\na yield-only parameter. The result follows from normalizing the complete ratios in every fitted\nparameter direction on the same integration sample.\nThe need to recalculate the normalization increases the computational complexity of profil-\ning the log likelihood. Using an interpolation that preserves the normalization is, therefore,\nadvantageous in practical applications. An alternative approach, introduced in the ATLAS\nNSBI measurement [8], interpolates the complete expression for the intensity. This option\npreserves the relation between the integrated intensity and the expected yield and, therefore, the\nfinite-sample closure of the Asimov sample. More recently, flow-based models were proposed to\nmodel variations as parameter-dependent deformations of a nominal density [20]. The Jacobian\n"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "6     Discussion and outlook\nThe contribution of hNDE is to connect classifier-based NSBI to an evaluable density model\nand a reference from which additional events can be generated on demand. The flow supplies\nthis tractable reference, while classifiers trained against its own generated samples learn the\ntarget-to-reference ratios. With common support and exact population ratios, their product\nwith the reference recovers the target densities without requiring the flow itself to model a\nphysical target. A reference that captures the dominant structures of the targets can make the\nratios easier to learn, although classifiers still require validation. This extends the ratio-based\nNSBI formalism implemented by ATLAS [8] to a generative density model: the same reference\nsupports pseudo-experiment generation, weighted Asimov datasets whose generating point is an\nexact maximizer of the finite "
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "• Reference support and overlap. The reference must cover every target throughout the\n\n24\n\f      parameter region used for inference. Where the reference density is much smaller than a\n      target, large ratios can make classifier training difficult and allow a few events to dominate\n      weighted samples. Training on a mixture of processes and relevant parameter variations,\n      with suitable tail behavior, can improve overlap but does not guarantee it. Ratio tails and\n      effective sample sizes should be monitored across the parameter region."
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "• Classifier accuracy and simulator sample validation. Empirical normalization fixes the\n    weighted average of each ratio on the reference sample, but it does not repair estimation\n    errors. Calibration, reweighting checks, ensemble stability, and comparisons with indepen-\n    dent simulator samples remain necessary. Exact Asimov closure and pseudo-experiments\n    generated from the same learned model cannot by themselves establish accuracy or cov-\n    erage under the simulator. Those claims require external validation and, where needed,\n    calibration using simulator pseudo-experiments."
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "• Finite sample integration. Under the positivity conditions of Sec. 4.2, normalizing the\n    complete parameter dependent ratios on the same fixed weighted sample makes the\n    generating point a global maximizer. This does not guarantee an accurate likelihood\n    curvature or scan away from that point. Interpreting the Asimov result as median expected\n    sensitivity also retains the usual asymptotic assumptions. Repeated integrations or block\n    estimates should account for fluctuations of the normalizers. Comparisons between sampling\n    from the reference and importance sampling, with the learned model fixed, help assess\n    numerical uncertainty separately from model error."
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "Further studies should also assess whether a single NIS proposal provides useful precision across\nseveral POI scans and NP variations. Mixtures of flows or iterative proposal refinement could\nbe explored where a single flow provides insufficient overlap.\n\n6.1   Simulator validation of expected sensitivity"
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "Independent simulator validation provides the empirical basis for using the hNDE Asimov\ndataset in an expected sensitivity study. Exact Asimov closure establishes consistency with the\nlearned likelihood: under the conditions of Sec. 4.2, the generating point is a global maximizer\neven if the classifiers are inaccurate [12]. This checks the construction and its normalization,\nbut does not establish agreement with the original simulator. Likewise, generating and fitting\npseudo-experiments with the same learned model cannot reveal errors shared by its generation\nand inference procedures.\nThe external check is to generate separate ensembles from hNDE and from the original simulator at\nthe same parameter values, and analyze both with the same frozen hNDE likelihood. Comparing\nthe resulting distributions of parameter estimators and test statistics then tests whether the\nlearned generator repro"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "25\n\fA dense validation grid may be prohibitively expensive. Comparisons at a limited set of\nrepresentative POI and NP values, including points where modelling is expected to be difficult,\ncan nevertheless provide meaningful confidence in using the hNDE Asimov construction for the\nbroader sensitivity study. These checks should resolve discrepancies at the precision required\nby that study. Their scope remains limited by the parameter points, distribution regions, and\nensemble sizes examined; agreement at selected points does not establish accuracy everywhere.\nValidation of expected sensitivity should also be distinguished from calibration of confidence\nintervals. A Neyman construction calibrated with independent simulator pseudo-experiments\nat the relevant parameter points can provide valid coverage even when the learned likelihood\nis imperfect [3], subject to the precision of the calibrat"
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "6.2   Related work\n\nThe hNDE formalism extends the ratio-based NRE formalism to a generative NDE model.\nFollowing the ideas implemented by ATLAS [8], process-to-reference density ratios share a\ncommon reference and are combined with event yields and NP dependence to construct the\nlikelihood ratios used for inference. hNDE retains this structure and supplies an explicit reference\ndensity that can be evaluated and sampled. Multiplying the learned ratios by this reference then\ngives absolute densities and supports event generation, extending NRE to NDE.\nThe role of the flow qϕ is to define the reference, rather than to model a particular physical\ntarget. Ignoring this role, the pure algebraic structure\n\npb(x; θ) = qϕ (x) rψ (x; θ),                               (6.1)"
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "has precedents in work on generative models. Grover et al. [22] use a learned generator as\nthe reference and estimate the target-to-reference density ratio with a classifier to reweight its\nsamples toward the target distribution. The same idea has been used many other contexts. In\nHEP, DCTRGAN [23] uses related reweighting to improve generative calorimeter simulation.\nThese works aim to improve a generator trained to approximate the target distribution. Although\nhNDE uses the same trivial algebraic factorization, the generative model and the density ratios\nhave very different roles.\nRelated uses of flows and reweighting appear in Boltzmann generators [24] and flow-based\nsampling for fermionic lattice field theories [25]. There, a specified physical distribution provides\nthe weights or Metropolis acceptance probabilities needed to obtain the target distribution from\nflow proposals. For th"
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "7     Conclusion\nWe have presented hNDE, a framework for NSBI that combines expressive NRE with a reference\nflow that can be evaluated and sampled. The flow defines the reference hypothesis and is\nchosen to cover the support of the target distributions of interest. Classifiers trained against\nsamples drawn from this flow learn the target-to-reference density ratios. After normalization,"
+    },
+    {
+      "id": "b-117",
+      "type": "body",
+      "text": "26\n\fmultiplying the reference density by a learned ratio provides an evaluable target-density surrogate,\nwith generation through resampling of the weighted reference. The same learned model can\ntherefore support likelihood evaluation, pseudo-experiment generation, and expected sensitivity\ncalculations within an NSBI analysis.\nFor frequentist analyses of independent events, this representation supports extended likelihoods,\npseudo-experiments, and Neyman constructions. We also construct weighted unbinned Asimov\ndatasets with exact finite sample closure. Normalizing the complete component ratios at every\nparameter point on the same weighted sample makes the generating point a global maximizer of\nthe finite learned likelihood, under the stated positivity and auxiliary conditions. This result\napplies to both yield and shape parameters without requiring differentiability.\nA further contributi"
+    },
+    {
+      "id": "b-118",
+      "type": "body",
+      "text": "Data availability statement The data that support the findings of this study are openly\navailable at https://github.com/rafaellopesdesa/hnsbi_asimov. The repository contains\nthe code to reproduce the event generation and analysis presented in the demonstration.\n\nDeclaration of generative artificial intelligence (AI) use We acknowledge the use of\nChatGPT and Claude throughout this project for assistance in scripting and for help editing\nthe manuscript; the authors take full responsibility for the content of this manuscript.\n\nDisclosure statement       The authors report there are no competing interests to declare."
+    },
+    {
+      "id": "b-119",
+      "type": "body",
+      "text": "Acknowledgments\nThe organizers of the 2026 ML4HEP School at the Tata Institute of Fundamental Research,\nwhere the initial idea for this project was developed, are gratefully acknowledged. Support\nduring the school was partially provided by the US National Science Foundation award HSF-\nIndia OISE-2201990. JS is also grateful for insightful discussions with Kyle Cranmer on the\nsubject. The work of RCLSA is partially supported by the US Department of Energy award\nDE-SC0010004. The work of JS is partially supported by the US National Science Foundation\nIRIS-HEP Cooperative Agreement PHY-2323298."
+    },
+    {
+      "id": "b-120",
+      "type": "body",
+      "text": "27\n\fReferences\n [1] Kyle Cranmer, Johann Brehmer, and Gilles Louppe. “The frontier of simulation-based\n     inference”. In: Proceedings of the National Academy of Sciences 117.48 (Dec. 2020),\n     pp. 30055–30062. doi: 10.1073/pnas.1912789117. arXiv: 1911.01429 [stat.ML].\n [2] Kyle Cranmer, Juan Pavez, and Gilles Louppe. Approximating Likelihood Ratios with\n     Calibrated Discriminative Classifiers. 2015. arXiv: 1506.02169 [stat.AP].\n [3] Johann Brehmer et al. “Constraining Effective Field Theories with Machine Learning”.\n     In: Phys. Rev. Lett. 121.11 (2018), p. 111801. doi: 10.1103/PhysRevLett.121.111801.\n     arXiv: 1805.00013 [hep-ph].\n [4] Johann Brehmer et al. “A Guide to Constraining Effective Field Theories with Machine\n     Learning”. In: Phys. Rev. D 98.5 (2018), p. 052004. doi: 10.1103/PhysRevD.98.052004.\n     arXiv: 1805.00020 [hep-ph].\n [5] Joeri Hermans, Volodimir Begy, "
+    },
+    {
+      "id": "b-121",
+      "type": "body",
+      "text": "28\n\f[16] Ilja Klebanov and T. J. Sullivan. Transporting Higher-Order Quadrature Rules: Quasi-\n     Monte Carlo Points and Sparse Grids for Mixture Distributions. 2023. doi: 10.48550/\n     arXiv.2308.10081. arXiv: 2308.10081 [math.NA].\n[17] Thomas Müller et al. “Neural Importance Sampling”. In: ACM Transactions on Graphics\n     38.5 (2019). doi: 10.1145/3341156. arXiv: 1808.03856 [cs.LG].\n[18] Tim Hesterberg. “Weighted Average Importance Sampling and Defensive Mixture Dis-\n     tributions”. In: Technometrics 37.2 (1995), pp. 185–194. doi: 10.1080/00401706.1995.\n     10484303.\n[19] Kyle Cranmer et al. HistFactory: A tool for creating statistical model for use with RooFit\n     and RooStats. Tech. rep. CERN-OPEN-2012-016. Geneva: CERN, Jan. 2012. url: https:\n     //cds.cern.ch/record/1456844.\n[20] Davide Valsecchi, Mauro Donegà, and Rainer Wallny. Factorizable Normalizing Flows for\n     para"
+    },
+    {
+      "id": "b-122",
+      "type": "body",
+      "text": "29\n\fA     Mathematical details of importance sampling\nThis appendix gives the mathematical details supporting Sec. 4.3: the statistical properties under\nimportance sampling with common normalization, the optimal-proposal argument and weighted\ntraining objective, and the extension to a normalized NDE model. We use the population\nquantities and statistical results defined in Sec. 4.2 and keep the trained model and generating\npoint fixed throughout.\n\nA.1    Statistical properties under importance sampling\n\nFor a fixed normalized proposal g whose support covers qϕ , the same population integral is"
+    },
+    {
+      "id": "b-123",
+      "type": "body",
+      "text": "qϕ (x)\n                                                   \u0014                 \u0015\n                                         Iθ = Eg        Yθ (x) .                                         (A.1)\n                                                  g(x)\nFor learned proposals, the statements below are conditional on their training sample; the final\nintegration sample is independent of that sample. With fixed component normalizers and raw\nimportance weights ρ = qϕ /g, the pointwise estimators remain unbiased and\n                                               fixed,g        4\n                                   Var[−2∆ℓ\n                                         c               ]=     Varg [ρYθ ].                             (A.2)\n                                                              M\nSelf-normalizing these weights alone would define different ratio estimators. We now propagate\nself-normalized "
+    },
+    {
+      "id": "b-124",
+      "type": "body",
+      "text": "1 X                           1 X\n                  S0 =       ρm ,         Bs,v =           ρm rs,v (xm ),           v = A, θ.            (A.3)\n                         M m                           M m\n\nThen Zs,v = Bs,v /S0 . Writing Hv =          s λs,v rs,v /Bs,v gives\n                                         P\n\ne v = S0 Hv ,         ρm\n                              h                         A\n                                                          =\n                                                        HA (xm ),\n                                                       wm\n                                                    M\n                                     1 X                 HA (xm )                                        (A.4)\n                               Ibθ =     ρm HA (xm ) log          .\n                                     M m                 Hθ (xm )"
+    },
+    {
+      "id": "b-125",
+      "type": "body",
+      "text": "The common factor S0 cancels from both the Asimov weights and the ratio inside the logarithm.\nThe coefficients in Eq. (4.25) satisfy\n\ns,θ = Iθ + λA ,                 bTs,θ = λA .                        (A.5)\n                              X                                 X\n                                    bA\n                               s                                 s\n\nExpanding Eq. (A.4) around Bs,v = 1 and using these identities gives\n                                                  2 X\n                      −2∆ℓ(θ)\n                        c     + 2∆ℓ(θ) =              ρm Uθ (xm ) + op (M −1/2 ),                        (A.6)\n                                                  M m"
+    },
+    {
+      "id": "b-126",
+      "type": "body",
+      "text": "under the corresponding moment and differentiability conditions for importance sampling. Since\nEg [ρUθ ] = 0, the leading variance is\n                                                    4\n                          VarMC [−2∆ℓ(θ)]\n                                   c      =           Eg [(ρUθ )2 ] + o(M −1 ),\n                                                   M\n                                                   Z q 2 (x)U 2 (x)\n                                                       ϕ     θ\n                                   Eg [(ρUθ )2 ] =                   dx.                                 (A.7)\n                                                          g(x)"
+    },
+    {
+      "id": "b-127",
+      "type": "body",
+      "text": "30\n\fThese statements require the corresponding weighted moment, derivative, and remainder controls.\nUnder second-order expectation control, the same-sample log likelihood and statistic have biases\nof order M −1 . For the profiled statistic, evaluate U at θµ∗ and apply Sec. 4.2.4. Setting g = qϕ\nrecovers the direct-sampling results. This derivation accounts for both the normalized reference\nweights and the component normalizers. Section 4.3 uses the resulting variance coefficient to\ndesign an efficient sampling proposal for discovery, exclusion, and confidence-interval scans.\n\nA.2    Optimal proposals and weighted likelihood training"
+    },
+    {
+      "id": "b-128",
+      "type": "body",
+      "text": "For a single tested point, Cauchy–Schwarz gives\n                         \u0012Z                 \u00132       Z q2 U 2        ! \u0012Z       \u0013\n                                                        ϕ θ\n                              qϕ |Uθ | dx        ≤              dx          g dx .          (A.8)\n                                                          g\n\nFor normalized g, equality gives Eq. (4.41) when its normalizing constant is finite and positive.\nReplacing |Uθ | by the scan amplitude A gives Eq. (4.43). The objective is a weighted sum of\nvariances at the design points; it does not directly minimize the maximum error across a scan or\nthe variance of an interval crossing. The defensive mixture in Eq. (4.45) restores support where\nthe formal proposal vanishes.\nThe weighted training objective satisfies\n\nEqϕ [A log gη ] = Eqϕ [A] Eg⋆ [log gη ],                     (A.9)"
+    },
+    {
+      "id": "b-129",
+      "type": "body",
+      "text": "so maximizing it minimizes the KL divergence DKL (g ⋆ ∥gη ). Within a restricted flow family,\nthis need not minimize the integration variance [17]. The fitted flow and its defensive mixture\ntherefore approximate the formal optimum; the achieved variance reduction must be assessed on\nfresh integration samples.\n\nA.3    Application to a normalized NDE model\n\nThe construction also applies to a frozen, normalized and evaluable NDE model ν(x; θ) =\nλ(θ)p(x; θ). For λA > 0, choose pA = p(·; θA ) as the reference and make the substitutions\n\nν(x; θA )\n                           qϕ −→ pA ,            Yθ (x) −→ λA log                .         (A.10)\n                                                                        ν(x; θ)"
+    },
+    {
+      "id": "b-130",
+      "type": "body",
+      "text": "Their product leaves the expected integral unchanged. For normalization on the common sample,\npA must cover every tested density; otherwise a broader reference is required. Treating the total\ndensity as one component, Eq. (4.26) applies with rθ = p(·; θ)/pA and rA = 1.\nPilot events can be drawn from pA when a sampler is available, or from another proposal with the\ncorresponding importance weights. Evaluable densities are required to compute those weights.\nThis extension improves integration of the NDE model; it does not correct errors in the learned\ndensity.\n\nB     Additional details of the demonstration\nB.1    Network architectures and training\n\nThe preselection classifier has three hidden layers of 256 nodes. Its threshold on the estimated\nsignal-to-background density ratio is chosen to give an expected selected background-to-signal\nratio of approximately 250."
+    },
+    {
+      "id": "b-131",
+      "type": "body",
+      "text": "31\n\f                                                        Held-out background                    Weighted reference\n\n0.4\n\n0.3\n     Density\n\n½target = +0:223         ½target = +0:171                ½target = +0:011        ½target = ¡0:127\n               0.2                          ½w: ref: = +0:226        ½w: ref: = +0:163               ½w: ref: = +0:013       ½w: ref: = ¡0:125\n               0.1                           ¢½ = +0:003               ¢½ = ¡0:008                    ¢½ = +0:002             ¢½ = +0:001\n\n0.0\n\n5\n                                                                     ½target = ¡0:068                ½target = +0:016        ½target = +0:179\n                4\n         x2"
+    },
+    {
+      "id": "b-132",
+      "type": "body",
+      "text": "½w: ref: = ¡0:065               ½w: ref: = +0:009       ½w: ref: = +0:182\n                3                                                      ¢½ = +0:003                    ¢½ = ¡0:007             ¢½ = +0:003\n\n2\n\n6\n                                                                                                     ½target = ¡0:087        ½target = ¡0:188\n         x3\n\n4                                                                                    ½w: ref: = ¡0:082       ½w: ref: = ¡0:189\n                                                                                                      ¢½ = +0:005             ¢½ = ¡0:001\n                2\n\n6\n\n4\n                                                                                                                             ½target = +0:013\n                2\n         x4"
+    },
+    {
+      "id": "b-133",
+      "type": "body",
+      "text": "½w: ref: = +0:010\n                0                                                                                                             ¢½ = ¡0:003\n\n6\n         x5\n\n4\n\n2.5   5.0    7.5   2           4                2.5       5.0       7.5         0                   5       4               6\n                             x1                   x2                          x3                           x4                        x5"
+    },
+    {
+      "id": "b-134",
+      "type": "body",
+      "text": "Figure 6: Background reweighting validation after preselection. The diagonal panels compare\nnormalized one-dimensional densities from 100,000 independent selected background events with\nan equally sized subsample of the five-million-event flow reference, reweighted by rB,ψ . The\nlower-triangle panels compare pairwise density contours, and the upper-triangle entries compare\ncorrelation coefficients. The distributions are normalized separately to test shape agreement."
+    },
+    {
+      "id": "b-135",
+      "type": "body",
+      "text": "The reference density uses a quadratic-spline normalizing flow [28] with ten coupling transforms.\nEach conditioner has four hidden layers of 1,024 features. The splines have 16 bins over the\nstandardized interval [−5, 5] and linear tails outside it. The flow is trained by unweighted\nmaximum likelihood on 50,000 selected signal and 50,000 selected background events, with\nbatches of 2,048, an initial learning rate of 10−4 , and at most 70 epochs with early stopping.\nSeparate ensembles estimate the signal-to-reference and background-to-reference ratios. Each\nensemble contains four independently initialized dense networks with four hidden layers of 1,024\nnodes. Training uses five million events in each class, at most 50 epochs, batches of 1,024, and\nan initial learning rate of 10−3 . Class weights are normalized separately and no post-training\ncalibration is applied. The arithmetic mean of t"
+    },
+    {
+      "id": "b-136",
+      "type": "body",
+      "text": "32\n\flikelihood on the two-million-event pilot sample described in Sec. 5.4.\n\nB.2    Background reweighting checks\n\nFigure 6 tests whether the background ratio reweights the reference to the selected background\ndistribution. The one-dimensional projections and pairwise comparisons assess shape agreement\nindependently of the physical signal and background yields. The likelihood comparison in Sec. 5.2\ntests the effect of the learned model on inference.\n\nB.3    Proposal-fit diagnostics"
+    },
+    {
+      "id": "b-137",
+      "type": "body",
+      "text": "Figure 7 compares the learned log density ratio log(gη /qϕ ) with the target log A after subtracting\ntheir respective means. The correlation is 0.901, with slope 0.725 and RMS 0.503. The learned\nproposal therefore approximates the target without reproducing it exactly. After importance\nreweighting, closure is obtained in all five reference projections. The exact importance weights\naccount for the proposal density actually used, so proposal-fit errors affect integration efficiency\nwithout changing the target integral.\n\n½ = 0:901\n                                                      3    slope = 0:725\n                                                           RMS = 0:503\n                        Centered log[gη (x)=qϕ (x)]\n\nProbability per hexagon\n                                                      2                                     10−2\n\n1\n\n0                                     10−3"
+    },
+    {
+      "id": "b-138",
+      "type": "body",
+      "text": "-1\n\n-2\n                                                                                            10−4\n                                                      -3\n\n-2        0           2\n                                                                    Centered log A(x)\n\nFigure 7: Proposal training diagnostic. The centered learned log density ratio log(gη /qϕ ) is\ncompared with the centered target log A. The color scale gives the fraction of reference events\nin each hexagon on a logarithmic scale. The dashed diagonal marks agreement. The correlation,\nslope, and RMS characterize the proposal fit; the integration gain is measured separately in\nFig. 4.\n\nB.4    Performance comparison with flow-only estimation"
+    },
+    {
+      "id": "b-139",
+      "type": "body",
+      "text": "Figure 8 compares hNDE, analytic truth, and a likelihood built from separately trained signal\nand background flows. All three are evaluated on the dataset used in Fig. 2a. The scan using\nflows alone continues to a minimum near µ = 3, substantially displaced from the analytic fit.\nThis illustrates how errors in the learned densities can affect inference in this example.\nThe signal and background densities each use an ensemble of four independently trained rational-\nquadratic-spline flows, trained on the same data as the hNDE classifiers. Each flow has ten\ncoupling transforms with eight spline bins and linear tails outside [−5, 5] in standardized\ncoordinates. Each transform has a conditioner containing four residual blocks with 1024 hidden\nfeatures. An individual flow is therefore substantially larger than an individual ratio classifier,\nwhich has four hidden layers of 1024 nodes."
+    },
+    {
+      "id": "b-140",
+      "type": "body",
+      "text": "33\n\f                                                              14\n                                                                                                                           hNDE\n                                                              12                                                           Analytic density\n                                                                                                                           Flow only\n                                                              10\n\n8\n\nt¹\n                                                                6\n\n4\n\n2\n\n0\n                                                                0.0           0.5          1.0      1.5                      2.0        2.5        3.0\n                                                                                                    ¹"
+    },
+    {
+      "id": "b-141",
+      "type": "body",
+      "text": "Figure 8: Likelihood ratio scans using hNDE, analytic densities, and flow-only density estimation\n(black). The vertical line marks the generating value µ = 1.\n\nB.5                       Effect of model misspecification"
+    },
+    {
+      "id": "b-142",
+      "type": "body",
+      "text": "We introduce a controlled model error by replacing each normalized process-to-reference ratio\nwith a mixture of 95% of itself and 5% of the other process-to-reference ratio. At µtrue = 1,\npseudo-experiments from this deformed hNDE model and the original simulator are both analyzed\nwith the deformed likelihood.\nIn Figs. 9a and 9b, the deformed hNDE ensemble (blue) follows its Asimov prediction (orange),\nwhile the simulator ensemble (black, with Poisson statistical uncertainties) reveals differences\nin the estimator distribution and the q0 tail. The latter changes the p-values inferred from\nthe learned Asimov prediction. This illustrates why agreement within the learned model must\nbe complemented by independent simulator validation before using its Asimov predictions for\nsensitivity studies. In the estimator panel, the dotted line marks µtrue = 1; the dash-dotted line\nmarks the signal stre"
+    },
+    {
+      "id": "b-143",
+      "type": "body",
+      "text": "Probability per bin\n\n0.05                             Simulator toys (Psim )\n                                                                                                                           10−2\n                        0.04\n\n0.03\n                                                                                                                           10−3\n                        0.02\n\n0.01"
+    },
+    {
+      "id": "b-144",
+      "type": "body",
+      "text": "0.00                                                                                               10−4\n                               0           1         2                   3                 4                                      5           10         15              20                25\n                                                     ¹\n                                                     c                                                                                                   q0\n\n(a) Signal-strength estimator.                                                                     (b) Discovery-statistic tail.\n\nFigure 9: Controlled model misspecification with a 5% ratio deformation. Panels (a) and (b)\ncompare the estimator and discovery-statistic distributions with the Asimov predictions. Both\ntoy ensembles are analyzed with the same deformed likelihood."
+    },
+    {
+      "id": "b-145",
+      "type": "body",
+      "text": "34\n\fC     Supplemental material\n\nhNDE workflow for expected HEP inference\n    A tractable reference supplies density and sampling; learned ratios supply precision; NIS supplies efficiency.\n\nBUILD THE LIKELIHOOD\n\nProcess-to-reference\n        1     Physics simulation                  2    Reference flow                                  3                                            4   Frozen hNDE\n                                                                                                               ratios\n\n( ; )                                     ∼ ( , )                    ∼ \n                                                                                                      target reference                                   ( ; ) = ∑ () , ( ; )"
+    },
+    {
+      "id": "b-146",
+      "type": "body",
+      "text": "( ; ) = ( ) ( ; )\n                                                                                                                                            ,\n\nsignal        background\n                                               tractable    (     ): density + samples                                                          validate once • freeze before NIS\n            ( ; ) samples; yields  ()                                                                       , (   ; ) ≃ ( ; )/ ( )\n\nreference samples + defensive support\n    OPTIMIZE THE EXPECTED DATASET\n\n8     Expected inference                  7    NIS Asimov sample                               6       NIS proposal                         5   Pilot task map\n\nmarker area ∝\n                                                                                                                                           "
+    },
+    {
+      "id": "b-147",
+      "type": "body",
+      "text": "\n                                                           ∼ ,  =  /∑ℓ\n                                                                                                                            ⋆\n                                                                                                                      ≃        ∝ \n                                                                                                                                                                        ̂\n            profile-likelihood scan                                                                                                                          ̂\n                                                                                                                                                                  [         ]\n                                                              "
+    },
+    {
+      "id": "b-148",
+      "type": "body",
+      "text": "Figure 10: Overview of the hNDE workflow for expected HEP inference. Top: samples from\nthe physics simulator are used to train a tractable reference flow qϕ (x) and process-to-reference\ndensity ratios rs,ψ (x; θ) ≃ ps (x; θ)/qϕ (x). Bottom: pilot estimates U\n                                                                       bpk of the event fluctuations,\nincluding same-sample normalization, define the proposal-training weights Abp . The NIS flow gη\napproximates the optimal proposal g ⋆ ∝ qϕ A and enters the defensive mixture gϵ = (1−ϵ)gη +ϵqϕ .\nFresh samples from gϵ use self-normalized reference weights ωm = ρm / ℓ ρℓ , with ρm =\n                                                                                 P"
+    },
+    {
+      "id": "b-149",
+      "type": "body",
+      "text": "qϕ (xm )/gϵ (xm ). Normalizing the component ratios on these same events gives h  e and the Asimov\nweights wm = ωm h(xm ; θA ), which satisfy m wm = λA exactly. The resulting weighted Asimov\n          A                                         A\n                   e                           P\n\ndataset is used for the expected profile likelihood-ratio scan.\n\n35"
+    }
+  ]
+}
