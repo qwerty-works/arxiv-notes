@@ -22,6 +22,19 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Enable auto-merge (squash)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use a repo PAT, NOT secrets.GITHUB_TOKEN. GitHub suppresses push
+          # events for GITHUB_TOKEN pushes, so a token-merged PR lands on main
+          # without ever firing deploy.yml - the post sits there unpublished
+          # with no error. A PAT merges as a real user, so push fires and the
+          # deploy runs unattended.
+          # Falls back to GITHUB_TOKEN (and says so loudly) so a missing secret
+          # degrades to the old broken-but-visible behaviour rather than a
+          # silently unmerged PR. Better: loud and broken than quietly dead.
+          GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
         run: |
+          if [ -z "${{ secrets.PAT }}" ]; then
+            echo "::warning title=Missing PAT secret::secrets.PAT is not set; \
+          falling back to GITHUB_TOKEN. Merges will NOT trigger the deploy \
+          workflow - the post will not go live unattended."
+          fi
           gh pr merge "${{ github.event.pull_request.number }}" --auto --squash --delete-branch
