@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Manual escape hatch. Merges performed with GITHUB_TOKEN (the auto-merge
+  # workflow) do NOT fire the push trigger above, so the post would sit on main
+  # forever unpublished. Deploys can be re-dispatched by hand from there.
+  workflow_dispatch:
 
 permissions:
   contents: read
