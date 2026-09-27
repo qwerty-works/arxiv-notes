@@ -13,8 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
+      # --delete-branch runs `git branch -D` locally, so a checkout is required.
+      # Without it gh dies with "not a git repository" and `|| true` hides it,
+      # leaving the PR open with auto-merge silently never enabled.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Enable auto-merge (squash)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr merge "${{ github.event.pull_request.number }}" --auto --squash --delete-branch || true
+          gh pr merge "${{ github.event.pull_request.number }}" --auto --squash --delete-branch
