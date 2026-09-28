@@ -1,0 +1,672 @@
+{
+  "arxivId": "2609.31619",
+  "paperTitle": "Learning to Stop without Learning to Stop: Self-Supervised Confidence Training Improves Reasoning Efficiency",
+  "abstract": "Reasoning models often generate very long reasoning traces, making inference computationally expensive. Existing approaches typically improve efficiency either through inference-time early-stopping mechanisms or by explicitly encouraging shorter reasoning during training, for example through reinforcement learning with length penalties. We show that substantial efficiency gains can instead emerge from a different kind of supervision: \\textit{confidence}. Using a self-supervised procedure, we fine-tune reasoning models to predict their confidence in the answer at intermediate points along their own reasoning trajectories using only 600 training problems. Confidence is used only as a training target: the loss contains no objective for reasoning length, efficiency, or stopping. At inference, the fine-tuned models use the standard generation procedure, with no confidence elicitation or early-stopping mechanism. Despite this, self-supervised confidence fine-tuning makes reasoning more efficient, reducing generated tokens by up to 25\\% at matched accuracy across Gemma, Qwen, Nemotron, and GPT-OSS models on mathematical, scientific, and coding reasoning benchmarks, with efficiency gains comparable to methods that explicitly optimize for shorter reasoning. Analysis of reasoning episodes further shows that confidence supervision largely preserves the base models&#39; high-level reasoning composition rather than selectively suppressing particular behaviors. Our results suggest that efficient reasoning may emerge as a downstream consequence of learning metacognitive signals, without being directly optimized.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Reasoning models often generate very long reasoning traces, making inference computationally expensive. Existing approaches typically improve efficiency either through inference-time early-stopping mechanisms or by explicitly encouraging shorter reasoning during training, for example through reinforcement learning with length penalties. We show that substantial efficiency gains can instead emerge from a different kind of supervision: \\textit{confidence}. Using a self-supervised procedure, we fine-tune reasoning models to predict their confidence in the answer at intermediate points along their own reasoning trajectories using only 600 training problems. Confidence is used only as a training target: the loss contains no objective for reasoning length, efficiency, or stopping. At inference, the fine-tuned models use the standard generation procedure, with no confidence elicitation or early-stopping mechanism. Despite this, self-supervised confidence fine-tuning makes reasoning more efficient, reducing generated tokens by up to 25\\% at matched accuracy across Gemma, Qwen, Nemotron, and GPT-OSS models on mathematical, scientific, and coding reasoning benchmarks, with efficiency gains comparable to methods that explicitly optimize for shorter reasoning. Analysis of reasoning episodes further shows that confidence supervision largely preserves the base models&#39; high-level reasoning composition rather than selectively suppressing particular behaviors. Our results suggest that efficient reasoning may emerge as a downstream consequence of learning metacognitive signals, without being directly optimized."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 2: (a) Trial-answer correctness and (b) agreement with the final answer increase with con-"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 3: Overview of ConfSFT. (a) The policy generates reasoning rollouts, constructs self-"
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Table 1: Main results. ConfSFT reduces generated tokens while maintaining base-model accuracy"
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: Training Dynamics. (a) Accuracy remain stable. (b) Generated tokens decrease. (c)"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: Different efficiency methods reshape reasoning in different ways. Following the"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Table 2: Supervision-signal ablations. Replacing graded confidence with position, binary correct-"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Table 3: Choice of decision-point marker on Gemma-4-E2B. ConfSFT remains effective when"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Table 4: ConfSFT hyperparameters for the three models in Table 1. Shared settings are in the text"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Table 5: Main results relative to the base model, with paired 95% CIs. Acc and tokens are"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 6: Pass@8. Same methods and benchmarks as Table 1."
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 6: Gemma-4-E2B counterpart of Figure 2."
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Figure 7: Gemma-4-E2B counterpart of Figure 4."
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Figure 8: Accuracy (left) and token reduction (right) over training rounds for the four supervision"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Table 7: DEER confidence thresholds. Early exit at 0.95 and 0.98 thresholds."
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Figure 9: Length-penalty GRPO training curves."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "Preprint.\n\nL EARNING TO S TOP WITHOUT L EARNING TO S TOP :\n                                         S ELF -S UPERVISED C ONFIDENCE T RAINING I MPROVES\n                                         R EASONING E FFICIENCY\n                                          Parsa Hosseini1,2∗ Akasha Tigalappanavara2 Sumit Nawathe1 Chenrui Fan1\n                                          Sourya Basu2 Genta Indra Winata2 Anirban Das2 Soheil Feizi1 Nima Chitsazan2\n                                          1\n                                            University of Maryland 2 AI Foundations, Capital One\n\nA BSTRACT\narXiv:2609.31619v1 [cs.AI] 25 Sep 2026"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Reasoning models often generate very long reasoning traces, making inference\n                                                     computationally expensive. Existing approaches typically improve efficiency either\n                                                     through inference-time early-stopping mechanisms or by explicitly encouraging\n                                                     shorter reasoning during training, for example through reinforcement learning with\n                                                     length penalties. We show that substantial efficiency gains can instead emerge from\n                                                     a different kind of supervision: confidence. Using a self-supervised procedure, we\n                                                     fine-tune reasoning models to predict their confidence in the answer at intermediate\n         "
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "1       I NTRODUCTION\n                                         Reasoning language models have achieved strong performance across a wide range of challenging\n                                         tasks, but often at substantial inference cost. Modern reasoning models can generate tens of thousands\n                                         of tokens before producing an answer, motivating growing interest in making reasoning more efficient.\n                                         Several lines of work have sought to improve\n                                                                                                                          Efficient Reasoning\n                                         the efficiency of reasoning in LLMs. De-                     Existing approaches                        Our approach\n                                         spite their differences, thes"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "stopping methods monitor signals such as con-\n                                         fidence (Yang et al., 2025; Hosseini et al., Figure 1: Teaching confidence instead of efficiency.\n                                         2026), uncertainty (Wang et al., 2025), or an- Existing methods explicitly optimize for shorter rea-\n                                         swer stability (Liu & Wang, 2025) and ter- soning traces; we supervise only confidence.\n                                         minate reasoning when further computation\n                                         appears unnecessary. At training time, other approaches directly encourage shorter reasoning, for\n                                         example through reinforcement learning with length penalties (Liu et al., 2025; Arora & Zanette,\n                                         2025) or fine-tuning on selected concise re"
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\fPreprint."
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "In this work, we study a different question: Can efficient reasoning emerge without directly training\nthe model to produce shorter reasoning traces? We introduce ConfSFT, a self-supervised fine-tuning\nprocedure that trains a reasoning model to predict its confidence at intermediate points along its\nown reasoning trajectories. The confidence targets are derived entirely from the model’s own token\nprobabilities and require neither gold answers nor external judges. Crucially, confidence is the only\nsupervised signal: reasoning tokens are masked from the loss, and the objective contains no term for\nreasoning length, efficiency, or stopping. At inference, the fine-tuned model uses standard generation,\nwith no confidence elicitation or stopping mechanism. Figure 1 illustrates this.\nThe motivation for this supervision comes from a simple observation: confidence provides a mean-\ningful signal ab"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "2    R ELATED W ORK"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Training LLMs for efficient reasoning. A growing line of work directly trains reasoning models to\nuse less computation. Several approaches use reinforcement learning objectives that explicitly favor\nshorter correct reasoning traces (Liu et al., 2025; Arora & Zanette, 2025; Yi et al., 2025). Others\nfine-tune on self-generated concise trajectories, either by selecting short reasoning paths or filtering\non-policy generations for correctness and conciseness (Munkhbat et al., 2025; Zhao et al., 2026).\nOther methods explicitly train models to adapt or terminate their reasoning through truncated rollouts,\nselective reasoning, or confidence-guided post-training (Chen et al., 2026a; Huang et al., 2026; Jiang\net al., 2026; Han et al., 2026; Qiao et al., 2025). While these methods differ in how efficiency is\nencouraged, they all make shorter or more efficient reasoning an explicit part of the train"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "2\n\fPreprint.\n\n(a)                                                                            (b)                                                                    (c)                                                                     (d)\n\nP(early answer = final answer)\n                    0.6                                                                             1.0\n\naccuracy gain ([Ut ∣ ct])\n                                                                                                                                                                          25                           median = 1766                                0.4\n\nshare of rollouts (%)\n                    0.5"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "P(answer correct)\n                                                                                                    0.8\n                                                                                                                                                                          20\n                    0.4                                                                                                                                                                                                                             0.3\n                                                                                                    0.6\n                                                                                                                                                                          15\n                    0.3\n                                                        "
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "0.0                                                                             0.0                                                                    0\n                       0.0    0.2    0.4         0.6   0.8   1.0                                       0.0   0.2    0.4         0.6   0.8   1.0                                0   2500   5000   7500 10000 12500                                     0.0   0.2    0.4         0.6   0.8   1.0\n                                    confidence ct                                                                  confidence ct                                          tokens after becoming confident (ct ≥ 0.95)                                             confidence ct"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Figure 2: (a) Trial-answer correctness and (b) agreement with the final answer increase with con-\nfidence. (c) The model often continues generating after first reaching ct ≥ 0.95. (d) The expected\naccuracy gain from further reasoning decreases with confidence.\n\nquality and reliability (He et al., 2025a; Chen et al., 2026b). ConfSFT differs in both the source\nand role of the confidence signal. We derive confidence targets directly from the model’s own token\nprobabilities at intermediate reasoning states and train only to predict these targets, without gold\ncorrectness labels or external feedback. Rather than optimizing efficiency, correctness, or a desired\nconfidence trajectory, we study whether this self-supervised confidence learning alone can induce\nmore efficient reasoning.\n\n3                            C ONFIDENCE AND THE VALUE OF F URTHER R EASONING"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "What do we mean by confidence? At an intermediate point in reasoning, we probe the model\nfor its current answer. Given the reasoning generated so far, we append a fixed answer-elicitation\nprompt (e.g., The final answer is \\boxed{) and greedily generate the model’s current\ntrial answer, as illustrated in Figure 3a (Step 2). Let t index such an intermediate state and at denote\nits trial answer. We define the corresponding confidence ct as the geometric mean of the token\nprobabilities assigned to at , i.e., its length-normalized likelihood. Importantly, this score is computed\nentirely from the model’s own distribution and does not require knowing whether the trial answer is\ncorrect. The exact answer-elicitation prompts are provided in Appendix A.3.\nWe do not interpret this score as a calibrated probability of correctness: a confidence of 0.8, for\nexample, does not necessarily imply that the"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Ut = 1[afinal is correct] − 1[at is correct],                                                                                                                                    (1)\n\nwhere at is the trial answer at t and afinal is the answer after completing the reasoning trajectory.\nThus, Ut > 0 when further reasoning corrects the current answer and Ut < 0 when it changes a\ncorrect intermediate answer into an incorrect final answer. As shown in Figure 2, the expected gain\nfrom continued reasoning decreases sharply with confidence: further reasoning is most beneficial at\nlow-confidence states and provides little average improvement once confidence is high.\n\n3\n\fPreprint."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "Together, these observations suggest that confidence provides a self-supervised signal about both the\nmodel’s current reasoning state and the value of additional computation. Prior work has used the same\nconfidence signals to explicitly control reasoning, either through inference-time early stopping (Yang\net al., 2025; Hosseini et al., 2026) or by truncating rollouts during training (Chen et al., 2026a). We\ninstead ask a different question: what happens if the model is simply trained to predict this signal at\nintermediate reasoning states? In the following sections, we show that confidence supervision alone\ncan substantially reduce generated tokens, without truncating trajectories or explicitly encouraging\nshorter reasoning."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "4    M ETHOD\nMotivated by the observations in Section 3, we introduce ConfSFT, a self-supervised procedure\nfor fine-tuning reasoning models with confidence supervision at intermediate reasoning states. As\nillustrated in Figure 3, ConfSFT repeatedly generates reasoning trajectories from the current policy,\nconstructs confidence labels from intermediate states, and fine-tunes the model to predict these labels.\nWe describe each step below.\n\nGenerating reasoning rollouts. We begin with a small subset Dtrain of the training problems. For\neach problem x ∈ Dtrain , we use the current policy πθ to generate one or more reasoning trajectories\nτ = (y1 , . . . , yT ). These are standard reasoning rollouts, generated without confidence elicitation or\nany instruction to reason efficiently. The prompts are provided in Appendix A.1."
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "Constructing confidence labels. For each rollout, we identify a set of intermediate decision points\nusing a fixed textual marker. By default, we use occurrences of Wait and take the reasoning prefix\nimmediately preceding each occurrence as an intermediate reasoning state. Let t index such a decision\npoint and y<t denote the corresponding reasoning prefix. When a trajectory contains many decision\npoints, we retain at most M , selected approximately uniformly across the trajectory, to prevent a\nsingle rollout from contributing disproportionately to the training set.\nTo construct a confidence target for y<t , we append a fixed answer-elicitation prompt q and greedily\ngenerate a trial answer a = (a1 , . . . , an ). We define its confidence as the geometric mean of the\ntoken probabilities assigned to the generated answer:\n                                             n\n                        "
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Confidence-supervised fine-tuning. For each decision point, we construct one training example by\nconcatenating the problem prompt, the corresponding reasoning prefix y<t , a fixed natural-language\npriming prefix p, and the quantized confidence label ℓt :\n                               s = prompt(x) ⊕ y<t ⊕ p ⊕ ℓt                                      (3)\n                                    |        {z           } |{z}\n                                           context, masked      supervised\n\nwhere ⊕ denotes concatenation. We use the fixed priming prefix:\nFrom 0% (very low) to 100% (very high), my confidence in the answer so far is"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "Let S(s) denote the token positions corresponding to the confidence label ℓt . We optimize the\nstandard next-token cross-entropy only over these positions:\n                                                                     \n                                               X\n                          L(θ) = −E(x,y,t)         log πθ (sj | s<j ) .                   (4)\n                                                  j∈S(s)\n\n4\n\fPreprint."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "(a) Training\n    1                                                         2                                                      3\n                         Generate                                          Construct                                             Confidence-supervised\n                         rollouts                                       confidence labels                                             fine-tuning\n                                                                                repeat\n\n2a−1 = 2024\n                                                          P\n        1       Problem           Reasoning model                               Wait        2024 = 111111010002                 Wait      sum = 55"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "one token at a time\n                                                                                                                         geometric mean\n                    2a−1 = 2024\n                P\n        2                                Final answer is:              Reasoning model               5          5                         72%\n                   reasoning so far      answer-elicitation prompt                               p1 =.80 p2 =.65\n\nFrom 0% (very low) to 100% (very high),\n                                      2a−1 = 2024\n                               P\n        3       Problem                                 my confidence in the answer so far is                    72%\n                                                                                                                    loss\n                                                           masked"
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "(b) Inference\n                                                                                                               P\n        Problem. Exactly 2024 finite nonempty sets B of positive integers have their maximum in A. Find             a∈A a.\n\nBase                                                      ≈14K tokens            Ours                                                   ≈3K tokens"
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "Each a gives 2a−1 sets, so\n                                        P a−1\n                                                                                         Each a gives 2a−1 sets, so\n                                                                                                                    P a−1\n                                         2    = 2024.                                                                2    = 2024.\n                                                                                         2024 = 111111010002 ⇒ exponents {10, 9, 8, 7, 6, 5, 3}.\n             Wait write 2024 in binary: 111111010002 .                                   So A = {11, 10, 9, 8, 7, 6, 4}.\n              Wait recheck 1024+512+ . . . +8 = 2024.\n                                                                                          Wait check 11+10+9+8+7+6+4 = 55.\n            . . "
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "Final answer: 55                                                                 Final answer: 55\n\nFigure 3: Overview of ConfSFT. (a) The policy generates reasoning rollouts, constructs self-\nsupervised confidence labels at intermediate states, and is fine-tuned only on the confidence targets.\n(b) At inference, the fine-tuned policy uses standard generation but can produce substantially shorter\nreasoning while reaching the same correct answer.\nAll other tokens, including the problem prompt, reasoning prefix, and priming prefix, are masked\nfrom the loss. Thus, the model is trained only to predict the confidence label conditioned on an\nintermediate reasoning state; it is not trained to reproduce the sampled reasoning trajectory or to\ngenerate confidence text within its chain of thought. The objective contains no term for reasoning\nlength, stopping, or efficiency."
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Iterative on-policy training. Because both reasoning traces and confidence targets are policy-\ngenerated, we refresh them as the policy changes. At round r, we sample rollouts from a fresh subset\nof training problems using πθr , construct confidence labels at decision points, and fine-tune on the\nresulting examples to obtain πθr+1 (Figure 3a). Later rounds generally yield more efficient policies.\nWe evaluate the policy after each round on a fixed held-out validation set."
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Inference. Inference is unchanged from the base model. The fine-tuned model uses the same\ndecoding procedure, with no confidence instruction, answer-elicitation cue, priming prefix, verifier,\nor early-exit mechanism. The fine-tuned models also do not spontaneously emit confidence values or\nthe priming prefix within their reasoning traces. Thus, any change in reasoning length arises from the\nfine-tuned policy itself rather than an inference-time intervention. Figure 3b illustrates this behavior\non an AIME problem, where the fine-tuned policy reaches the same correct answer with substantially\nshorter reasoning.\n\n5           E XPERIMENTS\n5.1           S ETUP"
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "Models. We evaluate ConfSFT on four reasoning model families of different scales: Gemma-4-\nE2B (Team, 2026), Qwen3-4B (Qwen Team, 2025), Nemotron-Nano-8B (Bercovich et al., 2025),\nand GPT-OSS-20B (OpenAI, 2025).\nTraining Data. We train on problems from AIME2000–2023 (Veeraboina, 2023). AIME2024 is held\nout for validation; no test benchmark is used during training or model selection.\n\n5\n\fPreprint."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Table 1: Main results. ConfSFT reduces generated tokens while maintaining base-model accuracy\nacross model families and task domains.\n                                                      M ATH                         S CIENCE                         C ODING                          AVERAGE\nMethod                                    AIME2025                GSM8K           GPQA-Diamond           LiveCodeBench       HumanEval\n                                   Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Token Red."
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Nemotron-Nano-8B\nBase                               42.5     11,325         91.8     1,192        52.5     7,338      44.2    11,761          89.7     3,600        64.1     0.0%\nDEER(Yang et al., 2025)            39.8 9,076 (-19.9%)     89.2 765 (-35.8%)     49.8 5,712 (-22.2%) 17.4 1,731 (-85.3%)     47.1 511 (-85.8%)     48.7   -49.8%\nOn-Policy SFT(Zhao et al., 2026)   39.0 10,487 (-7.4%)     91.1 999 (-16.2%)     50.3 6,146 (-16.2%) 41.8 11,364 (-3.4%)     89.3 3,174 (-11.8%)   62.3   -11.0%\nA&Z(Arora & Zanette, 2025)         41.5 9,644 (-14.8%)     91.0 1,218 (+2.2%)    50.9 6,738 (-8.2%) 44.5 11,346 (-3.5%)      88.4 3,489 (-3.1%)    63.3    -5.5%\nConfSFT (ours)                     45.6 10,153 (-10.4%)    91.6 1,010 (-15.3%)   52.8 6,278 (-14.4%) 45.1 11,151 (-5.2%)     90.8 3,225 (-10.4%)   65.2   -11.1%"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Gemma-4-E2B\nBase                               35.0     7,284          91.2     956          42.6     3,294        42.1     7,543        93.2     2,210        60.8     0.0%\nDEER(Yang et al., 2025)            24.2 4,924 (-32.4%)     90.4 912 (-4.6%)      36.5 2,432 (-26.2%)   31.3 5,333 (-29.3%)   82.9 1,905 (-13.8%)   53.1   -21.3%\nOn-Policy SFT(Zhao et al., 2026)   27.3 5,601 (-23.1%)     90.9 1,049 (+9.7%)    42.1 3,587 (+8.9%)    41.0 7,711 (+2.2%)    93.2 2,318 (+4.9%)    58.9   +0.5%\nA&Z(Arora & Zanette, 2025)         35.4 7,018 (-3.7%)      91.3 963 (+0.7%)      41.5 3,224 (-2.1%)    41.2 7,291 (-3.3%)    93.6 2,200 (-0.5%)    60.6    -1.8%\nConfSFT (ours)                     32.1 5,987 (-17.8%)     91.4 938 (-1.9%)      40.8 2,968 (-9.9%)    42.4 6,403 (-15.1%)   93.8 2,059 (-6.8%)    60.1   -10.3%"
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Qwen3-4B\nBase                               59.2     13,268         94.8     2,292        53.0     9,075      46.8     14,954         93.3     3,495        69.4    0.0%\nDEER(Yang et al., 2025)            40.4 9,086 (-31.5%)     84.8 580 (-74.7%)     47.1 3,621 (-60.1%) 25.8 10,374 (-30.6%)    50.8 756 (-78.4%)     49.8   -55.0%\nOn-Policy SFT(Zhao et al., 2026)   58.8 11,405 (-14.0%)    95.1 1,414 (-38.3%)   53.9 7,694 (-15.2%) 45.9 14,518 (-2.9%)     93.1 2,944 (-15.7%)   69.3   -17.2%\nConfSFT (ours)                     58.8 11,365 (-14.3%)    94.5 1,710 (-25.4%)   55.8 6,838 (-24.6%) 45.0 12,122 (-18.9%)    93.3 3,054 (-12.6%)   69.5   -19.2%"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "gpt-oss-20b\nBase                               52.7        5,802       94.0       482        61.0     3,732      53.5     5,034          95.9      917         71.4     0.0%\nDEER(Yang et al., 2025)            52.7    5,807 (+0.1%)   94.0    482 (+0.1%)   61.0 3,753 (+0.6%) 51.1 4,824 (-4.2%)       90.6   832 (-9.2%)    69.9    -2.5%\nConfSFT (ours)                     53.3    5,235 (-9.8%)   94.1    437 (-9.2%)   61.0 3,112 (-16.6%) 50.7 4,393 (-12.7%)     95.0   850 (-7.2%)    70.8   -11.1%"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "Evaluation. We evaluate on AIME2025 (Dekoninck et al., 2026), GSM8K (Cobbe et al., 2021),\nGPQA-Diamond (Rein et al., 2024), HumanEval (Chen et al., 2021), and LiveCodeBench (Jain et al.,\n2024). We sample 16 completions per problem and report accuracy and average generated tokens\nacross them. The full evaluation protocol is provided in Appendix C.\nTraining Details. We apply the ConfSFT procedure described in Section 4. We partition the training\nproblems into eight groups, allowing up to eight training rounds, and sample eight rollouts per training\nproblem and 16 per validation problem. Full training hyperparameters and implementation details are\nprovided in Appendix A.\nBaselines. We compare against the corresponding base model and DEER (Yang et al., 2025), an\ninference-time early-stopping method that uses confidence to terminate reasoning. As training-time\nbaselines, we evaluate A&Z (Aror"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "5.2      M AIN R ESULTS"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "Table 1 shows that ConfSFT consistently reduces generated tokens while maintaining base-model\naccuracy across all four model families. ConfSFT reduces tokens by 11.1%, 10.3%, 19.2%, and\n11.1% on Nemotron, Gemma, Qwen, and GPT-OSS, respectively. In Appendix C.5, we report\nconfidence intervals and show that the token reductions are statistically significant, while the changes\nin accuracy are not. Importantly, although ConfSFT is trained only on AIME problems, the efficiency\ngains transfer beyond mathematics to scientific reasoning and coding benchmarks.\nComparison with explicit efficiency training. We compare ConfSFT with two training-time\napproaches: A&Z (Arora & Zanette, 2025) and On-Policy SFT (Zhao et al., 2026). Across the model\nfamilies where these baselines are evaluated, ConfSFT achieves comparable or larger efficiency gains\ndespite receiving no supervision that favors shorter reas"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "6\n\fPreprint.\n\n(a)                                                      (b)                                                   (c)                                                                    (d)\n                                                                                                                                                                                                          Base                          ConfSFT\n               100\n                                                                                                                           0.4                                                            0.4\n\n10.0k\n\nfraction of Waits\nAccuracy (%)\n\nAvg. tokens"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "C-MAE\n               50                                                     9.5k\n                                                                                                                           0.2                                                            0.2\n\n9.0k"
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "0                                                                                                          0.0                                                            0.0\n                     0    1         2          3   4                         0     1         2          3      4                 0       1          2         3   4                             0          50          100 0              50             100\n                              Training round                                           Training round                                        Training round                                                      predicted confidence\n\nFigure 4: Training Dynamics. (a) Accuracy remain stable. (b) Generated tokens decrease. (c)\nConfidence predictions improved. (d) Confidence predictions become more graded."
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "ThinkPrune                            +2.8 -3.0 +1.9 +6.1 -2.7                                            -6.5                     +0.6\n      L1-Max                            +3.5           -6.2 +5.6                                            -5.4                     +2.3\nOn-Policy SFT                           +0.5 -0.9      +1.6 -0.9\n         A&Z                            +0.4 +0.8      +0.4                                                 -1.0                                                                                                                                  ConfSFT\n     ConfSFT                                 +0.7 +0.4                                                      -0.7                                                                                                                                  Other\n                                                               "
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "lore\n                                               lyze\n\nr\n                                                                     n\n\nify\n\nr\n                                     d\n\nnito\n\nwe\n                                                       Pla\n                                 Rea\n\nToken share reallocated (pp)\n                                                                                                  Ver\n                                                                             lem\n\nAns\n                                                                                 Exp\n                                         Ana\n\nMo\n                                                                       Imp"
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Figure 5: Different efficiency methods reshape reasoning in different ways. Following the\nSchoenfeld-style episode taxonomy, we compare each efficient policy with its corresponding base\npolicy. Left: change in reasoning-token share for each episode, in percentage points. Right: total\nvariation distance between the before- and after-training episode distributions."
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Comparison with inference-time early stopping. We additionally compare against DEER (Yang\net al., 2025), which uses confidence to explicitly terminate reasoning at inference time. DEER can\nproduce larger token reductions, but its effectiveness varies considerably across tasks and can come\nwith large accuracy losses. This is particularly pronounced on coding benchmarks: with Nemotron,\nLiveCodeBench accuracy drops from 44.2% to 17.4% and HumanEval accuracy from 89.7% to\n47.1%. In contrast, ConfSFT reduces generated tokens without applying an inference-time stopping\nrule and preserves accuracy across domains. Additional baseline details are provided in Appendix F.\n\n5.3                      C ONFIDENCE L EARNING AND E FFICIENCY DYNAMICS"
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "We next examine whether the model actually learns the confidence-prediction task, and how this\nrelates to the efficiency gains during training. We measure prediction quality using confidence mean\nabsolute error (C-MAE), the mean absolute difference between the model’s predicted confidence\nand the quantized self-supervised target on held-out reasoning states. Predictions are elicited using\nthe same priming prefix as in Section 4; lower C-MAE indicates better prediction of the confidence\ntargets.\nFigure 4(a–c) shows the training dynamics for Nemotron on the validation set. As training progresses,\nC-MAE decreases substantially and average generated tokens fall, while accuracy remains approxi-\nmately unchanged. Thus, the model learns to predict the confidence targets at the same time that its\nreasoning becomes more efficient.\nFigure 4(d) further shows how the predicted confidence distributio"
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "5.4                      R EASONING C OMPOSITION UNDER E FFICIENCY T RAINING\n\nPrior work has used Schoenfeld’s Episode Theory to decompose model reasoning into different\ncognitive steps (Li et al., 2025; 2026). In particular, ThinkARM (Li et al., 2026) annotates reasoning at\nthe sentence level using eight categories—Read, Analyze, Plan, Implement, Explore, Verify, Monitor,\nand Answer—and shows that efficiency methods can alter reasoning in qualitatively different ways,\nselectively changing the amount of computation allocated to different episodes rather than simply\nshortening all reasoning uniformly.\n\n7\n\fPreprint."
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "Following this framework, we annotate reasoning traces before and after efficiency training and com-\npare the fraction of reasoning tokens assigned to each episode. We compare ConfSFT with several ex-\nplicit efficiency-training methods, including L1-Max (Aggarwal & Welleck, 2025), ThinkPrune (Hou\net al., 2025), A&Z (Arora & Zanette, 2025), and On-Policy SFT (Zhao et al., 2026). We perform this\nanalysis on AIME2025 with 16 sampled completions per problem for each method, using publicly\navailable checkpoints when available and our reproductions otherwise. Full annotation, checkpoint,\nand details are provided in Appendix G.\nFigure 5 shows the change in episode composition relative to each method’s corresponding base\nmodel. The heatmap reports the signed change in token share for each episode. We summarize the\noverall change as\n                                           8\n                   "
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "where pk is the fraction of reasoning tokens assigned to episode k. Equivalently, DTV measures how\nmuch reasoning-token share is reallocated across episode categories after training.\nConsistent with prior work (Li et al., 2026), different efficiency methods produce markedly different\nchanges in reasoning composition. L1-Max, ThinkPrune, and On-Policy SFT substantially redistribute\ncomputation across episodes, with large shifts in categories such as Implement, Explore, and Verify.\nIn contrast, ConfSFT induces relatively small changes in episode shares, largely preserving the\nreasoning composition of the corresponding base policies. This suggests that ConfSFT does not\nachieve efficiency by selectively suppressing a particular reasoning behavior, but rather reduces\ncomputation while preserving the relative allocation across high-level reasoning episodes.\n\n6     A BLATIONS"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "6.1   W HAT SUPERVISION SIGNAL MATTERS ?"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "We test whether the efficiency gains of ConfSFT arise specifically from learning confidence, or more\ngenerally from fine-tuning on intermediate reasoning states. We keep the training procedure fixed\nand replace the confidence target with three alternative supervision signals. Position uses a target\nderived only from the position of the corresponding token in the reasoning trajectory, testing whether\nlearning reasoning progress is sufficient. Binary correctness replaces graded confidence with a\nbinary target: 100% if the trial answer is correct and 2% otherwise. Unlike ConfSFT, this target\nrequires access to the gold answer. Finally, Shuffled confidence randomly permutes the original\nconfidence targets across training examples, preserving the label distribution while breaking the\ncorrespondence between each reasoning state and its confidence.\nTable 2 shows that the supervision signal matt"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "Table 2: Supervision-signal ablations. Replacing graded confidence with position, binary correct-\nness, or shuffled confidence yields weaker or less consistent efficiency gains.\n                                          Gemma-4-E2B            Nemotron-Nano-8B\n                 Method                Acc.↑    Avg. Tokens↓     Acc.↑   Avg. Tokens↓\n                 Base                  48.7        7,065         60.0        9,996\n                 Position              46.5     6,550 (-7.3%)    61.0    10,122 (+1.3%)\n                 Binary correctness    48.5     7,480 (+5.9%)    58.3     9,703 (-2.9%)\n                 Shuffled confidence   48.7     7,057 (-0.1%)    57.1    10,392 (+4.0%)\n                 ConfSFT               48.3     6,242 (-11.7%)   58.3     9,025 (-9.7%)\n\n8\n\fPreprint."
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "Table 3: Choice of decision-point marker on Gemma-4-E2B. ConfSFT remains effective when\nWait is replaced with paragraph breaks (\\n\\n).\n                              M ATH                              S CIENCE                           C ODING                            AVERAGE\nMarker           AIME2025                  GSM8K           GPQA-Diamond              LiveCodeBench                HumanEval         Acc.↑ Token Red.↑\n         Acc.↑ Avg. Tokens↓ Acc.↑ Avg. Tokens↓ Acc.↑ Avg. Tokens↓ Acc.↑ Avg. Tokens↓ Acc.↑ Avg. Tokens↓"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "Base      35.0         7,284        91.2       956        42.6        3,294        42.1       7,543        93.2        2,210        60.8     0.0%\nWait      32.1     5,987 (-17.8%)   91.4    938 (-1.9%)   40.8     2,968 (-9.9%)   42.4   6,403 (-15.1%)   93.8     2,059 (-6.8%)   60.1    -10.3%\n\\n\\n      36.3     6,241 (-14.3%)   91.2    935 (-2.2%)   40.9     3,015 (-8.5%)   41.0   6,741 (-10.6%)   93.0     2,071 (-6.3%)   60.5     -8.4%\n\n6.2      C HOICE OF D ECISION P OINTS"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "By default, ConfSFT identifies decision points using occurrences of the textual marker Wait.\nHowever, the method does not require this marker to occur frequently: Gemma-4-E2B produces\nonly about four Wait occurrences per trajectory on average, compared with more than 20 for the\nother model families, yet still shows substantial efficiency gains in Table 1. This raises a broader\nquestion of whether Wait itself is important, or whether it simply provides a convenient way to\nsample intermediate reasoning states. To test this, we use paragraph boundaries (\\n\\n) as a more\ngeneral marker, which all evaluated models emit consistently and more than 100 times per trajectory\non average.\nTable 3 shows that ConfSFT remains effective when decision points are identified using \\n\\n.\nOn Gemma, this variant reduces generated tokens by 8.4% while maintaining average accuracy,\ncompared with a 10.3% reductio"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "7      C ONCLUSION\nWe show that reasoning efficiency can emerge from self-supervised confidence training, even when\nthe training objective does not explicitly encourage shorter reasoning or stopping and inference\nremains unchanged. By training models to predict confidence at intermediate reasoning states using\nonly their own token probabilities, we obtain substantial reductions in generated tokens at matched\naccuracy across multiple model families and mathematical, scientific, and coding benchmarks, despite\ntraining on only 600 AIME problems. Confidence supervision achieves accuracy–efficiency tradeoffs\ncomparable to methods that explicitly optimize for shorter reasoning. These results suggest that more\nefficient reasoning can emerge as a downstream consequence of learning confidence itself.\nReproducibility. We provide detailed descriptions of all components to facilitate reproducibility"
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "ACKNOWLEDGMENTS\nThis work was supported in part by NSF CAREER Award 1942230, the ONR PECASE Award\nN00014-25-1-2378, ARO Early Career Program Award 310902-00001, Army Grant W911NF-21-2-\n0076, NSF Award CCF-2212458, NSF Award 2229885 (NSF Institute for Trustworthy AI in Law\nand Society, TRAILS), MURI Grant 14262683, DARPA AIQ Grant HR00112590066, and a Meta\nResearch Award 314593-00001\n\n9\n\fPreprint."
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "R EFERENCES\nPranjal Aggarwal and Sean Welleck. L1: Controlling how long a reasoning model thinks with\n  reinforcement learning, 2025. URL https://arxiv.org/abs/2503.04697.\nDaman Arora and Andrea Zanette. Training language models to reason efficiently, 2025. URL\n  https://arxiv.org/abs/2502.04463.\nDavid Bani-Harouni, Chantal Pellegrini, Paul Stangel, Ege Özsoy, Kamilia Zaripova, Nassir Navab,\n  and Matthias Keicher. Rewarding doubt: A reinforcement learning approach to calibrated confi-\n  dence expression of large language models, 2026. URL https://arxiv.org/abs/2503.\n  02623.\nAkhiad Bercovich, Itay Levy, Izik Golan, Mohammad Dabbah, Ran El-Yaniv, Omri Puny, Ido\n  Galil, Zach Moshe, Tomer Ronen, Najeeb Nabwani, Ido Shahaf, Oren Tropp, Ehud Karpas, Ran\n  Zilberstein, Jiaqi Zeng, Soumye Singhal, Alexander Bukharin, Yian Zhang, Tugrul Konuk, Gerald\n  Shen, Ameya Sunil Mahabaleshwarkar, Bilal"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "10\n\fPreprint."
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "Mehul Damani, Isha Puri, Stewart Slocum, Idan Shenfeld, Leshem Choshen, Yoon Kim, and Jacob\n Andreas. Beyond binary rewards: Training lms to reason about their uncertainty, 2026. URL\n https://arxiv.org/abs/2507.16806.\nJasper Dekoninck, Nikola Jovanović, Tim Gehrunger, Kári Rögnvaldsson, Ivo Petrov, Chenhao Sun,\n  and Martin Vechev. Beyond benchmarks: Matharena as an evaluation platform for mathematics\n  with llms. 2026. URL https://arxiv.org/abs/2605.00674.\nJacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep\n  bidirectional transformers for language understanding, 2019. URL https://arxiv.org/\n  abs/1810.04805.\nYichao Fu, Xuewei Wang, Yuandong Tian, and Jiawei Zhao. Deep think with confidence, 2025. URL\n  https://arxiv.org/abs/2508.15260.\nJingchu Gai, Guanning Zeng, Christina Baek, Chen Wu, J. Zico Kolter, Andrej Risteski, and Aditi\n   Raghunathan"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "11\n\fPreprint."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "Junyeob Kim, Sang-goo Lee, and Taeuk Kim. Think just enough: Leveraging self-assessed confidence\n  for adaptive reasoning in language models. In Vera Demberg, Kentaro Inui, and Lluís Marquez\n  (eds.), Findings of the Association for Computational Linguistics: EACL 2026, pp. 5000–5006,\n  Rabat, Morocco, March 2026. Association for Computational Linguistics. ISBN 979-8-89176-386-\n  9. doi: 10.18653/v1/2026.findings-eacl.263. URL https://aclanthology.org/2026.\n  findings-eacl.263/.\nMing Li, Nan Zhang, Chenrui Fan, Hong Jiao, Yanbin Fu, Sydney Peters, Qingshu Xu, Robert Lissitz,\n and Tianyi Zhou. Understanding the thinking process of reasoning models: A perspective from\n schoenfeld’s episode theory, 2025. URL https://arxiv.org/abs/2509.14662.\nMing Li, Chenrui Fan, Yize Cheng, Soheil Feizi, and Tianyi Zhou. Schoenfeld’s anatomy of\n mathematical reasoning by language models, 2026. URL https://"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "12\n\fPreprint.\n\nChenxu Yang, Qingyi Si, Yongjie Duan, Zheliang Zhu, Chenyu Zhu, Zheng Lin, Li Cao, and Weiping\n  Wang. Dynamic early exit in reasoning models. arXiv preprint arXiv:2504.15895, 2025.\n\nJingyang Yi, Jiazheng Wang, and Sida Li. Shorterbetter: Guiding reasoning models to find optimal in-\n   ference length for efficient reasoning, 2025. URL https://arxiv.org/abs/2504.21370.\n\nXixian Yong, Xiao Zhou, Yingying Zhang, Jinlin Li, Yefeng Zheng, and Xian Wu. Think or not?\n  exploring thinking efficiency in large reasoning models via an information-theoretic lens, 2025.\n  URL https://arxiv.org/abs/2505.18237.\n\nAnqi Zhang, Yulin Chen, Jane Pan, Chen Zhao, Aurojit Panda, Jinyang Li, and He He. Reasoning\n  models know when they’re right: Probing hidden states for self-verification, 2025. URL https:\n //arxiv.org/abs/2504.05419."
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "Anhao Zhao, Ziyang Chen, Junlong Tong, Yingqi Fan, Fanghua Ye, Shuhao Li, Yunpu Ma, Wenjie\n  Li, and Xiaoyu Shen. On-policy supervised fine-tuning for efficient reasoning. arXiv preprint\n  arXiv:2602.13407, 2026.\n\nA     P ROMPTS AND TRAINING SEQUENCES\n\nThis section gives the exact prompts and training-example construction used by ConfSFT. We use the\nnotation of Section 4.\n\nA.1   R EASONING PROMPT ( ROLLOUTS AND EVALUATION )\n\nTraining rollouts and the mathematical evaluations use the same user prompt, applied through each\nmodel’s chat template with the generation prompt appended. No confidence instruction is added at\ntraining or at test time. GPQA-Diamond, LiveCodeBench, and HumanEval replace the boxed line\nwith the benchmark-specific instructions in Appendix C.3.\n\n{problem}\n\nPlease reason step by step, and put your final answer within \\boxed{}."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "The system prompt is detailed thinking on for Nemotron, which is how that family en-\nables chain-of-thought, and empty for Gemma and Qwen. Gemma and Qwen are rendered with\nenable_thinking=True so the chat template opens a thinking block. GPT-OSS-20B uses the\nHarmony chat template with reasoning effort medium and no additional system prompt.\n\nA.2   D ECISION - POINT MARKERS"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "By default, decision points are occurrences of Wait within the model’s reasoning. We identify\nthem with the regular expression \\bWait\\b and retain only matches before the end-of-thinking\nmarker (</think> for Nemotron and Qwen; <channel|> for Gemma; <|channel|>final\nfor GPT-OSS-20B). When a trajectory contains more than M = 32 decision points, we retain\n32 approximately uniformly spaced points in their original order. For Gemma, special tokens are\nretained while decoding so that <channel|> remains available as the end-of-thinking marker.\nGPT-OSS-20B does the same for <|channel|>final.\nThe paragraph-boundary variant in Section 6 uses the same rule with the marker \\n\\n in place of\nWait.\n\nA.3   T RIAL - ANSWER PROBE"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "At a decision point, we append the following answer-elicitation prompt q to the problem prompt and\nreasoning prefix y<t . The decision-point marker itself is excluded from the prefix.\n\n\\n**Final Answer**\\n\\nThe final answer is \\boxed{\n\n13\n\fPreprint.\n\nWe greedily generate at most 16 tokens and stop at a closing brace, newline, end-of-thinking marker,\nor end-of-sequence token. A terminating stop token is excluded from the score. The trial answer a\nis the brace-balanced span following the open brace in q, and ct is the geometric mean of its token\nprobabilities, as defined in Equation 2. Constructing the ConfSFT target never uses the gold answer.\n\nA.4    P RIMING PREFIX AND LABEL\n\nWe use K = 50 percentage levels in 2% increments. Each ct ∈ [0, 1] is rounded up to the smallest\ngrid point ℓt ∈ {2%, 4%, . . . , 100%} that is at least ct . The priming prefix p is the sentence used in\nSection 4:"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "From 0% (very low) to 100% (very high), my confidence in the answer so far is\n\nA.5    T RAINING SEQUENCE AND LOSS MASK\n\nA training example concatenates the chat prompt, the reasoning prefix y<t , the priming prefix p and\nthe label ℓt (Equation 3). A single space separates the reasoning from p when the prefix does not\nalready end in whitespace, and a single space separates p from ℓt . The tail of such a sequence reads\n\n... so the exponents are {10,9,8,7,6,5,3}. From 0% (very low) to 100%\n(very high), my confidence in the answer so far is 72%\n\nand the loss mask over its segments is"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "segment                                                                      supervised\n-----------------------------------------------                              ----------\nchat prompt (system + problem + instruction)                                 no\nreasoning prefix y_<t>                                                       no\npriming prefix p                                                             no\nseparating space                                                             no\n\"72%\"                                                                        yes"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "Only the tokens of ℓt receive a loss; every other position, including padding, is assigned the ignore\nindex and does not contribute to Equation 4. We use a maximum training context of 16,384 tokens for\nNemotron, Gemma, and Qwen. For GPT-OSS-20B the limit is 8,192 tokens, for both the supervised\nsequence and the generated rollout, because a 16,384-token update does not fit our compute budget\non this model (Appendix B.3).\n\nB     T RAINING HYPERPARAMETERS\n\nB.1   S HARED RECIPE"
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "We use full-parameter fine-tuning in bfloat16 with FSDP for Nemotron, Gemma, and Qwen.\nGPT-OSS-20B is trained with LoRA instead (Appendix B.3). We use Adafactor with learning rates\ngiven in Table 4, no weight decay, gradient clipping at 1.0, and linear warmup over the first 3% of\noptimizer steps in each round. The per-device batch size is 1 with 4 gradient-accumulation steps. We\nmake one pass over the confidence examples constructed in each round.\nTraining uses the AIME problems from 2000–2023 (Veeraboina, 2023), while the 30 AIME 2024\nproblems are held out for validation and checkpoint selection. The training set contains 695 problems.\nWe shuffle it once with seed 42 and divide it into eight disjoint groups: seven groups of 87 problems\nand one group of 86. At round r, the current policy πθr generates 8 rollouts for each problem in group\nr. We construct one confidence-supervision example"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "14\n\fPreprint."
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "Table 4: ConfSFT hyperparameters for the three models in Table 1. Shared settings are in the text\nabove.\n                                        Nemotron-Nano-8B         Gemma-4-E2B       Qwen3-4B\n       System prompt                 detailed thinking on     (none)          (none)\n       Think-end marker                    </think>       <channel|> </think>\n       T / top-p / top-k                  0.6 / 0.95 / 20 1.0 / 0.95 / 64 0.6 / 0.95 / 20\n       Learning rate                        1 × 10−6        2 × 10−6        1 × 10−6\n       Groups / problems per round             8 / 87         8 / 87          8 / 87\n       Rollouts / training problem                8              8                8\n       Validation rollouts / problem             16             16               16\n       Decision-point marker                  Wait            Wait            Wait\n       Selected round        "
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "B.2   P ER - MODEL SETTINGS\n\nTable 4 lists the settings that differ across the three ConfSFT models in Table 1.\nThe Hugging Face checkpoints are nvidia/Llama-3.1-Nemotron-Nano-8B-v1,\ngoogle/gemma-4-E2B-it, and Qwen/Qwen3-4B. Attention is SDPA for Nemotron and\nQwen and eager attention for Gemma. Gemma additionally keeps special tokens at decode time, as\nnoted above.\n\nB.3   GPT-OSS-20B"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "GPT-OSS-20B (openai/gpt-oss-20b) is a mixture-of-experts model. Its expert weights are\nstored in MXFP4, and a full-parameter update does not fit our training setup, so we fine-tune a LoRA\nadapter and leave the base weights frozen, including every expert layer. The adapter has rank r = 16,\nscaling α = 32, and dropout 0, and is applied only to the attention projections q_proj, k_proj,\nv_proj, and o_proj. For the supervised step we dequantize the MXFP4 weights to bfloat16.\nGeneration keeps the native MXFP4 weights and applies the adapter on top.\nThe optimizer, warmup, clipping, and loss mask match Section B.1. The learning rate is 2 × 10−5 ,\nthe per-device batch size is 1, and we do not accumulate gradients. We train for one round on the first\ngroup of 87 problems, with 2 rollouts per problem, and report that round-1 adapter. Decision points\nare Wait, and the end-of-thinking marker is <|cha"
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "B.4   A BLATION AND DECISION - POINT VARIANTS\n\nFor the supervision-signal ablations in Table 2, we keep the training construction fixed and replace\nonly the target that is expressed as ℓt . Position is the fraction of thinking tokens preceding the\ndecision point. Binary correctness is 100% when the trial answer is correct and 2% otherwise.\nShuffled confidence randomly permutes the ConfSFT labels across training examples, preserving\ntheir marginal distribution.\nThe Nemotron ablations use the main Nemotron configuration and learning rate 1 × 10−6 . We report\nround 4 for ConfSFT, Position, and Binary correctness, and round 2 for Shuffled confidence. The\nGemma ablations use paragraph boundaries as decision points, four training problems per round,\nlearning rate 1×10−6 , and the round-5 checkpoint. This is also the paragraph-boundary configuration\nreported in Table 3."
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "C     E VALUATION PROTOCOL\n\nTable 1 uses standard generation with no confidence instruction, answer cue, or priming prefix. For\neach problem, we sample 16 independent completions. We report accuracy as mean correctness\nacross all samples (pass@1) and pass@8 using the unbiased estimator\n                                                      n−c\n                                                          \u0001\n                                      pass@k = 1 − nk \u0001 ,\n                                                          k\n\n15\n\fPreprint."
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "where n = 16 is the number of sampled completions and c is the number of correct completions for\nthe problem. This corresponds to the probability that at least one correct answer appears among k\nsamples.\nAvg. Tokens is the mean number of generated completion tokens. Token Red. is computed relative\nto the corresponding base model as\n                                          \u0012            \u0013\n                                               tmethod\n                                   100 × 1 −              .\n                                                tbase\n\nC.1   M ODELS AND DECODING\n\nDecoding follows each model family’s recommended sampler:"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "Model                Mode                          T    top-p    top-k\n              Gemma-4-E2B          enable_thinking=True         1.0   0.95      64\n              Nemotron-Nano-8B     detailed thinking on         0.6   0.95      20\n              Qwen3-4B             enable_thinking=True         0.6   0.95      20\n              GPT-OSS-20B          Reasoning: medium            1.0    1.0      40\n\nWe use a maximum of 8,192 generated tokens for GPT-OSS-20B, matching the context used during\nconfidence training, and 16,384 for the other models. For LiveCodeBench, we increase the limit to\n32,768.\n\nC.2   B ENCHMARKS AND SAMPLE COUNTS"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "We use the Hugging Face versions listed below. For LiveCodeBench, we use the lite code-generation\nsplit from releases v5 and v6 and keep problems with contest_date ≥ 2025-01-01, resulting in\n182 problems from contests between 2025-01-04 and 2025-04-06. For GPQA-Diamond, we shuffle\nthe answer choices once per question and use the same ordering for all methods."
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "Benchmark        Hugging Face source                                     Problems      Samples / problem\nAIME 2025        opencompass/AIME2025 (parts I+II)                               30                  16\nGSM8K            openai/gsm8k (main test)                                     1,319                  16\nGPQA-Diamond     Idavidrein/gpqa (gpqa_diamond)                                 198                  16\nLiveCodeBench    livecodebench/code_generation_lite (v5+v6)                     182                  16\nHumanEval        openai/openai_humaneval (test)                                 164                  16\n\nC.3   E VALUATION PROMPTS\n\nAIME 2025 and GSM8K use the boxed instruction of Appendix A.1. GPQA-Diamond asks for a\nletter in a box. Code benchmarks ask for a markdown fence rather than a box, and LiveCodeBench\nkeeps the official stdin versus starter-code wording."
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "GPQA-Diamond:\n{question}\n\n(A) ...\n(B) ...\n(C) ...\n(D) ...\n\nReason step by step and put your final answer letter (A, B, C, or D) in \\boxed{}.\n\nLiveCodeBench (no starter code):\n{question}\n\nRead the inputs from stdin, solve the problem, and write the answer to stdout\n\n16\n\fPreprint.\n\n(do not directly test on the sample inputs). Enclose your code within delimiters\nas follows.\n\nPlease reason step by step. Put your final Python solution in a markdown code\nblock: ‘‘‘python ... ‘‘‘.\n\nLiveCodeBench (with starter code):\n{question}\n\nYou will use the following starter code to write the solution to the problem\nand enclose your code within delimiters.\n‘‘‘python\n{starter_code}\n‘‘‘\n\nPlease reason step by step. Put your final Python solution in a markdown code\nblock: ‘‘‘python ... ‘‘‘.\n\nHumanEval:\nComplete the following Python function. Read the docstring carefully.\n\n‘‘‘python\n{function_prompt}\n‘‘‘"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "Please reason step by step. Put your final Python solution in a markdown code\nblock: ‘‘‘python ... ‘‘‘. The block must define the function described above\n(including the signature).\n\nC.4   A NSWER EXTRACTION AND GRADING\n\nWe use the same fixed extraction and grading procedure for the base model and all evaluated methods.\nAlthough the prompts specify a final-answer format, models occasionally produce the correct answer\nwithout following it exactly. We therefore use simple fallback rules to recover answers or code\nalready present in the completion rather than marking these cases incorrect."
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "AIME 2025 and GSM8K. We first look for an answer in \\boxed{...} and take the first number\ninside the last box. If no boxed answer is present, we take the last number appearing in the final 160\ncharacters of the completion. The extracted number is compared with the first number in the gold\nanswer, so, for example, a prediction of 336 is credited against gold 336◦ .\n\nGPQA-Diamond. We first extract the final answer letter A–D from the last \\boxed{...}. If\nno boxed answer is present, we take the last standalone letter A–D in the final 160 characters. The\nextracted letter is compared with the gold answer after applying the fixed answer-choice ordering\nused for that question."
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "LiveCodeBench. We extract Python code from the completion and evaluate it with the official\nLiveCodeBench tests using a 6s timeout. We first use the last non-empty closed markdown code\nblock. If the model opens a final code block but does not close it, we also consider the text following\nthat fence. When the benchmark expects a Solution method but the generated code instead defines\nthe corresponding standalone function, we additionally wrap that function in the required interface. A\nsample is marked correct if one of these extracted versions passes all tests. These fallback rules only\nrecover code already present in the completion or adapt its interface; we do not repair or otherwise\nmodify the generated solution."
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "HumanEval. We use the last markdown code block, dropping a leading language tag when present.\nIf no usable code block is found, we use the code produced after the model’s reasoning section. If the\nextracted program already defines the target function, we execute it directly; otherwise, we treat it as\n\n17\n\fPreprint."
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "Table 5: Main results relative to the base model, with paired 95% CIs. Acc and tokens are\ndifferences from the corresponding base row of Table 1.\n                                                            M ATH                                   S CIENCE                                  C ODING                               AVERAGE\nMethod                                      AIME2025                        GSM8K                 GPQA-Diamond               LiveCodeBench                 HumanEval\n                                     Acc↑          Avg. Tokens↓      Acc↑      Avg. Tokens↓     Acc↑     Avg. Tokens↓     Acc↑       Avg. Tokens↓       Acc↑    Avg. Tokens↓     Acc↑      Token Red."
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "Nemotron-Nano-8B\nDEER(Yang et al., 2025)            −2.7±2.3    −2,249±593         −2.6±0.5     −427±29        −2.7±1.5 −1,626±220 −26.8±4.4 −10,030±944 −42.6±4.7 −3,089±701 −15.5±1.4 −49.8±1.6%\nOn-Policy SFT(Zhao et al., 2026)   −3.5±4.9     −838±351          −0.7±0.5     −193±25        −2.2±2.1 −1,192±248 −2.3±1.4   −397±189   −0.4±1.2 −426±234 −1.8±1.1 −11.0±1.6%\nA&Z(Arora & Zanette, 2025)         −1.0±5.4    −1,681±458         −0.8±0.3     +26±16         −1.6±1.8 −600±151 +0.3±1.3     −415±224   −1.3±1.2 −112±253 −0.9±1.2 −5.5±1.6%\nConfSFT (ours)                     +3.1±4.6    −1,173±385         −0.2±0.3     −182±17        +0.3±1.7 −1,060±128 +1.0±1.1   −610±191   +1.1±1.3 −376±275 +1.1±1.0 −11.1±1.6%"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "Gemma-4-E2B\nDEER(Yang et al., 2025)          −10.8±5.6 −2,360±630 −0.8±0.2                  −44±6         −6.1±1.9   −862±125       −10.8±2.4 −2,210±310 −10.3±2.2          −305±89        −7.8±1.4 −21.3±1.9%\nOn-Policy SFT(Zhao et al., 2026) −7.7±5.6 −1,684±538 −0.3±0.4                   +93±6         −0.5±1.9   +293±54        −1.1±1.4   +168±103   0.0±1.5           +108±32        −1.9±1.3 +0.5±1.4%\nA&Z(Arora & Zanette, 2025)       +0.4±3.9   −266±171 +0.1±0.3                   +7±5          −1.1±1.5    −70±31        −0.9±1.6   −252±96   +0.3±1.2           −10±34         −0.2±0.9 −1.8±0.6%\nConfSFT (ours)                   −2.9±3.0 −1,297±244 +0.2±0.3                   −18±4         −1.8±1.7   −326±44        +0.3±1.3 −1,139±129 +0.6±1.0            −151±39        −0.7±0.8 −10.3±0.7%"
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "Qwen3-4B\nDEER(Yang et al., 2025)          −18.8±9.8 −4,182±1121 −9.9±1.8 −1,711±84 −6.0±4.0 −5,455±427 −21.1±3.9 −4,580±580 −42.5±4.8 −2,738±524 −19.6±2.5 −55.0±2.4%\nOn-Policy SFT(Zhao et al., 2026) −0.4±7.3 −1,863±665 +0.2±0.6 −877±56 +0.9±3.6 −1,381±180 −0.9±1.5       −436±322  −0.1±0.8 −550±169 −0.1±1.7 −17.2±1.7%\nConfSFT (ours)                   −0.4±5.2 −1,903±583 −0.3±0.8 −583±63 +2.7±2.9 −2,237±215 −1.9±1.3 −2,832±383       0.0±1.1   −440±207   0.0±1.2 −19.2±1.6%\n\ngpt-oss-20b\nDEER(Yang et al., 2025)            0.0±0.0          +5±24         0.0±0.0       +1±0          0.0±0.0       +21±4       −2.5±0.8     −209±91        −5.3±1.9     −84±45        −1.6±0.4 −2.5±0.9%\nConfSFT (ours)                     +0.6±4.3        −567±187       +0.1±0.3      −44±9         −0.1±1.6     −620±89      −2.9±2.3     −641±110       −0.9±1.4     −66±25        −0.6±1.1 −11.1±1.0%"
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "Table 6: Pass@8. Same methods and benchmarks as Table 1.\n                                                                    M ATH                                S CIENCE                             C ODING                                   AVERAGE\nMethod                                             AIME2025                     GSM8K                  GPQA-Diamond              LiveCodeBench        HumanEval\n                                            P@8↑ Avg. Tokens↓ P@8↑ Avg. Tokens↓ P@8↑ Avg. Tokens↓ P@8↑ Avg. Tokens↓ P@8↑ Avg. Tokens↓ P@8↑ Token Red."
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "Nemotron-Nano-8B\nBase                                        67.1     11,325             97.0         1,192          82.3        7,338         59.4       11,761          97.9       3,600        80.7       0.0%\nDEER(Yang et al., 2025)                     66.9 9,076 (-19.9%)         96.8      765 (-35.8%)      79.7    5,712 (-22.2%)    34.3    1,731 (-85.3%)     80.5    511 (-85.8%)    71.7      -49.8%\nOn-Policy SFT(Zhao et al., 2026)            67.7 10,487 (-7.4%)         96.3      999 (-16.2%)      81.9    6,146 (-16.2%)    58.7    11,364 (-3.4%)     97.5   3,174 (-11.8%)   80.4      -11.0%\nA&Z(Arora & Zanette, 2025)                  71.6 9,644 (-14.8%)         96.8     1,218 (+2.2%)      80.1    6,738 (-8.2%)     61.1    11,346 (-3.5%)     97.3   3,489 (-3.1%)    81.4       -5.5%\nConfSFT (ours)                              69.7 10,153 (-10.4%)        97.0     1,010 (-15.3%)     81.9    "
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "Gemma-4-E2B\nBase                                        56.9         7,284          95.8          956           75.3        3,294         57.7        7,543          98.6       2,210        76.9       0.0%\nDEER(Yang et al., 2025)                     46.5     4,924 (-32.4%)     95.7       912 (-4.6%)      70.9    2,432 (-26.2%)    51.8    5,333 (-29.3%)     97.7   1,905 (-13.8%)   72.5      -21.3%\nOn-Policy SFT(Zhao et al., 2026)            45.5     5,601 (-23.1%)     96.0      1,049 (+9.7%)     75.0    3,587 (+8.9%)     58.6    7,711 (+2.2%)      99.4   2,318 (+4.9%)    74.9      +0.5%\nA&Z(Arora & Zanette, 2025)                  53.5     7,018 (-3.7%)      96.0       963 (+0.7%)      73.4    3,224 (-2.1%)     55.5    7,291 (-3.3%)      99.0   2,200 (-0.5%)    75.5       -1.8%\nConfSFT (ours)                              57.3     5,987 (-17.8%)     95.8       938 (-1.9%)      73.6    2,968 "
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "Qwen3-4B\nBase                                        73.3     13,268             94.8         2,292          72.2        9,075         58.9     14,954            97.1       3,495        79.3       0.0%\nDEER(Yang et al., 2025)                     73.3 9,086 (-31.5%)         84.8      580 (-74.7%)      64.1    3,621 (-60.1%)    48.4 10,374 (-30.6%)       85.4    756 (-78.4%)    71.2      -55.0%\nOn-Policy SFT(Zhao et al., 2026)            76.7 11,405 (-14.0%)        96.9     1,414 (-38.3%)     77.1    7,694 (-15.2%)    60.8 14,518 (-2.9%)        97.2   2,944 (-15.7%)   81.7      -17.2%\nConfSFT (ours)                              76.7 11,365 (-14.3%)        94.5     1,710 (-25.4%)     70.7    6,838 (-24.6%)    56.1 12,122 (-18.9%)       97.0   3,054 (-12.6%)   79.0      -19.2%"
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "gpt-oss-20b\nBase                                        78.4          5,802         97.7           482          85.8        3,732         67.4        5,034          99.3       917          85.7       0.0%\nDEER(Yang et al., 2025)                     78.4      5,807 (+0.1%)     97.7        482 (+0.1%)     85.8    3,753 (+0.6%)     67.0    4,824 (-4.2%)      99.1    832 (-9.2%)     85.6       -2.5%\nConfSFT (ours)                              76.3      5,235 (-9.8%)     97.8        437 (-9.2%)     88.3    3,112 (-16.6%)    66.1    4,393 (-12.7%)     98.8    850 (-7.2%)     85.5      -11.1%\n\na continuation of the dataset prompt and prepend the original function prompt. We evaluate with the\nofficial HumanEval tests using a 3s timeout.\n\nC.5          M ORE EVALUATION RESULTS"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "Table 5 reports paired question-level 95% confidence intervals for the results in Table 1. Each method\nis compared with its corresponding base model on the same set of questions. Accuracy values are\ndifferences in percentage points, while token values are differences in average generated tokens. The\nintervals show that the token reductions from ConfSFT are consistent across model families, while\naccuracy remains close to the corresponding base models.\nTable 6 additionally reports pass@8, computed with the unbiased estimator described in Appendix C.\nThe overall pattern is consistent with pass@1: ConfSFT substantially reduces generated tokens while\npreserving pass@8 close to the corresponding base model across all four model families.\n\nD          A DDITIONAL ANALYSES ON G EMMA -4-E2B"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "Figure 6 repeats the four-panel analysis of Figure 2 on the Gemma-4-E2B base model.\nWe repeat the confidence-learning analyses from Section 5.2 on Gemma-4-E2B.\n\n18\n\f Preprint.\n\n(a)                                                                                                          (b)                                                                                                    (c)                                                                          (d)"
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "P(early answer = final answer)\n                                                                                                                                1.0\n                                                                                                                                                                                                                                                                              median = 3810                              0.35\n\naccuracy gain ( [Ut ct])\n                                                                                                                                                                                                                          12.5"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "share of rollouts (%)\n                    0.6                                                                                                         0.8                                                                                                                                                                                      0.30\nP(answer correct)\n                                                                                                                                                                                                                          10.0\n                                                                                                                                0.6                                                                                                                                                                                      0.25\n "
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "Figure 6: Gemma-4-E2B counterpart of Figure 2.\n\n(a)                                                                                                (b)                                                                (c)                                                                                                               (d)\n                                                                                                                                                                                                                                                                                     Base                                                            ConfSFT\n                    100\n                                                                                                                                                                                0.4\n\n7.0k"
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "fraction of Waits\n                                                                                                                                                                                                                                                              0.4\n     Accuracy (%)\n\nAvg. tokens\n\nC-MAE\n                    50\n                                                                                                                                                                                0.2\n                                                                                   6.5k\n                                                                                                                                                                                                                                                              0.2"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "6.0k\n                     0                                                                                                                                                          0.0                                                                           0.0\n                          0    1      2         3         4     5                          0                                    1        2         3   4         5                    0     1                                         5                             0                 50                                        100 0                  50              100\n                                   Training round                                                                                     Training round                                            Training round                                                                    "
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Figure 7: Gemma-4-E2B counterpart of Figure 4.\n\nFigure 7 repeat the confidence-learning analyses from Section 5.2 on Gemma-4-E2B. It tracks\n C-MAE, tokens, and accuracy across training rounds. C-MAE and tokens falls over training, and\n accuracy stays within a few points of the base model.\n\nE                           S UPERVISION - SIGNAL ABLATIONS OVER TRAINING ROUNDS\n\nFigure 8 tracks the four supervision variants of Table 2 on AIME 2024 validation (30 × 16) over\n training rounds. Left panels show accuracy; right panels show token reduction relative to the pre-SFT\n baseline (positive is shorter). On both models, ConfSFT is the only variant whose token reduction\n grows steadily while accuracy remains near the base model.\n\nF                           BASELINES\n\nF.1                         DEER"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "We apply the early-exit rule of Yang et al. (2025) with confidence threshold 0.95 (following their\nsetup) to stored reasoning traces and grade its output using the same benchmark-specific procedures\ndescribed above. Decision points and the trial-answer probe match Appendices A.2 and A.3. DEER\nexits at the first decision point with ct ≥ 0.95 and returns the corresponding trial answer. If no\ndecision point crosses the threshold, it returns the original completion.\n The reported token count includes the reasoning prefix through the exit and the trial-answer tokens\n generated at each visited decision point. The fixed cue q is not included in the token count.\n On LiveCodeBench and HumanEval, the trial prompt replaces the boxed cue of Appendix A.3:\n\n\\n‘‘‘python\\n"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "Following the original DEER setup for coding benchmarks, confidence is computed using at most the\n first 50 trial-answer tokens.\nWe additionally evaluate a more conservative threshold of 0.98 in Table 7. Increasing the threshold\nreduces premature exits and improves accuracy, but correspondingly yields smaller token savings.\nThe qualitative conclusion remains unchanged: DEER’s accuracy–efficiency behavior is highly\nsensitive to the stopping threshold and varies substantially across tasks, whereas ConfSFT achieves\nmore consistent reductions without an inference-time stopping rule.\n\n19\n\fPreprint."
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "ConfSFT       Position                            Binary        Shuffle\n                    (a) Gemma-4-E2B · accuracy                                                    (b) Gemma-4-E2B · token reduction\n               51                                                                          12.5\n               50                                                                          10.0\n               49\n\nToken reduction (%)\n                                                                                            7.5\nAccuracy (%)"
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "48                                                                           5.0\n               47                                                                           2.5\n               46                                                                           0.0\n               45                                                                           2.5\n               44                                                                           5.0\n               43                                                                           7.5\n                     0       1        2         3         4      5                                  0       1             2       3       4   5\n                                     Training round                                                                  Training round\n                    (c) Nemotron-Nano-8B · accuracy            "
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "Token reduction (%)\n               61                                                                           5.0\nAccuracy (%)\n\n60                                                                           2.5\n               59                                                                           0.0\n               58                                                                           2.5\n               57                                                                           5.0\n               56                                                                           7.5\n                     0           1         2          3          4                                  0           1             2       3       4\n                                     Training round                                                                  Training round"
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "Figure 8: Accuracy (left) and token reduction (right) over training rounds for the four supervision\nsignals in Table 2, AIME 2024 validation. Dashed lines mark the pre-SFT baseline.\n\nF.2                 A&Z"
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "We train Nemotron-8B and Gemma-4-E2B using the GRPO with the length penalty from Arora &\nZanette (2025) on a random subset of size 10k from the DeepMath-103K dataset He et al. (2025b)\nfor training. We use the Verl framework for training, with FSDP and colocated vLLM rollout, and\nTP=8 on 8×H100, using number of rollouts K = 16 for Nemotron and K = 8 for Gemma-4, with\nbatch size 64, learning rate 1 × 10−6 , KL loss coefficient 0.04, and no normalization of advantages\nby standard deviation in GRPO. To fit the model into a H100 node, we use maximum response\nlength of 12,288 for Nemotron and 9,216 for Gemma-4, with GPU memory utilization of 0.4 and 0.3\nrespectively. This is because Gemma-4 has a much larger vocabulary size of ∼262k, which causes\nout-of-memory errors if the maximum response length is too high.\nWe trained our RL length-penalty models using a DeepMath-103K subset rather than the"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "20\n\fPreprint.\n\nTable 7: DEER confidence thresholds. Early exit at 0.95 and 0.98 thresholds.\n                                 M ATH                          S CIENCE                         C ODING                          AVERAGE\nMethod               AIME2025                 GSM8K           GPQA-Diamond           LiveCodeBench       HumanEval\n              Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Avg. Tokens↓ Acc↑ Token Red."
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "Nemotron-Nano-8B\nBase         42.5     11,325           91.8     1,192        52.5     7,338      44.2    11,761          89.7     3,600        64.1    0.0%\nDEER (0.95) 39.8 9,076 (-19.9%)        89.2 765 (-35.8%)     49.8 5,712 (-22.2%) 17.4 1,731 (-85.3%)     47.1 511 (-85.8%)     48.7   -49.8%\nDEER (0.98) 41.9 9,585 (-15.4%)        90.4 916 (-23.2%)     51.4 6,494 (-11.5%) 28.1 6,727 (-42.8%)     60.7 1,005 (-72.1%)   54.5   -33.0%\nConfSFT      45.6 10,153 (-10.4%)      91.6 1,010 (-15.3%)   52.8 6,278 (-14.4%) 45.1 11,151 (-5.2%)     90.8 3,225 (-10.4%)   65.2   -11.1%"
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "Gemma-4-E2B\nBase        35.0     7,284             91.2       956        42.6     3,294      42.1     7,543          93.2     2,210        60.8    0.0%\nDEER (0.95) 24.2 4,924 (-32.4%)        90.4    912 (-4.6%)   36.5 2,432 (-26.2%) 31.3 5,333 (-29.3%)     82.9 1,905 (-13.8%)   53.1   -21.3%\nDEER (0.98) 29.6 5,814 (-20.2%)        90.7    925 (-3.2%)   38.7 2,739 (-16.8%) 38.9 6,910 (-8.4%)      89.9 2,136 (-3.4%)    57.6   -10.4%\nConfSFT     32.1 5,987 (-17.8%)        91.4    938 (-1.9%)   40.8 2,968 (-9.9%) 42.4 6,403 (-15.1%)      93.8 2,059 (-6.8%)    60.1   -10.3%"
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "Qwen3-4B\nBase          59.2     13,268          94.8     2,292        53.0     9,075      46.8     14,954         93.3     3,495        69.4    0.0%\nDEER (0.95)   40.4 9,086 (-31.5%)      84.8 580 (-74.7%)     47.1 3,621 (-60.1%) 25.8 10,374 (-30.6%)    50.8 756 (-78.4%)     49.8   -55.0%\nDEER (0.98)   42.9 9,289 (-30.0%)      87.4 689 (-69.9%)     50.3 4,573 (-49.6%) 39.2 13,986 (-6.5%)     63.5 1,140 (-67.4%)   56.7   -44.7%\nConfSFT       58.8 11,365 (-14.3%)     94.5 1,710 (-25.4%)   55.8 6,838 (-24.6%) 45.0 12,122 (-18.9%)    93.3 3,054 (-12.6%)   69.5   -19.2%"
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "gpt-oss-20b\nBase          52.7        5,802        94.0       482        61.0     3,732        53.5     5,034        95.9      917         71.4     0.0%\nDEER (0.95)   52.7    5,807 (+0.1%)    94.0    482 (+0.1%)   61.0 3,753 (+0.6%)    51.1 4,824 (-4.2%)    90.6   832 (-9.2%)    69.9    -2.5%\nDEER (0.98)   52.7    5,833 (+0.5%)    94.0    483 (+0.2%)   61.0 3,756 (+0.7%)    53.1 5,267 (+4.6%)    94.4   908 (-1.0%)    71.0   +1.0%\nConfSFT       53.3    5,235 (-9.8%)    94.1    437 (-9.2%)   61.0 3,112 (-16.6%)   50.7 4,393 (-12.7%)   95.0   850 (-7.2%)    70.8   -11.1%\n\n(a) Nemotron-8B reward.                                            (b) Nemotron-8B mean response length.\n\n(c) Gemma-4-E2B reward.                                            (d) Gemma-4-E2B mean response length.\n\nFigure 9: Length-penalty GRPO training curves."
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "sensitive to the length-penalty coefficient: small values provide little efficiency gain, while larger\nvalues substantially degrade performance.\n\n21\n\fPreprint.\n\nF.3   O N -P OLICY SFT"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "We evaluate On-Policy-SFT (Zhao et al., 2026) as an additional baseline training method. We utilize\ntheir released code, which is a modification of the Verl framework, with some minor changes for\nversion compatibility and adding support for additional models. For the Qwen3-4B, Nemotron, and\nGemma-4 models, we use AIME 2000-2023 as a training dataset, with N = 2 rollouts per prompt\nper epoch, a training batch size of 16, a maximum response length of 16384. As a validation set,\nwe use AIME 2024 with 16 rollouts per problem and a maximum respone length of 16384. For the\nQwen and Gemma models, training is performed on 16×RTXA5000 GPUs, while for Nemotron it is\nperformed on 4×L40S GPUs; we use tenor parallelism TP=2 in all cases.\nFor all three models, we perform a hyperparameter grid search over learning rate (ranging from\n1 × 10−6 to 5 × 10−6 ). For all models, we use the recommended setting"
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "G     S CHOENFELD ’ S A NATOMY"
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "Schoenfeld’s Episode Theory (Schoenfeld, 1985) is a framework originally designed for analyzing\nthe cognitive states of human during mathematical problem solving. Li et al. (2025; 2026) adapt the\ntheory for studying the thinking patterns of large reasoning models. By decomposing the reasoning\nprocess into 8 categories of cognitive episodes, namely Read, Analyze, Plan, Implement, Explore,\nVerify, Answer, and Monitor, the adapted framework provides a comprehensive characterization of\nreasoning in terms of structures and dynamics.\nWe follow their sentence-level annotation setting and train a classifier so that the same taxonomy can\nbe applied to every trace in our efficiency comparison. Supervision comes from the sentence-level\nepisode labels on the open-source traces of Li et al. (2026), covering 15 models. We draw a uniform\nsubsample of 120,000 sentences with seed 42, then hold out a stra"
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "the fraction of reasoning-token share reallocated across the eight episodes.\nConfSFT largely preserves the reasoning composition of the base policy it starts from. Its episode\nshares change only slightly, including on Implement, Explore, and Verify, so the shorter traces still\nallocate computation across episodes in nearly the same way. The same comparison shows why this is\n\n22\n\fPreprint.\n\nspecific to ConfSFT: L1-Max, ThinkPrune, and On-Policy SFT substantially redistribute computation\nacross those episodes. ConfSFT reduces the amount of reasoning while keeping that allocation intact.\n\n23"
+    }
+  ]
+}
