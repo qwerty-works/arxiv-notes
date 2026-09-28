@@ -25,6 +25,17 @@ Every post is written to be:
 - **Tip-heavy** (aim for **≥75% actionable takeaways**)
 - Easy to operationalize immediately
 
+### Writing style
+
+Write for a curious general reader who may know little about the paper's field. Explain
+necessary technical terms in everyday language the first time they appear, then use the
+proper term when it helps. Prefer short sentences, concrete examples, and familiar
+analogies. Write like a patient expert explaining a difficult paper to a curious friend.
+
+Keep the paper's important findings, technical vocabulary, nuance, and research accuracy.
+Make the ideas easier to follow; do not flatten them into vague or overly simple claims.
+Avoid academic filler, unexplained jargon, dense nested clauses, and unnecessary notation.
+
 Specifically, each post includes:
 - A **TL;DR** (fast orientation)
 - A section of **Copy/paste prompts** with **one-click copy buttons** (so you can try the idea immediately)
