@@ -1,0 +1,312 @@
+{
+  "arxivId": "2609.35741",
+  "paperTitle": "Shockingly Simple Self-retrospection Improves Agentic Models Without RL",
+  "abstract": "People learn not only by repeating successful actions, but also by recounting and explaining their experiences, revising their understanding to guide future behavior. Can a language-model agent improve its future actions by training only on explanations of its own experience? We investigate this question by studying Retrospection-Only Fine-Tuning (ROFT), a minimal online procedure designed to isolate the effect of explanation-only training on subsequent behavior. The agent attempts a task, observes available feedback, generates a retrospective explanation, and is fine-tuned with a next-token prediction loss on the explanation tokens alone. The procedure uses neither an external teacher nor a reward-based policy update. In software-engineering experiments with Qwen3.5-4B, ROFT is trained on problems with mixed successful and unsuccessful base-model attempts. On held-out SWE-bench Verified and Pro, it reaches 49.2% and 26.8% solve rates after 20 updates without using a verifier, compared with GRPO&#39;s 48.0% and 25.3% after 40 updates in the evaluated runs, and makes faster early progress in training time and sampled attempts. It also learns to solve individual tasks on which all 64 sampled base-model attempts failed, showing that learning can begin without any initially successful trajectories. Behavioral analyses find that ROFT indirectly assigns credit to actions, encouraging good actions and discouraging incorrect ones. Moreover, prompting retrospections to emphasize more direct solutions yields shorter subsequent attempts even without an explicit length penalty. Together, these findings show that learning to explain can also improve learning to do, establishing self-generated retrospections as useful training targets and motivating further study of explanation-to-action transfer.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "People learn not only by repeating successful actions, but also by recounting and explaining their experiences, revising their understanding to guide future behavior. Can a language-model agent improve its future actions by training only on explanations of its own experience? We investigate this question by studying Retrospection-Only Fine-Tuning (ROFT), a minimal online procedure designed to isolate the effect of explanation-only training on subsequent behavior. The agent attempts a task, observes available feedback, generates a retrospective explanation, and is fine-tuned with a next-token prediction loss on the explanation tokens alone. The procedure uses neither an external teacher nor a reward-based policy update. In software-engineering experiments with Qwen3.5-4B, ROFT is trained on problems with mixed successful and unsuccessful base-model attempts. On held-out SWE-bench Verified and Pro, it reaches 49.2% and 26.8% solve rates after 20 updates without using a verifier, compared with GRPO&#39;s 48.0% and 25.3% after 40 updates in the evaluated runs, and makes faster early progress in training time and sampled attempts. It also learns to solve individual tasks on which all 64 sampled base-model attempts failed, showing that learning can begin without any initially successful trajectories. Behavioral analyses find that ROFT indirectly assigns credit to actions, encouraging good actions and discouraging incorrect ones. Moreover, prompting retrospections to emphasize more direct solutions yields shorter subsequent attempts even without an explicit length penalty. Together, these findings show that learning to explain can also improve learning to do, establishing self-generated retrospections as useful training targets and motivating further study of explanation-to-action transfer."
+    },
+    {
+      "id": "cap-0",
+      "type": "caption",
+      "text": "Figure 1: ROFT achieves competitive performance with 63% less training time than GRPO. Held-out"
+    },
+    {
+      "id": "cap-1",
+      "type": "caption",
+      "text": "Figure 2: Illustrative RL versus RR. Black arrows show RR’s online collection and rendering, not RL updates."
+    },
+    {
+      "id": "cap-2",
+      "type": "caption",
+      "text": "Figure 3: SWE-bench Verified problems categorized by base model outcomes over 16 attempts."
+    },
+    {
+      "id": "cap-3",
+      "type": "caption",
+      "text": "Figure 4: Early training gains transfer to held-out tasks, while later training reward need not"
+    },
+    {
+      "id": "cap-4",
+      "type": "caption",
+      "text": "Figure 5: ROFT has higher training efficiency. ROFT and GRPO trained on SWE-rebench, with"
+    },
+    {
+      "id": "cap-5",
+      "type": "caption",
+      "text": "Figure 6: ROFT can improve performance on near and beyond frontier problems. Online solve"
+    },
+    {
+      "id": "cap-6",
+      "type": "caption",
+      "text": "Figure 7: (a) RR conducts more credit assignment than GRPO. Bars show trajectory-balanced"
+    },
+    {
+      "id": "cap-7",
+      "type": "caption",
+      "text": "Figure 8: (a, b) Reasoning and read/search contexts show larger prediction changes. KL"
+    },
+    {
+      "id": "cap-8",
+      "type": "caption",
+      "text": "Figure 9: (a) Online RR has the highest observed solve rate. SWE-bench Verified performance"
+    },
+    {
+      "id": "cap-9",
+      "type": "caption",
+      "text": "Table 1: ✓ yes; × no; ∼ partial: —: no weight training. Actions: directly trains task-solving outputs, including"
+    },
+    {
+      "id": "cap-10",
+      "type": "caption",
+      "text": "Figure 10: Three uses of retrospection. Top: context internalization collects experience, generates a retro-"
+    },
+    {
+      "id": "cap-11",
+      "type": "caption",
+      "text": "Table 2: Character budgets for constructing the retrospection input. Budgets exclude inserted"
+    },
+    {
+      "id": "cap-12",
+      "type": "caption",
+      "text": "Table 3: Reference online training and generation hyperparameters for ROFT. Experiment-specific"
+    },
+    {
+      "id": "cap-13",
+      "type": "caption",
+      "text": "Figure 11: SWE-bench Verified solve rates for Qwen3.5-4B"
+    },
+    {
+      "id": "cap-14",
+      "type": "caption",
+      "text": "Figure 12: Online solve rates for Django through 40 updates and Pylint through 100 updates, using"
+    },
+    {
+      "id": "cap-15",
+      "type": "caption",
+      "text": "Figure 13: Online solve rate for SymbiFlow 17 through 60 updates, extending the trajectory in Fig. 6b"
+    },
+    {
+      "id": "cap-16",
+      "type": "caption",
+      "text": "Figure 14: SWE-bench Verified performance after 40 updates of single-task ROFT from Qwen3.5-4B."
+    },
+    {
+      "id": "cap-17",
+      "type": "caption",
+      "text": "Figure 15: Likelihood-change directions across training. Each update group compares GRPO"
+    },
+    {
+      "id": "cap-18",
+      "type": "caption",
+      "text": "Table 4: Mean coding-rollout lengths around update 10, pooled over batches 8–12. Percentage"
+    },
+    {
+      "id": "cap-19",
+      "type": "caption",
+      "text": "Figure 16: Distributional change across rollout progress. Task-balanced forward KL between the"
+    },
+    {
+      "id": "cap-20",
+      "type": "caption",
+      "text": "Table 5: Repeated-evaluation results on the fixed 64 training problems. Rates average ten attempts"
+    },
+    {
+      "id": "cap-21",
+      "type": "caption",
+      "text": "Figure 17: Token-level forward-KL measurements.                 Original 49-token rollout win-"
+    },
+    {
+      "id": "cap-22",
+      "type": "caption",
+      "text": "Figure 18: Retrospection with and without a final verdict. SWE-bench Verified solve rates after"
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "arXiv preprint\n\nS HOCKINGLY S IMPLE S ELF - RETROSPECTION\n                                         I MPROVES AGENTIC M ODELS W ITHOUT RL\n                                         Jonathan Light1,5 B Christopher Zhang Cui2,5 Jeonghye Kim3,5 Roger Creus Castanyer4,5\n                                         Emiliano Penaloza4,5 Zhengyan Shi5 Alessandro Sordoni5 Marc-Alexandre Côté5\n                                         Xingdi Yuan5 Minseon Kim5\n                                         1                              2                      3              4            5\n                                             RPI                            UC San Diego           KAIST          Mila         Microsoft Research\n                                         B Corresponding author: jonathan.li.connect@gmail.com"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Qwen3.5-4B | ROFT: self-retrospection only, no verifier, no RL updates, no teacher | GRPO: RL baseline\narXiv:2609.35741v1 [cs.AI] 28 Sep 2026\n\nSWE-bench Verified                                                                        SWE-bench Pro\n                                                                   51                                                                                       29\n\nROFT                                                                      28           ROFT\n                                                                   50\n                                             Test solve rate (%)"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Test solve rate (%)\n                                                                              49.2% | 3.05 h                                                                         26.8% | 3.05 h\n                                                                                                                                                            27\n                                                                   49\n                                                                                                                                                            26\n                                                                   48\n                                                                                                                                                            25\n                                                                                   "
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "46                                                                                       23\n                                                                        0         2        4         6            8        10                                    0      2        4        6         8    10\n                                                                                      Training time (hours)                                                                 Training time (hours)\n                                                                                                                         Same GPU allocation\n\nFigure 1: ROFT achieves competitive performance with 63% less training time than GRPO. Held-out\n                                         performance of ROFT versus GRPO on agentic coding tasks."
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "A BSTRACT\n                                                                            People learn not only by repeating successful actions, but also by recounting\n                                                                            and explaining their experiences, revising their understanding to guide future\n                                                                            behavior. Can a language-model agent improve its future actions by training only\n                                                                            on explanations of its own experience? We investigate this question by studying\n                                                                            Retrospection-Only Fine-Tuning (ROFT), a minimal online procedure designed to\n                                                                            isolate the effect of explanation-only"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "1\n\farXiv preprint\n\n1    I NTRODUCTION"
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "We sometimes understand an experience differently in the act of recounting it. Explaining why a\nconversation went badly, someone might begin with “I did not make my point clearly enough.” But as\nthey reconstruct the exchange, another explanation emerges: they kept defending their proposal while\nthe other person was questioning its premise. The lesson is no longer to explain the same point more\nforcefully, but to establish which question needs answering. Nothing about the original outcome has\nchanged. What changes is their understanding of what happened—and, with it, how they might act\nnext time. For language-model agents, this suggests a complementary training target: not only the\nactions taken during an attempt, but retrospective explanations that make sense of the experience.\nReinforcement learning with verifiable rewards (RLVR) offers an effective way to learn from ex-\nperience by rei"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "Can an agent improve its future actions by training only on self-generated retrospective\n                              explanations of its own experience?"
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "We call this direction Retrospection Reinforcement (RR): training on self-generated retrospections\nof past experience, with the aim of improving subsequent behavior. A retrospection may summarize\nevents, track how beliefs evolved, explain decisions or outcomes, identify corrections, or articulate\nlessons for future attempts. Our procedure trains on this retrospective text rather than directly\nsupervising the recorded task-solving actions. The hypothesis is that learning to explain an experience\ncan improve how the model acts in later attempts. We assess this hypothesis through subsequent task\nperformance and behavior changes, not through the fluency of explanations or a reduction in their\nprediction loss.\nTo study this route in isolation, we introduce Retrospection-Only Fine-Tuning (ROFT), a delib-\nerately minimal online procedure. The agent attempts a task, observes the outcome and avai"
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "2\n\farXiv preprint\n\nThese results suggest a complementary design axis for agent training: not only which experiences to\nlearn from, but what to learn to say about them. Our results show that experience can support useful\ntraining targets even when binary outcomes provide no contrast or in the absence of any outcome\nverdict. The prompt-dependent behavioral changes further suggest that the content of those targets\nmatters: changing what an agent emphasizes in retrospection can change how it subsequently acts.\nRetrospection is therefore not merely a record of experience, but a potentially steerable source of\nsupervision."
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "2      R ETROSPECTION -O NLY T RAINING\nAn unsuccessful attempt may be a poor example to imitate but still provide useful experience to\ninterpret. Here, we describe how an agent can be trained exclusively on retrospections of its own\nexperience and evaluated on its subsequent task performance.\n\n2.1      L EARNING TO EXPLAIN , EVALUATED BY DOING"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Learning to do directly optimizes task-solving outputs, including reasoning, answers, and actions.\nReward-based updates, imitation, and distillation can all serve this purpose. Learning to explain\ninstead trains the model to produce a retrospective account of a completed attempt. We call this\ndirection Retrospection Reinforcement (RR).\nA retrospection is a textual account of past experience, generated in light of the recorded interaction\nand any available feedback. Its form can range from a trajectory summary or a ledger of evolving\nbeliefs to an explanation of decisions or outcomes, a correction, or a reusable lesson. No particular\ncontent structure is required. Retrospections may discuss actions and possible corrections; the\ndistinction is between training on a post-attempt account and directly supervising task-solving\nactions. Fig. 2 contrasts direct action training with retrospection"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "Trained      Masked\n                                                                                                             Rewards\n\nReinforcement                Task           Action          Observation             Action            Observation               Reward model\nlearning\n                          Find a book    Check shelf        Shelf empty            Ask staff            At desk                   or verifier\nLearning to do\n                                                               Online collection → render"
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Retrospection              Retrospection                      Trajectory representation                                     Retrospection\nReinforcement               instruction                                                                                The book was at the desk;\n                          How can you achieve        Task       Action      Observation    Action     Observation\n                                                                                                                            ask staff when\nLearning to explain         the task faster     Find a book   Check shelf   Shelf empty   Ask staff     At desk\n                                                                                                                          the shelf is empty.\n                                                                                                              "
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "2.2      ROFT: A MINIMAL TEST OF EXPLANATION - TO - ACTION TRANSFER\n\nRetrospection-Only Fine-Tuning (ROFT) repeats a simple loop: attempt a task, explain the\nexperience, fit the explanation, and act again using the updated weights. We exclude direct action\nsupervision and retained retrospection so that neither can account for an improvement in doing.\n\nCollect experience. The agent attempts a task x, producing an interaction trajectory τ , and receives\navailable feedback v. In our software-engineering experiments, the record includes actions and\nobservations, the submitted patch, and available test feedback. Both successful and unsuccessful\nattempts are eligible: the method does not require a successful example to imitate."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "Explain the experience. The same model samples K retrospections from a context h(x, τ, v)\ncontaining an instruction and a bounded rendering of the record. Our default experimental prompt asks\nfor a consequential assumption or decision, supporting or contradicting evidence, a correction when\n\n3\n\farXiv preprint\n\nappropriate, and concrete triggers for applying the lesson. This is one instantiation of retrospection,\nnot a requirement on its form. The model supplies its own interpretations rather than receiving an\nexternal teacher’s critiques. Available verdicts condition these interpretations; they do not become\nreward weights in the objective. The example below shows how even a passing attempt can yield a\nlesson about a specific decision.\n    Retrospection after a passing attempt (full prompts and responses in App. D)"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "System prompt (abridged).\n    Identify a consequential assumption or decision, the evidence for or against it, a correction if needed, and\n    concrete triggers for applying the lesson. State uncertainty when evidence is insufficient.\n     User prompt (abridged).\n    Task: Prevent a failed Pact context-manager test from leaving stale interactions that cause later tests to fail.\n    Action: Inspect the context manager’s exit and verify() methods.\n    Observation: verify() clears the interaction list, but exit skips it when an exception occurs.\n    Action: Clear self. interactions on exceptional exit, then run the Pact and consumer tests.\n    Observation: All 70 tests pass.\n     Retrospection (final-answer excerpt).\n    “The correct decision was to clear interactions directly in exit when an exception is detected, ensuring\n    proper state reset regardless of whether verify() is called.”"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "Fit only the explanation, not the attempt. Let Dt contain the retained context–retrospection pairs\n(h, y) for update t. Holding these generated targets fixed, we fine-tune the model πθ with next-token\ncross-entropy:\n                                            |y|\n                                1 X X                                            X\n            LROFT (θ; Dt ) = −                  log πθ (yj | h, y<j ),    Tt =         |y|.        (1)\n                                Tt         j=1\n                                        (h,y)∈Dt                                            (h,y)∈Dt"
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "The loss averages globally over retained retrospection tokens. The task, attempted actions, obser-\nvations, and feedback are masked as prediction targets, although gradients can flow through their\ncontext representations. There is no action-target loss, reward-based policy update, or independent\nsemantic-quality filter on the retrospections.\nAct again using updated weights. The learner collects fresh attempts and retrospections as training\nproceeds. Subsequent attempts, including evaluation, receive neither stored retrospection text nor an\nadded retrospection step. Any benefit must therefore transfer through the updated weights, rather\nthan through access to a written lesson. This closes the loop between explaining and doing while\nkeeping their training targets distinct. Sampling settings, target processing, batch construction, and\nasynchronous weight refresh are specified in App. B."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "3     R ESULTS\nWe evaluate explanation-to-action transfer through three questions. Does retrospection-only training\nimprove held-out solve rates, and at what training cost? Can learning begin when all sampled base\nmodel attempts fail? Does retrospection content shape subsequent behavior as measured by action-\nlikelihood changes, interventions on retrospection instructions, and changes to content weighting?\nThese questions assess behavioral transfer.\nWe distinguish two learning regimes using sampled base-model outcomes. A problem is in the\nlearning zone if the base model produces both successful and unsuccessful solutions across k\nsampled attempts; it is beyond frontier if none of those attempts succeeds. Fig. 3 illustrates the\ndistinction for Qwen3.5-4B on all 500 SWE-bench Verified problems using 16 attempts per problem.\nThe experiments below use three attempts to screen the learning-zo"
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "4\n\farXiv preprint\n\nBase Qwen3.5-4B | SWE-bench Verified                        500 problems | 16 attempts per problem\n\nMastered                       Learning frontier                        Beyond frontier\n\n10.4%                                 61.8%                                 27.8%\n       52 problems                       309 problems                             139 problems\n\n16/16 solved                       1-15/16 solved                           0/16 solved\n\nFigure 3: SWE-bench Verified problems categorized by base model outcomes over 16 attempts.\nPercentages of problems solved in all, some, or none of 16 attempts pooled from 16 evaluations."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "retain only problems on which Qwen3.5-4B produces both successful and unsuccessful solutions\nacross three initial attempts. We assess held-out performance on SWE-bench Verified (OpenAI,\n2024) and SWE-bench Pro (Deng et al., 2025). All three datasets require agents to resolve real-\nworld repository issues by producing code patches evaluated against executable tests. SWE-bench\nVerified comprises 500 human-validated Python tasks, whereas SWE-bench Pro emphasizes more\ncomplex, long-horizon tasks that often require substantial changes across multiple files. Qwen3.5-4B\nperformance is 44.2% and 23.9% on Verified and Pro respectively in our setup.\nGeneralization. ROFT achieves higher held-out solve rates on both benchmarks in Fig. 4b: its 20-\nupdate checkpoint reaches 49.2% on SWE-bench Verified and 29.0% on SWE-bench Pro, compared\nwith 48.0% and 25.3% for GRPO at 40 updates. These gains do not "
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "3.2   L EARNING B EYOND THE M ODEL’ S F RONTIER\nWe next ask whether learning can begin without any observed successful base-model attempts, rather\nthan only on the mixed-success problems. With binary success rewards, an all-failure GRPO group\nhas zero within-group advantage and provides no reward-derived policy-gradient signal, so GRPO\ndoes not learn in this regime. ROFT instead obtains supervision from retrospections of failed attempts.\nTo study an all-failure starting point, we train separate Qwen3.5-4B runs on individual SWE-bench\nVerified and SWE-rebench tasks, each beginning with 0/64 successful base model attempts on that\ntask and using only self-generated retrospections for supervision. After 40 updates, the online solve\nrate reaches 1.75% on SymPy and 3.29% on SymbiFlow (Fig. 6). Thus, retrospection-only training\ncan produce successful solutions from an all-failure starting point"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "5\n\farXiv preprint\n\nGRPO    ROFT\n                                 ROFT @10                              GRPO @40                                         GRPO @90\n                                 49.0%                                 48.0%                                            46.0%                                                  55\n                                                                                                                                                                                               49.2%\n                                                                                                                                                                                         48%"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "Mean rollout reward\n                      0.65           ROFT @20\n                                     49.2%                                                                                                                                     45\n                      0.60"
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "Resolved (%)\n                      0.55                                                                                                                                                     35\n                                                                                                                                                                                                                      29%\n                      0.50\n                                                                                                                                                                                                              25.3%\n                                                                       GRPO @20                                                           ROFT\n                      0.45                                                                                   "
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "(a) Training reward and held-out evaluations.                                                                                              (b) Held-out performance."
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Figure 4: Early training gains transfer to held-out tasks, while later training reward need not\nimprove generalization. (a) Training reward through 40 ROFT updates and 100 GRPO updates.\nFlags report separate SWE-bench Verified test set solve rates at the marked checkpoints. (b) Solve\nrates on SWE-bench Verified and SWE-bench Pro for ROFT at update 20 and GRPO at update 40.\n                      0.65                                                                      0.65                                                                           0.65\n                                                                RR                                                                        RR                                                                          RR\n                                                                GRPO                                                           "
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "Mean rollout reward\n\nMean rollout reward\n                      0.55                                                                      0.55                                                                           0.55\n\n0.50                                                                      0.50                                                                           0.50\n\n0.45                                                                      0.45                                                                           0.45"
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "0.40                                                                      0.40                                                                           0.40\n                          0.0h          1.5h        3.0h                                               0         10     20      30               40                                   0           2k        4k               6k\n                                      Training wall time                                                         Optimizer updates                                                               Rollout samples\n\n(a) Training wall time.                                                   (b) Optimizer updates.                                                   (c) Sampled solution attempts."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "Figure 5: ROFT has higher training efficiency. ROFT and GRPO trained on SWE-rebench, with\ntraining reward plotted against (a) wall time, (b) optimizer updates, and (c) completed solution\nattempts, including zero-advantage attempts rejected by GRPO. See App. E for details.\n\nby GPT-6 Astra using the recorded evidence. For each turn, including both reasoning and actions, we\ncompare its mean token log-likelihood under the initial Qwen3.5-4B model and after ten optimizer\nupdates of ROFT or GRPO, conditioning on the same recorded history. Fig. 7a shows the fraction\nof turns whose likelihood increases, computed separately for each correctness label within each\ntrajectory and then averaged equally across trajectories containing that label. Under RR, correct"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "2.5                                                                       4.0                                                                            20\n                                    ROFT                                                                        ROFT                                                                           ROFT\n\n2.0                                                                       3.2                                                                            16\nSolve rate (%)\n\nSolve rate (%)\n\nSolve rate (%)\n\n1.5                                                                       2.4                                                                            12\n\n1.0                                                                       1.6                                                                              8"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "0.5                                                                       0.8                                                                              4\n\n0.0                                                                       0.0                                                                              0\n                             0       10         20       30       40                                   0        10          20       30          40                                  0         10        20      30         40\n                                    Training updates                                                           Training updates                                                                Training updates"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "(a) SymPy 20916                                                              (b) SymbiFlow 17                                                             (c) Pylint 6386\n                            (SWE-bench Verified).                                                           (SWE-rebench).                                                           (SWE-bench Verified).\n\nFigure 6: ROFT can improve performance on near and beyond frontier problems. Online solve\nrates during 40 updates of ROFT on a single task. SymPy and SymbiFlow begin with 0/64 successes;\nPylint begins with 2/64 and reaches a smoothed solve rate of 12.00% at update 40. We see similar\nresults on Django and with longer training runs (Sec. F.2).\n\n6\n\farXiv preprint"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "turns increase in likelihood more often than incorrect turns (32.41% versus 21.21%), whereas GRPO\nshows similar rates for both (44.14% versus 45.30%). This separation is consistent with indirect\ncredit assignment without direct action supervision. See Sec. G.1 for details.\n\nBaseline        Faster                                         SWE-bench Verified\n                               Correct    Incorrect\n                                                                                15\n                                                                                                                                                 52\n                                                                                                                                                                                  50.4"
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "Tokens (k)\n                       50                                                                            -12.3%\n                            44.1   45.3                                              -11.7%\nTurns with increased\n\n12.5                                      -10.3%\n                                                                                                                                                 50                49.2\n\nSolve rate (%)\n   likelihood (%)"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "40\n                                             32.4\n                                                                                10\n                       30                                                                                                                             47.8\n                                                         21.2                                        -12.9%\n                                                                                50   -13.1%\n                                                                                                                       -13.0%\n                       20"
+    }
+  ]
+}
