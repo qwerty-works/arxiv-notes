@@ -1,0 +1,882 @@
+{
+  "arxivId": "2609.40303",
+  "paperTitle": "How Much of a Harness Does a Strong Agent Need for Autonomous ML Engineering?",
+  "abstract": "Recent autonomous machine learning engineering (MLE) agents have made significant progress on public leaderboards. Often motivated by progress stagnation over long-horizon cycles and limited Large Language Model (LLM) primitives, modern MLE agents are deployed on top of increasingly elaborate machinery: multi-agent orchestrators, dedicated retrieval subagents, and more. While such harnesses expand, the use of more primitive but improved coding agents - where LLMs have direct access to the execution environment through read, write, and bash primitives - has received little attention in the field. In this paper we find that, under an equal time budget and the same frontier LLM backbone, open-source state-of-the-art harnesses provide no advantages over a single session of a minimal-harness coding agent baseline, pointing to the backbone as the primary driver for performance. Via a series of large-scale systematic ablation studies, we argue that the machinery layers become redundant in the coding agent setting. We conclude that the effort spent elaborating hand-crafted harnesses around strong models yields poor returns for current MLE benchmarks.",
+  "chunks": [
+    {
+      "id": "abs-0",
+      "type": "abstract",
+      "text": "Recent autonomous machine learning engineering (MLE) agents have made significant progress on public leaderboards. Often motivated by progress stagnation over long-horizon cycles and limited Large Language Model (LLM) primitives, modern MLE agents are deployed on top of increasingly elaborate machinery: multi-agent orchestrators, dedicated retrieval subagents, and more. While such harnesses expand, the use of more primitive but improved coding agents - where LLMs have direct access to the execution environment through read, write, and bash primitives - has received little attention in the field. In this paper we find that, under an equal time budget and the same frontier LLM backbone, open-source state-of-the-art harnesses provide no advantages over a single session of a minimal-harness coding agent baseline, pointing to the backbone as the primary driver for performance. Via a series of large-scale systematic ablation studies, we argue that the machinery layers become redundant in the coding agent setting. We conclude that the effort spent elaborating hand-crafted harnesses around strong models yields poor returns for current MLE benchmarks."
+    },
+    {
+      "id": "b-0",
+      "type": "body",
+      "text": "How Much of a Harness Does a Strong\n                                             Agent Need for Autonomous ML\n                                             Engineering?\n                                             Kirill Brilliantov1,2,∗ , Alejandro Hernández-Cano1,2,∗,† , Emmanuel Abbé1,2\n                                             1\n                                                 EPFL, 2 Apple\narXiv:2609.40303v1 [cs.AI] 30 Sep 2026\n\n∗ Equal contribution, † Work done while interning at Apple"
+    },
+    {
+      "id": "b-1",
+      "type": "body",
+      "text": "Recent autonomous machine learning engineering (MLE) agents have made significant progress on public leaderboards.\n                                             Often motivated by progress stagnation over long-horizon cycles and limited Large Language Model (LLM) primitives,\n                                             modern MLE agents are deployed on top of increasingly elaborate machinery: multi-agent orchestrators, dedicated re-\n                                             trieval subagents, and more. While such harnesses expand, the use of more primitive but improved coding agents —\n                                             where LLMs have direct access to the execution environment through read, write, and bash primitives — has received\n                                             little attention in the field. In this paper we find that, under an equal time budget and the same fr"
+    },
+    {
+      "id": "b-2",
+      "type": "body",
+      "text": "Date: October 1, 2026"
+    },
+    {
+      "id": "b-3",
+      "type": "body",
+      "text": "1   Introduction\n                                         Autonomous machine learning engineering (MLE) has become a demanding testbed for LLM-based agents:\n                                         solutions are open-ended ML pipelines, a single evaluation can take hours on expensive hardware, and the\n                                         feedback signal — a validation score — is noisy. Since Jiang et al. (2025) framed the problem as tree\n                                         search over code, the dominant design has been the harness: an outer program that queries an LLM for\n                                         code, executes it, and orchestrates the exploration and combination of candidate solutions. Motivated by\n                                         stagnation over long horizons and by the limits of a single LLM call, harnesses have grown steadily more\n                    "
+    },
+    {
+      "id": "b-4",
+      "type": "body",
+      "text": "1\n\f                                                                   Medal rate (↑)\n                     70%                                                                                 Harness:           Selection:\n                                                                                                         Malena             Self-select\n                     60%                                                                                 Arbor              Oracle\n  Medal rate (↑)\n\nAiScientist\n                     50%\n                                                                                                         MLEvolve\n                                                                                                         ScienceFlow\n                     40%\n\n30%\n\n20%\n\nPercentile (↑)\n\n70\n             Percentile (↑)\n\n60\n\n50\n\n40\n\n30"
+    },
+    {
+      "id": "b-5",
+      "type": "body",
+      "text": "Kimi K3               GLM 5.2                     DeepSeek V4 Flash        Gemma 4 31B\n\nFigure 1 Performance across backbones and harnesses. Any-medal rate (↑, top) and mean percentile (↑, bottom),\nself-select (filled) vs. oracle (open), macro-averaged over the full fixed30 set at 24h time budget. Brackets are 95%\nbootstrap CIs. Backbones are grouped along a single shared x-axis; color identifies the harness."
+    },
+    {
+      "id": "b-6",
+      "type": "body",
+      "text": "existing baselines are rare.\nEvidence from neighbouring domains suggests the answer may be “very little”. Across 35 releases of software-\nengineering harnesses, Sghaier et al. (2026) find no statistically significant improvement over a fixed backbone\non SWE-bench (Jimenez et al., 2024); a single well-prompted agent can match multi-agent workflows (Xu\net al., 2026); multi-agent failures stem from coordination rather than capability (Cemri et al., 2025; Orogat\net al., 2026); and orchestration can introduce substantial overhead and coordination failures (Orogat et al.,\n2026). Coding agents have accordingly become a standard, strong baseline in agentic evaluation (Sghaier et al.,\n2026; Wang et al., 2026a; Li et al., 2026b). In MLE, however, this practice has arrived only recently (Jin\net al., 2026; Yang et al., 2026; Chen et al., 2026a; Zhao et al., 2026), and the coding agent comparisons\nre"
+    },
+    {
+      "id": "b-7",
+      "type": "body",
+      "text": "2\n\f      multiple backbones, in which Malena is not outperformed at any frontier backbone (Section 5.1). Our\n      results suggest that coding-agent post-training substitutes for the scaffolding that harnesses hand-\n      design: weaker backbones still benefit from hand-crafted workflow priors, but as agentic capability\n      grows, a plain coding agent loop closes the gap, echoing the bitter lesson (Sutton, 2019).\n    • A trace analysis showing that a capable coding agent performs adaptive search without harness-imposed\n      structure (Section 5.2)."
+    },
+    {
+      "id": "b-8",
+      "type": "body",
+      "text": "2    Related work\nJiang et al. (2025) target autonomous MLE tasks with tree search over single-file programs. Subsequent\nsystems follow a common template: an outer harness prompts an LLM for code, and handles execution,\nscoring and exploration (Yang et al., 2025; Nam et al., 2025; Fang et al., 2025; Du et al., 2025; Kulibaba\net al., 2026; Li et al., 2026a; Yuan et al., 2025; Qu et al., 2026; Le et al., 2026; Nadafian et al., 2026; Choi\net al., 2026; Meng et al., 2026; Fu et al., 2026). The components these harnesses usually introduce cluster\ninto a small number of claims about what LLMs cannot be trusted to do unaided.\nSeveral systems devote their principal contribution to compressing or partitioning accumulated state (Zhu\net al., 2026; Zhao et al., 2026; Chen et al., 2026a; Jin et al., 2026). Most remaining interventions shape the\nsearch topology, either through validation-score-driven "
+    },
+    {
+      "id": "b-9",
+      "type": "body",
+      "text": "3    Experimental settings\nWe build our harness on the OpenCode v1.15.6 coding agent framework (OpenCode Contributors, 2026), and\nour primary benchmark is MLE-bench (Chan et al., 2025), with task selection described in Appendix A.1.\nWhen reporting performance of a method that produces several submissions, we distinguish between self-\nselection, where the reported submission is the one with the best validation score reported by the agent, and\noracle selection, where it is the one with the best hidden test score. Unless otherwise specified, we report\nself-selected performance. Percentile indicates the percentage of human leaderboard entries that score worse\nthan the agent. We report 95% Confidence Intervals (CIs) on macro-task averages, holding the set of tasks\nfixed and bootstrapping on the seeds available for each task. Unless otherwise stated, we report results with\nthe GLM 5.2 backbone"
+    },
+    {
+      "id": "b-10",
+      "type": "body",
+      "text": "4    What interventions actually matter?\nTo study which components of MLE harnesses matter, we run a series of systematic ablations that attribute\nperformance to individual interventions. We identify four broad families of such interventions and study their\neffect. Each one isolates a class of intervention employed by contemporary harnesses, re-implemented inside a\nsingle codebase so that only the intervention varies. For each intervention, we instantiate the simplest faithful\nversion of the published component rather than any one system’s variant, so that any effect is attributable\n\n3\n\f                                                                    Medal rate (↑)                                                                                                                                         Percentile (↑)"
+    },
+    {
+      "id": "b-11",
+      "type": "body",
+      "text": "Iteration:                Aggregation:\n 50%               Chat                      Single iteration                                                                                           60\n                   Oneshot                   Best-of-N @ 6h\n 40%\n                                                                                                                                                        50\n\n30%\n                                                                                                                                                        40\n\n20%\n                                                                                                                                                        30\n 10%\n                                                                                                                                                        20"
+    },
+    {
+      "id": "b-12",
+      "type": "body",
+      "text": "0B            A1              31\n                                                      B             as\n                                                                       h\n                                                                                   Pr\n                                                                                      o\n                                                                                                      as\n                                                                                                         h\n                                                                                                                     Pr\n                                                                                                                        o      5.2             K3                          0B            A1                31\n           "
+    },
+    {
+      "id": "b-13",
+      "type": "body",
+      "text": "Figure 2 Impact of a coding agent environment. Average percentile and medal rate obtained by Chat and Oneshot\niterations under different LLM backbones in the default29 task set. Circles represent single-iteration performance,\nwhile squares indicate Best-of-N performance at six-hour budgets."
+    },
+    {
+      "id": "b-14",
+      "type": "body",
+      "text": "to the class of intervention rather than to an implementation detail. End-to-end fidelity to specific published\nsystems is deferred to Section 5, where we run those systems as released.\nAcross all intervention families studied in this work, the coding agent environment is the highest-leverage\nintervention an MLE system can employ. We show empirically that additional machinery provides no sta-\ntistically significant advantage as the coding agent is given more autonomy. Furthermore, in Section 5 we\nargue that every common additional harness intervention can plausibly be dismissed as redundant given a\ncoding agent environment, and further hypothesize that the problems such interventions are usually designed\nto solve become null under the common MLE benchmark setting with modern LLMs."
+    },
+    {
+      "id": "b-15",
+      "type": "body",
+      "text": "4.1      Coding agent environment\nMany MLE systems call LLMs through a chat-like interface, where the LLM receives a single prompt and can\nonly generate text, with no direct interaction with the execution environment. Building a successful MLE\nsystem from this primitive requires sophisticated machinery, often including dedicated draft/debug/improve\nagents, careful context management, retry loops, and hand-crafted data-crawler scripts that give the agent\nenough information about the data to solve the task. A coding agent environment, by contrast, exposes\nfile manipulation and execution primitives directly to the LLM, making it possible to greatly simplify such\nharnesses. We measure the impact of the coding agent environment by directly comparing the effectiveness\nof both interfaces. We ablate two different iterations, which serve as atomic units of work:\nChat The LLM is called through a c"
+    },
+    {
+      "id": "b-16",
+      "type": "body",
+      "text": "4\n\f4.2   Search primitives\nMLE systems usually explore the solution space with tree or graph search over a set of ML pipelines. Previous\nwork (Toledo et al., 2025) has explored the impact of different search algorithms for chat-based AIDE-like\nsystems and found that careful co-design of search policy and instructions improves performance. We test\nwhether such findings extend to coding agent systems by chaining Oneshot iterations to refine their solutions\nat a matched 24h budget under different tree search algorithms (details in Appendix B.3):\nChain always picks the most recent node as parent and represents pure iterative improvement.\nGreedy picks the node with the best validation score as parent and represents pure exploitation.\nUCB1 applies an upper-confidence-bound rule over visits and validation scores and represents the classical\n   explore-exploit trade-off, using standard rank-norm"
+    },
+    {
+      "id": "b-17",
+      "type": "body",
+      "text": "4.3   Autonomy\nIn the previous ablations, the search is orchestrated manually by the harness. In this section, we remove such\norchestration altogether and arrive at an even simpler baseline, which we label Malena. The Malena iteration\nis also built on the coding agent infrastructure but, instead of being prompted to produce a single submission,\nruns a single session spanning the entire time budget, only briefly prompted to continue working whenever a\nturn ends. This lets the agent drive exploration, exploitation and its own knowledge base autonomously. We\nbuild a minimal harness around it, providing a small set of tools that may help the agent stay grounded as\nthe session grows:1\n   • submission tool: Adds a submission file to the registry. No test or leaderboard scores are communicated\n     to the agent. This tool is not needed in Chat and Oneshot iterations, whose single submission is "
+    },
+    {
+      "id": "b-18",
+      "type": "body",
+      "text": "5\n\f                                           Self-select                                                                   Oracle\n                  70%\n\n60%\n\n50%\n Medal rate (↑)\n\n40%\n\n30%\n\n20%\n\n10%\n\n0%\n\n0h     4h    8h        12h       16h      20h        24h        0h            4h           8h      12h   16h   20h   24h\n                                             Time                                                                        Time\n                                                         Malena   Best-of-N       UCB1        Greedy        Chain\n\nFigure 3 Performance evolution at 24h budget. Trajectories are extracted by selecting the best submission\navailable at different times, aggregated in the default29 task set. Left: self-select medal rate. Right: oracle-best\nmedal rate. Malena achieves the highest medal rate. Chain, Greedy and UCB1 perform similarly."
+    },
+    {
+      "id": "b-19",
+      "type": "body",
+      "text": "between 0.4% and 5.6% depending on the method. Despite having also better average percentile, when\ncompared with UCB1 and Greedy it becomes statistically indistinguishable. Regardless, Malena exhibits\nthe lowest validation gap of all iterations at 1.876pp, presumably as reusing the exact validation pipeline\nbetween attempts allows to maintain higher consistency between internal validation scores than tree-search\nmethods. We further explore the effect of Malena under different time budgets in Appendix C.4 and the\neffect of backbone models in Appendix C.5. One possible drawback of this single-session strategy arises in\nthe long-horizon regime, where the context may overflow the LLM’s window. To test this, Appendix C.7\nartificially caps Malena’s context window."
+    },
+    {
+      "id": "b-20",
+      "type": "body",
+      "text": "4.4                     Multi-agent orchestration\nMLE harnesses often guide exploration using several, potentially parallel, agents. Such agents are typically\norganized either hierarchically or as a network of peers. We attempt to isolate the effectiveness of such\nprocedures by introducing three coordination interventions:\n                  D Delegation. Enables background subagents via the native task tool and encourages their use through\n                    a prompt addition. This represents the hierarchical planner–executor structure.\n         P3 Parallelism. When enabled, the harness spawns three independent Malena iterations on the same\n            physical machine. While this allows more submissions and ideas to be tested, it also risks hardware\n            contention. Parallelism represents the network of peers.\n                  B broadcast tool. Enabled jointly with parallelism."
+    },
+    {
+      "id": "b-21",
+      "type": "body",
+      "text": "6\n\f                                   Percentile (↑)                                Medal rate (%, ↑)\n                         Self-select                Oracle               Self-select                  Oracle\n         base      66.51 [62.46, 69.97]     69.29 [65.82, 72.13]     55.7 [48.2, 62.9]       60.4 [53.2, 66.8]\n         +D        63.62 [59.27, 68.26]     67.40 [63.22, 71.98]     45.2 [38.1, 54.8]       47.0 [38.1, 56.0]\n         +P3       67.77 [64.58, 70.62]     71.79 [69.34, 73.83]     52.4 [42.8, 61.9]       60.7 [53.6, 67.3]\n         +B+P3     58.91 [53.50, 64.05]     68.57 [65.77, 71.14]     33.3 [23.8, 40.5]       53.0 [45.8, 60.1]\n\nTable 1 Performance of Malena under different ablations on the fixed14 split at 24h budget. The 95% CI\nfor each metric is reported in brackets. + indicates interventions on top of base, - indicates intervention removals."
+    },
+    {
+      "id": "b-22",
+      "type": "body",
+      "text": "5     Generalization to production harnesses\nWe test whether the conclusions of Section 4 generalize to a wider selection of open-source state-of-the-\nart harnesses. We compare our base Malena single long-session loop with MLEvolve (Du et al., 2026),\nAiScientist (Chen et al., 2026a), Arbor (Jin et al., 2026), and ScienceFlow (Zhao et al., 2026); full descriptions\nof each baseline, and the full per-backbone MLE-bench comparison table, are in Appendix D. The selected\nmethods span a wide range of harness design choices along the axes we ablated. MLEvolve represents the older\nparadigm, in which the minimal unit of work is a single completion; the others are more recent and emphasize\norchestrating multiple agentic sessions with tools. Malena itself is a single such session, so the comparison is\nnot chat-vs-agent but rather a minimal single-session harness against harnesses that add scaffoldin"
+    },
+    {
+      "id": "b-23",
+      "type": "body",
+      "text": "5.1   Results\nTable 2, Figure 1, and Figure 4 sum-              Table 2 NatureBench results. Surpassed-SOTA rate (↑, % of tasks\nmarize the headline results: across 17            where the oracle-best run surpasses the published SOTA), macro-\nharness–backbone pairs on the 30 MLE-             averaged over tasks. A run with no valid submission counts as a\nbench tasks and 6 pairs on the 40 Na-             failure. Brackets are 95% CIs.\ntureBench tasks (full specification in Ap-\npendix D), Malena matches or beats every                                    Surpassed SOTA (%) ↑\nharness on every tested pair. Only at the                 Backbone      Malena AiScientist MLEvolve\nsmaller Gemma 4 31B backbone does the\n                                                                          21.7            17.5             10.8\npicture change, with MLEvolve ahead by                    GLM-5.2      [1"
+    },
+    {
+      "id": "b-24",
+      "type": "body",
+      "text": "detailed paired-by-task comparison is in\nAppendix D.2.\nThe left panel of Figure 4 shows all four methods following a broadly similar quality-vs-wall-clock-time\nprofile: quality rises quickly in the first few hours, plateaus by around the 5–10 hour mark, and further gains\nafterwards arrive mostly as occasional step jumps — when a new best submission lands — rather than as\nsmooth continued improvement. AiScientist generally lags behind, except in the final ≈4 hours, where it\nquickly catches up, and MLEvolve is the slowest to plateau.\nThe right panel of Figure 4 shows the inference cost of each method. Although total token volumes are\ncomparable across agentic harnesses, cost is driven almost entirely by cache-read tokens. At GLM 5.2,\nMalena’s modeled USD cost ($12.12) is ≈6.2× AiScientist’s ($1.95), even though its input and output token\nvolumes are comparable to Arbor’s and AiScientist’s "
+    },
+    {
+      "id": "b-25",
+      "type": "body",
+      "text": "medium effort; see Appendix D.3 for details."
+    },
+    {
+      "id": "b-26",
+      "type": "body",
+      "text": "7\n\f                                                                                                                                               Harness                                                                                102\n                                                                                                                 109                            Malena\n                       70\n                                                                                                                                                Arbor\n                       60                                                                                                                       AiScientist\n                                                                                                                 108                            MLEvolve"
+    },
+    {
+      "id": "b-27",
+      "type": "body",
+      "text": "Inference cost (USD)\n                                                                                                                                                                                                                                      101\n Percentile (oracle)\n\n50\n\nTokens per run\n                       40                                                                                        107"
+    },
+    {
+      "id": "b-28",
+      "type": "body",
+      "text": "30                                                                                                                                                                                                             100\n                                                                                                                 106\n                                                                    Harness\n                       20                                               Malena\n                                                                        Arbor\n                       10                                                                                        105\n                                                                        AiScientist\n                                                                        MLEvolve                                                          "
+    },
+    {
+      "id": "b-29",
+      "type": "body",
+      "text": "Figure 4 Left: oracle best-so-far percentile vs. wall-clock time, macro-averaged over fixed30 tasks, for different\nharnesses. Right: per-run distribution over all seeds of cumulative input, output and modelled cache-read tokens by\nthe end of each run, plus a fourth group giving the resulting per-run USD cost (right-hand axis). Each box’s solid\nblack line indicates median; dashed line indicates mean. MLEvolve’s cache is always exactly 0, since its tree-search\nnodes are independent LLM calls. All results shown are at the GLM 5.2 backbone."
+    },
+    {
+      "id": "b-30",
+      "type": "body",
+      "text": "its whole prior context every turn (the same-session cache model still prices that resent context, even though\nit credits most of it as a cache hit); Arbor and AiScientist instead reset into fresh, shorter-lived threads per\nbranch or submission, so their modeled cache-read volume never grows as large. Nonetheless, overall cost\nremains dominated by hardware.3\n\n5.2                         Trace Analysis\nWe now examine whether Malena exhibits the failure\nmode that motivates prior designs, and how severely.                                                                                               Malena        p25=0.58 p50=0.75 p75=0.90"
+    },
+    {
+      "id": "b-31",
+      "type": "body",
+      "text": "The failure mode these designs are most explicitly built                                                                                0.4\n                                                                                                                                                   AiScientist\n                                                                                                                                                   MLEvolve\n                                                                                                                                                                 p25=0.55 p50=0.74 p75=0.85\n                                                                                                                                                                 p25=0.60 p50=0.80 p75=0.90"
+    },
+    {
+      "id": "b-32",
+      "type": "body",
+      "text": "around is an inability to reliably search the space of                                                                                             Oneshots      p25=0.40 p50=0.65 p75=0.82\n\nML solutions, so we focus our trace analysis on search,\n                                                                                                                   Share within Group\n\n0.3\n\nstudying in depth the traces of Kimi K3 and GLM 5.2\nunder MLEvolve, AiScientist, Malena and Oneshot iter-                                                                                   0.2"
+    },
+    {
+      "id": "b-33",
+      "type": "body",
+      "text": "ations.\n                                                                                                                                        0.1\nPrior designs typically impose an explicit search struc-\nture — a tree over candidate ideas (Arbor, MLEvolve),\n                                                                                                                                        0.0\na population of competing programs, or a stagnation-                                Rarity\n                                                                                                                                                      0.0            0.2             0.4             0.6         0.8            1.0"
+    },
+    {
+      "id": "b-34",
+      "type": "body",
+      "text": "triggered switch to a fresh idea (ScienceFlow) — built\naround a discrete unit of work or checkpoint that is       Figure 5 Per-technique rarity by method. Rar-\neither refined or abandoned. Malena’s workflow with        ity of a technique is computed once per task over\nGLM 5.2 and Kimi K3 differs qualitatively: it produces     every method/backbone group’s runs combined (see\na single general pipeline spanning a task’s natural stages Appendix E.2).\n(e.g., the two-stage embed-then-retrieve pipeline on whale; see Appendix E.5), then spends the rest of the\nrun on what amounts to hyperparameter search, but over code patches rather than parameter values. This\nlets it reuse checkpoints and utility code (data loading, preprocessing, validation splits) across iterations,\nimproving efficiency and narrowing the generalization gap.\nGoing further, we annotate each trajectory’s checkpoints with the ML "
+    },
+    {
+      "id": "b-35",
+      "type": "body",
+      "text": "8\n\f                          1.0\n                                            AiScientist                            Malena                             MLEvolve\n    ensembling\n    post_processing\n    model_selection       0.8\n    training\n    inference             0.6\n    architecture\n    regularization\n    loss                  0.4\n    optimization\n    feature_engineering\n    augmentation          0.2\n    data_pipeline\n    data_preprocessing\n                          0.0\n                                0.0   0.2   0.4     0.6   0.8   1.0   0.0   0.2   0.4   0.6   0.8   1.0   0.0   0.2   0.4   0.6   0.8   1.0"
+    },
+    {
+      "id": "b-36",
+      "type": "body",
+      "text": "Figure 6 Category composition of techniques used so far, over the course of a run, one column per method.\nThe x-axis is checkpoint fraction through the run (∈ [0, 1]); the y-axis is the decayed share of technique-category tags\nat that point (stacked, summing to 1). Each technique contributes to a checkpoint’s composition with exponential\ndecay by recency, giving a balanced view of the solution’s techniques that still favours ones added recently. Per-task\nand alternate half-life versions are in Appendix E.3."
+    },
+    {
+      "id": "b-37",
+      "type": "body",
+      "text": "than for AiScientist, with the shares of ensembling, model selection, and post-processing all increasing until\nthe very end of the run. MLEvolve, in contrast, settles into a roughly stable technique distribution after\nabout the first 10% of the run (Figure 6). Second, this skew towards performance does not confine Malena\nto well-known recipes: Figure 5 shows that Malena and MLEvolve are consistently the top two methods in\ntechnique rarity (see Appendix E.2 for how rarity is computed), i.e., the techniques they use tend to appear\nin fewer of the other groups’ runs. Malena therefore keeps proposing comparatively rare techniques while\nbecoming more performance-oriented late in the run.\nTogether, these results suggest that a sufficiently capable coding-agent backbone can drive this kind of search\nlargely on its own: Malena balances exploring genuinely rare techniques against a growing perfor"
+    },
+    {
+      "id": "b-38",
+      "type": "body",
+      "text": "6     Conclusion\nSystems for autonomous machine learning engineering have grown steadily more elaborate: search trees over\ncandidate solutions, populations of competing programs, teams of specialized agents. That machinery was\ndesigned when the underlying unit of work was a single model completion, which cannot run the code it\nwrites, remember what it already tried, or react to an error. Coding-focused post-training has since changed\nthe primitive itself: a model highly capable of autonomous work plans, executes and debugs inside one\nlong-running session, without an outer program telling it what to do next. This paper asks which of the\naccumulated machinery still earns its keep once the primitive can do these things itself, and answers it by\nablating that machinery layer by layer at a fixed model, budget and task set.\nAlmost all of the gain comes from the runtime and LLM backbone, and al"
+    },
+    {
+      "id": "b-39",
+      "type": "body",
+      "text": "9\n\fworking autonomously has poor returns. The leverage is in the model and in the runtime it is given, not in\nthe scaffolding built around them."
+    },
+    {
+      "id": "b-40",
+      "type": "body",
+      "text": "Limitations    Most of our results rely on MLE-bench, which has known task-preparation issues and, being\nbuilt from public Kaggle competitions, is a plausible contamination target; we mitigate this by fixing broken\ntasks, directly checking for contamination, and additionally evaluating on NatureBench. A second limitation\nis statistical power: some results still have confidence intervals wide enough to preclude strong claims about\neffect size, though we believe the weaker no-worse-than claims are well supported. A third is scope: most\nharness interventions we test operate within a single worker, and we leave a more in-depth exploration of\nsophisticated inter-agent coordination protocols to future work. A fourth is possible asymmetry in tuning\neffort between Malena and the external harnesses it is compared against; Appendix D.3 documents the\nbackbone-specific bug fixes and configuration ab"
+    },
+    {
+      "id": "b-41",
+      "type": "body",
+      "text": "Reproducibility statement\nFull experimental settings are described in Section 3 and in Appendix B: the coding agent framework\nand tool set exposed to the model in each iteration (Appendix B.2), the search strategies compared (Ap-\npendix B.3), and the exact LLM backbones and hosting configuration used, with their HuggingFace identifiers\n(Appendix A.4). The task sets used for both benchmarks are listed in full in Appendix A.1 (MLE-bench,\nincluding which tasks we fixed to remove data or ground-truth-leakage issues, and why) and Appendix A.3\n(NatureBench); the exact code diffs we applied to fix the affected MLE-bench preparation scripts are given\nin Appendix A.2. Our statistical methodology — how macro-task averages, bootstrap confidence intervals,\nand paired-by-task comparisons are computed — is described in Appendix A.5."
+    },
+    {
+      "id": "b-42",
+      "type": "body",
+      "text": "Acknowledgments\nWe thank Simin Fan for help during the earlier stages of this project, and Samy Bengio for useful feedback\nduring its later stages."
+    },
+    {
+      "id": "b-43",
+      "type": "body",
+      "text": "References\nPeter Auer, Nicolò Cesa-Bianchi, and Paul Fischer. Finite-time analysis of the multiarmed bandit problem. Mach.\n  Learn., 47(2-3):235–256, May 2002.\nLei Bai, Zongsheng Cao, Yang Chen, Zhiyao Cui, Shangheng Du, Yue Fan, Shiyang Feng, Zijie Guo, Haonan He,\n  Liang He, Xiaohan He, Shuyue Hu, Yusong Hu, Songtao Huang, Yichen Jiang, Hao Li, Xin Li, Dahua Lin, Weihao\n  Lin, Fenghua Ling, Dongrui Liu, Zhuo Liu, Wenjie Lou, Runmin Ma, Chunjiang Mu, Haoyang Peng, Tianshuo\n  Peng, Jinxin Shi, Luohe Shi, Boyuan Sun, Zelin Tan, Shengji Tang, Yan Teng, Qianyi Wang, Xiaosong Wang,\n  Yiming Wu, Yi Xie, Xiangchao Yan, Jingqi Ye, Peng Ye, Fangchen Yu, Jiakang Yuan, Bihao Zhan, Bo Zhang, Chen\n  Zhang, Shufei Zhang, Shuaiyu Zhang, Wenlong Zhang, Yiqun Zhang, Junpeng Zhao, Zhijie Zhong, Bowen Zhou,\n  and Yuhao Zhou. Scaling the horizon, not the parameters: Reaching trillion-parameter performance "
+    },
+    {
+      "id": "b-44",
+      "type": "body",
+      "text": "10\n\fJiefeng Chen, Bhavana Dalvi Mishra, Jaehyun Nam, Rui Meng, Tomas Pfister, and Jinsung Yoon. Mars: Modular\n   agent with reflective search for automated ai research, 2026b. URL https://arxiv.org/abs/2602.02660.\nDaewon Choi, Kyunghyun Park, Woomin Song, Saket Dingliwal, Sai Muralidhar Jayanthi, Jinwoo Shin, and Aram\n  Galstyan. Idlespec: Exploiting idle time via speculative planning for llm agents, 2026. URL https://arxiv.org/\n  abs/2605.22154.\nDeepSeek-AI. Deepseek-v4: Towards highly efficient million-token context intelligence, 2026.\nShangheng Du, Xiangchao Yan, Dengyang Jiang, Jiakang Yuan, Yusong Hu, Xin Li, Liang He, Bo Zhang, and Lei\n  Bai. Automlgen: Navigating fine-grained optimization for coding agents, 2025. URL https://arxiv.org/abs/\n  2510.08511.\nShangheng Du, Xiangchao Yan, Jinxin Shi, Zongsheng Cao, Shiyang Feng, Zichen Liang, Boyuan Sun, Tianshuo Peng,\n  Yifan Zhou, Xin "
+    },
+    {
+      "id": "b-45",
+      "type": "body",
+      "text": "11\n\fJiajie Jin, Yuyang Hu, Kai Qiu, Qi Dai, Chong Luo, Guanting Dong, Xiaoxi Li, Tong Zhao, Xiaolong Ma, Gongrui\n   Zhang, Zhirong Wu, Bei Liu, Zhengyuan Yang, Linjie Li, Lijuan Wang, Hongjin Qian, Yutao Zhu, and Zhicheng\n   Dou. Toward generalist autonomous research via hypothesis-tree refinement, 2026. URL https://arxiv.org/abs/\n   2606.11926.\nKimi Team, Tongtong Bai, Yifan Bai, Yiping Bao, M. C., Jianfeng Cai, Xinyuan Cai, Peizhou Cao, Yuxuan Cao, Ziwei\n  Chai, Y. Charles, H. S. Che, Guanduo Chen, Guangyu Chen, Guanzheng Chen, Huarong Chen, Jia Chen, Jianlong\n  Chen, Jun Chen, Kexin Chen, Peng Chen, Ruijue Chen, Wentao Chen, Xin Chen, Yang Chen, Yanru Chen, Yifei\n  Chen, Yingjiang Chen, Yuankun Chen, Yujie Chen, Yutian Chen, Zhirong Chen, Dazhi Cheng, Yean Cheng, Jialei\n  Cui, Jingbing Cui, Anqi Dai, Jiaqi Deng, Hao Ding, Rui Ding, Shaofeng Ding, Mengfan Dong, Mengnan Dong,\n  Yuhao Do"
+    },
+    {
+      "id": "b-46",
+      "type": "body",
+      "text": "12\n\fWoosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph E. Gonzalez, Hao\n Zhang, and Ion Stoica. Efficient memory management for large language model serving with pagedattention. In\n Proceedings of the ACM SIGOPS 29th Symposium on Operating Systems Principles, 2023.\nDat Le, Duc-Cuong Le, Anh-Son Nguyen, Tuan-Dung Bui, Thu-Trang Nguyen, Son Nguyen, and Hieu Dinh Vo. iml:\n  Executable, problem-grounded, and broadly exploratory code-driven automl, 2026. URL https://arxiv.org/abs/\n  2602.13937.\nAnnan Li, Chufan Wu, Zengle Ge, Yee Hin Chong, Zhinan Hou, Lizhe Cao, Cheng Ju, Jianmin Wu, Huaiming Li,\n  Haobo Zhang, Shenghao Feng, Mo Zhao, Fengzhi Qiu, Rui Yang, Mengmeng Zhang, Wenyi Zhu, Yingying Sun,\n  Quan Sun, Shunhao Yan, Danyu Liu, Dawei Yin, and Dou Shen. The fm agent, 2026a. URL https://arxiv.org/\n  abs/2510.26144.\nXiaochuan Li, Ryan Ming, Pranav Setlur"
+    },
+    {
+      "id": "b-47",
+      "type": "body",
+      "text": "13\n\f  Brenner, Callie Riggins Zetino, Cameron Raymond, Camillo Lugaresi, Carolina Paz, Cary Hudson, Cedric Whit-\n  ney, Chak Li, Charles Chen, Charlotte Cole, Chelsea Voss, Chen Ding, Chen Shen, Chengdu Huang, Chris Colby,\n  Chris Hallacy, Chris Koch, Chris Lu, Christina Kaplan, Christina Kim, CJ Minott-Henriques, Cliff Frey, Cody Yu,\n  Coley Czarnecki, Colin Reid, Colin Wei, Cory Decareaux, Cristina Scheau, Cyril Zhang, Cyrus Forbes, Da Tang,\n  Dakota Goldberg, Dan Roberts, Dana Palmie, Daniel Kappler, Daniel Levine, Daniel Wright, Dave Leo, David Lin,\n  David Robinson, Declan Grabb, Derek Chen, Derek Lim, Derek Salama, Dibya Bhattacharjee, Dimitris Tsipras,\n  Dinghua Li, Dingli Yu, DJ Strouse, Drew Williams, Dylan Hunn, Ed Bayes, Edwin Arbus, Ekin Akyurek, Elaine Ya\n  Le, Elana Widmann, Eli Yani, Elizabeth Proehl, Enis Sert, Enoch Cheung, Eri Schwartz, Eric Han, Eric Jiang,\n  Eric Mitc"
+    },
+    {
+      "id": "b-48",
+      "type": "body",
+      "text": "14\n\f  Shavrina, Jean-Christophe Gagnon-Audet, Michael Shvartsman, Shagun Sodhani, Alexander H. Miller, Abhishek\n  Charnalia, Derek Dunfield, Carole-Jean Wu, Pontus Stenetorp, Nicola Cancedda, Jakob Nicolaus Foerster, and\n  Yoram Bachrach. Ai research agents for machine learning: Search, exploration, and generalization in mle-bench,\n  2025. URL https://arxiv.org/abs/2507.02554.\nYike Wang, Huaisheng Zhu, Zhengyu Hu, Yige Yuan, Zhengyu Chen, Shakti Senthil, Hannaneh Hajishirzi, Yulia\n  Tsvetkov, Pradeep Dasigi, and Teng Xiao. Rethinking the evaluation of harness evolution for agents, 2026a. URL\n  https://arxiv.org/abs/2607.12227.\nYuru Wang, Lejun Cheng, Yuxin Zuo, Sihang Zeng, Bingxiang He, Che Jiang, Junlin Yang, Yuchong Wang, Kaikai\n  Zhao, Weifeng Huang, Kai Tian, Zhenzhao Yuan, Jincheng Zhong, Weizhi Wang, Ning Ding, Bowen Zhou, and\n  Kaiyan Zhang. Naturebench: Can coding agents match t"
+    },
+    {
+      "id": "b-49",
+      "type": "body",
+      "text": "15\n\fA     Experimental setting details"
+    },
+    {
+      "id": "b-50",
+      "type": "body",
+      "text": "A.1   MLE-bench tasks used\nOur primary dataset used in this paper is MLE-bench (Chan et al., 2025), which consists of 75 tasks. In\nthis paper we focus on a subset of 30 tasks. We largely follow Hambardzumyan et al. (2026), which used\nthe 30 tasks reported in the GPT-5 system card (Singh et al., 2026) for their experiments. We, however,\nsubstitute the task bms-molecular-translation in favor of alaska2-image-steganalysis, due to its more\npermissive license. Our final split consists of 5 Lite, 21 Medium and 4 High tasks. All tasks used in the\npaper are shown in Table 3, along with the split they belong to and the shorthand name by which they may\nbe referenced in this paper.\nResults presented in Section 4 are reported on the original MLE-bench without any intervention, and in the\n29 task split (without either bms or alaska2). This split is referred to in this work as the default29 task\nsplit"
+    },
+    {
+      "id": "b-51",
+      "type": "body",
+      "text": "A.2   Fixes applied to MLE-bench tasks\nBelow we list the fixes for champs, hubmap, smartphone, and multi-modal: the bug in each, and the change\nwe made to its MLE-bench prepare.py. All four issues are documented by the MLE-bench maintainers on\nGitHub, in the “Known Issues” section of the official repository’s README (https://github.com/openai/\nmle-bench#known-issues): champs in pull request #70 (https://github.com/openai/mle-bench/pull/\n70), multi-modal in issue #77 (https://github.com/openai/mle-bench/issues/77), smartphone in issue\n#93 (https://github.com/openai/mle-bench/issues/93), and hubmap directly in the README. The\nmaintainers deferred fixing them to avoid invalidating existing leaderboard submissions, so the upstream\npreparation scripts still contain these bugs; the diffs below are our own fixes. The diffs are shortened for\nspace (... marks omitted context, comments are trimmed"
+    },
+    {
+      "id": "b-52",
+      "type": "body",
+      "text": "16\n\fTable 3 Full MLE-bench task suite used in the paper. Competitions marked with ‖ are not part of the default29\nsplit. Tasks with * indicate the fixed14 task subset, and † indicates fixed10. Tasks with ‡ were identified to have\nbreaking issues, and results aggregated on them in fixed subsets come from our fixed version of such tasks."
+    },
+    {
+      "id": "b-53",
+      "type": "body",
+      "text": "Full competition ID                                  Split\n                      alaska2*†‖           alaska2-image-steganalysis                          Medium\n                      aptos2019            aptos2019-blindness-detection                        Lite\n                      billion-word*        billion-word-imputation                             Medium\n                      cassava*†            cassava-leaf-disease-classification                 Medium\n                      champs*†‡            champs-scalar-coupling                              Medium\n                      freesound*†          freesound-audio-tagging-2019                        Medium\n                      h&m                  h-and-m-personalized-fashion-recommendations        Medium\n                      hms                  hms-harmful-brain-activity-classification            High\n                      hotel"
+    },
+    {
+      "id": "b-54",
+      "type": "body",
+      "text": "+         train_only_csvs = {\n                    \"dipole_moments\": dipole_moments,\n                    ...\n          ...\n                for molecule_name in tqdm(\n      -             new_train[\"molecule_name\"].unique(), desc=\"Copying ...\"\n      +             sorted(all_molecule_names), desc=\"Copying ...\"\n                ):"
+    },
+    {
+      "id": "b-55",
+      "type": "body",
+      "text": "hubmap-kidney-segmentation: leaked test annotations. The original script copied {image_id}.json\ninto public/test/. This file is the unencoded glomerulus polygon annotation, i.e. the same information as\nthe RLE-encoded target. Kaggle’s real test set only ships the -anatomical-structure.json sidecar. We\ndrop the annotation from the test copy and assert that only the sidecar remains.\n      --- a/mlebench/competitions/hubmap-kidney-segmentation/prepare.py\n      +++ b/mlebench/competitions/hubmap-kidney-segmentation/prepare.py\n           for image_id in tqdm(new_test[\"id\"], desc=\"Copying test images\"):\n               shutil.copy(raw / \"train\" / f\"{image_id}.tiff\",\n                            public / \"test\" / f\"{image_id}.tiff\")\n      -        shutil.copy(raw / \"train\" / f\"{image_id}.json\",\n      -                    public / \"test\" / f\"{image_id}.json\")\n               shutil.copy(\n          "
+    },
+    {
+      "id": "b-56",
+      "type": "body",
+      "text": "17\n\f          ...\n      +         assert len(list((public / \"test\").glob(\"*.json\"))) == len(new_test)"
+    },
+    {
+      "id": "b-57",
+      "type": "body",
+      "text": "smartphone-decimeter-2022: leaked reference trajectory. The original script copied each test drive’s\nfull raw directory into public/test/ and removed only ground_truth.csv. The latitude/longitude in\nground_truth.csv is linearly interpolated from the reference NovAtel SPAN receiver’s NMEA log, and\nthat log stayed in the public test folder. We delete every SPAN-reference .nmea file and keep the per-phone\nonboard-GNSS .nmea logs, which Kaggle legitimately provides.\n      --- a/mlebench/competitions/smartphone-decimeter-2022/prepare.py\n      +++ b/mlebench/competitions/smartphone-decimeter-2022/prepare.py\n            for fpath in (public / \"test\").rglob(\"ground_truth.csv\"):\n                fpath.unlink() # don’t include ground truth in public test data\n      +     span_nmea_files = [\n      +         fpath for fpath in (public / \"test\").rglob(\"*.nmea\")\n      +         if \"span\" in fpath.name."
+    },
+    {
+      "id": "b-58",
+      "type": "body",
+      "text": "multi-modal-gesture-recognition: labelled test samples. The original script built the test set by\ncopying the raw training4.tar.gz byte for byte. training4 is fully labelled training data, so every sample’s\n*_data.mat still contained the ground-truth gesture sequence in Video.Labels. We rebuild the archive one\nsample at a time, empty Video.Labels, and check that every repacked sample has empty labels.\n      --- a/mlebench/competitions/multi-modal-gesture-recognition/prepare.py\n      +++ b/mlebench/competitions/multi-modal-gesture-recognition/prepare.py\n      +def _clear_video_labels(mat_bytes: bytes) -> bytes:\n      +     mat = scipy.io.loadmat(io.BytesIO(mat_bytes))\n      +     video = mat[\"Video\"]\n      +     labels = video[\"Labels\"][0, 0]\n      +     ...\n      +     video[\"Labels\"][0, 0] = np.empty((1, 0), dtype=labels.dtype)\n      +     buf = io.BytesIO()\n      +     scipy.io.savemat"
+    },
+    {
+      "id": "b-59",
+      "type": "body",
+      "text": "A.3   NatureBench tasks used\nNatureBench (Wang et al., 2026b) asks an agent to try to match or exceed the published state-of-the-art\nresult of a recent Nature-family paper on that paper’s own held-out evaluation protocol. Unlike fixed30’s\nKaggle competitions, there is no external leaderboard to compute a percentile against: each task ships a\ndedicated evaluation service that the agent may query online, unlimited times, via an /evaluate endpoint\nthat returns the candidate’s score. We follow NatureBench’s own protocol and report a task as surpassed\nwhen its normalized gain score g > 0.1. We report the beat-SOTA rate — the fraction of tasks on which the\nbest score achieved anywhere in the run (oracle) surpasses the published SOTA — macro-averaged over a\nlicensed task cohort at an 8h time budget, for both a GLM 5.2 and a Kimi K3 backbone.\nTable 4 lists the 40 NatureBench tasks used for the r"
+    },
+    {
+      "id": "b-60",
+      "type": "body",
+      "text": "A.4   LLM backbones used\nUnless otherwise stated, we report results using GLM 5.2 backbone LLM. All backbones are served locally\nwith vLLM (Kwon et al., 2023) on 8×B200 or 8×A100 80GB nodes for smaller models. Unless otherwise\nspecified, all models run with reasoning enabled at their maximum available configuration, and at their\n\n18\n\f  Table 4 NatureBench task cohort used in the paper. Task IDs are the paper’s Nature-family DOI suffix."
+    },
+    {
+      "id": "b-61",
+      "type": "body",
+      "text": "s41467-025-65557-7     s41592-025-02662-x     s42256-023-00630-8    s42256-025-01010-0\n          s41551-024-01257-9     s41592-025-02826-9     s42256-023-00636-2    s42256-025-01026-6\n          s41551-024-01312-5     s41592-025-02886-x     s42256-023-00654-0    s43588-024-00689-2\n          s41587-024-02414-w     s42256-022-00447-x     s42256-023-00712-7    s43588-024-00698-1\n          s41592-023-01940-w     s42256-022-00459-7     s42256-024-00790-1    s43588-024-00716-2\n          s41592-023-02035-2     s42256-022-00518-z     s42256-024-00795-w    s43588-024-00732-2\n          s41592-023-02124-2     s42256-022-00526-z     s42256-024-00815-9    s43588-024-00757-7\n          s41592-024-02257-y     s42256-022-00541-0     s42256-024-00892-w    s43588-025-00842-5\n          s41592-024-02316-4     s42256-023-00627-3     s42256-024-00956-x    s43588-025-00917-3\n          s41592-024-02372-w     s422"
+    },
+    {
+      "id": "b-62",
+      "type": "body",
+      "text": "canonical maximum sequence length. Input and output costs, when reported, are the weighted effective per-\ntoken prices listed for each backbone on https://openrouter.ai/ — a marketplace that aggregates multiple\ninference providers per model and reports a usage-weighted effective price across them, rather than any single\nprovider’s list price — snapshotted around September 2026. Cache-read cost is modeled as 0.1× the input\ncost: none of the harnesses compared here report real cache-hit token counts directly (see the per-method\ntelemetry notes in Section 5.1 and Appendix D.4), so this is a fixed discount applied uniformly rather than a\nper-backbone reported cache price. The following are all the LLMs reported in this paper, along with their\nHuggingFace identifier; backbones we compute a dollar cost for elsewhere in the paper are annotated with\ntheir September-2026 OpenRouter price:\n   • GP"
+    },
+    {
+      "id": "b-63",
+      "type": "body",
+      "text": "A.5   Statistical protocol\nThroughout the paper, our main performance reported is based on the macro-task average. For an experiment\nwith T different tasks, each task t containing Nt seeds, for metric metric, we report:\n                                            T      N\n                                                   t\n                                        1X 1 X\n                                                     metric(runt,r ).\n                                        T t=1 Nt r=1"
+    },
+    {
+      "id": "b-64",
+      "type": "body",
+      "text": "Our confidence intervals are estimated via bootstrap on the fixed set of T tasks, sampling for each task\nfrom the Nt available seeds before computing the macro average, and taking the quantiles of the simulated\ndistribution. For each plot and table presented, the comparison is always based on the same task set. In the\ntables presented in this paper, we mark as bold numbers the best results obtained across arms, and when\npresent, with underlined and italics the second and third best, respectively.\nFor our A vs B comparisons, we compute the paired-by-task difference to isolate positive or negative effects"
+    },
+    {
+      "id": "b-65",
+      "type": "body",
+      "text": "19\n\fon the ablation:\n                                                                                         \n                      T        N (A)t                            N (B)t\n                   1 X 1       X                             1   X\n                                      metric(run(A)t,r ) −              metric(run(B)t,r ) .\n                   T t=1 N (A)t r=1                        N (B)t r=1"
+    },
+    {
+      "id": "b-66",
+      "type": "body",
+      "text": "To determine statistical significance, we compute the 95% CIs of the paired-by-task difference (again, on\nthe fixed set of T tasks, bootstrapping from N (A)t and N (B)t ). If 0 does not lie in the CI — which we\nmark with * in our paired-by-task tables throughout the paper — we can establish a statistically significant\ndifference in the metric in the ablation. When 0 lies in the CI, the arms become statistically indistinguishable\nat our power level based on the amount of seeds we ran in our experiments. With this method, between-task\ndifficulty cancels, which results in narrower intervals than regular marginal CIs.\n\nB     Implementation details\nIn this section, we provide more details about our core iterations ablated, along with their optional tool and\ninfrastructure addons below."
+    },
+    {
+      "id": "b-67",
+      "type": "body",
+      "text": "B.1   Iterations\nAll three iterations are compiled from a single prompt-template family. All iterations share a base prompt\nwith the agent persona, the scientific-approach questions, the resource and time budget line and a few general\nrecommendations. A specialized task description and instruction block is then chosen for each iteration and\naligns with the goal and environment available for each method.\nIn the task description, the Oneshot and Malena iterations are handed only the data paths (raw data directory,\ndescription file and sample submission file) since they can explore the data themselves through their tools.\nOn the other hand, Chat receives the task description verbatim and an inline overview of the data computed\nby the harness: a directory tree of the data folder, per-file previews (per-column statistics for CSVs — dtype,\ncardinality/value counts, mean, range and NaN counts —"
+    },
+    {
+      "id": "b-68",
+      "type": "body",
+      "text": "20\n\f      iterations), and score.txt (a single floating-point validation score on the task’s metric and direction).\n      These deliverables are expressed as guarantees: when the agent ends its turn, the harness statically\n      verifies the file set and re-prompts the agent with the list of missing or malformed guarantees (e.g. an\n      unparsable score file) until all hold.\n      When the parent node already carries a scripted solution (a previous main.py and design.md), the\n      prompt switches to an improve variant: the agent is instructed to study the documented design, to\n      decide between refining and pivoting using the recorded execution cost and results, and to overwrite\n      the same files (any other scripts are discarded). This is the mechanism by which the search strategies\n      of Section 4.2 share information between nodes.\n      The implementation also supports appen"
+    },
+    {
+      "id": "b-69",
+      "type": "body",
+      "text": "B.2   Infrastructure\nThe discussion in this section only applies to coding agent iterations (Oneshot and Malena).\nOur core coding agent loop harnesses over OpenCode. It preserves all default tools, except we explicitly\ndisabled doom_loop, plan_exit, and question. Moreover, we overwrite the native bash tool with our own\nimplementation (more information in the following overview). The most important and used tools for the\ncoding agent are:\n   • read: Reads the contents of a file.\n   • write: Writes the contents of a file.\n   • edit: Edits the contents of a file.\n   • bash: Executes a command. Note that we disabled the native bash implementation, and used our own\n     version. Both versions remain highly similar in usage, description and output format, except for the\n     fact that we manually control the maximum command execution timeout (set to 24h in all experiments\n     unless otherwise"
+    },
+    {
+      "id": "b-70",
+      "type": "body",
+      "text": "21\n\fOn top of this, we additionally ablated the following tools. The default Malena configuration has submission,\nsystem, and jobs tools enabled. The other coding agent iterations run with them disabled, unless otherwise\nspecified for any particular ablation.\n   • submission_register tool: Adds a submission file to the registry. No test or leaderboard scores are\n     communicated to the agent. Additionally, the agent may use submission_list to list the previous\n     submissions it has produced during the session. Whenever this tool is enabled, we also add a short text\n     in the session’s prompt to guide the agent regarding its usage.\n   S system tool: Returns the current hardware resources, utilization, and time remaining.\n   J jobs tools: Allow running bash commands in the background, waiting for them to complete and\n     cancelling ongoing jobs. Whenever this tool is enabled, we also"
+    },
+    {
+      "id": "b-71",
+      "type": "body",
+      "text": "22\n\f    I Minimal prompt: The initial prompt of the agent is simplified to contain only the crucial information,\n      removing general guidelines to follow and examples.\nIn the entire paper, unless otherwise specified, Oneshot iteration is evaluated without any intervention, and\nMalena makes use of the submission, system and jobs tools only."
+    },
+    {
+      "id": "b-72",
+      "type": "body",
+      "text": "B.3   Search strategies\nThe Chain and Greedy strategies are straightforward and are implemented as described in Section 4.2. The\nUCB1 strategy follows a deterministic selection rule, applying the UCB1 index (Auer et al., 2002) to the\npool of existing nodes. Unlike the tree-descent formulation of UCT (Kocsis & Szepesvári, 2006) adopted by\nprior MLE systems (Du et al., 2026; Chen et al., 2026b), which recursively selects among the children of the\ncurrent node, we score every node in the tree and take a single global supremum.\nIn the following, assume the competition metric is higher-is-better (the lower-is-better case is analogous,\nreplacing each normalized score by its complement). Let T be the current tree, V (T ) its nodes, and s(n)\nthe validation score recorded on node n. Then, ŝ(n) = maxn′ ∈subtree(n) s(n′ ), so that a node’s value reflects\nwhat its descendants eventually achieved. T"
+    },
+    {
+      "id": "b-73",
+      "type": "body",
+      "text": "C     Additional Chat, Oneshot and Malena experiments\n\nC.1   Oneshot time limit effect\nWe ablate the effect of the per-iteration time limit in our default Oneshot experimental setting for DeepSeek\nV4 Pro (Preview) and GLM 5.2 models. Results are in Figure 7. We observe, as expected, a monotonic\nimprovement of per-iteration performance as the time budget increases. Nonetheless, the actual performance\nof the aggregated Best-of-N composites quickly saturates at the three hour mark. In our experimental setup,\nthe six hour time limit default provides an reasonable choice to balance the performance and cost tradeoff.\n\n23\n\fNote that, even when prompted to use the highest possible time budget of 12h, the agents still have a much\nlower average effective time usage, which is what allows us to aggregate Best-of-N at the 6h budget."
+    },
+    {
+      "id": "b-74",
+      "type": "body",
+      "text": "Percentile (↑)                                                                               Effective time\n                  65                                                                                   5.6h\n\n60                                                                                   4.9h\n\n55                                                                                   4.2h\n\nEffective time\n Percentile (↑)"
+    },
+    {
+      "id": "b-75",
+      "type": "body",
+      "text": "Model:            Aggregation:\n                                                                                                       3.5h     DeepSeek V4 Pro   Single iteration\n                  50                                                                                            (Preview)         Best-of-N @ 6h\n                                                                                                       2.8h     GLM 5.2\n                  45\n                                                                                                       2.1h\n                  40\n                                                                                                       1.4h\n\n35\n                                                                                                       0.7h"
+    },
+    {
+      "id": "b-76",
+      "type": "body",
+      "text": "1.5h         3h                      6h          12h                                    1.5h             3h                       6h      12h\n                                       Time limit (per iteration)                                                                  Time limit (per iteration)\n\nFigure 7 Impact of per-iteration time limits. Average percentile and effective-time obtained by Oneshot iterations\nunder different per-iteration time budgets in the default29 set. Circled points represent single-iteration performance,\nwhile boxes indicate Best-of-N performance at six hour budgets. Error bars represent 95% CIs across our fixed 29-task\nset. The effective time measures the time taken for the run to finish. Best-of-N aggregates may remain below the\ntarget of 6h in the case of failing iterations that would exceed the maximum budget allocated."
+    },
+    {
+      "id": "b-77",
+      "type": "body",
+      "text": "C.2                    Pairwise Oneshot search strategy and Malena agent comparison\n\nTable 5 Pairwise paired-by-task comparison. Results reported on the 24h budget, using the default29 task split.\nIn an A vs B comparison, positive percentile differences indicate better average performance of A. Percentile difference\nreported along with 95% CIs."
+    },
+    {
+      "id": "b-78",
+      "type": "body",
+      "text": "Percentile (↑)                                         Medal rate (%, ↑)\n                                                                          ∆                                                 ∆                        won A/B/=\n                             Oneshot search strategy\n                             Best-of-N vs UCB1       -2.71 [-6.60, +1.44]                                       -5.3 [-11.8, +1.1]                         4/7/18\n                             Best-of-N vs Greedy     -1.98 [-5.86, +1.89]                                       -5.3 [-11.2, +0.6]                         3/7/19\n                             Best-of-N vs Chain      -0.51 [-4.66, +3.27]                                       -4.2 [-11.2, +2.9]                         4/7/18\n                             UCB1 vs Greedy          +0.73 [-2.85, +4.35]                                       +0.0 [-5.7, +5.7]"
+    },
+    {
+      "id": "b-79",
+      "type": "body",
+      "text": "In Section 4.2 and 4.3, we provided a head-to-head comparison in the paired-by-task regime between all search\nmethods tested, and the Malena agent. In Table 5 we give a more detailed examination of such comparisons,\nand Table 6 gives a more detailed view on the selection gap between these methods."
+    },
+    {
+      "id": "b-80",
+      "type": "body",
+      "text": "C.3                    Hidden validation gap\nIn Section 4 we observed that the gap of the performance between self-select (based on validation score)\nand oracle-best (based on actual test scores) becomes a problem, particularly for strategies that share less\ninformation between their iterations. In this section, we analyze three different interventions that can help\nmitigate such issue. Our experiment setting is on the default Oneshot iteration configuration (six hour per-\niteration time limit, GLM 5.2), and the baseline behavior control is the Best-of-N aggregation at 12h budget\nsetting. We compare:\n\n24\n\fTable 6 Selection gap for different methods. Results reported on the 24h budget, with the default29 split, along\nwith 95% CIs."
+    },
+    {
+      "id": "b-81",
+      "type": "body",
+      "text": "Percentile (↑)                    Selection gap (↓)\n                                  Self-select                   Oracle\n               Malena        69.30 [66.74, 71.78]     71.18 [69.02, 73.46]     1.876 [0.805, 3.205]\n               Best-of-N     64.21 [61.19, 67.07]     71.04 [69.49, 72.66]     6.832 [4.336, 9.634]\n               UCB1          66.92 [64.30, 69.36]     70.89 [68.45, 73.35]     3.973 [2.484, 5.367]\n               Greedy        66.19 [63.43, 68.71]     68.98 [67.32, 70.56]     2.788 [1.011, 5.054]\n               Chain         64.72 [61.97, 67.42]     66.87 [64.08, 69.57]     2.152 [1.409, 2.899]"
+    },
+    {
+      "id": "b-82",
+      "type": "body",
+      "text": "V Strict validation guidelines: We inject to the prompt a set of strict validation guidelines the agent must\n     adhere to, with the hopes to minimize data leakage.\n  BI Baseline iteration: At the beginning of the run, a Baseline iteration is spawned. The Baseline iteration\n     aims to provide a simple, fast-to-run ML pipeline baseline to solve the task, while ensuring the validation\n     split strategy follows a strict set of guidelines. Once this iteration ends, and until the 12h time limit, new\n     Oneshot iterations use the Baseline’s workspace as starting point, while still remaining independent from\n     each other. The goal for this intervention is to provide a common validation strategy for the iterations,\n     and minimize the inconsistencies that come from differently designed sets.\n  HV Hidden validation: At the beginning of the iteration, the harness prepares a determinist"
+    },
+    {
+      "id": "b-83",
+      "type": "body",
+      "text": "Table 7 Selection gap mitigation strategies. Performance reported with 95% CIs. default29 split at 12h budget.\n\nPercentile (↑)                      Selection gap (↓)\n                                Self-select                 Oracle\n                  BI       61.24 [58.85, 63.82]     63.26 [61.28, 65.38]     2.024 [1.125, 2.901]\n                  base     62.56 [60.34, 64.63]     67.99 [66.74, 69.26]     5.433 [3.681, 7.359]\n                  +V       63.74 [59.93, 67.04]     67.57 [66.23, 68.69]     3.833 [0.936, 7.263]\n                  HV       61.55 [59.73, 64.36]     66.03 [63.38, 68.10]     4.479 [2.412, 5.944]"
+    },
+    {
+      "id": "b-84",
+      "type": "body",
+      "text": "Table 7 shows the results of this experiment. We see that the base independent Best-of-N Oneshot configu-\nration provides the best percentile ceiling (oracle), while the introduction of the strict validation guidelines\nin the prompt alone allows for a slightly better self-select performance, at the cost of also lowering the oracle\nceiling. Finally, the introduction of the initial baseline iteration provides the smallest gap of all interventions\nablated, at the cost of a significantly worse performance ceiling. A plausible mechanism for these differences\nis the comparability of the validation scores themselves, rather than the number of submissions available\nto choose from: a single session produces all of its candidates under one validation split, so their reported\nscores are mutually comparable, whereas independent Best-of-N iterations each design their own split and\nthe harness is then"
+    },
+    {
+      "id": "b-85",
+      "type": "body",
+      "text": "25\n\fC.4    Malena budget scaling\nWe study how Malena scales under different time budgets. Our experimental setting consists of a DeepSeek\nV4 Pro (Preview) backbone, with a bare Malena iteration, meaning with the submission, system, and jobs\ntools disabled. This serves as the minimal harness over a coding agent. In our implementation, we use the\nsubmission tool to register the validation scores of each submission, and without it, we have no self-select\nmechanism. For this reason, in this section we report only the oracle ceiling score which, despite not being a\nproduction-ready configuration, still gives a realistic range of the temporal behavior of the agent, especially\nsince the Malena iteration shows the lowest validation gap in our tested iterations (see Appendix C.2)."
+    },
+    {
+      "id": "b-86",
+      "type": "body",
+      "text": "Budget\n                                        50        3h\n                                                  6h\n                                                  12h\n                                        40\n                                                  24h\n                  Percentile (oracle)\n\n30\n\n20\n\n10\n\n0\n\n0h         4h   8h        12h        16h   20h          24h\n                                                                   Time\n\nFigure 8 Behaviour of Malena under different time budgets. Average oracle percentile obtained by Malena on\nthe default29 split with a DeepSeek V4 Pro (Preview) backbone model. Trajectories are extracted from the full run\nby scoring the submissions available at each time. Dotted lines are shown after a timeout target is hit, and maintain\nthe performance achieved."
+    },
+    {
+      "id": "b-87",
+      "type": "body",
+      "text": "Figure 8 shows the results of Malena under different time limits. We observe that the performance steadily\nincreases as more budget is available. Interestingly, despite having an almost identical prompt where the\nonly difference is the time limit mentioned itself, and the automatic time left reminders mentioned at the\nend of the turn,4 the performance of the agent at identical timeframes varies significantly depending on the\ntotal time budget allocated. This suggests that the agent does adapt its exploration vs exploitation strategy\ndepending on the time budget."
+    },
+    {
+      "id": "b-88",
+      "type": "body",
+      "text": "C.5    Malena with different backbones\nWe test the performance of the Malena iteration with different backbone models, and compare it with the\nBest-of-N Oneshot composite at the 24h time budget target. Our selection of backbones is obtained from\nthe results observed in Section 4.1, and we selected two frontier LLMs (GLM 5.2 and Kimi K3), both final\nreleases of the DeepSeek V4 family, and Gemma 4 31B — a smaller model that still shows clear benefits\nfrom the agentic environment. We plot our results in Figure 9, and detailed paired-by-task comparison in\nTable 8. While the frontier models show a clear benefit from the long single-session iteration, the percentile\nof the weaker model favors Best-of-N in comparison — although the medal rate remains consistently better\nin Malena iterations. This may suggest that larger models can better leverage the autonomy in the single-\nsession, or that the"
+    },
+    {
+      "id": "b-89",
+      "type": "body",
+      "text": "automatic messages periodically regardless of the progress in the session turn.\n\n26\n\f                                                         Percentile (↑)                                                                                  Medal rate (↑)\n                                                                                                                  70%\n                         Method\n                          Malena\n                  70                                                                                              60%\n                          Best-of-N\n\n50%\n\nMedal rate (↑)\n Percentile (↑)\n\n60\n\n40%\n                  50\n\n30%\n\n40\n                                                                                                                  20%"
+    },
+    {
+      "id": "b-90",
+      "type": "body",
+      "text": "Gemma 4 31B    DeepSeek V4 Flash DeepSeek V4 Pro     GLM 5.2   Kimi K3                           Gemma 4 31B   DeepSeek V4 Flash DeepSeek V4 Pro   GLM 5.2   Kimi K3\n                                                            Model                                                                                            Model\n\nFigure 9 Malena model ablation. Average percentile and medal rate obtained by the Malena iteration and Best-of-N\nOneshot iterations at the 24h time budget in the default29 set. Error bars represent 95% CIs across our fixed 29-task\nset.\n\nTable 8 Pairwise paired-by-task comparison of different backbones. Reported is the performance difference\nbetween Malena (A) vs Best-of-N (B); higher numbers indicate stronger average Malena performance. Results reported\nusing the default29 task split, with 95% CIs."
+    },
+    {
+      "id": "b-91",
+      "type": "body",
+      "text": "Percentile (↑)                                         Medal rate (%, ↑)\n                                                                                      ∆                                                ∆                         won A/B/=\n                                  Gemma 4 31B                              -3.97 [-7.98, -0.35]*                        +7.9 [+4.3, +11.8]*                           4/1/24\n                                  DeepSeek V4 Flash                        +1.15 [-5.42, +7.77]                          +3.3 [-6.3, +12.4]                          9/6/14\n                                  DeepSeek V4 Pro                         +9.39 [+3.36, +15.98]*                        +12.8 [+2.9, +22.4]*                         11/4/14\n                                  GLM 5.2                                 +5.52 [+1.93, +9.57]*                         +12.0 [+5.7, +18.4"
+    },
+    {
+      "id": "b-92",
+      "type": "body",
+      "text": "C.6                    Malena infrastructure ablation\nIn this section, we ablate further interventions of the Malena iteration itself. We first ablate the importance\nof all interventions of the Malena harness presented in Section 4.3, and we introduce a fourth intervention:\n                  N Time nudges: Scheduled at 25%, 50%, 75% and 90%, the system automatically queues a brief message\n                    to the session and informs the agent about elapsed time. Note that for our default budget of 24h, the\n                    first time nudge is queued at 6h, which corresponds to the hard time limit of each Oneshot iteration.\nResults are shown in Table 9, top row set. We observe that for such long 24h sessions, the performance of\nthe agent is negatively impacted when removing the system tool, suggesting that the agent struggles to track\ntime correctly without it. On the other hand, the"
+    },
+    {
+      "id": "b-93",
+      "type": "body",
+      "text": "27\n\ftion 4.4.\nTable 9 Malena infrastructure ablation. Performance reported with 95% CIs. Top set: default29 split at 24h.\nBottom set: fixed14 split at 12h."
+    },
+    {
+      "id": "b-94",
+      "type": "body",
+      "text": "Percentile (↑)                          Medal rate (%, ↑)\n                         Self-select                 Oracle           Self-select          Oracle\n       Infrastructure ablation (24h, 29 tasks)\n       base         69.30 [66.74, 71.78]   71.18 [69.02, 73.46]   59.4 [54.8, 63.9]   62.5 [58.4, 66.3]\n       +N           63.85 [59.73, 67.77]   65.98 [62.05, 69.83]   48.9 [43.1, 54.0]   52.3 [46.6, 57.5]\n       -J           70.47 [66.89, 74.25] 72.84 [69.55, 76.10]     62.1 [56.9, 67.2]   62.1 [56.9, 67.2]\n       -S-J         65.33 [62.05, 68.61]   68.36 [65.16, 71.45]   50.6 [44.8, 56.3]   56.9 [50.6, 62.6]\n       Additional ablation (12h, 14 tasks)\n       +N          58.84 [55.58, 62.11]    63.18 [60.51, 65.83]   40.3 [34.1, 46.5]   45.2 [39.7, 50.7]\n       +N+D        61.28 [56.43, 65.46]    63.16 [58.41, 67.36]   44.3 [36.2, 51.9]   47.1 [39.5, 54.8]\n       +N+P3       59.78 [55.2"
+    },
+    {
+      "id": "b-95",
+      "type": "body",
+      "text": "C.7   Malena under a constrained context budget\nWe additionally test how Malena performs under an extremely short context budget with frequent summa-\nrization, on the full fixed10 task subset, comparing against the standing, unconstrained Malena baseline\non the same tasks. We compare the behavior on GLM 5.2 running at its native 1M context limit, with an\nartificially constrained version that at whenever the session hits the 64k context limit, it triggers OpenCode’s\nnative session summarization compaction routine to reduce the context window.\nCompaction fires reliably under the shrunk budget. Every shrunk-context run triggers OpenCode’s\nbuilt-in compaction at least once, at an average rate of 9.5 compactions over the 24h budget (it ranges\nfrom 3 to 63 compactions; over the n = 40 runs we observe 381 compaction events total). The context\nsize right before compaction averages 65.4k tokens, "
+    },
+    {
+      "id": "b-96",
+      "type": "body",
+      "text": "C.8   Oneshot infrastructure ablation\nWe extend the experiments reported in Appendix C.6 and ablate different interventions in the Oneshot\niteration. More information about these interventions in Appendix B.2. We report the average performance\nper iteration on GLM 5.2 and DeepSeek V4 Pro (Preview) backbones in Table 13. While most interventions\nprovide a modest point-estimate improvement and only H resolving as statistically significant for GLM 5.2,\n\n28\n\fTable 10 Malena pairwise paired-by-task comparison. In an A vs B comparison, positive percentile differences\nindicate better average performance of A. Differences reported along with 95% CIs. Top set: 24h, default29 split.\nMiddle set: 24h, fixed14 split. Bottom set: 12h, fixed14 split."
+    },
+    {
+      "id": "b-97",
+      "type": "body",
+      "text": "Percentile (↑)                          Medal rate (%, ↑)\n                                                  ∆                                  ∆                   won A/B/=\n               Infrastructure ablation (24h, 29 tasks)\n               base vs +N         +5.46 [+0.70, +10.67]*              +10.6 [+3.7, +17.9]*                 8/1/20\n               base vs -J           -1.17 [-5.64, +3.34]               -2.6 [-10.2, +4.7]                  3/6/20\n               base vs -S-J         +3.97 [-0.07, +7.97]              +8.9 [+1.7, +15.9]*                  9/3/17\n               Orchestration ablation (24h, 14 tasks)\n               base vs +D          +2.88 [-2.94, +8.73]                +10.5 [-1.0, +22.0]                   4/4/6\n               base vs +P3          -1.26 [-6.09, +3.21]               +3.3 [-8.2, +14.9]                    4/3/7\n               base vs +B+P3     +7.59 [+0.99,"
+    },
+    {
+      "id": "b-98",
+      "type": "body",
+      "text": "Table 11 Avg. compactions before first medal.\n\nTask    alaska2   cassava     champs   freesound     hubmap    imet        kuzushiji   multi-modal     nfl   petfinder\n        Avg       –         1.2         –         1.5          –          2.0         4.2         12.5         2.5      1.7\n\nTable 12 Malena under a shrunk context/output budget. Any-medal rate (↑) and mean percentile (↑), with\n95% CIs, self-selected and oracle (best-of-pool), on the full fixed10 task subset (10 tasks × 4 seeds, n = 40 per arm)."
+    },
+    {
+      "id": "b-99",
+      "type": "body",
+      "text": "Self-selected                                           Oracle\n          Group                   Any-medal       Mean percentile                  Any-medal          Mean percentile\n          Malena 1M        57.5% [42.2, 71.5]         77.1 [68.0, 86.2]         65.0% [49.5, 77.9]       78.8 [69.8, 87.8]\n          Malena 64k       50.0% [35.2, 64.8]         73.5 [65.3, 81.7]         50.0% [35.2, 64.8]       74.5 [66.3, 82.7]\n\nand I for DeepSeek V4 Pro (Preview), only when running all of them together we can observe a larger\nperformance improvement, as shown in Table 14.\n\nD     Additional experiments with external harnesses"
+    },
+    {
+      "id": "b-100",
+      "type": "body",
+      "text": "D.1   Detailed external harness description\nMLEvolve. (Du et al., 2026) MLEvolve maintains a tree of candidate solutions, each node a complete\ntraining script with a single parent, and expands it by UCT: nodes carry visit counts and a backpropagated\nreward, and selection descends by the usual upper-confidence-bound rule with an exploration constant that\ndecays over the run. The backpropagated reward is not the task metric but a small hand-designed signal\n— a bonus for beating the incumbent, a penalty for a node that fails to run. Past the halfway point of\nthe budget the selector blends UCT with rank-weighted sampling from a global, greedily-ranked top-K, so\nexploration gives way to exploitation on a schedule rather than through the search rule itself. Six operators\nproduce nodes: draft, improve, evolution (improve using the branch’s own trajectory), debug, and two\ncross-branch operators,"
+    },
+    {
+      "id": "b-101",
+      "type": "body",
+      "text": "29\n\fTable 13 Oneshot infrastructure ablation. Average performance observed per Oneshot iteration reported with\n95% CIs in the default29 split. Top set: GLM 5.2 backbone. Bottom set: DeepSeek V4 Pro (Preview) backbone."
+    },
+    {
+      "id": "b-102",
+      "type": "body",
+      "text": "Percentile (↑)        Medal rate (↑)\n                            base              55.15 [54.31, 55.98]     36.8 [35.5, 38.2]\n                            +S+J              56.58 [54.78, 58.41]     37.9 [34.5, 41.4]\n                            +S+J+N            55.99 [54.18, 57.85]     37.1 [33.6, 40.1]\n                            +H                57.08 [55.39, 58.80]     38.8 [35.8, 41.8]\n                            +D                56.95 [55.12, 58.81]     39.2 [35.8, 42.7]\n                            +V                54.47 [52.62, 56.38]     35.9 [32.4, 39.4]\n                            +S+J+N+H+D+V      57.94 [56.07, 59.77]     41.8 [38.8, 44.8]\n                            base              39.63 [38.10, 41.11]     20.3 [18.0, 22.4]\n                            +H                39.99 [37.97, 42.07]     19.8 [16.8, 22.8]\n                            +V                41.08 [38.92, 43"
+    },
+    {
+      "id": "b-103",
+      "type": "body",
+      "text": "Table 14 Pairwise paired-by-task comparison. Average per-iteration difference observed. Results reported using\nthe default29 task split. In an A vs B comparison, positive percentile differences indicate better average performance\nof A. Percentile difference reported along with 95% CIs. Top set: GLM 5.2 backbone. Bottom set: DeepSeek V4 Pro\n(Preview) backbone."
+    },
+    {
+      "id": "b-104",
+      "type": "body",
+      "text": "Percentile (↑)                Medal rate (%, ↑)\n                                                     ∆                      ∆              won A/B/=\n              GLM 5.2\n              base vs +S+J                  -1.43 [-3.29, +0.57]     -1.1 [-4.7, +2.7]      9/10/10\n              base vs +S+J+N                -0.85 [-2.88, +1.22]     -0.2 [-3.9, +3.2]      9/10/10\n              base vs +H                  -1.93 [-3.85, -2.9e-03]*   -2.0 [-5.4, +1.3]      7/10/12\n              base vs +D                    -1.80 [-3.82, +0.23]     -2.4 [-6.0, +1.2]      9/10/10\n              base vs +V                   +0.68 [-1.32, +2.82]      +0.9 [-2.7, +4.7]      8/10/11\n              base vs +S+J+N+H+D+V          -2.80 [-4.83, -0.74]*    -5.0 [-8.4, -1.5]*     5/13/11\n              DeepSeek V4 Pro (Preview)\n              base vs +H              -0.36 [-2.85, +2.22]           +0.5 [-3.4, +4.0]   "
+    },
+    {
+      "id": "b-105",
+      "type": "body",
+      "text": "several branches. Crossover therefore flows through the prompt rather than the topology: a fusion node\nstill has exactly one parent, with the other candidates injected as reference text, so the structure is a tree\nwith cross-branch information flow and not a genealogical graph. Three candidates execute concurrently on\none GPU. It commits, greedily and with no end-of-run re-ranking, whichever submission had the best self-\nreported validation metric at the time it was produced — a number an LLM extracts from the candidate’s\nown stdout. It also keeps a hybrid BM25+FAISS retrieval memory over past attempts within a run, indexing\neach successful node by its plan and a code summary (and each debug node by the error it was repairing)\nand querying it when drafting, improving and debugging; we enable it in all runs reported here.\nAiScientist. (Chen et al., 2026a) AiScientist has no search structu"
+    },
+    {
+      "id": "b-106",
+      "type": "body",
+      "text": "30\n\fsubagents run blocking, and the only concurrency is whatever background training the model chooses to\nlaunch inside its sandbox. Most consequentially for Section 5.1, the final choice among candidates is made\nby the agent rather than by harness code: no code ranks candidates, but the agent is required, as a step\nbefore submitting, to compare its candidates against the registry and its experiment log and copy the best\nto the canonical submission path. It does so substantively — where it records the decision, it cites the\ncross-validation or hold-out protocol it designed, per-candidate scores under that protocol, and a rationale\ncomparing them (for instance choosing a blended ensemble at OOF F1 0.944 over its two components at\n0.942 and 0.938). Its self-selected number is therefore a genuine self-selection on its own validation signal, as\nfor the other methods; the difference is that t"
+    },
+    {
+      "id": "b-107",
+      "type": "body",
+      "text": "D.2   Detailed MLE-bench results\nIn Table 15, we provide more details on the headline results presented in Figure 1 of Malena, along with the\ndifferent external harnesses we ran, on the fixed30 split in MLE-bench. Additionally, Table 16 shows the\npaired-by-task relative performance for Malena against all other methods. We find that Malena outperforms\nevery presented baseline at the GLM 5.2 backbone across both performance metrics; obtains strictly better\npercentile scores for Kimi K3, and either beats or comes up as statistically indistinguishable at the DeepSeek\nV4 Flash. The only backbone where Malena presents a significant regression against other baselines is with\nGemma 4 31B — the weaker of all models tested — where MLEvolve outperforms according to the percentile\nmetric, while maintaining an equivalent medal rate at our current statistical power.\nTwo data caveats apply across metho"
+    },
+    {
+      "id": "b-108",
+      "type": "body",
+      "text": "D.3   Tuning effort invested in baseline harnesses\nBecause Malena is our own system, a natural concern is that we invested asymmetrically more integration\nand tuning effort into it than into the external harnesses it is compared against. This appendix reports\nthat effort, spanning backbone-compatibility bug fixes and targeted configuration ablations on MLEvolve,\nScienceFlow, and Arbor. In each case, this work either (i) fixed a genuine defect — adopted into every\ncanonical batch reported elsewhere in the paper; (ii) found no reliable improvement, in which case we kept\nthe harness’s original canonical configuration and report the negative result here rather than omitting it; or\n(iii) found a genuine backbone-specific configuration effect and adopted the better setting as canonical — the\none such case is MLEvolve’s reasoning effort on DeepSeek V4 Flash (Appendix D.3)."
+    },
+    {
+      "id": "b-109",
+      "type": "body",
+      "text": "MLEvolve: reasoning effort on DeepSeek V4 Flash.For every other backbone reported above, MLEvolve’s canon-\nical batches use that backbone’s own reasoning_effort=max (or equivalent) setting, matching every other\nmethod’s convention. On DeepSeek V4 Flash, we instead adopt reasoning_effort=medium as MLEvolve’s\ncanonical setting, the only backbone where it departs from max. The reason is a length effect specific to this\nbackbone: at max, DeepSeek V4 Flash emits substantially longer reasoning traces than it does at medium."
+    },
+    {
+      "id": "b-110",
+      "type": "body",
+      "text": "31\n\fTable 15 MLE-bench performance with different harnesses and backbones. Any-medal rate (↑) and mean\npercentile (↑), self-selected vs. oracle (best-in-pool), macro-averaged over the full fixed30 set (mean over seeds within\na task, then mean over tasks) at 24h time budget. A run with no valid submission counts as the worst possible outcome\n(no medal, worst percentile) rather than being excluded from its row’s average. Brackets are 95% bootstrap CIs (seed-\nresampling, task set fixed). Sections are grouped by backbone model; bold/underline/italic rank the 1st/2nd/3rd\nbest value per column within a section, among rows on that section’s shared task set."
+    },
+    {
+      "id": "b-111",
+      "type": "body",
+      "text": "Percentile (↑)                                Medal rate (↑)\n                             Self-select                Oracle               Self-select            Oracle\n      Kimi K3\n      Malena           72.75 [70.75, 74.82]     75.54 [73.90, 77.35]     60.0 [55.6, 64.4]    65.6 [60.0, 70.0]\n      Arbor            68.46 [66.63, 70.08]     69.53 [67.76, 71.25]     60.0 [56.7, 63.3]    61.1 [57.8, 64.4]\n      AiScientist      64.15 [61.26, 67.10]     65.48 [62.54, 68.32]     52.2 [46.7, 57.8]    53.3 [47.8, 58.9]\n      MLEvolve         63.89 [62.00, 65.74]     70.32 [68.98, 71.58]     50.0 [46.7, 54.4]    63.3 [60.0, 66.7]\n      GLM 5.2\n      Malena           69.74 [67.38, 72.23]     71.56 [69.43, 73.66]     62.5 [58.3, 66.7]    65.0 [61.7, 68.3]\n      Arbor            59.26 [56.37, 62.13]     60.70 [57.92, 63.54]     45.8 [41.7, 50.0]    47.5 [42.5, 52.5]\n      AiScientist      61.39 [58"
+    },
+    {
+      "id": "b-112",
+      "type": "body",
+      "text": "Because MLEvolve’s tree search issues many independent, short LLM calls rather than growing a single ses-\nsion, per-call reasoning length translates almost directly into wall-clock cost per search step, so under max’s\nmuch longer traces MLEvolve completes only a fraction of the search steps it completes at medium within a\nfixed 24h budget.\nTo quantify this we compare max and medium on an identical 10-task subset (same tasks, same seed range,\nsame 24h timeout for both arms; Table 17). Cutting reasoning effort to medium reduces the median reasoning\nlength per LLM call by roughly 5× (37,124 to 7,069 characters), which more than triples the mean number\nof completed search-tree nodes per run (18.5 to 62.8). Per-node quality is essentially unchanged between\nthe two settings — the buggy-node rate is within noise (61% vs. 62%) — so the additional search volume at\nmedium is not, on average, lower"
+    },
+    {
+      "id": "b-113",
+      "type": "body",
+      "text": "Before either harness’s canonical GLM 5.2 batch could run, we\nIndependent tool-calling failures on GLM 5.2.\nfound and fixed two unrelated bugs that both manifested as tool-calling failures specific to this backbone.\nMLEvolve’s structured-output calls request a named (forced) tool_choice; GLM 5.2 served behind our vLLM\ndeployment enters grammar-constrained decoding under a forced choice, and its FSM has no transition for the\nreasoning tokens the model wants to emit before its answer, so every such call failed with an internal server\nerror. We fixed this by defaulting MLEvolve’s structured-output calls to tool_choice=auto (configurable\nper stage, so backends that do handle a forced choice reliably are unaffected). Independently, ScienceFlow’s"
+    },
+    {
+      "id": "b-114",
+      "type": "body",
+      "text": "32\n\fTable 16 Paired Malena vs. baseline comparison across all models, macro-averaged per task, over the fixed30 task set.\nHigher percentile numbers indicate stronger average performance for Malena."
+    },
+    {
+      "id": "b-115",
+      "type": "body",
+      "text": "Percentile (↑)                                     Medal rate (%, ↑)\n                                                                        ∆                                      ∆                      won A/B/=\n           Kimi K3\n           Malena vs Arbor                            +4.29 [+1.54, +7.05]*                        +0.0 [-5.6, +5.6]                      5/5/20\n           Malena vs AiScientist                      +8.60 [+4.91, +12.15]*                      +7.8 [+0.0, +15.6]                      7/2/21\n           Malena vs MLEvolve                         +8.85 [+6.11, +11.70]*                     +10.0 [+3.3, +16.7]*                     7/2/21\n           GLM 5.2\n           Malena vs Arbor                           +10.48 [+6.76, +14.29]*                     +16.7 [+10.0, +22.5]*                   12/1/17\n           Malena vs AiScientist                      +8.36 [+5.12, +"
+    },
+    {
+      "id": "b-116",
+      "type": "body",
+      "text": "Table 17 MLEvolve on DeepSeek V4 Flash, max vs. medium reasoning effort, restricted to an identical 10-task\nsubset and 24h timeout for both arms. Any-medal rate and none-rate are self-selected outcomes; mean percentile is\noracle (best-in-pool). 95% CIs are bootstrapped over per-task run lists (2000 resamples), matching the convention\nused for the paper’s headline tables. Reasoning length is a per-LLM-call median pooled across all calls in each arm’s\nruns; node counts (mean/run) and the buggy-node rate are from each run’s full search-tree journal."
+    },
+    {
+      "id": "b-117",
+      "type": "body",
+      "text": "reasoning_effort     Any-medal rate (%) ↑ [95% CI]    None-rate (%) ↓   Mean percentile ↑ [95% CI]   Median reasoning (chars) ↓   Mean nodes/run ↑   Buggy rate (%) ↓\nmax                           0.0 [0.0, 0.0]               13.8              42.6 [36.0, 48.5]                 37124                    18.5               61\nmedium (canonical)          25.0 [10.0, 30.0]               2.5              53.1 [44.9, 59.8]                  7069                    62.8               62"
+    },
+    {
+      "id": "b-118",
+      "type": "body",
+      "text": "LLM client always included a tools/tool_choice field in its request payload, even for calls with no tools\nto offer (e.g., its metric-output-interpreter step); the same GLM 5.2 deployment rejects an explicit empty\ntools: [] array outright, which we fixed by omitting the field entirely rather than sending an empty array.\nThese are two independent root causes, each surfaced by validating against a live endpoint before launching\nthe canonical batch, not two symptoms of the same underlying fix."
+    },
+    {
+      "id": "b-119",
+      "type": "body",
+      "text": "ScienceFlow: worker count and resource-admission policy.  ScienceFlow’s canonical configuration runs multiple\nparallel exploratory workers sharing a single GPU (2 workers for GLM 5.2; a single worker gated by an\nLLM-based resource-admission heuristic for DeepSeek V4 Flash). Suspecting that this concurrency could\nitself be a source of resource congestion, we tested two independent mitigations, one per backbone.\nOn GLM 5.2, we compared 1 worker against the canonical 2 workers across the full fixed30 split (Table 18).\nAny-medal rate and mean percentile are statistically indistinguishable between the two worker counts; the\n1-worker point estimate is nominally higher on any-medal rate (43.9% vs. 40.0%). This comparison uses the\nfull fixed30 split, following an inconclusive result on an earlier 11-task subset; CIs at this sample size cannot\nrule out a modest true effect. We kept the canonical "
+    },
+    {
+      "id": "b-120",
+      "type": "body",
+      "text": "33\n\fTable 18 ScienceFlow (GLM 5.2), num_workers=1 vs. the canonical num_workers=2, full fixed30 cover-\nage, with no data-variant confound between the two. Both any-medal and mean percentile are oracle (best-of-pool)\nacross every candidate ScienceFlow harvests per run, flipped so higher is better. 95% CIs are bootstrapped over\nper-task run lists (2000 resamples).\n\nConfiguration               Any-medal rate (%) ↑ [95% CI]                 Mean percentile ↑ [95% CI]\n            2 workers (canonical)                  40.0 [33.3, 46.7]                          60.7 [57.4, 64.6]\n            1 worker                               43.9 [36.7, 50.0]                          60.4 [56.1, 64.3]"
+    },
+    {
+      "id": "b-121",
+      "type": "body",
+      "text": "policy was necessary (Table 19). It was not: any-medal rate and mean percentile are both somewhat lower\nunder resource_smart_policy, and the gap is within the noise we see elsewhere at this sample size. We\nkept resource_smart_llm as canonical.\n\nTable 19 ScienceFlow (DeepSeek V4 Flash), resource-admission ablation, identical 10-task subset and 24h\ntimeout as Appendix D.3’s MLEvolve ablation. Both any-medal and mean percentile are oracle (best-of-pool) across\nevery candidate ScienceFlow harvests per run, flipped so higher is better, matching every other percentile column in\nthis paper. 95% CIs are bootstrapped over per-task run lists (2000 resamples), matching the convention used for the\npaper’s headline tables (Section 5.1)."
+    },
+    {
+      "id": "b-122",
+      "type": "body",
+      "text": "Configuration                    Any-medal rate (%) ↑ [95% CI]      Gold (%)    Silver (%)   Bronze (%)    Mean percentile ↑ [95% CI]\n resource_smart_llm (canonical)          28.3 [10.0, 50.0]             10.0        13.3           5.0             66.6 [52.9, 80.7]\n resource_smart_policy                   20.0 [0.0, 40.0]               2.5        10.0           7.5             52.2 [39.6, 65.5]"
+    },
+    {
+      "id": "b-123",
+      "type": "body",
+      "text": "Arbor: executor timeout and convergence early-stopping (GLM 5.2). Arbor’s canonical configuration for both\nGLM 5.2 and DeepSeek V4 Flash uses reasoning_effort=max, a 1M-token context window, 3 parallel\nexecutors, and a 4-hour timeout per individual experiment inside its 24h wall-clock budget; the executor\ntimeout and the stop_after=8 convergence early-stopping threshold ablated below are not values we chose\n— both are ported unmodified from the mle_kaggle competition-optimization plugin bundled in Arbor’s own\npublic GitHub repository, so these ablations test Arbor’s own maintainers’ defaults rather than a configu-\nration we picked ourselves. We ran two targeted ablations against this configuration. First, we tripled the\nexecutor timeout to 12 hours; the medal rate is unchanged (Table 20). Second, we tried relaxing Arbor’s\nconvergence-based early stopping (default stop_after=8 consecutive"
+    },
+    {
+      "id": "b-124",
+      "type": "body",
+      "text": "Table 20 Arbor (GLM 5.2), executor-timeout and convergence ablations against the canonical 4-seed base-\nline, matched per task. Any-medal is self-selected, best-of-pool across every scored idea-tree node. 95% CIs are\nbootstrapped over per-task run lists (2000 resamples), matching the convention used for the paper’s headline tables.\n\nAblation                                       Baseline any-medal rate (%) ↑ [95% CI]        Ablation any-medal rate (%) ↑ [95% CI]\n Executor timeout: 4h → 12h                                   12.5 [0.0, 50.0]                              12.5 [0.0, 50.0]\n Convergence early-stop: stop_after 8 → 999                  50.0 [0.0, 100.0]                             43.8 [25.0, 75.0]"
+    },
+    {
+      "id": "b-125",
+      "type": "body",
+      "text": "D.4    Trajectory and token usage with Kimi K3\nFigure 4’s two panels are GLM 5.2 only. Figure 10 reproduces both at Kimi K3 using the same fixed30 task\nset.\nThe overall shape matches Figure 4: quality rises quickly in the first few hours and plateaus thereafter, with\nAiScientist again the slowest to converge. On cost, Malena’s cache-read volume again dominates its token\nfootprint the same way it does at GLM 5.2, but Kimi K3’s much higher output pricing ($13.99/M vs. GLM\n5.2’s $3.123/M) makes MLEvolve’s uncached, output-heavy tree search the most expensive of the four shown\nhere."
+    },
+    {
+      "id": "b-126",
+      "type": "body",
+      "text": "34\n\f                       80\n                                                                                                                      Harness                                                             102\n                                                                                                               109     Malena\n                       70                                                                                              AiScientist\n                                                                                                                       Arbor\n                       60                                                                                      108     MLEvolve\n\nInference cost (USD)\n Percentile (oracle)\n\nTokens per run\n                       50"
+    },
+    {
+      "id": "b-127",
+      "type": "body",
+      "text": "40                                                                                      107                                                                        101\n\n30\n                                                                 Harness\n                       20                                                                                      106\n                                                                     Malena\n                                                                     Arbor\n                       10\n                                                                     AiScientist\n                                                                     MLEvolve                                  105                                                                        100\n                        0"
+    },
+    {
+      "id": "b-128",
+      "type": "body",
+      "text": "0h    4h     8h      12h     16h   20h                 24h\n                                               Time                                                                  Input tokens    Output tokens   Cache-read tokens   Inference cost\n\nFigure 10 Left: oracle best-so-far vs. wall-clock time at Kimi K3 for Malena, Arbor, AiScientist, and MLEvolve.\nRight: per-run distribution of cumulative input, output(+reasoning), and modeled cache-read tokens, plus a USD-\ncost group at Kimi K3 pricing, for Malena, Arbor, AiScientist, and MLEvolve. MLEvolve’s cache group is omitted\n(always exactly 0, same reason as the GLM 5.2 figure)."
+    },
+    {
+      "id": "b-129",
+      "type": "body",
+      "text": "D.5                         Quality by task difficulty\nIn order to better understand the strengths of Malena against other baselines, and better investigate its\nimproved performance, we partition the fixed30 split into four different clusters, according to perceived\ndifficulty among all harnesses:\n                       1. nomad2018, plant, spooky, stanford, us\n                       2. aptos2019, freesound, h&m, hotel, hubmap, mlsp, tweet, whale\n                       3. billion-word, cassava, imet, kuzushiji, multi-modal, nfl, petfinder\n                       4. alaska2, champs, hms, jigsaw, new, osic, smartphone, tensorflow2, uw, ventilator\nWe plot the individual oracle performance among these clusters in Figure 11. On the easiest cluster (1), all\nmethods approach ceiling performance by 24h, though AiScientist lags behind for much of the run before\ncatching up. On cluster 2, Malena an"
+    },
+    {
+      "id": "b-130",
+      "type": "body",
+      "text": "D.6                         NatureBench: evaluation protocol\nFor NatureBench, we follow the benchmark’s own online evaluation protocol as published (Appendix A.3):\nrather than a single held-out grader run once at the end of a run, as in MLE-bench, each task exposes a\nlive /evaluate HTTP endpoint that an agent may query an unbounded number of times over the course of\na run, with the endpoint automatically tracking the best score seen across all calls. We give every harness\nwe compare here — Malena, AiScientist, and MLEvolve — unrestricted access to this endpoint, matching\nNatureBench’s protocol as published.\nWe extend the per-run time budget to 8h, double NatureBench’s own published default of 4h, to give the\nslower of our search-based baselines (MLEvolve, whose tree search advances through many short, sequential\nsteps rather than one long session) a more comfortable margin within which t"
+    },
+    {
+      "id": "b-131",
+      "type": "body",
+      "text": "35\n\f                                                Cluster 1 (5 tasks)                                                            Cluster 2 (8 tasks)\n                       100\n\n80\n Percentile (oracle)\n\n60\n\n40\n\nHarness\n                        20                                                         Malena\n                                                                                   Arbor\n                                                                                   AiScientist\n                         0                                                         MLEvolve\n\nCluster 3 (7 tasks)                                                            Cluster 4 (10 tasks)\n                       100\n\n80\n Percentile (oracle)\n\n60\n\n40\n\n20\n\n0"
+    },
+    {
+      "id": "b-132",
+      "type": "body",
+      "text": "0h    4h     8h            12h          16h   20h                  24h   0h        4h       8h             12h          16h   20h   24h\n                                                       time                                                                           time\n\nFigure 11 Oracle best-so-far vs. wall-clock time, faceted by task cluster. Malena’s lead is largest on cluster 3, smaller\nbut present on clusters 2 and 4, and narrowest on cluster 1, where every method approaches ceiling performance by\n24h.\n\nscoring opportunities exercised, this asymmetry may put MLEvolve at a mechanical disadvantage on this\nparticular metric, independent of any difference in the quality of the strategies it discovers.\n\nTable 21 Number of /evaluate calls per run on NatureBench. 25th/50th/75th percentiles across our full\nNatureBench run cohort, pooling both the GLM 5.2 and Kimi K3 backbones."
+    },
+    {
+      "id": "b-133",
+      "type": "body",
+      "text": "Malena                 AiScientist        MLEvolve\n                                                       p25                         8                         7            2\n                                                       p50 (median)               16                        18            8\n                                                       p75                        36                        96           18"
+    },
+    {
+      "id": "b-134",
+      "type": "body",
+      "text": "E                        Trace Analysis\nThis appendix gives the full methodology behind Section 5.2’s checkpoint labeling and the technique-overlap\nanalysis it enables, including the labeling schema, the offline deduplication/clustering procedure, and technique-\nname normalization we omitted from the main text for space. Labeling was run on a fixed set of 10 original\nMLE-bench tasks (aptos2019, billion-word-imputation, cassava, champs, freesound, h&m, jigsaw, nfl,\npetfinder, ventilator) – not to be confused with the fixed10 challenging split used elsewhere in this\npaper, which is a different set of 10 tasks. The checkpoint-mining and labeling steps below (through canoni-\ncalization) are the current pipeline behind Figure 6 and Figure 5. Unless stated otherwise, the labeling/judge\nmodel throughout is GLM 5.2."
+    },
+    {
+      "id": "b-135",
+      "type": "body",
+      "text": "E.1                          Checkpoint mining\nCheckpoints. We unify run traces across methods to a common checkpoint format: a snapshot of the\nrun’s code repository at specific points in time, method-dependent since each harness structures its own\ntrajectory differently – for Malena, immediately before a long job submission, a long bash tool call, or a"
+    },
+    {
+      "id": "b-136",
+      "type": "body",
+      "text": "36\n\fsubmission-registration tool call; for MLEvolve, before executing a candidate; for AiScientist, before a long\nbash tool call; for Arbor, before a job-submit call. Oneshot and Completions have no intermediate trajectory\nto snapshot and are labeled once, on the final state of the repository. Runs with multiple checkpoints are\nlabeled sequentially along this chain, each job seeded with the entries already logged for its nearest earlier\ncheckpoint so it only has to add, remove, or revise entries rather than re-deriving the whole technique set\nfrom scratch.\nLabeling schema (pass 1: technique extraction). The judge (GLM 5.2) reads a checkpoint’s code and\nlogs zero or more entries, each with: a free-form snake_case name (no reuse-search against prior entries –\nnaming convergence is handled later, offline); 1–3 categories, ordered most-to-least applicable, drawn from\na fixed 13-way taxonomy "
+    },
+    {
+      "id": "b-137",
+      "type": "body",
+      "text": "E.2   Main-text plot methodology\nThis subsection gives the exact construction behind the two main-text plots built on top of the canonical\ntechnique clusters above: the category-share-decay curves (Figure 6) and the per-technique rarity distribution\n(Figure 5).\nCategory-share decay (half-life). Figure 6 tracks a method’s technique-category composition as a function\nof checkpoint fraction x ∈ [0, 1] (progress through a run, pooled over every checkpoint of every run of that\nmethod). Every technique discovered at fraction f ≤ x contributes weight 0.5(x−f )/h to x’s composition,\nfor half-life h: a technique discovered exactly at x has full weight 1, one discovered h earlier has weight 0.5,\nand older ones decay smoothly toward (but never reach) 0. Weighted category-tag counts are normalized\nto shares at each x. h → ∞ recovers a plain cumulative count of every technique discovered so far; h → "
+    },
+    {
+      "id": "b-138",
+      "type": "body",
+      "text": "37\n\ftask, pool every run of every (method, backbone) group on that task, and for each cluster c let nc be how\nmany of those pooled runs exhibit it; c’s rarity is 1 − nc /ntotal , the fraction of that task’s pooled runs that\ndid not use it. Pooling within the task across every group (rather than, say, comparing a group only to\none fixed baseline) means rarity reflects how many runs overall exhibit a technique, not how many distinct\ngroups do – a technique used by only a handful of runs stays rare even when those runs happen to span more\nthan one group (Appendix E.5 gives a rarity-0.9 example shared across exactly two groups). Figure 5 plots,\nper method, the resulting distribution of these per-technique rarity values (pooled across backbones and 10\ntasks) into six windows centered at rarity 0, 0.2, . . . , 1.0 (half-width 0.1)."
+    },
+    {
+      "id": "b-139",
+      "type": "body",
+      "text": "E.3       Robustness of the category-share-decay curves\nFigure 6 in the main text pools all labeled tasks at a single half-life (0.25). Figure 12 shows the same pooled\nconstruction at three half-lives closer to the main text’s value (0.1, 0.15, 0.2), and Figures 13 and 14 show\nthe identical three-half-life construction on two individual tasks (aptos2019 and nfl) instead of pooled, to\ncheck that the shape of Malena’s late-run shift toward ensembling/model_selection is not an artifact of the\nparticular half-life or of pooling across tasks."
+    },
+    {
+      "id": "b-140",
+      "type": "body",
+      "text": "1.0\n                                              AiScientist                             Malena                             MLEvolve\n      ensembling\n      post_processing       0.8\n      model_selection       0.6\n      training\n      inference             0.4\n      architecture\n      regularization        0.2\n      loss                  0.0\n      optimization          1.0\n      feature_engineering\n      augmentation          0.8\n      data_pipeline         0.6\n      data_preprocessing\n                            0.4\n                            0.2\n                            0.0\n                            1.0\n                            0.8\n                            0.6\n                            0.4\n                            0.2\n                            0.0\n                                  0.0   0.2   0.4     0.6   0.8   1.0   0.0    0.2   0.4   0.6   0.8   1.0   0.0   0.2  "
+    },
+    {
+      "id": "b-141",
+      "type": "body",
+      "text": "Figure 12 Pooled category-share-decay curve (all labeled tasks) at half-lives 0.1, 0.15, and 0.2 (rows, top to bottom)\n– smaller half-life is a more local, noisier snapshot of recently-introduced techniques. As in Figure 6, the x-axis is\ncheckpoint fraction through the run (∈ [0, 1]) and the y-axis is the decayed share of technique-category tags at that\npoint."
+    },
+    {
+      "id": "b-142",
+      "type": "body",
+      "text": "E.4       Per-task technique-category composition across methods\nFigure 6 and Figure 5 both look at a method’s technique choices pooled across all 10 tasks – respectively how\nits category mix shifts over the course of a run, and how rare its techniques are relative to every other group.\nA complementary question is whether methods reach for a different mix of technique categories than each\nother on the same task, i.e. whether task identity or method identity is the bigger driver of what a method\ntries. Here we look directly at the technique-category composition of each method’s repertoire on each task\nindependently.\nFor a given (task, method) pair, we take the set of every distinct canonical technique cluster (Appendix E.1\nabove) any of that method’s backbone/seed runs on that task exhibit, and tally, for each category tag in the\ntaxonomy above, how many of those clusters carry it (a clus"
+    },
+    {
+      "id": "b-143",
+      "type": "body",
+      "text": "38\n\f                            1.0\n                                              AiScientist                             Malena                             MLEvolve\n      ensembling\n      post_processing       0.8\n      model_selection       0.6\n      training\n      inference             0.4\n      architecture\n      regularization        0.2\n      loss                  0.0\n      optimization          1.0\n      feature_engineering\n      augmentation          0.8\n      data_pipeline         0.6\n      data_preprocessing\n                            0.4\n                            0.2\n                            0.0\n                            1.0\n                            0.8\n                            0.6\n                            0.4\n                            0.2\n                            0.0\n                                  0.0   0.2   0.4     0.6   0.8   1.0   0.0    0.2   0.4"
+    },
+    {
+      "id": "b-144",
+      "type": "body",
+      "text": "Figure 13 Category-share-decay curve on aptos2019 alone, at half-lives 0.1, 0.15, and 0.2 (rows, top to bottom). As in\nFigure 6, the x-axis is checkpoint fraction through the run (∈ [0, 1]) and the y-axis is the decayed share of technique-\ncategory tags at that point."
+    },
+    {
+      "id": "b-145",
+      "type": "body",
+      "text": "a strong driver on its own: feature_engineering dominates every method’s profile on champs, h&m, and\nnfl, while ensembling dominates on petfinder and, for Malena and AiScientist specifically, on aptos2019,\ncassava, and jigsaw as well. Second, on top of that shared task-driven baseline, Malena and AiScientist’s\nprofiles track each other closely on most tasks (e.g. aptos2019, cassava, freesound, nfl), while MLEvolve is\nthe most frequent outlier – visibly heavier on data_preprocessing and lighter on ensembling on several of\nthose same tasks, consistent with its pooled under-representation of ensembling growth in Figure 6. The task\njigsaw shows the largest cross-method spread: Oneshots’ profile there is missing most of the ensembling\nshare the other three methods have, replaced by a much larger loss/optimization block."
+    },
+    {
+      "id": "b-146",
+      "type": "body",
+      "text": "E.5       Illustrative session excerpts\nThe excerpts below are verbatim (only trimmed for length, marked with ...) pulls from real session tran-\nscripts, given as illustrative examples of the reasoning/tool-call structure behind the checkpoint-labeling\nclaims in Section 5.2. [bash] lines are literal shell commands the agent issued; <reasoning> blocks are the\nagent’s own prose immediately before or after them.\nExample 1: Malena, GLM 5.2, tweet.\n         <reasoning>\n         ...Let me train deberta with 4 epochs using pseudo_test_v2, tag debv3pl2...\n         </reasoning>\n         [bash] python src/train.py --model microsoft/deberta-v3-large --tag debv3pl2\n                --lr 1e-5 --epochs 4 --extra_train work/pseudo_test_v2.csv\n         -> [fold 0 epoch 3] val_jaccard=0.7211 ... best val_jaccard per fold\n         <reasoning>\n         Iterated pseudo-labels + 4 epochs: OOF = 0.7212 (vs 0.7"
+    },
+    {
+      "id": "b-147",
+      "type": "body",
+      "text": "Example 2: MLEvolve, GLM 5.2, aptos2019."
+    },
+    {
+      "id": "b-148",
+      "type": "body",
+      "text": "39\n\f                          1.0\n                                            AiScientist                             Malena                             MLEvolve\n    ensembling\n    post_processing       0.8\n    model_selection       0.6\n    training\n    inference             0.4\n    architecture\n    regularization        0.2\n    loss                  0.0\n    optimization          1.0\n    feature_engineering\n    augmentation          0.8\n    data_pipeline         0.6\n    data_preprocessing\n                          0.4\n                          0.2\n                          0.0\n                          1.0\n                          0.8\n                          0.6\n                          0.4\n                          0.2\n                          0.0\n                                0.0   0.2   0.4     0.6   0.8   1.0   0.0    0.2   0.4   0.6   0.8   1.0   0.0   0.2   0.4   0.6   0.8  "
+    },
+    {
+      "id": "b-149",
+      "type": "body",
+      "text": "Figure 14 Category-share-decay curve on nfl alone, at half-lives 0.1, 0.15, and 0.2 (rows, top to bottom). As in Figure 6,\nthe x-axis is checkpoint fraction through the run (∈ [0, 1]) and the y-axis is the decayed share of technique-category\ntags at that point."
+    },
+    {
+      "id": "b-150",
+      "type": "body",
+      "text": "<reasoning>\n       The evolution trajectory reveals severe overfitting (train loss drops below\n       0.10 while validation loss plateaus > 0.60), indicating that the highly\n       capable ConvNeXt base model easily memorizes this small dataset. To break\n       this stagnation, we must apply a Tier 2 shift focusing on robust\n       regularization rather than just tweaking losses or backbones. By\n       introducing Mixup data augmentation, stochastic depth (Drop Path), and\n       feature-level dropout, we force the model to learn smoother, generalized\n       decision boundaries between severity grades, effectively combatting\n       single-landscape overfitting.\n       </reasoning>\n\nExample 3: AiScientist, GLM 5.2, aptos2019.\n       <reasoning>\n       Now I have a clear picture. Let me summarize the state and plan refinements:"
+    },
+    {
+      "id": "b-151",
+      "type": "body",
+      "text": "Current state:\n       - 8 models, 5-fold CV, ensemble OOF QWK = 0.9290\n       - Best single models: cnexts_384 (0.9236), efnb5_512 (0.9231)\n       - Models highly correlated (0.96-0.99) -- limited diversity gain\n       - Huge raw->tuned QWK gap (0.09-0.13) -- continuous scores poorly calibrated\n       - Training is noisy (raw_qwk bounces across epochs)\n       - Training takes ~130 min/model"
+    },
+    {
+      "id": "b-152",
+      "type": "body",
+      "text": "Refinement plan (low-risk, high-impact, no broad rewrite):\n       1. Ensemble weighting refinement (no retraining): rank-averaging,\n          z-score normalization, greedy forward selection -- cheap, could\n          push 0.9290 -> 0.93+\n       2. Threshold tuning quality -- better optimization\n       3. Training stability (one refined retrain): SWA, be... [truncated in log]\n       </reasoning>\n       [bash] cd /home/code && python3 -c \"\n       import pandas as pd, numpy as np\n       from utils import OptimizedRounder, qwk\n       from scipy.optimize import minimize\n\noof = pd.read_csv(’artifacts/ensemble_kfold_oof.csv’)"
+    },
+    {
+      "id": "b-153",
+      "type": "body",
+      "text": "40\n\f                                                                                                                          Technique-category composition by method, per task (backbones pooled, completions excluded)\n                                                                                                                                                                                                                                                                                                                                              data_preprocessing\n                                                       aptos2019                                                 billion-word                                                        cassava                                                      champs                                                  freesound                      "
+    },
+    {
+      "id": "b-154",
+      "type": "body",
+      "text": "regularization\n                                                                                                                                                                                                                                                                                                                                              architecture\n                         0.6                                                                                                                                                                                                                                                                                                                  inference\n                                                                                                                                                                                                  "
+    },
+    {
+      "id": "b-155",
+      "type": "body",
+      "text": "0.0\n                                 lena                tist            lve           ho t\n                                                                                       s\n                                                                                             lena                tist             lve           ho t\n                                                                                                                                                    s\n                                                                                                                                                          lena                tist             lve           ho t\n                                                                                                                                                                                                                 s"
+    },
+    {
+      "id": "b-156",
+      "type": "body",
+      "text": "1.0\n                                                            h&m                                                         jigsaw                                                         nfl                                                    petfinder                                                    ventilator\n\n0.8\nShare of category-tags\n\n0.6\n\n0.4\n\n0.2"
+    },
+    {
+      "id": "b-157",
+      "type": "body",
+      "text": "0.0\n                                 lena                tist            lve           ho t\n                                                                                       s\n                                                                                             lena                tist             lve           ho t\n                                                                                                                                                    s\n                                                                                                                                                          lena                tist             lve           ho t\n                                                                                                                                                                                                                 s"
+    },
+    {
+      "id": "b-158",
+      "type": "body",
+      "text": "Figure 15  Technique-category composition of each method’s technique repertoire, per task (backbones pooled,\n completions excluded). The x-axis is method (Malena, AiScientist, MLEvolve, Oneshots); the y-axis is share of\n category-tags. Bar segments are shares of category-tags (a technique tagged with multiple categories counts toward\n each), not shares of techniques.\n\nmodel_cols = [’score_efnb5_456’,’sco... [truncated in log]\n                                        -> [tool_result] result_len=1233 (stdout not recoverable in this log format)"
+    },
+    {
+      "id": "b-159",
+      "type": "body",
+      "text": "This is the final record of the subagent’s session (30 total records): after inspecting all 8 trained models’\nsummaries/histories over 9 prior turns (git log, config/dataset/model/utils reads, per-model kfold summaries,\ntraining histories, GPU/torch versions), it explicitly frames the decision as “no broad rewrite” and chooses an\nensemble-reweighting analysis over artifacts/ensemble_kfold_oof.csv rather than editing any training\ncode (14 bash + 6 read_file_chunk calls, 0 edit_file calls across the whole subagent session).\n Example 4: Malena, GLM 5.2, whale – the two-stage pipeline referenced in Section 5.2. Within\n its first 17 checkpoints, Malena settles on a two-stage pipeline and never changes its architecture again over\n the remaining 63 (80 total): a metric-learning embedder, followed by nearest-neighbor retrieval with a learned\n novelty detector.\n                                   "
+    },
+    {
+      "id": "b-160",
+      "type": "body",
+      "text": "Stage 1 (src/train.py) trains a CNN/ViT backbone with an ArcFace loss to produce normalized whale-fluke\n embeddings. Stage 2 (src/retrieve.py, src/centroid_submit.py, src/detector.py) computes cosine-\n similarity nearest neighbors against the training embeddings, ranks top-5 candidates via per-class centroids,\n and uses a small logistic-regression classifier over similarity-gap features (top-1/2/3 similarity, gaps, top-5\n mean/std) to flag new_whale queries – individuals never seen in training. All 63 subsequent checkpoints are\n targeted patches to this fixed pipeline rather than new stages: backbone swaps (EfficientNetV2 → ConvNeXt\n → Swin), input-resolution bumps, novelty-threshold retuning, and ensembling. One checkpoint (014_ms_-\n centroid_fAB) illustrates the granularity of these patches:\n                                        <reasoning> (checkpoint 014_ms_centroid_fAB)\n          "
+    },
+    {
+      "id": "b-161",
+      "type": "body",
+      "text": "That is, the agent is choosing which fixed sub-module of the pipeline to improve next, at the granularity of"
+    },
+    {
+      "id": "b-162",
+      "type": "body",
+      "text": "41\n\fa targeted code change, rather than tuning a numeric hyperparameter or introducing a new pipeline stage.\nExample 5: independent convergence on soft-label self-training, aptos2019 (GLM 5.2 vs. Kimi\nK3). Malena’s GLM 5.2 and Kimi K3 runs on aptos2019 independently converge on the same canonical\ntechnique cluster – soft-label self-training (pseudo-labeling using an ensemble’s own predictions as soft targets)\n– without sharing a run, then diverge in how much surrounding machinery each backbone builds around it.\nThis cluster has rarity 0.9 (Appendix E.2): across every AiScientist, MLEvolve, and Oneshot run on this\ntask, none use it.\nThe GLM 5.2 run (logged as pseudo_label_self_training):\n      Mechanism: Generate soft pseudo-labels by running a trained model on\n      unlabeled data, combine the pseudo-labeled samples with the original\n      labeled training set (using soft target distribu"
+    },
+    {
+      "id": "b-163",
+      "type": "body",
+      "text": "Instantiation: dataset.py PseudoDataset combines train images (hard\n      labels, soft-onehot with label smoothing) and pseudo-labeled test images\n      (soft probs from ensemble predictions). train_pl.py orchestrates per-fold\n      pseudo-label training. Pseudo-labels sourced from infer.py\n      --save_test_probs output."
+    },
+    {
+      "id": "b-164",
+      "type": "body",
+      "text": "The Kimi K3 run (logged independently as self_training_pseudo_labels), landing on the identical mech-\nanism:\n      Instantiation: train_pseudo.py loads ensemble test probability\n      predictions (from compute_ensemble_test_probs.py) as soft pseudo-labels\n      for unlabeled test images. Trains jointly on labeled train data (one-hot\n      hard targets) and pseudo-labeled test data (soft 5-class probs) via soft\n      cross-entropy... Pseudo data influence controlled by --pseudo_repeat\n      (dataset repetition factor)... Supports per-fold warm-start via\n      --init_from_dir.\n\nEvidence:\n      comb = ConcatDataset([train_ds_hard, *([train_ds_pseudo] * cfg.pseudo_repeat)])\n      loss = -(targets * logp)\n      if weight is not None: loss = loss * weight[None, :].to(device)"
+    },
+    {
+      "id": "b-165",
+      "type": "body",
+      "text": "The two runs share the core mechanism but not its surroundings. Before being folded into the single canonical\ncluster above during the offline canonicalization stage, the GLM 5.2 run builds substantially more machinery\naround it: a weighted soft-cross-entropy loss (pseudo-labeled samples down-weighted 0.2 vs. 1.0 for labeled\nones), pseudo-label sharpening (raising soft probabilities to a power > 1 and renormalizing to peak the target\ndistribution), iterative multi-round pseudo-labeling (retraining on a previous round’s ensemble output, then\nkeeping whichever round scored better per model on OOF), and two rounds of brute-force combinatorial\nsearch – first over which round/resolution each ensemble member should use (up to 324 combinations, each\nscored by out-of-fold threshold-optimized QWK), then over 7 candidate final ensemble configurations. The\nKimi K3 run instead builds a leaner versio"
+    },
+    {
+      "id": "b-166",
+      "type": "body",
+      "text": "F    Contamination check\nEvery fixed30 task is a public Kaggle competition, and MLE-bench itself ships a set of reference kernels/note-\nbooks for a subset of its competitions (public solutions collected as part of the benchmark’s own construction).\nWe check for memorized/copied code using a vendored copy of Dolos, MLE-bench’s own source-code similarity\ntool, against a curated corpus of 1,350 distinct real solutions spanning all 30 fixed30 tasks."
+    },
+    {
+      "id": "b-167",
+      "type": "body",
+      "text": "42\n\fCode similarity (Dolos). Dolos’s default pairwise similarity score normalizes shared token k-grams by\nthe union of both files’ tokens (a Jaccard-style measure), which is a poor fit for our setting and, notably,\nbiased in the direction of under -reporting contamination rather than over-reporting it: Malena’s solution\nfiles are typically much smaller than the monolithic Kaggle notebooks in the real corpus, so even if Malena\nfully reused a small fragment of a large real file verbatim, the shared tokens would be a small fraction of the\n(large) union and the similarity score would stay low – the metric would fail to flag exactly the kind of partial\ncopying we care about. We instead score every pair by containment – the fraction of the smaller-file’s tokens\nthat also appear in the other file, together with the longest matching token run – which asks “how much of\nthis file was drawn from th"
+    },
+    {
+      "id": "b-168",
+      "type": "body",
+      "text": "metric                       group               p50     p90     p95      p99\n                 Dolos containment            real-vs-real       0.008   0.077   0.143    0.453\n                 Dolos containment            Malena-vs-real     0.002   0.009   0.013    0.020\n                 mean-pooling cosine          real-vs-real       0.735   0.877   0.909    0.968\n                 mean-pooling cosine          Malena-vs-real     0.773   0.880   0.896    0.919\n                 Chamfer                      real-vs-real       0.634   0.741   0.778    0.882\n                 Chamfer                      Malena-vs-real     0.638   0.713   0.726    0.746\n                 Chamfer (bg-subtracted)      real-vs-real       0.130   0.237   0.273    0.377\n                 Chamfer (bg-subtracted)      Malena-vs-real     0.134   0.209   0.222    0.242"
+    },
+    {
+      "id": "b-169",
+      "type": "body",
+      "text": "Behavioral check: environment interaction matters. A separate, model-independent argument against\nmemorization comes from comparing iteration types rather than code directly: if Malena’s solutions were\n\n43\n\flargely memorized from pretraining, a single completion asked to produce a full solution to a competition\nit has “seen” should score close to the full agentic loop, since no environment feedback would be needed to\nrecall a memorized answer. We can clearly observe that such thing is not the case in our corpus. From\nFigure 2, we can observe that even Best-of-N Oneshot iterations aggregated at 6h time budgets performs\nsignificantly better than the single Chat iteration. This is the opposite of what contamination would predict,\nand is consistent with the agent doing real iterative problem-solving rather than recalling known answers.\n\nG     Discussion"
+    },
+    {
+      "id": "b-170",
+      "type": "body",
+      "text": "G.1   Limitations\nThe primary limitation of this study is that most of our results rely on MLE-bench (Chan et al., 2025),\nwhich has known issues in its task preparation scripts and, being built from public Kaggle competitions, is a\nplausible target for pretraining contamination. We mitigate this in three ways. First, we identified and fixed\nthe subset of fixed30 tasks with broken preparation scripts (missing data or ground-truth leakage) rather\nthan excluding them, so that our comparisons stay on the full 30-task set used elsewhere in the paper; see\nAppendix A.1 and Table 3 for which tasks were fixed. Second, we directly checked for contamination via\ntwo independent methods, a code-similarity (Dolos) check and a bag-of-embeddings similarity check, both\nagainst a curated corpus of real fixed30 solutions and both finding no anomalous similarity between Malena-\ngenerated code and real solut"
+    },
+    {
+      "id": "b-171",
+      "type": "body",
+      "text": "G.2   Broader Outlook\nBeyond the direct ablation results, our observations across backbones and prior harnesses point at two related\nhypotheses about why scaffolding is losing its edge, which we lay out here as motivation for future work rather"
+    },
+    {
+      "id": "b-172",
+      "type": "body",
+      "text": "44\n\fthan claims this paper establishes.\nPost-training ate the harness. Frontier LLMs are increasingly post-trained directly inside a coding-agent\nloop – rewarded for planning, executing, and debugging across many turns of real tool use – rather than\nonly on single-turn completions. We hypothesize that this kind of post-training substitutes for exactly the\nscaffolding that a plain coding-agent environment (Oneshot) would otherwise need on top of a chat completion\n(Chat): search over what to try next, recovery from a failed step, deciding when a result is good enough to stop\non. If so, the Chat-vs-Oneshot gap (Section 4.1) should track how much of this coding-agent post-training a\nmodel has received, more than it tracks raw model scale. We see suggestive evidence for this in the DeepSeek\nV4 family: the Preview releases show close to no gap between Chat and Oneshot performance, while the fi"
+    },
+    {
+      "id": "b-173",
+      "type": "body",
+      "text": "Apple and the Apple logo are trademarks of Apple Inc., registered in the U.S. and other countries and regions.\n\n45"
+    }
+  ]
+}
